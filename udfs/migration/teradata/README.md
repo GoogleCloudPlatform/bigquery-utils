@@ -2,7 +2,7 @@
 
 This directory contains [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
 which mimic the behavior of proprietary functions in Teradata. Each UDF within this
-directory will be automatically synchronized to the `bqutil` within the
+directory will be automatically synchronized to the `bqutil` project within the
 `td` dataset for reference in queries.
 
 For example, if you'd like to reference the `nullifzero` function within your query,
