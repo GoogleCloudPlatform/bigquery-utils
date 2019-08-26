@@ -2,7 +2,7 @@
 
 This directory contains community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
 to extend BigQuery for more specialized usage patterns. Each UDF within this
-directory will be automatically synchronized to the `bqutil` within the
+directory will be automatically synchronized to the `bqutil` project within the
 `fn` dataset for reference in queries.
 
 For example, if you'd like to reference the `int` function within your query,
