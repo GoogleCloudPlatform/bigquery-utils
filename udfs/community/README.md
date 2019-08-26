@@ -109,7 +109,7 @@ SELECT bqutil.fn.url_keys(
 
 
 ### [url_param(query STRING, p STRING)](url_param.sql)
-Get an array of url param keys.
+Get the value of a url param key.
 
 ```sql
 SELECT bqutil.fn.url_param(
