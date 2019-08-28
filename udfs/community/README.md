@@ -37,6 +37,8 @@ SELECT bqutil.fn.int(1) int1
 1, 2, 7, 7
 ```
 
+Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
+
 
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
