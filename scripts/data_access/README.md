@@ -7,10 +7,12 @@ Google Cloud offers data access logs across many [services](https://cloud.google
 This sample will walk through [enabling data access logs](https://cloud.google.com/logging/docs/audit/configure-data-access)
 in a project, creating a Stackdriver sink, and creating a BigQuery View providing analytical information.
 
-## audit_summary View
+## Audit View
 
 The View analyses READ, WRITE, and ADMIN operations across BigQuery datasets and GCS buckets. The logs
 contains object and table-level information, but this is dropped.
+
+The view is stored in ```data_access.audit_summary```.
 
 There is one data access log entry for every service executing. There is also an associated
 list in protopayload_auditlog.authorizationInfo that contains the list of permissions
