@@ -28,7 +28,7 @@ The columns of the View are the following:
 | actor | Service account or end-user |
 | op | Operation (READ, WRITE, or ADMIN) |
 | granted | Whether access was permitted |
-| entity | <project>.<GSC bucket> or <project>.<BigQuery dataset> |
+| entity | Project_ID.GCS_Bucket or Prroject_ID.BigQuery_Dataset |
 
 ## Instructions
 
