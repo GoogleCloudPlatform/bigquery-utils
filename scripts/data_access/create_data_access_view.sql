@@ -13,6 +13,7 @@ WITH
   -- Pull out Data Access logs
   DataAccess AS (
     SELECT
+      -- Hour truncated
       TIMESTAMP_TRUNC(d.timestamp, HOUR) AS hour,
       -- Project ID that the access method was called on
       d.resource.labels.project_id,
@@ -115,14 +116,17 @@ SELECT
   -- Project is of the resource or, if not there,
   -- then for the method accessing it (eg for buckets)
   CASE
+      -- BigQuery project.dataset
       WHEN service = 'bigquery' THEN
         CONCAT(parts[SAFE_OFFSET(1)], '.', parts[SAFE_OFFSET(3)])
+      -- GCS project.bucket
       WHEN service = 'storage' THEN
         CONCAT(project_id, '.', parts[SAFE_OFFSET(3)])
   END AS entity
 FROM
   DataAccess
 WHERE
+  -- Limit to BigQuery dataset / GCS bucket operations
   ARRAY_LENGTH(parts) >= 4
 GROUP BY
   1,2,3,4,5,6;

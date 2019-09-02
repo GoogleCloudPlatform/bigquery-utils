@@ -20,14 +20,14 @@ These permissions are listed for [GCS permissions](https://cloud.google.com/stor
 [BigQuery permissions](https://cloud.google.com/bigquery/docs/access-control#bq-permissions).
 
 The columns of the View are the following:
-Column | Description
--------|------------
-hour | Top-of-the-hour the access occurred
-service | Service (storage or bigquery)
-actor | Service account or end-user
-op | Operation (READ, WRITE, or ADMIN)
-granted | Whether access was permitted
-entity | <project>.<GSC bucket> or <project>.<BigQuery dataset>
+| Column | Description |
+|--------|-------------|
+| hour | Top-of-the-hour the access occurred |
+| service | Service (storage or bigquery) |
+| actor | Service account or end-user |
+| op | Operation (READ, WRITE, or ADMIN) |
+| granted | Whether access was permitted |
+| entity | <project>.<GSC bucket> or <project>.<BigQuery dataset> |
 
 ## Instructions
 
@@ -59,7 +59,7 @@ Create your data_access dataset.
 
     bq mk data_access
 
-Create a data access audit sink.
+Create a data access audit sink. Be sure to grant BigQuery Data Editor role to the appropriate service account.
 
     gcloud logging sinks create compute_activity \
       bigquery.googleapis.com/projects/${PROJECT_ID}/datasets/data_access \
