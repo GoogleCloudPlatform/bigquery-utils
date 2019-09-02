@@ -1,14 +1,15 @@
-# Sample Data Access Audit VIEW
 
-## Overview
+# Sample Data Access Audit View
+
+## Overview
 
 Google Cloud offers data access logs across many [services](https://cloud.google.com/logging/docs/audit/services).
 This sample will walk through [enabling data access logs](https://cloud.google.com/logging/docs/audit/configure-data-access)
-in a project, creating a Stackdriver sink, and creating a BigQuery VIEW providing analytical information.
+in a project, creating a Stackdriver sink, and creating a BigQuery View providing analytical information.
 
-## audit_summary VIEW
+## audit_summary View
 
-The VIEW analyses READ, WRITE, and ADMIN operations across BigQuery datasets and GCS buckets. The logs
+The View analyses READ, WRITE, and ADMIN operations across BigQuery datasets and GCS buckets. The logs
 contains object and table-level information, but this is dropped.
 
 There is one data access log entry for every service executing. There is also an associated
@@ -18,8 +19,9 @@ granted (or denied) as part of the service execution.
 These permissions are listed for [GCS permissions](https://cloud.google.com/storage/docs/access-control/iam-permissions) and
 [BigQuery permissions](https://cloud.google.com/bigquery/docs/access-control#bq-permissions).
 
-The columns of the VIEW are the following:
+The columns of the View are the following:
 Column | Description
+-------|------------
 hour | Top-of-the-hour the access occurred
 service | Service (storage or bigquery)
 actor | Service account or end-user
