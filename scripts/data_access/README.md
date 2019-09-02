@@ -21,7 +21,7 @@ These permissions are listed for [GCS permissions](https://cloud.google.com/stor
 
 The columns of the View are the following:
 | Column | Description |
-|--------|-------------|
+| ------ | ----------- |
 | hour | Top-of-the-hour the access occurred |
 | service | Service (storage or bigquery) |
 | actor | Service account or end-user |
