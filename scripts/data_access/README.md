@@ -20,6 +20,7 @@ These permissions are listed for [GCS permissions](https://cloud.google.com/stor
 [BigQuery permissions](https://cloud.google.com/bigquery/docs/access-control#bq-permissions).
 
 The columns of the View are the following:
+
 | Column | Description |
 | ------ | ----------- |
 | hour | Top-of-the-hour the access occurred |
