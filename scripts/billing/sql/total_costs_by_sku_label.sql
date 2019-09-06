@@ -3,8 +3,8 @@ Query returns total costs by sku and all labels
 */
 
 SELECT
-  sku.description,
+  sku.description AS sku_description,
   TO_JSON_STRING(labels) AS labels,
   sum(cost) AS cost
-FROM `data-analytics-pocs.public.billing_dashboard_export`
-GROUP BY 1,2
+FROM `bqutil.billing.billing_dashboard_export`
+GROUP BY sku_description, labels

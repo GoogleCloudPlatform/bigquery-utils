@@ -2,7 +2,7 @@
 
 In addition to the Billing product available within the GCP Console, you may want to export billing data to BigQuery for custom analytics.  Below are some example queries to help get you started using the standard data export format.  See the [links below](#useful-links) to learn more about GCP billing datasets including how to export your own billing data for analysis.
 
-The example SQL snippets below reference a sample billing export available as a public dataset in BigQuery (**`data-analytics-pocs.public.billing_dashboard_export`**).  You will need to replace references to this table with your own dataset. 
+The example SQL snippets below reference a sample billing export available as a public dataset in BigQuery (**`bqutil.billing.billing_dashboard_export`**).  You will need to replace references to this table with your own project and dataset. 
 
 ## Example Queries
 
