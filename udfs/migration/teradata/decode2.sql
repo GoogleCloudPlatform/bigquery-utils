@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-CREATE OR REPLACE  FUNCTION td.decode2(exp  ANY TYPE, s1  ANY TYPE, r1  ANY TYPE, s2  ANY TYPE, r2  ANY TYPE, def  ANY TYPE) AS 
+CREATE OR REPLACE FUNCTION td.decode2(
+  expr ANY TYPE,
+  s1 ANY TYPE, r1 ANY TYPE,
+  s2 ANY TYPE, r2 ANY TYPE,
+  def ANY TYPE)
+AS 
 ((
-  case 
-  when exp = s1 then r1
-  when exp is NULL and s1 is NULL then r1
-  when exp = s2 then r2
-  when exp is NULL and s2 is NULL then r2
-  else def
-  end 
+  CASE 
+    WHEN expr = s1 OR (expr IS NULL AND s1 IS NULL) THEN r1
+    WHEN expr = s2 OR (expr IS NULL AND s2 IS NULL) THEN r2
+    ELSE def
+  END 
 ))
