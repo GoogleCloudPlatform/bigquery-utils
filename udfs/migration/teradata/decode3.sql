@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION td.decode3(
   s1 ANY TYPE, r1 ANY TYPE,
   s2 ANY TYPE, r2 ANY TYPE,
   s3 ANY TYPE, r3 ANY TYPE,
-  def  ANY TYPE) AS
+  def ANY TYPE) AS
 ((
   CASE 
     WHEN expr = s1 OR (expr IS NULL AND s1 IS NULL) THEN r1
