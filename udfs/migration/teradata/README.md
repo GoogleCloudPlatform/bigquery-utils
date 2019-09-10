@@ -19,6 +19,7 @@ SELECT bqutil.td.nullifzero(0)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
 * [nullifzero](#nullifzeroexpr-any-type)
 * [zeroifnull](#zeroifnullexpr-any-type)
+* [decode](#decode-function)
 
 ## Documentation
 
@@ -78,4 +79,48 @@ SELECT bqutil.td.zeroifnull(NULL)
   , bqutil.td.zeroifnull(1)
 
 0, 0, 1
+```
+
+### Decode function
+Decode function compares expression `expr` with search parameters (`s1`,`s2`,...,`sN`) and returns n-th match from result parameters (`r1`,`r2`,...,`rN`).
+Decode supports up to 10 search parameters.
+
+More details can be found in [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/8Jial4oyTcTU94YzVNRWIQ).
+
+To match this functionality in BigQuery, we can define a UDF for each number of search parameters. Note the `def` can be set to `NULL` but the type must match the type of the result parameters. If `NULL` is passed, it should be casted to the proper type.
+
+#### [decode1(expr  ANY TYPE, s1  ANY TYPE, r1  ANY TYPE, def  ANY TYPE)](decode1.sql)
+Returns `r1` if the `expr` is equal to `s1`, else `def` is returned.
+```sql
+SELECT bqutil.td.decode1(1, 1, 'One', CAST(NULL as STRING))
+  , bqutil.td.decode1(0, 1, 'One', CAST(NULL as STRING))
+  , bqutil.td.decode1('True', 'True', 1, 0)
+  , bqutil.td.decode1('False', 'True', 1, 0)
+  , bqutil.td.decode1(1, 1, 'One', 'Not One')
+  , bqutil.td.decode1(0, 1, 'One', 'Not One')
+
+	
+'One', null, 1, 0, 'One', 'Not One'
+```
+
+#### [decode2(expr ANY TYPE, s1 ANY TYPE, r1 ANY TYPE, ..., [sn, rn], def ANY TYPE)](decode2.sql)
+Returns `r1` if the `expr` is equal to `s1`, `r2` if the `expr` is equal to `s2`, else `def` is returned.
+```sql
+SELECT bqutil.td.decode2(1, 1, 'True', 0, 'False', '')
+  , bqutil.td.decode2(0, 1, 'True', 0, 'False', 'def')
+  , bqutil.td.decode2(3, 1, 'True', 0, 'False', CAST(NULL as STRING))
+
+'True', 'False', null
+```
+
+#### [decode3(expr ANY TYPE, s1 ANY TYPE, r1 ANY TYPE, ..., [sn, rn], def ANY TYPE)](decode3.sql)
+Returns `r1` if the `expr` is equal to `s1`, `r2` if the `expr` is equal to `s2`, `r3` if the `expr` is equal to `s3`, else `def` is returned.
+```sql
+SELECT bqutil.td.decode3(1, 1, 'True', 0, 'False', NULL, 'False', 'Invalid')
+  , bqutil.td.decode3(0, 1, 'True', 0, 'False', NULL, 'False', 'Invalid')
+  , bqutil.td.decode3(100, 1, 'True', 0, 'False', NULL, 'False', 'Invalid')
+  , bqutil.td.decode3('F', 'F', 'Female', 'M', 'Male', 'O', 'Other', CAST(NULL as STRING))
+  , bqutil.td.decode3('True', 'True', True, 'False', False, '', False, CAST(NULL as BOOLEAN))
+
+'True', 'False', 'Invalid', 'Female' ,true
 ```
