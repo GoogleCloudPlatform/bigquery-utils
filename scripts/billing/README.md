@@ -11,7 +11,6 @@ The example SQL snippets below reference a sample billing export available as a 
 |Monthly total costs and credits|monthly|-|[Link](sql/monthly_costs_credits.sql)|
 |Monthly invoice total costs and credits|monthly|-|[Link](sql/monthly_invoice_costs_credits.sql)|
 |Monthly total costs by project|monthly|project|[Link](sql/monthly_costs_by_project.sql)|
-|Forecast net balance with credits|monthly|-|[Link](sql/forecast_net_balance.sql)|
 |Previous month's net-charges per service|monthly|service|[Link](sql/previous_month_costs_by_service.sql)|
 |Previous month’s net-charges by resource label|monthly|label|[Link](sql/previous_month_costs_by_label.sql)|
 |Previous month’s per-service charges by label value|monthly|service,label|[Link](sql/previous_month_costs_by_service_label.sql)|

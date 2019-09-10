@@ -1,5 +1,5 @@
 /*
-Query returns the invoice total for each month, as a sum of regular costs,
+Query returns the invoice total for each month as a sum of regular costs,
 taxes, adjustments, and rounding errors.
 */
 
