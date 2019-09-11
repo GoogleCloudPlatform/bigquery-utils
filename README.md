@@ -9,6 +9,7 @@ BigQuery.
 This repository is broken up into:
 
 * [Scripts](/scripts) - Python, Shell, & SQL scripts
+  * [billing](/scripts/billing) - Example queries over the GCP billing export
 * [UDFs](/udfs) - User-defined functions for common usage as well as migration
   * [community](/udfs/community) - Community contributed user-defined functions
   * [teradata](/udfs/migration/teradata) - UDFs which mimic the behavior of proprietary functions in Teradata
