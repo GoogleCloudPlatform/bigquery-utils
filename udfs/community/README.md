@@ -19,6 +19,7 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
+* [random_value](#random_valuearr-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 
@@ -96,6 +97,19 @@ SELECT bqutil.fn.random_int(0,10) randint, COUNT(*) c
 FROM UNNEST(GENERATE_ARRAY(1,1000))
 GROUP BY 1
 ORDER BY 1
+```
+
+
+### [random_value(arr ANY TYPE)](random_value.sql)
+Returns a random value from an array.
+
+```sql
+SELECT
+  bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+  bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+  bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
+
+'tino', 'julie', 'jordan'
 ```
 
 
