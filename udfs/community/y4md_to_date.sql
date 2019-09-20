@@ -15,6 +15,6 @@
  */
 
 CREATE OR REPLACE FUNCTION
-  fn.Y4MD_TO_DATE(y4md STRING)
+  fn.y4md_to_date(y4md STRING)
   RETURNS DATE AS ( CAST(CONCAT(SUBSTR(y4md, 0, 4), '-', SUBSTR(y4md, 5, 2), '-', SUBSTR(y4md, 7, 2)) AS DATE) );
   
