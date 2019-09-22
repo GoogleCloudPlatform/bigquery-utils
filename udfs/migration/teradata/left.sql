@@ -15,5 +15,8 @@
  */
 
 CREATE OR REPLACE FUNCTION td.left(string_expr STRING, length_expr INT64) AS (
-  SUBSTR(string_expr, 1, length_expr)
+  CASE
+    WHEN length_expr < 0 THEN ERROR('The length argument to LEFT must be a positive integer!')
+    ELSE SUBSTR(string_expr, 1, length_expr)
+  END
 );
