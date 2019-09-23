@@ -17,8 +17,10 @@ SELECT bqutil.td.nullifzero(0)
 * [decode](#decode-function)
 * [index](#indexstring_expr1-string-string_expr2-string)
 * [last_day](#last_daydate_expr-date)
+* [left](#leftstring_expr-string-length_expr-int64)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
 * [nullifzero](#nullifzeroexpr-any-type)
+* [right](#rightstring_expr-string-length_expr-int64)
 * [zeroifnull](#zeroifnullexpr-any-type)
 
 ## Documentation
@@ -97,6 +99,15 @@ SELECT bqutil.td.last_day('2019-07-05')
 ```
 
 
+### [left(string_expr STRING, length_expr INT64)](left.sql)
+Returns the leftmost number of characters in `string_expr` specified by the `length_expr` parameter. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/Ef3DAn9emz~W57YSCkoEOQ)
+```sql
+SELECT bqutil.td.left('Test String', 6)
+
+Test S
+```
+
+
 ### [months_between(date_expr1 DATE, date_expr2 DATE)](months_between.sql)
 Returns the number of months between `date_expr1` and `date_expr2`. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/ZrhSoO_oe_0dW9lkeueH1Q)
 ```sql
@@ -115,6 +126,15 @@ SELECT bqutil.td.nullifzero(NULL)
   , bqutil.td.nullifzero(1)
 
 NULL, NULL, 1
+```
+
+
+### [right(string_expr STRING, length_expr INT64)](right.sql)
+Returns the rightmost number of characters in `string_expr` specified by the `length_expr` parameter. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/4bAyNUOB6_VOuvSVrDRqDQ)
+```sql
+SELECT bqutil.td.right('Test String', 6)
+
+String
 ```
 
 
