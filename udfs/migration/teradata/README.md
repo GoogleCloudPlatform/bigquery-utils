@@ -104,7 +104,7 @@ Returns the leftmost number of characters in `string_expr` specified by the `len
 ```sql
 SELECT bqutil.td.left('Test String', 6)
 
-Test S
+'Test S'
 ```
 
 
@@ -134,7 +134,7 @@ Returns the rightmost number of characters in `string_expr` specified by the `le
 ```sql
 SELECT bqutil.td.right('Test String', 6)
 
-String
+'String'
 ```
 
 
