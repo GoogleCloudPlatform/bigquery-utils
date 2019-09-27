@@ -20,6 +20,8 @@ SELECT bqutil.td.nullifzero(0)
 * [left](#leftstring_expr-string-length_expr-int64)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
 * [nullifzero](#nullifzeroexpr-any-type)
+* [nvl](#nvlexpr1-any-type-expr2-any-type)
+* [nvl2](#nvl2expr1-any-type-expr2-any-type-expr3-any-type)
 * [right](#rightstring_expr-string-length_expr-int64)
 * [zeroifnull](#zeroifnullexpr-any-type)
 
@@ -126,6 +128,26 @@ SELECT bqutil.td.nullifzero(NULL)
   , bqutil.td.nullifzero(1)
 
 NULL, NULL, 1
+```
+
+
+### [nvl(expr1 ANY TYPE, expr2 ANY TYPE)](nvl.sql)
+Returns `expr2` if `expr1` evaluates to `NULL`, else `expr1`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/A3B8KYGf9EJhU2iCgqqrzw)
+```sql
+SELECT bqutil.td.nvl(NULL, 2.0)
+  , bqutil.td.nvl(1.0, 2.0)
+
+2.0, 1.0
+```
+
+
+### [nvl2(expr1 ANY TYPE, expr2 ANY TYPE, expr3 ANY TYPE)](nvl2.sql)
+Returns `expr3` if `expr1` evaluates to `NULL`, else `expr2`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/_77jzgn34QLLsZDslWefpw)
+```sql
+SELECT bqutil.td.nvl2(NULL, 2.0, 3.0)
+  , bqutil.td.nvl2(1.0, 2.0, 3.0)
+
+3.0, 2.0
 ```
 
 
