@@ -14,6 +14,7 @@ SELECT bqutil.td.nullifzero(0)
 ## UDFs
 
 * [ascii](#asciistring_expr-string)
+* [chr](#chrint_expr-int64)
 * [decode](#decode-function)
 * [index](#indexstring_expr1-string-string_expr2-string)
 * [last_day](#last_daydate_expr-date)
@@ -33,6 +34,17 @@ Returns the decimal representation of the first character in the `string_expr`. 
 SELECT bqutil.td.ascii('y')
 
 121
+```
+
+
+### [chr(int_expr INT64)](chr.sql)
+Returns the Latin ASCII character of `int_expr`. [Teradata docs](https://docs.teradata.com/reader/756LNiPSFdY~4JcCCcR5Cw/FUQ2~FCYkt6QoamvY1G4Cg)
+```sql
+SELECT bqutil.td.chr(66)
+  , bqutil.td.chr(255)
+  , bqutil.td.chr(511)
+
+'B', 'ÿ', 'ÿ'
 ```
 
 
