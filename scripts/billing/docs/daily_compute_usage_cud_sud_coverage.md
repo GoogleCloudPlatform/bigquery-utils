@@ -1,19 +1,19 @@
 ## Example Output
+The resulting table will include costs from all GCE SKUs. SKUs to which CUD or SUD have been applied will show both the credit $ amount and the usage amount offset by the credit. This is the schema of the output table, along with an example value.
 
-| Invoice month | Usage costs | Commitment costs | CUD credits | Net CUD savings | SUD credits |
-| :- | -: | -: | -: | -: | -: |
-| 201805 | 16.89 | 10.64 | -16.89 | 6.25 | 0 |
-| 201806 | 39.09 | 22.98 | -34.2 | 11.22 | 0 |
-| 201807 | 106.02 | 44.53 | -35.34 | -9.19 | -21.2 |
-| 201808 | 177.33 | 44.53 | -35.34 | -9.19 | -41.21 |
-| 201809 | 176.11 | 43.09 | -34.2 | -8.89 | -42.57 |
-| 201810 | 181.98 | 44.53 | -35.34 | -9.19 | -43.99 |
-| 201811 | 176.35 | 28.79 | -11.45 | -17.34 | -46.62 |
-| 201812 | 181.98 | 22.26 | 0 | -22.26 | -54.59 |
-| 201901 | 181.98 | 22.26 | 0 | -22.26 | -54.59 |
-| 201902 | 164.37 | 20.11 | 0 | -20.11 | -49.31 |
-| 201903 | 384.19 | 119.46 | -167.48 | 48.02 | -49.98 |
-| 201904 | 896.85 | 427.42 | -666.68 | 239.26 | -58.43 |
-| 201905 | 968.01 | 459.94 | -729.8 | 269.86 | -63.85 |
-| 201906 | 954.12 | 481.99 | -762.07 | 280.07 | -59.85 |
-| 201907 | 686.07 | 328.18 | -523.83 | 195.64 | -29.04 |
+| **Field Name** | **Description** | **Example Value** |
+| :- | :- | :- |
+| usage_date | Date (Los Angeles Time) in which the usage occurred | 2019-07-23 |
+| region | Location.region in Billing Export schema | us-central1 |
+| unit | Usage.unit in Billing Export schema | seconds |
+| project_id | Project.id in Billing Export schema | committed-use-discount-test2 |
+| project_name | project.name in Billing Export schema | committed-use-discount-test2 |
+| sku_id | Sku.id in Billing Export schema | 2E27-4F75-95CD |
+| sku_description | Sku.description in Billing Export system labels | N1 Predefined Instance Core running in Americas |
+| machine_spec | See Billing Export system labels | n1-standard-1 |
+| usage_amount | Usage.amount in Billing Export schema  | 184590.0 |
+| cost | See Billing Export schema | 1.620846 |
+| CUD_covered_usage | Amount of usage covered by CUD; unit is indicated by the unit field. | 147668.06959875411 |
+| CUD_cost | $ amount offset by CUD credits; in the currency of your Billing Account, as indicated by the currency field of your billing export  | -1.296641 |
+| SUD_covered_usage | Amount of usage covered by SUD; unit is indicated by the unit field. | 14768.276077462948 |
+| SUD_cost | $ amount offset by SUD credits; in the currency of your Billing Account, as indicated by the currency field of your billing export  | -0.129677 |
