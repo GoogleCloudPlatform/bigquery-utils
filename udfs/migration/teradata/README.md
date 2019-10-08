@@ -14,12 +14,15 @@ SELECT bqutil.td.nullifzero(0)
 ## UDFs
 
 * [ascii](#asciistring_expr-string)
+* [chr](#chrint_expr-int64)
 * [decode](#decode-function)
 * [index](#indexstring_expr1-string-string_expr2-string)
 * [last_day](#last_daydate_expr-date)
 * [left](#leftstring_expr-string-length_expr-int64)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
 * [nullifzero](#nullifzeroexpr-any-type)
+* [nvl](#nvlexpr1-any-type-expr2-any-type)
+* [nvl2](#nvl2expr1-any-type-expr2-any-type-expr3-any-type)
 * [right](#rightstring_expr-string-length_expr-int64)
 * [zeroifnull](#zeroifnullexpr-any-type)
 
@@ -31,6 +34,17 @@ Returns the decimal representation of the first character in the `string_expr`. 
 SELECT bqutil.td.ascii('y')
 
 121
+```
+
+
+### [chr(int_expr INT64)](chr.sql)
+Returns the Latin ASCII character of `int_expr`. [Teradata docs](https://docs.teradata.com/reader/756LNiPSFdY~4JcCCcR5Cw/FUQ2~FCYkt6QoamvY1G4Cg)
+```sql
+SELECT bqutil.td.chr(66)
+  , bqutil.td.chr(255)
+  , bqutil.td.chr(511)
+
+'B', 'ÿ', 'ÿ'
 ```
 
 
@@ -126,6 +140,26 @@ SELECT bqutil.td.nullifzero(NULL)
   , bqutil.td.nullifzero(1)
 
 NULL, NULL, 1
+```
+
+
+### [nvl(expr1 ANY TYPE, expr2 ANY TYPE)](nvl.sql)
+Returns `expr2` if `expr1` evaluates to `NULL`, else `expr1`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/A3B8KYGf9EJhU2iCgqqrzw)
+```sql
+SELECT bqutil.td.nvl(NULL, 2.0)
+  , bqutil.td.nvl(1.0, 2.0)
+
+2.0, 1.0
+```
+
+
+### [nvl2(expr1 ANY TYPE, expr2 ANY TYPE, expr3 ANY TYPE)](nvl2.sql)
+Returns `expr3` if `expr1` evaluates to `NULL`, else `expr2`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/_77jzgn34QLLsZDslWefpw)
+```sql
+SELECT bqutil.td.nvl2(NULL, 2.0, 3.0)
+  , bqutil.td.nvl2(1.0, 2.0, 3.0)
+
+3.0, 2.0
 ```
 
 
