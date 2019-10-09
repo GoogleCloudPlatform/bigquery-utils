@@ -134,9 +134,10 @@ function build() {
     local dataset=$(get_dataset $file)
 
     if [[ ! -z $dataset ]]; then
-      execute_query $file true
+      execute_query $file true &
     fi
   done <<< "$sql_files"
+  wait < <(jobs -p)
 }
 
 
