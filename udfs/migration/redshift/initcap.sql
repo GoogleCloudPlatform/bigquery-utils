@@ -15,16 +15,18 @@
  */
 
 CREATE OR REPLACE FUNCTION rs.initcap(string_expr STRING) AS (
-  (SELECT
-    CASE WHEN string_expr = '' THEN ''
-    ELSE STRING_AGG(
-      CONCAT(
-        UPPER(SUBSTR(word,1,1))
-        , LOWER(SUBSTR(word,2))
-      ), '' ORDER BY pos
-    )
-    END
-  FROM UNNEST(REGEXP_EXTRACT_ALL(string_expr, r'\s+|\p{P}+|\p{S}+|.[^\s\p{P}\p{S}]*')) AS word
-  WITH OFFSET AS pos
+  (
+    SELECT
+      CASE 
+        WHEN string_expr = '' THEN ''
+        ELSE 
+          STRING_AGG(
+            CONCAT(
+              UPPER(SUBSTR(word, 1, 1)),
+              LOWER(SUBSTR(word, 2))),
+            '' ORDER BY pos)
+        END
+    FROM UNNEST(REGEXP_EXTRACT_ALL(string_expr, r'\s+|\p{P}+|\p{S}+|.[^\s\p{P}\p{S}]*')) AS word
+    WITH OFFSET AS pos
   )
 );
