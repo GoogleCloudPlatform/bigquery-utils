@@ -17,6 +17,8 @@ SELECT bqutil.td.nullifzero(0)
 * [chr](#chrint_expr-int64)
 * [decode](#decode-function)
 * [index](#indexstring_expr1-string-string_expr2-string)
+* [initcap](#initcapstr_expr-string)
+* [instr](#instrhaystack-string-needle-string-position-int64-occurrence-int64)
 * [last_day](#last_daydate_expr-date)
 * [left](#leftstring_expr-string-length_expr-int64)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
@@ -66,7 +68,7 @@ SELECT bqutil.td.decode1(1, 1, 'One', CAST(NULL as STRING))
   , bqutil.td.decode1(1, 1, 'One', 'Not One')
   , bqutil.td.decode1(0, 1, 'One', 'Not One')
 
-	
+
 'One', null, 1, 0, 'One', 'Not One'
 ```
 
@@ -101,6 +103,24 @@ Returns the 1-based index of the first occurrence of `string_expr2` inside `stri
 SELECT bqutil.td.index('BigQuery', 'Query')
 
 4
+```
+
+
+### [initcap(str_expr STRING)](initcap.sql)
+Returns the string with the first character in each word in uppercase and all other characters in lowercase. Words are delimited by white space or characters that are not alphanumeric. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/UEPvXHHzWqddlheTJxjyEQ)
+```sql
+SELECT bqutil.td.initcap('aaa bbb ccc ddd')
+
+'Aaa Bbb Ccc Ddd'
+```
+
+
+### [instr(haystack STRING, needle STRING, position INT64, occurrence INT64)](instr.sql)
+Returns the position of the needle in the haystack argument. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/rrqCW37EQIIs_DS6JLvMbg)
+```sql
+SELECT bqutil.td.instr("Hello world!", "world", 0, 1)
+
+6
 ```
 
 
