@@ -133,3 +133,13 @@ SELECT bqutil.fn.url_param(
 
 "chrome"
 ```
+
+
+### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
+Convert a STRING formatted as a YYYYMMDD to a DATE
+
+```sql
+SELECT bqutil.fn.y4md_to_date('20201220')
+
+"2020-12-20"
+```
