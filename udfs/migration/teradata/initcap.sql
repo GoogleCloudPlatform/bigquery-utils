@@ -19,6 +19,6 @@ CREATE OR REPLACE FUNCTION td.initcap(str_expr STRING) AS (
     SELECT
       STRING_AGG(CONCAT(UPPER(SUBSTR(w,1,1)), LOWER(SUBSTR(w,2))), ' ' ORDER BY pos)
     FROM
-      UNNEST(SPLIT(str, ' ')) w WITH OFFSET pos
+      UNNEST(SPLIT(str_expr, ' ')) w WITH OFFSET pos
   )
 );
