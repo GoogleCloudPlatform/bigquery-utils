@@ -5,6 +5,22 @@ which mimic the behavior of proprietary functions in Redshift. Each UDF within t
 directory will be automatically synchronized to the `bqutil` project within the
 `rs` dataset for reference in queries.
 
+For example, if you'd like to reference the `translate` function within your query,
+you can reference it like the following:
+```sql
+SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
+```
+
 ## UDFs
 
-Nothing here yet, check back soon...
+* [translate](translate(expression-STRING,-characters_to_replace-STRING,-characters_to_substitute-STRING))
+
+## Documentation
+
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/r_TRANSLATE.html)
+```sql
+SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
+
+most tin
+```
