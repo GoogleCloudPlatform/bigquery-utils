@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nvl(expr1 ANY TYPE, expr2 ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION nvl(expr1 ANY TYPE, expr2 ANY TYPE) AS (
   IFNULL(expr1, expr2)
 );

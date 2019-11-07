@@ -25,7 +25,7 @@
  *
  * 'tino', 'julie', 'jordan'
  */
-CREATE OR REPLACE FUNCTION fn.random_value(arr ANY TYPE)
+CREATE OR REPLACE FUNCTION random_value(arr ANY TYPE)
 AS
 (
   (

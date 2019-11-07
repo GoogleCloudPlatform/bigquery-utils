@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.months_between(date_expr1 DATE, date_expr2 DATE) AS (
+CREATE OR REPLACE FUNCTION months_between(date_expr1 DATE, date_expr2 DATE) AS (
   DATE_DIFF(date_expr1, date_expr2, MONTH)
 );

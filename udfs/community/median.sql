@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.median(arr ANY TYPE) AS ((
+CREATE OR REPLACE FUNCTION median(arr ANY TYPE) AS ((
   SELECT IF (
     MOD(ARRAY_LENGTH(arr), 2) = 0,
     (arr[OFFSET(DIV(ARRAY_LENGTH(arr), 2) - 1)] + arr[OFFSET(DIV(ARRAY_LENGTH(arr), 2))]) / 2,

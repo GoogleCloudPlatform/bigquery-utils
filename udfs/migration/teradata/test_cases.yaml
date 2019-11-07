@@ -1,25 +1,47 @@
 last_day:
   - test:
-    input: DATE('2019-10-18')
-    expected_output: DATE('2019-10-31')
+    input: DATE("2019-10-18")
+    expected_output: DATE("2019-10-31")
   - test:
-    input: DATE('2019-11-18')
-    expected_output: DATE('2019-11-30')
+    input: DATE("2019-11-18")
+    expected_output: DATE("2019-11-30")
   - test:
-    input: DATE('2019-12-18')
-    expected_output: DATE('2019-12-31')
+    input: DATE("2019-12-18")
+    expected_output: DATE("2019-12-31")
   - test:
-    input: DATE('2019-01-18')
-    expected_output: DATE('2019-01-31')
+    input: DATE("2019-01-18")
+    expected_output: DATE("2019-01-31")
   - test:
-    input: DATE('2019-02-18')
-    expected_output: DATE('2019-02-28')
+    input: DATE("2019-02-18")
+    expected_output: DATE("2019-02-28")
   - test:
-    input: DATE('2019-03-18')
-    expected_output: DATE('2019-03-31')
+    input: DATE("2019-03-18")
+    expected_output: DATE("2019-03-31")
   - test:
-    input: DATE('2019-04-18')
-    expected_output: DATE('2019-04-30')
+    input: DATE("2019-04-18")
+    expected_output: DATE("2019-04-30")
+nullifzero:
+  - test:
+    input: -1
+    expected_output: -1
+  - test:
+    input: 0.0
+    expected_output: (NULL)
+  - test:
+    input: 0
+    expected_output: (NULL) ## NULL is a type in YAML so wrap it in parenthesis
+  - test: # Teradata casts strings into numeric
+    input: CAST(0 AS STRING)
+    expected_output: (NULL)
+  - test:
+    input: 1
+    expected_output: 1
+  - test:
+    input: 1.1
+    expected_output: 1.1
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
 nvl:
   - test:
     input: -1, 1
@@ -39,25 +61,3 @@ nvl:
   - test:
     input: 4, 1
     expected_output: 4
-nullifzero:
-  - test:
-    input: CAST(-1 AS INT64)
-    expected_output: CAST(-1 AS INT64)
-#  - test: # This test currently fails
-#    input: CAST(0.0 AS FLOAT64)
-#    expected_output: CAST(0.0 AS FLOAT64)
-  - test:
-    input: 0
-    expected_output: "NULL" ## NULL is a type in YAML so explicitly make it a string
-#  - test: #This test currently fails
-#    input: CAST(0 AS STRING)
-#    expected_output: CAST(0 AS INT64)
-  - test:
-    input: 2
-    expected_output: 2
-  - test:
-    input: 3
-    expected_output: 3
-  - test:
-    input: !!str NULL ## Can mark NULL as string using YAML explicit string tag
-    expected_output: !!str NULL

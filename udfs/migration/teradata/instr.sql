@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.instr(
+CREATE OR REPLACE FUNCTION instr(
   haystack STRING, needle STRING, position INT64, occurrence INT64)
 AS
 (

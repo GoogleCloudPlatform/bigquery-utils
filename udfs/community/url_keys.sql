@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.url_keys(query STRING)
+CREATE OR REPLACE FUNCTION url_keys(query STRING)
 RETURNS ARRAY<STRING>
 LANGUAGE js AS """
   ret = []
