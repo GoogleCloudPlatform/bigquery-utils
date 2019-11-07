@@ -28,7 +28,7 @@ class UDFTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        # Client object will be initialized in child class
+        # Client object is initialized in child class
         cls._client = None
         cls._test_cases = None
 

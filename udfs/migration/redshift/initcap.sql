@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION rs.initcap(string_expr STRING) AS (
+CREATE OR REPLACE FUNCTION initcap(string_expr STRING) AS (
   (
     SELECT
       CASE 
