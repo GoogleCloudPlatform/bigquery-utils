@@ -26,6 +26,6 @@ initcap:
   - test:
     input: CAST("one+one is   '(two-one)*[two]'" AS STRING)
     expected_output: CAST("One+One Is   '(Two-One)*[Two]'" AS STRING)
-  - test: # Testing
+  - test:
     input: CAST("<lorem>ipsum@GMAIL.COM" AS STRING)
     expected_output: CAST("<Lorem>Ipsum@Gmail.Com" AS STRING)

@@ -15,5 +15,5 @@
  */
 
 CREATE OR REPLACE FUNCTION nullifzero(expr ANY TYPE) AS (
-  NULLIF(expr, 0)
+  IF(CAST(expr AS INT64) = 0, NULL, expr)
 );
