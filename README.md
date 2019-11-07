@@ -12,19 +12,18 @@ This repository is broken up into:
   * [billing](/scripts/billing) - Example queries over the GCP billing export
 * [UDFs](/udfs) - User-defined functions for common usage as well as migration
   * [community](/udfs/community) - Community contributed user-defined functions
-  * [teradata](/udfs/migration/teradata) - UDFs which mimic the behavior of proprietary functions in Teradata
+  * [migration](/udfs/migration) - UDFs which mimic the behavior of proprietary functions in other data warehouses
 * [Views](/views) - Views over system tables such as audit logs or the
 `INFORMATION_SCHEMA`
   * [query_audit](/views/audit/query_audit.sql) - View to simplify querying the audit logs which can be used to power dashboards  ([example](https://codelabs.developers.google.com/codelabs/bigquery-pricing-workshop/#0)).
 
 ## Public UDFs
-All UDFs within this repository will be automatically created under the `bqutil` project under publicly shared datasets. Queries can then reference the shared UDFs via `bqutil.<dataset>.<function>()`.
-
-![Alt text](/images/public_udf_architecture.png?raw=true "Public UDFs")
-
+For more information on UDFs and using those provided in the repository with BigQuery, see the [README](/udfs/README.md) in the [udfs](/udfs) folder.
 
 ## Contributing
 See the contributing [instructions](/CONTRIBUTING.md) to get started contributing.
+
+To contribute UDFs to this repository, see the [instructions](/udfs/CONTRIBUTING.md) in the [udfs](/udfs) folder.
 
 ## License
 All solutions within this repository are provided under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Please see the [LICENSE](/LICENSE) file for more detailed terms and conditions.
