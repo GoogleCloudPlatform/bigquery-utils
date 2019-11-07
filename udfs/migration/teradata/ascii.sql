@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.ascii(string_expr STRING) AS (
+CREATE OR REPLACE FUNCTION ascii(string_expr STRING) AS (
   TO_CODE_POINTS(string_expr)[OFFSET(0)]
 );

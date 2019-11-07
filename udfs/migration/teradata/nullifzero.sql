@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION nullifzero(expr ANY TYPE) AS (
   NULLIF(expr, 0)
 );

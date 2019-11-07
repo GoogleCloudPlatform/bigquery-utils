@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.index(string_expr1 STRING, string_expr2 STRING) AS (
+CREATE OR REPLACE FUNCTION index(string_expr1 STRING, string_expr2 STRING) AS (
   STRPOS(string_expr1, string_expr2)
 );
