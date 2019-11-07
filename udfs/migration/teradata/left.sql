@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION left(string_expr STRING, length_expr INT64) AS (
+CREATE OR REPLACE FUNCTION `left`(string_expr STRING, length_expr INT64) AS (
   CASE
     WHEN length_expr < 0 THEN ERROR('The length argument to LEFT must be a positive integer!')
     ELSE SUBSTR(string_expr, 1, length_expr)

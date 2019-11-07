@@ -6,26 +6,26 @@ initcap:
     input: CAST("ALL CAPS" AS STRING)
     expected_output: CAST("All Caps" AS STRING)
   - test:
-    input: "\"does comma's behavior affect anything?\""
-    expected_output: "\"Does Comma'S Behavior Affect Anything?\""
+    input: CAST("does comma's behavior affect anything?" AS STRING)
+    expected_output: CAST("Does Comma'S Behavior Affect Anything?" AS STRING)
   - test:
-    input: "\"All non-musical theatre\""
-    expected_output: "\"All Non-Musical Theatre\""
+    input: CAST("All non-musical theatre" AS STRING)
+    expected_output: CAST("All Non-Musical Theatre" AS STRING)
   - test:
-    input: "\"All symphony, concerto, and choir concerts\""
-    expected_output: "\"All Symphony, Concerto, And Choir Concerts\""
+    input: CAST("All symphony, concerto, and choir concerts" AS STRING)
+    expected_output: CAST("All Symphony, Concerto, And Choir Concerts" AS STRING)
   - test:
-    input: "\"À vaillant coeur rien d’impossible\""
-    expected_output: "\"À Vaillant Coeur Rien D’Impossible\""
+    input: CAST("À vaillant coeur rien d’impossible" AS STRING)
+    expected_output: CAST("À Vaillant Coeur Rien D’Impossible" AS STRING)
   - test:
-    input: "\"640 k!ouGht tO BE enough~for_anyONE\""
-    expected_output: "\"640 K!Ought To Be Enough~For_Anyone\""
+    input: CAST("640 k!ouGht tO BE enough~for_anyONE" AS STRING)
+    expected_output: CAST("640 K!Ought To Be Enough~For_Anyone" AS STRING)
   - test:
-    input: "\"Simplicity & élÉgance are unpopular because they require hard-work&discipline\""
-    expected_output: "\"Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline\""
+    input: CAST("Simplicity & élÉgance are unpopular because they require hard-work&discipline" AS STRING)
+    expected_output: CAST("Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline" AS STRING)
   - test:
-    input: "\"one+one is   '(two-one)*[two]'\""
-    expected_output: "\"One+One Is   '(Two-One)*[Two]'\""
+    input: CAST("one+one is   '(two-one)*[two]'" AS STRING)
+    expected_output: CAST("One+One Is   '(Two-One)*[Two]'" AS STRING)
   - test: # Testing
-    input: "\"<lorem>ipsum@GMAIL.COM\""
-    expected_output: "\"<Lorem>Ipsum@Gmail.Com\""
+    input: CAST("<lorem>ipsum@GMAIL.COM" AS STRING)
+    expected_output: CAST("<Lorem>Ipsum@Gmail.Com" AS STRING)
