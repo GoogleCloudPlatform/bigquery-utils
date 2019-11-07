@@ -1,0 +1,7 @@
+int:
+  - test:
+    input: CAST(-1 AS INT64)
+    expected_output: CAST(-1 AS INT64)
+  - test:
+    input: CAST(0.0 AS FLOAT64)
+    expected_output: CAST(0.0 AS INT64)
