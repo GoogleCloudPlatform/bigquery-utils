@@ -25,7 +25,7 @@ SELECT bqutil.td.nullifzero(0)
 * [nvl2](#nvl2expr1-any-type-expr2-any-type-expr3-any-type)
 * [right](#rightstring_expr-string-length_expr-int64)
 * [zeroifnull](#zeroifnullexpr-any-type)
-* [otranslate]()
+* [otranslate](#otranslatesource_string-string-from_string-string-to_string-string)
 
 ## Documentation
 
