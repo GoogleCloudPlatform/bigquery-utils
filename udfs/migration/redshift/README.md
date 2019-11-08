@@ -14,6 +14,7 @@ SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 ## UDFs
 
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [interval_literal_to_seconds](#interval_literal_to_secondsinterval_literal-string)
 
 ## Documentation
 
