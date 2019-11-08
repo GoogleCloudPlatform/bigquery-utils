@@ -24,3 +24,13 @@ SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 
 most tin
 ```
+
+### [interval_literal_to_seconds(interval_literal STRING)](interval_literal_to_seconds.sql)
+This function parses a [Redshift interval literal](https://docs.aws.amazon.com/redshift/latest/dg/r_interval_literals.html) and converts it to seconds.
+```sql
+SELECT
+  rs.interval_literal_to_seconds('0.5 days, 3 hours, 59 minutes'),
+  rs.interval_literal_to_seconds('0.5 d,3h, 59m')
+
+57540, 57540
+```
