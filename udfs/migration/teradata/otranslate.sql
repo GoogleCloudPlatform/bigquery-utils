@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.otranslate(source_string STRING, from_string STRING, to_string STRING) AS (
-  IF(LENGTH(from_string) < LENGTH(to_string) OR LENGTH(source_string) < LENGTH(from_string), source_string,
-  (SELECT
-     STRING_AGG(
-       IFNULL(
-         (SELECT ARRAY_CONCAT([c], SPLIT(to_string, ''))[SAFE_OFFSET((
-            SELECT IFNULL(MIN(o2) + 1, 0) FROM UNNEST(SPLIT(from_string, '')) AS k WITH OFFSET o2
-            WHERE k = c))]
-         ),
-         ''),
-       '' ORDER BY o1)
-   FROM UNNEST(SPLIT(source_string, '')) AS c WITH OFFSET o1
-  ))
-);
+CREATE OR REPLACE FUNCTION
+  td.otranslate(source_string STRING,
+    from_string STRING,
+    to_string STRING) AS (
+  IF
+    (LENGTH(from_string) < LENGTH(to_string)
+      OR LENGTH(source_string) < LENGTH(from_string),
+      source_string,
+      (
+      SELECT
+        STRING_AGG( IFNULL( (
+            SELECT
+              ARRAY_CONCAT([c], SPLIT(to_string, ''))[SAFE_OFFSET((
+                SELECT
+                  IFNULL(MIN(o2) + 1,
+                    0)
+                FROM
+                  UNNEST(SPLIT(from_string, '')) AS k
+                WITH
+                OFFSET
+                  o2
+                WHERE
+                  k = c))] ),
+            ''), ''
+        ORDER BY
+          o1)
+      FROM
+        UNNEST(SPLIT(source_string, '')) AS c
+      WITH
+      OFFSET
+        o1 )) );
