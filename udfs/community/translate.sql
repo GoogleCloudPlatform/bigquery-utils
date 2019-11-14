@@ -20,27 +20,27 @@ CREATE OR REPLACE FUNCTION fn.translate(
   characters_to_substitute STRING) 
 AS (
   IF(
-  	   LENGTH(characters_to_replace) < LENGTH(characters_to_substitute)
-         OR LENGTH(expression) < LENGTH(characters_to_replace),
-       expression,
-       (
-         SELECT
-           STRING_AGG( 
-           	   IFNULL( 
-           	       (
-                     SELECT
-                       ARRAY_CONCAT([c], SPLIT(characters_to_substitute, ''))
-                       [SAFE_OFFSET(
-                           (
-                             SELECT IFNULL(MIN(o2) + 1, 0)
-                             FROM UNNEST(SPLIT(characters_to_replace, '')) AS k
-                             WITH OFFSET o2
-                             WHERE k = c
-                           ))]
-                   ),
-                   ''), 
-           	   '' ORDER BY o1)
-         FROM UNNEST(SPLIT(expression, '')) AS c
-         WITH OFFSET o1
-       )) 
+      LENGTH(characters_to_replace) < LENGTH(characters_to_substitute)
+        OR LENGTH(expression) < LENGTH(characters_to_replace),
+      expression,
+      (
+        SELECT
+          STRING_AGG( 
+           	  IFNULL( 
+           	      (
+                    SELECT
+                      ARRAY_CONCAT([c], SPLIT(characters_to_substitute, ''))
+                      [SAFE_OFFSET(
+                          (
+                            SELECT IFNULL(MIN(o2) + 1, 0)
+                            FROM UNNEST(SPLIT(characters_to_replace, '')) AS k
+                            WITH OFFSET o2
+                            WHERE k = c
+                          ))]
+                  ),
+                  ''), 
+           	  '' ORDER BY o1)
+        FROM UNNEST(SPLIT(expression, '')) AS c
+        WITH OFFSET o1
+      )) 
 );
