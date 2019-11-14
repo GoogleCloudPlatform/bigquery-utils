@@ -13,6 +13,7 @@ SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 
 ## UDFs
 
+
 * [interval_literal_to_seconds](#interval_literal_to_secondsinterval_literal-string)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 
@@ -35,4 +36,17 @@ For a given expression, replaces all occurrences of specified characters with sp
 SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 
 most tin
+```
+
+
+### [initcap(string_expr STRING)](initcap.sql)
+Returns the decimal representation of the first character in the `string_expr`. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/r_INITCAP.html)
+```sql
+SELECT bqutil.rs.initcap('À vaillant coeur rien d’impossible')
+  , bqutil.rs.initcap('640 k!ouGht tO BE enough~for_anyONE')
+  , bqutil.rs.initcap('Simplicity & élÉgance are unpopular because they require hard-work&discipline')
+  , bqutil.rs.initcap('one+one is   "(two-one)*[two]"')
+  , bqutil.rs.initcap('<lorem>ipsum@GMAIL.COM')
+
+'À Vaillant Coeur Rien D’Impossible', '640 K!Ought To Be Enough~For_Anyone', 'Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline', 'One+One Is   "(Two-One)*[Two]"', '<Lorem>Ipsum@Gmail.Com'
 ```

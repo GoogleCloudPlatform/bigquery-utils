@@ -14,7 +14,7 @@ WITH
     -- *****************************************************************
     -- *** INSERT YOUR BILLING BQ EXPORT TABLE NAME ON THE NEXT LINE ***
     -- *****************************************************************
-      `committed-use-discount-test.billing.gcp_billing_export_v1_016676_F7EDE9_45E9C2`
+      `PROJECT.DATASET.TABLE`
     WHERE
       service.description = "Compute Engine"
   ),
