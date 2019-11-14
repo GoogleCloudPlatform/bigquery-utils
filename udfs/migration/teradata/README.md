@@ -23,9 +23,9 @@ SELECT bqutil.td.nullifzero(0)
 * [nullifzero](#nullifzeroexpr-any-type)
 * [nvl](#nvlexpr1-any-type-expr2-any-type)
 * [nvl2](#nvl2expr1-any-type-expr2-any-type-expr3-any-type)
+* [otranslate](#otranslatesource_string-string-from_string-string-to_string-string)
 * [right](#rightstring_expr-string-length_expr-int64)
 * [zeroifnull](#zeroifnullexpr-any-type)
-* [otranslate](#otranslatesource_string-string-from_string-string-to_string-string)
 
 ## Documentation
 
@@ -164,6 +164,15 @@ SELECT bqutil.td.nvl2(NULL, 2.0, 3.0)
 ```
 
 
+### [otranslate(source_string STRING, from_string STRING, to_string STRING)](otranslate.sql)
+Returns `source_string` with every occurrence of each character in `from_string` replaced with the corresponding character in `to_string`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/UqxeIKN2A5LF~HyiovshLg)
+```sql
+SELECT bqutil.td.otranslate('Thin and Thick', 'Thk', 'Sp')
+
+'Spin and Spic'
+```
+
+
 ### [right(string_expr STRING, length_expr INT64)](right.sql)
 Returns the rightmost number of characters in `string_expr` specified by the `length_expr` parameter. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/4bAyNUOB6_VOuvSVrDRqDQ)
 ```sql
@@ -181,13 +190,4 @@ SELECT bqutil.td.zeroifnull(NULL)
   , bqutil.td.zeroifnull(1)
 
 0, 0, 1
-```
-
-
-### [otranslate(source_string STRING, from_string STRING, to_string STRING)](otranslate.sql)
-Returns `source_string` with every occurrence of each character in `from_string` replaced with the corresponding character in `to_string`. [Teradata docs](https://docs.teradata.com/reader/kmuOwjp1zEYg98JsB8fu_A/UqxeIKN2A5LF~HyiovshLg)
-```sql
-SELECT bqutil.td.otranslate('Thin and Thick', 'Thk', 'Sp')
-
-'Spin and Spic'
 ```
