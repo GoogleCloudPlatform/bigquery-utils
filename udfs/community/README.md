@@ -20,6 +20,7 @@ SELECT bqutil.fn.int(1.684)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
+* [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 
@@ -110,6 +111,15 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
+```sql
+SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
+
+most tin
 ```
 
 
