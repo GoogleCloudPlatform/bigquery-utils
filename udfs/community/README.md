@@ -23,7 +23,7 @@ SELECT bqutil.fn.int(1.684)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
-* [zeronorm](#zeronormx-any-type-any-type-meanx-float64-stddevx-float64)
+* [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
 
