@@ -23,7 +23,7 @@ SELECT bqutil.fn.int(1.684)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
-* [zero_norm](#zero_norm)
+* [zeronorm](#zeronormx-any-type-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
 
@@ -155,7 +155,7 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 "2020-12-20"
 ```
 
-### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](median.sql)
+### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
 Normalize a variable so that it has zero mean and unit variance.
 
 ```sql
@@ -170,12 +170,18 @@ stats AS (
   SELECT AVG(x) AS meanx, STDDEV(x) AS stddevx
   FROM r
 )
-SELECT x, bqutil.fn.zeronorm(x, meanx, stddevx) FROM r, stats;
-
-1	| 10 | -12.649110640673518
-2	| 20 | -6.324555320336759
-3	| 30 | 0.0
-4	| 40 | 6.324555320336759
-5	| 50 | 12.649110640673518
+SELECT x, bqutil.fn.zeronorm(x, meanx, stddevx) AS zeronorm
+FROM r, stats;
 ```
+
+returns:
+
+| Row | x | zeronorm |
+| --- | -- | ------- |
+| 1	| 10 | -12.649110640673518 |
+| 2	| 20 | -6.324555320336759 |
+| 3	| 30 | 0.0 |
+| 4	| 40 | 6.324555320336759 |
+| 5	| 50 | 12.649110640673518 |
+
 
