@@ -41,6 +41,30 @@ SELECT bqutil.fn.int(1) int1
 
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
+### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sql)
+Returns an integer number indicating the degree of similarity between two strings (0=identical, 1=single character difference, etc.)
+
+```sql
+SELECT source, target, `bigquery-lib.fn.levenshtein`(source, target) distance
+FROM UNNEST([
+  STRUCT("analyze" AS source, "analyse" AS target),
+  STRUCT("opossum", "possum"),
+  STRUCT("potatoe", "potatoe"),
+  STRUCT("while", "whilst"),
+  STRUCT("aluminum", "alumininium"),
+  STRUCT("Connecticut", "CT")
+]);
+```
+Row | source | target | distance
+--- | ----------- | ----------- | ---
+1   |	analyze     | analyse     | 1
+2   | opossum     | possum      | 1
+3   | potatoe     | potatoe     | 0
+4   | while       | whilst      | 2
+5   | aluminum    | alumininium | 3
+6   | Connecticut | CT          | 10
+
+> This function is based on the [Levenshtein distance algorithm](https://en.wikipedia.org/wiki/Levenshtein_distance) which determines the minimum number of single-character edits (insertions, deletions or substitutions) required to change one string into the other.
 
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
