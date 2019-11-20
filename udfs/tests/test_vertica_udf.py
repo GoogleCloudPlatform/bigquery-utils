@@ -24,7 +24,7 @@ UDF_PATHS = UDFTest.get_udf_paths(UDF_DIR)
 BIGQUERY_TEST_DATASET = 'fn_test'
 
 
-class TestCommunityUDF(UDFTest):
+class TestVerticaUDF(UDFTest):
 
     @classmethod
     def setUpClass(cls):
