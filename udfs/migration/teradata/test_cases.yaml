@@ -29,7 +29,7 @@ nullifzero:
     expected_output: (NULL)
   - test:
     input: 0
-    expected_output: (NULL) ## NULL is a type in YAML so wrap it in parenthesis
+    expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
   - test: # Teradata casts strings into numeric
     input: CAST(0 AS STRING)
     expected_output: (NULL)
