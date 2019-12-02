@@ -12,7 +12,12 @@ This repository is broken up into:
   * [billing](/scripts/billing) - Example queries over the GCP billing export
 * [UDFs](/udfs) - User-defined functions for common usage as well as migration
   * [community](/udfs/community) - Community contributed user-defined functions
-  * [teradata](/udfs/migration/teradata) - UDFs which mimic the behavior of proprietary functions in Teradata
+  * [migration](/udfs/migration) - UDFs which mimic the behavior of proprietary functions in the following databases:
+    * [netezza](/udfs/migration/netezza)
+    * [oracle](/udfs/migration/oracle)
+    * [redshift](/udfs/migration/redshift)
+    * [teradata](/udfs/migration/teradata)
+    * [vertica](/udfs/migration/vertica)
 * [Views](/views) - Views over system tables such as audit logs or the
 `INFORMATION_SCHEMA`
   * [query_audit](/views/audit/query_audit.sql) - View to simplify querying the audit logs which can be used to power dashboards  ([example](https://codelabs.developers.google.com/codelabs/bigquery-pricing-workshop/#0)).
