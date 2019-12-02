@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.instr(
-  haystack STRING, needle STRING, position INT64, occurrence INT64)
-AS
-(
-  (
-    SELECT
-      IFNULL(
-        NULLIF(
-          SUM(LENGTH(str)) + ((occurrence - 1) * LENGTH(needle)) + position,
-          LENGTH(haystack) + 1),
-        0)  -- No match
-    FROM
-      UNNEST(SPLIT(SUBSTR(haystack, position), needle)) AS str WITH OFFSET off
-    WHERE
-      off < occurrence
-  )
+CREATE OR REPLACE FUNCTION fn.zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64) AS (
+  SAFE_DIVIDE(x - meanx, stddevx)
 );

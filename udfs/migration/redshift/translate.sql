@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.instr(
-  haystack STRING, needle STRING, position INT64, occurrence INT64)
-AS
-(
-  (
-    SELECT
-      IFNULL(
-        NULLIF(
-          SUM(LENGTH(str)) + ((occurrence - 1) * LENGTH(needle)) + position,
-          LENGTH(haystack) + 1),
-        0)  -- No match
-    FROM
-      UNNEST(SPLIT(SUBSTR(haystack, position), needle)) AS str WITH OFFSET off
-    WHERE
-      off < occurrence
-  )
+CREATE OR REPLACE FUNCTION rs.translate(
+  expression STRING,
+  characters_to_replace STRING,
+  characters_to_substitute STRING) 
+AS (
+  bqutil.fn.translate(expression, characters_to_replace, characters_to_substitute)
 );

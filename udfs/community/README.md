@@ -20,8 +20,10 @@ SELECT bqutil.fn.int(1.684)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
+* [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
+* [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
 
@@ -113,6 +115,15 @@ SELECT
 ```
 
 
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
+```sql
+SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
+
+most tin
+```
+
+
 ### [url_keys(query STRING)](url_keys.sql)
 Get an array of url param keys.
 
@@ -143,3 +154,33 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 
 "2020-12-20"
 ```
+
+
+### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
+Normalize a variable so that it has zero mean and unit variance.
+
+```sql
+with r AS (
+  SELECT 10 AS x
+  UNION ALL SELECT 20
+  UNION ALL SELECT 30
+  UNION ALL SELECT 40
+  UNION ALL SELECT 50
+),
+stats AS (
+  SELECT AVG(x) AS meanx, STDDEV(x) AS stddevx
+  FROM r
+)
+SELECT x, bqutil.fn.zeronorm(x, meanx, stddevx) AS zeronorm
+FROM r, stats;
+```
+
+returns:
+
+| Row | x | zeronorm |
+| --- | -- | ------- |
+| 1	| 10 | -12.649110640673518 |
+| 2	| 20 | -6.324555320336759 |
+| 3	| 30 | 0.0 |
+| 4	| 40 | 6.324555320336759 |
+| 5	| 50 | 12.649110640673518 |
