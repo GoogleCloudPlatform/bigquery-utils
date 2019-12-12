@@ -135,6 +135,7 @@ function build() {
     local dataset=$(get_dataset $file)
 
     if [[ ! -z $dataset ]]; then
+      create_dataset_if_not_exists $dataset
       execute_query $file true $dataset
     fi
   done <<< "$sql_files"
@@ -161,7 +162,6 @@ function deploy() {
 
     if [[ ! -z $dataset ]]; then
       create_dataset_if_not_exists $dataset
-
       execute_query $file false $dataset
     fi
   done <<< "$sql_files"

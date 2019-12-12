@@ -1,4 +1,4 @@
 google-cloud-bigquery
-nose2
+pytest-parallel
 parameterized
 pyyaml

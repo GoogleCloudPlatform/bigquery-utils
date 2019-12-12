@@ -22,4 +22,6 @@
 #
 #########################################################################
 python3 -m pip install -r udfs/tests/requirements.txt
-python3 -m nose2 -v -c udfs/tests/unittest.cfg $1
+python3 -m pytest -v --workers 100 udfs/tests/create_udf_signatures.py
+python3 -m pytest -v --workers 100 udfs/tests/test_create_udfs.py
+python3 -m pytest -v --workers 100 udfs/tests/test_run_udfs.py
