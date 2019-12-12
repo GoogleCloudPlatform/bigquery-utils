@@ -145,6 +145,29 @@ SELECT bqutil.fn.url_param(
 "chrome"
 ```
 
+### [url_parse(string urlString, string partToExtract [, string keyToExtract])](url_parse_udf.sql)
+
+Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
+For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
+```sql
+WITH urls AS (
+  SELECT 'http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' as url
+  UNION ALL
+  SELECT 'rpc://facebook.com/' as url
+)
+SELECT url_parse(url, 'HOST'), url_parse(url, 'PATH'), url_parse(url, 'QUERY'), url_parse(url, 'REF'), url_parse(url, 'PROTOCOL') from urls
+```
+
+results:
+
+url_parse
++--------------+-------------+------------------+------+------+
+|     f0_      |     f1_     |       f2_        | f3_  | f4_  |
++--------------+-------------+------------------+------+------+
+| facebook.com | path1/p.php | k1=v1&k2=v2#Ref1 | Ref1 | http |
+| facebook.com | NULL        | NULL             | NULL | rpc  |
++--------------+-------------+------------------+------+------+
+
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
 Convert a STRING formatted as a YYYYMMDD to a DATE
@@ -184,4 +207,120 @@ returns:
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
 
+
+### [csv_to_struct(strList STRING)](csv_to_struct.sql)
+Take a list of comma separated key-value pairs and creates a struct.
+Input:
+strList: string that has map in the format a:b,c:d....
+Output: struct for the above map.
+```sql
+WITH test_cases AS (
+  SELECT NULL as s
+  UNION ALL
+  SELECT '' as s
+  UNION ALL
+  SELECT ',' as s
+  UNION ALL
+  SELECT ':' as s
+  UNION ALL
+  SELECT 'a:b' as s
+  UNION ALL
+  SELECT 'a:b,c:d' as s
+  UNION ALL
+  SELECT 'a:b' as s
+)
+SELECT key, value from test_cases as t, UNNEST(bqutil.fn.csv_to_struct(t.s)) s;
+```
+
+results:
+|-----|-------|
+| key | value |
+|-----|-------|
+|     |       |
+| a   | b     |
+| a   | b     |
+| c   | d     |
+| a   | b     |
+|-----|-------|
+
+### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
+Returns the first occurance of str in strList where strList is a comma-delimited string.
+Returns null if either argument is null.
+Returns 0 if the first argument contains any commas.
+For example, find_in_set('ab', 'abc,b,ab,c,def') returns 3.
+Input:
+str: string to search for.
+strList: string in which to search.
+Output: Position of str in strList
+```sql
+WITH test_cases AS (
+  SELECT 'ab' as str, 'abc,b,ab,c,def' as strList
+  UNION ALL
+  SELECT 'ab' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile,' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+)
+SELECT bqutil.fn.find_in_set(str, strList) from test_cases
+```
+
+results:
+|------|
+| f0_  |
+|------|
+|    3 |
+| NULL |
+|    1 |
+|    0 |
+|------|
+
+### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
+Given a key and a map, returns the SCALAR type value.
+
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.getValue('b', a), bqutil.fn.getValue('a', a), bqutil.fn.getValue('c', a) from test;
+```
+
+results:
+|-----|-----|-----|
+| f0_ | f1_ | f2_ |
+|-----|-----|-----|
+| bbb | aaa | ccc |
+|-----|-----|-----|
+
+### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
+Given a key and a map, returns the ARRAY type value.
+This is same as getValue except it returns an ARRAY type.
+This can be used when the map has multiple values for a given key.
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('a' AS key, 'AAA' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.getArrayValue('b', a), bqutil.fn.getArrayValue('a', a), bqutil.fn.getArrayValue('c', a) from test;
+```
+
+results:
+|---------|---------------|---------|
+|   f0_   |      f1_      |   f2_   |
+|---------|---------------|---------|
+| ["bbb"] | ["aaa","AAA"] | ["ccc"] |
+|---------|---------------|---------|
 
