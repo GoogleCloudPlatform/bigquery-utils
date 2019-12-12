@@ -1,4 +1,4 @@
--- Generate next ids and insert them into a sample table.
+-- Generates next ids and inserts them into a sample table.
 -- This implementation prevents against race condition.
 --
 -- @param INT64 id_count number of id to increase
