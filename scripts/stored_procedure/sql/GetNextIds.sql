@@ -1,5 +1,5 @@
--- A stored procedure to generate next ids and insert them into a sample table.
--- This implementation prevents against raised condition.
+-- Generate next ids and insert them into a sample table.
+-- This implementation prevents against race condition.
 --
 -- @param INT64 id_count number of id to increase
 -- @return ARRAY<int64> an array of generated ids
