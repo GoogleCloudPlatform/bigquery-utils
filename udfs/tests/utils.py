@@ -69,6 +69,17 @@ class Utils(object):
             return udf_path
 
     @staticmethod
+    def replace_with_test_datasets(udf_path):
+        with open(udf_path) as udf_file:
+            udf_sql = udf_file.read()
+        udf_sql = udf_sql.replace('\n', ' ')
+        pattern = re.compile(r'\.\w+?()\)')
+        match = pattern.search(udf_sql)
+        if match:
+            udf_name = match[1]
+        # TODO: Return the UDF with the dataset renamed
+
+    @staticmethod
     def get_target_bq_dataset(udf_path):
         parent_dir_name = dirname(udf_path).split('/')[-1]
         return BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)

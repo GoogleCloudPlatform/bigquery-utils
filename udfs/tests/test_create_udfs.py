@@ -37,6 +37,8 @@ class TestCreateUDFs(unittest.TestCase):
         )
         with open(udf_path) as udf_file:
             try:
+                # TODO: Replace dataset with renamed test dataset
+                # Utils.replace_with_test_datasets(udf_path)
                 udf_creation_result = client.query(
                     udf_file.read(),
                     job_config=job_config
