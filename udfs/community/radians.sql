@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION radians(x ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
   ACOS(-1) * x / 180
 );

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION zeroifnull(expr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION td.zeroifnull(expr ANY TYPE) AS (
   IFNULL(expr, 0)
 );

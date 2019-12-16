@@ -29,3 +29,7 @@ initcap:
   - test:
     input: CAST("<lorem>ipsum@GMAIL.COM" AS STRING)
     expected_output: CAST("<Lorem>Ipsum@Gmail.Com" AS STRING)
+translate:
+  - test:
+    input: CAST("Etiam.laoreet.libero@sodalesMaurisblandit.edu" AS STRING), CAST("@" AS STRING), CAST("." AS STRING)
+    expected_output: CAST("Etiam.laoreet.libero.sodalesMaurisblandit.edu" AS STRING)

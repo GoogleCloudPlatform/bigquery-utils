@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-CREATE OR REPLACE FUNCTION decode3(
+CREATE OR REPLACE FUNCTION td.decode3(
   expr ANY TYPE,
   s1 ANY TYPE, r1 ANY TYPE,
   s2 ANY TYPE, r2 ANY TYPE,

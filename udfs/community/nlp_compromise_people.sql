@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION nlp_compromise_people(str STRING)
+CREATE OR REPLACE FUNCTION fn.nlp_compromise_people(str STRING)
 RETURNS ARRAY<STRING>
 LANGUAGE js AS """
   return nlp(str).people().out('topk').map(x=>x.normal)
