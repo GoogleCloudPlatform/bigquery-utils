@@ -49,10 +49,11 @@ class Utils(object):
     def extract_udf_name(udf_path):
         with open(udf_path) as udf_file:
             udf_sql = udf_file.read()
-        pattern = re.compile(r'FUNCTION\s*`?(\w+)`?\s*\(')
+        udf_sql = udf_sql.replace('\n', ' ')
+        pattern = re.compile(r'FUNCTION\s*`?(\w+.)?(\w+)`?\s*\(')
         match = pattern.search(udf_sql)
         if match:
-            udf_name = match[1]
+            udf_name = match[2]
             return udf_name
 
     @staticmethod

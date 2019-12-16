@@ -33,7 +33,7 @@ class TestRunUDFs(unittest.TestCase):
             for case in test_cases[udf_name]:
                 try:
                     actual_result_rows = client.query(
-                        f'SELECT {bq_test_dataset}.{udf_name}('
+                        f'SELECT `{bq_test_dataset}.{udf_name}`('
                         f' {case["input"]} )'
                     ).result()
 
