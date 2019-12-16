@@ -21,8 +21,11 @@ from yaml import SafeLoader
 from yaml import load
 
 BIGQUERY_TEST_DATASET_MAPPINGS = {
-    'teradata': 'td_test',
+    'netezza': 'nz',
+    'oracle': 'or',
     'redshift': 'rs_test',
+    'teradata': 'td_test',
+    'vertica': 've',
     'community': 'fn_test',
 }
 
