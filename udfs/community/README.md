@@ -155,7 +155,6 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 "2020-12-20"
 ```
 
-
 ### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
 Normalize a variable so that it has zero mean and unit variance.
 

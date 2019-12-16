@@ -19,6 +19,26 @@ SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 
 ## Documentation
 
+### [interval_literal_to_seconds(interval_literal STRING)](interval_literal_to_seconds.sql)
+This function parses a [Redshift interval literal](https://docs.aws.amazon.com/redshift/latest/dg/r_interval_literals.html) and converts it to seconds.
+```sql
+SELECT
+  bqutil.rs.interval_literal_to_seconds('0.5 days, 3 hours, 59 minutes'),
+  bqutil.rs.interval_literal_to_seconds('0.5 d,3h, 59m')
+
+57540, 57540
+```
+
+
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/r_TRANSLATE.html)
+```sql
+SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
+
+most tin
+```
+
+
 ### [initcap(string_expr STRING)](initcap.sql)
 Returns the decimal representation of the first character in the `string_expr`. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/r_INITCAP.html)
 ```sql
