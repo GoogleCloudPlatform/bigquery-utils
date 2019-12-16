@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION translate(
+CREATE OR REPLACE FUNCTION rs.translate(
   expression STRING,
   characters_to_replace STRING,
   characters_to_substitute STRING) 

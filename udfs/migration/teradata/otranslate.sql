@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION translate(
+CREATE OR REPLACE FUNCTION td.translate(
   source_string STRING,
   from_string STRING,
   to_string STRING) 

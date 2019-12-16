@@ -37,10 +37,9 @@ class TestCreateUDFs(unittest.TestCase):
         )
         with open(udf_path) as udf_file:
             try:
-                # TODO: Replace dataset with renamed test dataset
-                # Utils.replace_with_test_datasets(udf_path)
+                udf_sql = Utils.replace_with_test_datasets(udf_path, client.project)
                 udf_creation_result = client.query(
-                    udf_file.read(),
+                    udf_sql,
                     job_config=job_config
                 ).result()
                 self.assertIsInstance(udf_creation_result, _EmptyRowIterator)

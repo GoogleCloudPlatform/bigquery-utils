@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION random_int(min ANY TYPE, max ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION fn.random_int(min ANY TYPE, max ANY TYPE) AS (
   bqutil.fn.int(min + RAND() * (max - min))
 );

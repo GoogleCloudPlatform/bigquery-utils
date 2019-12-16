@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION `right`(string_expr STRING, length_expr INT64) AS (
+CREATE OR REPLACE FUNCTION td.right(string_expr STRING, length_expr INT64) AS (
   CASE
     WHEN length_expr < 0 THEN ERROR('The length argument to RIGHT must be a positive integer!')
     ELSE SUBSTR(string_expr, -1 * length_expr, length_expr)

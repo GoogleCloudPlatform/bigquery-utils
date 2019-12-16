@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION url_param(query STRING, p STRING)
+CREATE OR REPLACE FUNCTION fn.url_param(query STRING, p STRING)
 RETURNS STRING
 LANGUAGE js AS """
   result = null;

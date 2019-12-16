@@ -36,9 +36,12 @@ class CreateUDFSignatures(unittest.TestCase):
             f'{client.project}.{bq_test_dataset}'
         )
         udf_name = Utils.extract_udf_signature(udf_path)
+        udf_sql = Utils.replace_with_test_datasets(
+            project_id=client.project,
+            udf_sql=f'CREATE OR REPLACE FUNCTION {udf_name} AS (0)')
         try:
             udf_creation_result = client.query(
-                f'CREATE OR REPLACE FUNCTION {udf_name} AS (0)',
+                udf_sql,
                 job_config=job_config
             ).result()
             self.assertIsInstance(udf_creation_result, _EmptyRowIterator)

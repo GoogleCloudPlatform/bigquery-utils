@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION nlp_compromise_number(str STRING)
+CREATE OR REPLACE FUNCTION fn.nlp_compromise_number(str STRING)
 RETURNS NUMERIC
 LANGUAGE js AS """
   return nlp(str).values(0).toNumber().out()

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION int(v ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION fn.int(v ANY TYPE) AS (
   CAST(FLOOR(CAST(v AS FLOAT64)) AS INT64)
 );

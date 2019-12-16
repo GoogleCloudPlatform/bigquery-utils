@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION nullifzero(expr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
   IF(CAST(expr AS INT64) = 0, NULL, expr)
 );
