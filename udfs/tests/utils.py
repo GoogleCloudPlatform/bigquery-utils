@@ -77,7 +77,7 @@ class Utils(object):
         udf_length_before_replacement = len(udf_sql)
         udf_sql = re.sub(
             r'(\w+\.)?(?P<bq_dataset>\w+)(?P<udf_name>\.\w+)\(',
-            f'`{project_id}.\g<bq_dataset>_test\g<udf_name>`(',
+            f'`{project_id}.\\g<bq_dataset>_test\\g<udf_name>`(',
             udf_sql)
         if udf_length_before_replacement == len(udf_sql):
             return None
