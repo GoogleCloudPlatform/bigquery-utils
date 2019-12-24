@@ -10,6 +10,7 @@ This repository is broken up into:
 
 * [Scripts](/scripts) - Python, Shell, & SQL scripts
   * [billing](/scripts/billing) - Example queries over the GCP billing export
+* [Stored Procesures](/stored_procedures) - Example stored procedures that provide solutions to address traditional database features
 * [UDFs](/udfs) - User-defined functions for common usage as well as migration
   * [community](/udfs/community) - Community contributed user-defined functions
   * [migration](/udfs/migration) - UDFs which mimic the behavior of proprietary functions in the following databases:
