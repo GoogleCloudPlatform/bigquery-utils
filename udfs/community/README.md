@@ -13,6 +13,10 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [csv](#csv_to_struct)
+* [find_in_set](#find_in_set)
+* [get_array_value](#get_array_value)
+* [get_value](#get_value)
 * [int](#intv-any-type)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
@@ -145,7 +149,7 @@ SELECT bqutil.fn.url_param(
 "chrome"
 ```
 
-### [url_parse(string urlString, string partToExtract [, string keyToExtract])](url_parse_udf.sql)
+### [url_parse(string urlString, string partToExtract )](url_parse_udf.sql)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
@@ -155,7 +159,7 @@ WITH urls AS (
   UNION ALL
   SELECT 'rpc://facebook.com/' as url
 )
-SELECT url_parse(url, 'HOST'), url_parse(url, 'PATH'), url_parse(url, 'QUERY'), url_parse(url, 'REF'), url_parse(url, 'PROTOCOL') from urls
+SELECT bqutil.fn.url_parse(url, 'HOST'), bqutil.fn.url_parse(url, 'PATH'), bqutil.fn.url_parse(url, 'QUERY'), bqutil.fn.url_parse(url, 'REF'), bqutil.fn.url_parse(url, 'PROTOCOL') from urls
 ```
 
 results:
@@ -275,32 +279,9 @@ results:
 |    0 |
 |------|
 
-### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
-Given a key and a map, returns the SCALAR type value.
-
-```sql
-WITH test AS (
-  SELECT ARRAY(
-    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
-  ) AS a
-)
-SELECT bqutil.fn.getValue('b', a), bqutil.fn.getValue('a', a), bqutil.fn.getValue('c', a) from test;
-```
-
-results:
-|-----|-----|-----|
-| f0_ | f1_ | f2_ |
-|-----|-----|-----|
-| bbb | aaa | ccc |
-|-----|-----|-----|
-
 ### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
 Given a key and a map, returns the ARRAY type value.
-This is same as getValue except it returns an ARRAY type.
+This is same as get_value except it returns an ARRAY type.
 This can be used when the map has multiple values for a given key.
 ```sql
 WITH test AS (
@@ -314,7 +295,7 @@ WITH test AS (
     SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
   ) AS a
 )
-SELECT bqutil.fn.getArrayValue('b', a), bqutil.fn.getArrayValue('a', a), bqutil.fn.getArrayValue('c', a) from test;
+SELECT bqutil.fn.get_array_value('b', a), bqutil.fn.get_array_value('a', a), bqutil.fn.get_array_value('c', a) from test;
 ```
 
 results:
@@ -323,4 +304,28 @@ results:
 |---------|---------------|---------|
 | ["bbb"] | ["aaa","AAA"] | ["ccc"] |
 |---------|---------------|---------|
+
+
+### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
+Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
+
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.get_value('b', a), bqutil.fn.get_value('a', a), bqutil.fn.get_value('c', a) from test;
+```
+
+results:
+|-----|-----|-----|
+| f0_ | f1_ | f2_ |
+|-----|-----|-----|
+| bbb | aaa | ccc |
+|-----|-----|-----|
 
