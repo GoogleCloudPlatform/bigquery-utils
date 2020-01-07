@@ -13,10 +13,10 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
-* [csv](#csv_to_struct)
-* [find_in_set](#find_in_set)
-* [get_array_value](#get_array_value)
-* [get_value](#get_value)
+* [csv_to_struct](#csv_to_structstrlist-string)
+* [find_in_set](#find_in_setstr-string-strlist-string)
+* [get_array_value](#get_array_valuek-string-arr-any-type)
+* [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
@@ -27,6 +27,7 @@ SELECT bqutil.fn.int(1.684)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
+* [url_parse](#url_parseurlstring-string-parttoextract-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
@@ -275,7 +276,7 @@ SELECT bqutil.fn.url_param(
 ```
 
 
-### [url_parse(string urlString, string partToExtract )](url_parse_udf.sql)
+### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sql)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
