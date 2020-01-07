@@ -31,6 +31,130 @@ SELECT bqutil.fn.int(1.684)
 
 ## Documentation
 
+### [csv_to_struct(strList STRING)](csv_to_struct.sql)
+Take a list of comma separated key-value pairs and creates a struct.
+Input:
+strList: string that has map in the format a:b,c:d....
+Output: struct for the above map.
+```sql
+WITH test_cases AS (
+  SELECT NULL as s
+  UNION ALL
+  SELECT '' as s
+  UNION ALL
+  SELECT ',' as s
+  UNION ALL
+  SELECT ':' as s
+  UNION ALL
+  SELECT 'a:b' as s
+  UNION ALL
+  SELECT 'a:b,c:d' as s
+  UNION ALL
+  SELECT 'a:b' as s
+)
+SELECT key, value from test_cases as t, UNNEST(bqutil.fn.csv_to_struct(t.s)) s;
+```
+
+results:
+|-----|-------|
+| key | value |
+|-----|-------|
+|     |       |
+| a   | b     |
+| a   | b     |
+| c   | d     |
+| a   | b     |
+|-----|-------|
+
+
+
+### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
+Returns the first occurance of str in strList where strList is a comma-delimited string.
+Returns null if either argument is null.
+Returns 0 if the first argument contains any commas.
+For example, find_in_set('ab', 'abc,b,ab,c,def') returns 3.
+Input:
+str: string to search for.
+strList: string in which to search.
+Output: Position of str in strList
+```sql
+WITH test_cases AS (
+  SELECT 'ab' as str, 'abc,b,ab,c,def' as strList
+  UNION ALL
+  SELECT 'ab' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile,' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+)
+SELECT bqutil.fn.find_in_set(str, strList) from test_cases
+```
+
+results:
+|------|
+| f0_  |
+|------|
+|    3 |
+| NULL |
+|    1 |
+|    0 |
+|------|
+
+
+
+### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
+Given a key and a map, returns the ARRAY type value.
+This is same as get_value except it returns an ARRAY type.
+This can be used when the map has multiple values for a given key.
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('a' AS key, 'AAA' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.get_array_value('b', a), bqutil.fn.get_array_value('a', a), bqutil.fn.get_array_value('c', a) from test;
+```
+
+results:
+|---------|---------------|---------|
+|   f0_   |      f1_      |   f2_   |
+|---------|---------------|---------|
+| ["bbb"] | ["aaa","AAA"] | ["ccc"] |
+|---------|---------------|---------|
+
+
+
+### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
+Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
+
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.get_value('b', a), bqutil.fn.get_value('a', a), bqutil.fn.get_value('c', a) from test;
+```
+
+results:
+|-----|-----|-----|
+| f0_ | f1_ | f2_ |
+|-----|-----|-----|
+| bbb | aaa | ccc |
+|-----|-----|-----|
+
+
+
 ### [int(v ANY TYPE)](int.sql)
 Convience wrapper which can be used to convert values to integers in place of
 the native `CAST(x AS INT64)`.
@@ -45,6 +169,7 @@ SELECT bqutil.fn.int(1) int1
 ```
 
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
+
 
 
 ### [median(arr ANY TYPE)](median.sql)
@@ -149,6 +274,7 @@ SELECT bqutil.fn.url_param(
 "chrome"
 ```
 
+
 ### [url_parse(string urlString, string partToExtract )](url_parse_udf.sql)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
@@ -182,6 +308,7 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 "2020-12-20"
 ```
 
+
 ### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
 Normalize a variable so that it has zero mean and unit variance.
 
@@ -210,122 +337,4 @@ returns:
 | 3	| 30 | 0.0 |
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
-
-
-### [csv_to_struct(strList STRING)](csv_to_struct.sql)
-Take a list of comma separated key-value pairs and creates a struct.
-Input:
-strList: string that has map in the format a:b,c:d....
-Output: struct for the above map.
-```sql
-WITH test_cases AS (
-  SELECT NULL as s
-  UNION ALL
-  SELECT '' as s
-  UNION ALL
-  SELECT ',' as s
-  UNION ALL
-  SELECT ':' as s
-  UNION ALL
-  SELECT 'a:b' as s
-  UNION ALL
-  SELECT 'a:b,c:d' as s
-  UNION ALL
-  SELECT 'a:b' as s
-)
-SELECT key, value from test_cases as t, UNNEST(bqutil.fn.csv_to_struct(t.s)) s;
-```
-
-results:
-|-----|-------|
-| key | value |
-|-----|-------|
-|     |       |
-| a   | b     |
-| a   | b     |
-| c   | d     |
-| a   | b     |
-|-----|-------|
-
-### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
-Returns the first occurance of str in strList where strList is a comma-delimited string.
-Returns null if either argument is null.
-Returns 0 if the first argument contains any commas.
-For example, find_in_set('ab', 'abc,b,ab,c,def') returns 3.
-Input:
-str: string to search for.
-strList: string in which to search.
-Output: Position of str in strList
-```sql
-WITH test_cases AS (
-  SELECT 'ab' as str, 'abc,b,ab,c,def' as strList
-  UNION ALL
-  SELECT 'ab' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
-  UNION ALL
-  SELECT 'mobile' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
-  UNION ALL
-  SELECT 'mobile,' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
-)
-SELECT bqutil.fn.find_in_set(str, strList) from test_cases
-```
-
-results:
-|------|
-| f0_  |
-|------|
-|    3 |
-| NULL |
-|    1 |
-|    0 |
-|------|
-
-### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
-Given a key and a map, returns the ARRAY type value.
-This is same as get_value except it returns an ARRAY type.
-This can be used when the map has multiple values for a given key.
-```sql
-WITH test AS (
-  SELECT ARRAY(
-    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('a' AS key, 'AAA' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
-  ) AS a
-)
-SELECT bqutil.fn.get_array_value('b', a), bqutil.fn.get_array_value('a', a), bqutil.fn.get_array_value('c', a) from test;
-```
-
-results:
-|---------|---------------|---------|
-|   f0_   |      f1_      |   f2_   |
-|---------|---------------|---------|
-| ["bbb"] | ["aaa","AAA"] | ["ccc"] |
-|---------|---------------|---------|
-
-
-### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
-Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
-
-```sql
-WITH test AS (
-  SELECT ARRAY(
-    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
-    UNION ALL
-    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
-  ) AS a
-)
-SELECT bqutil.fn.get_value('b', a), bqutil.fn.get_value('a', a), bqutil.fn.get_value('c', a) from test;
-```
-
-results:
-|-----|-----|-----|
-| f0_ | f1_ | f2_ |
-|-----|-----|-----|
-| bbb | aaa | ccc |
-|-----|-----|-----|
 
