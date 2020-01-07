@@ -57,15 +57,13 @@ SELECT key, value from test_cases as t, UNNEST(bqutil.fn.csv_to_struct(t.s)) s;
 ```
 
 results:
-|-----|-------|
+
 | key | value |
 |-----|-------|
-|     |       |
 | a   | b     |
 | a   | b     |
 | c   | d     |
 | a   | b     |
-|-----|-------|
 
 
 
@@ -92,14 +90,13 @@ SELECT bqutil.fn.find_in_set(str, strList) from test_cases
 ```
 
 results:
-|------|
+
 | f0_  |
 |------|
 |    3 |
 | NULL |
 |    1 |
 |    0 |
-|------|
 
 
 
@@ -123,11 +120,10 @@ SELECT bqutil.fn.get_array_value('b', a), bqutil.fn.get_array_value('a', a), bqu
 ```
 
 results:
-|---------|---------------|---------|
+
 |   f0_   |      f1_      |   f2_   |
 |---------|---------------|---------|
 | ["bbb"] | ["aaa","AAA"] | ["ccc"] |
-|---------|---------------|---------|
 
 
 
@@ -148,11 +144,10 @@ SELECT bqutil.fn.get_value('b', a), bqutil.fn.get_value('a', a), bqutil.fn.get_v
 ```
 
 results:
-|-----|-----|-----|
+
 | f0_ | f1_ | f2_ |
 |-----|-----|-----|
 | bbb | aaa | ccc |
-|-----|-----|-----|
 
 
 
@@ -291,13 +286,11 @@ SELECT bqutil.fn.url_parse(url, 'HOST'), bqutil.fn.url_parse(url, 'PATH'), bquti
 
 results:
 
-url_parse
-+--------------+-------------+------------------+------+------+
 |     f0_      |     f1_     |       f2_        | f3_  | f4_  |
-+--------------+-------------+------------------+------+------+
+|--------------|-------------|------------------|------|------|
 | facebook.com | path1/p.php | k1=v1&k2=v2#Ref1 | Ref1 | http |
 | facebook.com | NULL        | NULL             | NULL | rpc  |
-+--------------+-------------+------------------+------+------+
+
 
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
