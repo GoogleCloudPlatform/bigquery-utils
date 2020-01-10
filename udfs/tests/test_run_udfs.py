@@ -18,36 +18,40 @@ from parameterized import parameterized
 from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPICallError
 
-from utils import Utils
+import udf_test_utils as utils
 
 
 class TestRunUDFs(unittest.TestCase):
 
-    @parameterized.expand(Utils.get_all_udf_paths())
+    @parameterized.expand(utils.get_all_udf_paths())
     def test_run_udf_and_verify_expected_result(self, udf_path):
         client = bigquery.Client()
-        bq_test_dataset = Utils.get_target_bq_dataset(udf_path)
-        udf_name = Utils.extract_udf_name(udf_path)
-        test_cases = Utils.load_test_cases(udf_path)
-        if test_cases.get(udf_name):
-            for case in test_cases[udf_name]:
-                try:
-                    actual_result_rows = client.query(
-                        f'SELECT `{bq_test_dataset}.{udf_name}`('
-                        f' {case["input"]} )'
-                    ).result()
-
-                    expected_result_rows = client.query(
-                        f'SELECT {case["expected_output"]}'
-                    ).result()
-
-                    for actual, expected in zip(
-                            actual_result_rows, expected_result_rows):
-                        self.assertEqual(expected, actual)
-                except GoogleAPICallError as e:
-                    self.fail(e.message)
-        else:
+        bq_test_dataset = utils.get_target_bq_dataset(udf_path)
+        udf_name = utils.extract_udf_name(udf_path)
+        test_cases = utils.load_test_cases(udf_path)
+        if test_cases.get(udf_name) is None:
             self.skipTest(f'Test inputs and outputs are not provided for : {udf_path}')
+        for case in test_cases[udf_name]:
+            try:
+                actual_result_rows = client.query(
+                    f'SELECT `{bq_test_dataset}.{udf_name}`('
+                    f' {case["input"]} ) AS actual_result_rows'
+                ).result()
+
+                expected_result_rows = client.query(
+                    f'SELECT ( {case["expected_output"]} ) AS expected_result_rows'
+                ).result()
+
+                for expected_result_row, actual_result_row in zip(expected_result_rows, actual_result_rows):
+                    self.assertSequenceEqual(
+                        expected_result_row.values(),
+                        actual_result_row.values(),
+                        msg=(f'\nTest failed for: {client.project}.{bq_test_dataset}.{udf_name}( {case["input"]} )'
+                             f'\nExpected output: {expected_result_row.values()}'
+                             f'\nActual output: {actual_result_row.values()}'))
+
+            except GoogleAPICallError as e:
+                self.fail(e.message)
 
 
 if __name__ == '__main__':

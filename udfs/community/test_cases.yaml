@@ -1,16 +1,16 @@
 int:
   - test:
-    input: -1
-    expected_output: -1
+    input: CAST(-1 AS STRING)
+    expected_output: CAST(-1 AS INT64)
   - test:
-    input: 1
-    expected_output: 1
+    input: CAST(1 AS INT64)
+    expected_output: CAST(1 AS INT64)
   - test:
-    input: 2.5
-    expected_output: 2
+    input: CAST(2.5 AS FLOAT64)
+    expected_output: CAST(2 AS INT64)
   - test:
-    input: 7
-    expected_output: 7
+    input: CAST(7 AS INT64)
+    expected_output: CAST(7 AS INT64)
   - test:
-    input: 7.8
-    expected_output: 7
+    input: CAST(7.8 AS FLOAT64)
+    expected_output: CAST(7 AS INT64)

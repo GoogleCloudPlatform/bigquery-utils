@@ -20,31 +20,30 @@ from google.api_core.exceptions import GoogleAPICallError
 from google.cloud.bigquery import QueryJobConfig
 from google.cloud.bigquery.table import _EmptyRowIterator
 
-from utils import Utils
+import udf_test_utils as utils
 
 
 class TestCreateUDFs(unittest.TestCase):
 
-    @parameterized.expand(Utils.get_all_udf_paths())
+    @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf(self, udf_path):
         client = bigquery.Client()
-        bq_test_dataset = Utils.get_target_bq_dataset(udf_path)
+        bq_test_dataset = utils.get_target_bq_dataset(udf_path)
         client.create_dataset(bq_test_dataset, exists_ok=True)
 
         job_config = QueryJobConfig()
         job_config.default_dataset = (
             f'{client.project}.{bq_test_dataset}'
         )
-        with open(udf_path) as udf_file:
-            try:
-                udf_sql = Utils.replace_with_test_datasets(udf_path, client.project)
-                udf_creation_result = client.query(
-                    udf_sql,
-                    job_config=job_config
-                ).result()
-                self.assertIsInstance(udf_creation_result, _EmptyRowIterator)
-            except GoogleAPICallError as e:
-                self.fail(e.message)
+        try:
+            udf_sql = utils.replace_with_test_datasets(udf_path, client.project)
+            udf_creation_result = client.query(
+                udf_sql,
+                job_config=job_config
+            ).result()
+            self.assertIsInstance(udf_creation_result, _EmptyRowIterator)
+        except GoogleAPICallError as e:
+            self.fail(e.message)
 
 
 if __name__ == '__main__':

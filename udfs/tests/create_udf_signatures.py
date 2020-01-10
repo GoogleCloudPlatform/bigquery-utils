@@ -20,23 +20,23 @@ from google.api_core.exceptions import GoogleAPICallError
 from google.cloud.bigquery import QueryJobConfig
 from google.cloud.bigquery.table import _EmptyRowIterator
 
-from utils import Utils
+import udf_test_utils as utils
 
 
 class CreateUDFSignatures(unittest.TestCase):
 
-    @parameterized.expand(Utils.get_all_udf_paths())
+    @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf_signature(self, udf_path):
         client = bigquery.Client()
-        bq_test_dataset = Utils.get_target_bq_dataset(udf_path)
+        bq_test_dataset = utils.get_target_bq_dataset(udf_path)
         client.create_dataset(bq_test_dataset, exists_ok=True)
 
         job_config = QueryJobConfig()
         job_config.default_dataset = (
             f'{client.project}.{bq_test_dataset}'
         )
-        udf_name = Utils.extract_udf_signature(udf_path)
-        udf_sql = Utils.replace_with_test_datasets(
+        udf_name = utils.extract_udf_signature(udf_path)
+        udf_sql = utils.replace_with_test_datasets(
             project_id=client.project,
             udf_sql=f'CREATE OR REPLACE FUNCTION {udf_name} AS (0)')
         try:
