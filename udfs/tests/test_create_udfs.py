@@ -24,7 +24,11 @@ import udf_test_utils as utils
 
 
 class TestCreateUDFs(unittest.TestCase):
-
+    """
+    This class uses the parameterized python package (https://pypi.org/project/parameterized/) to programmatically
+    create multiple python test function definitions (based off `test_create_udf`). It will effectively create a
+    python test function for each UDF that it encounters as it walks through the udfs/ directory.
+    """
     @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf(self, udf_path):
         client = bigquery.Client()

@@ -22,7 +22,13 @@ import udf_test_utils as utils
 
 
 class TestRunUDFs(unittest.TestCase):
-
+    """
+    This class uses the parameterized python package (https://pypi.org/project/parameterized/) to programmatically
+    create multiple python test function definitions (based off `test_run_udf_and_verify_expected_result`).
+    It will effectively create a python test function for each UDF that it encounters as it walks through the
+    udfs/ directory. This class tests each UDF by running it in BigQuery with the inputs given in the test_cases.yaml
+    file, and then asserting that the results equal the expected outputs given in the test_cases.yaml file.
+    """
     @parameterized.expand(utils.get_all_udf_paths())
     def test_run_udf_and_verify_expected_result(self, udf_path):
         client = bigquery.Client()
