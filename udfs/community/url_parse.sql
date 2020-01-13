@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
---url_parse(string urlString, string partToExtract)
---Returns the specified part from the URL. Valid values for partToExtract include PROTOCOL, HOST, PATH, QUERY, and REF.
---For example, parse_url('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
-CREATE OR REPLACE FUNCTION fn.check_protocol(url STRING)
-AS (
-  CASE
-    WHEN REGEXP_CONTAINS(url, '^[a-zA-Z]+://') THEN url
-    ELSE CONCAT('http://', url)
-  END
-);
 
 CREATE OR REPLACE FUNCTION fn.url_parse(url STRING, part STRING)
 AS (
