@@ -119,7 +119,7 @@ results:
 |         |       5    |     2     |
 |         |    1000    |     1     |
 
-```
+
 
 ### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
 Given a key and a map, returns the ARRAY type value.
