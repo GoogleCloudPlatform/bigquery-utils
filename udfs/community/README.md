@@ -15,6 +15,7 @@ SELECT bqutil.fn.int(1.684)
 
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
+* [freq_table](#freq_table-arr-any-type)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
@@ -99,6 +100,26 @@ results:
 |    0 |
 
 
+
+### [freq_table(arr ANY TYPE)](freq_table.sql)
+Construct a frequency table (histogram) of an array of elements.
+Frequency table is represented as an array of STRUCT(value, freq)
+
+```sql
+SELECT bqutil.fn.freq_table([1,2,1,3,1,5,1000,5]) ft
+```
+
+results:
+
+|   Row   |  ft.value  |  ft.freq  |
+|---------|------------|-----------|
+|    1    |       1    |     3     |
+|         |       2    |     1     |
+|         |       3    |     1     |
+|         |       5    |     2     |
+|         |    1000    |     1     |
+
+```
 
 ### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
 Given a key and a map, returns the ARRAY type value.
