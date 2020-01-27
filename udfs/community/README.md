@@ -15,7 +15,7 @@ SELECT bqutil.fn.int(1.684)
 
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
-* [freq_table](#freq_table-arr-any-type)
+* [freq_table](#freq_tablearr-any-type)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
