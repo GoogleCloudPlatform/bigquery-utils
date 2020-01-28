@@ -38,7 +38,7 @@ class CreateUDFSignatures(unittest.TestCase):
         udf_name = utils.extract_udf_signature(udf_path)
         udf_sql = utils.replace_with_test_datasets(
             project_id=client.project,
-            udf_sql=f'CREATE OR REPLACE FUNCTION {udf_name} AS (0)')
+            udf_sql=f'CREATE OR REPLACE FUNCTION {udf_name} AS (NULL)')
         try:
             udf_creation_result = client.query(
                 udf_sql,
