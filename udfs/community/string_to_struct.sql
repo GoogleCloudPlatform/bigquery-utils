@@ -15,7 +15,7 @@
  */
 
 -- string_to_struct:
--- helper funcitons for parsing key-value data from a string to struct
+-- helper function for parsing key-value data from a string to struct
 -- Input:
 -- strList: string that has map in the format 'a:b,c:d....'
 -- entry_delimiter: string that has the delimiter e.g. ','

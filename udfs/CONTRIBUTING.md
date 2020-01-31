@@ -4,21 +4,30 @@ Thank you for taking the time to contribute to this repository of user-defined f
 
 The following is a set of guidelines for contributing a UDF to this repository.
 
-## Pull Request Process
+## UDF Contribution Guidelines
 
-1. In order to contribute a UDF to this repository, please include these changes in a pull request:
-    * Add a SQL file containing the UDF and a Contributor License Agreement 
-    (see the below [section](#contributor-license-agreement) for more information) to the appropriate directory. 
-    If this is a function replicating something in a data warehouse, choose the associated sub-directory in the
-     [migration](/udfs/migration) directory. Otherwise, choose the [community](/udfs/community) directory.
-    * Edit the `test_cases.yaml` file to include test inputs and expected outputs for the function. Make sure test 
-    cases provide full coverage of the function's expected behavior. For example, if integers are expected input, 
-    please provide test cases with the following inputs: negative numbers, zero, positive numbers, and null values.
-    * Edit the `README.md` in the associated sub-directory to include a description of the function. Make sure your 
-    function is listed in alphabetical order amongst the other functions in the `README.md`. 
+### Add your UDF 
+
+1. Add your UDFs (**one** UDF per file) and a [Contributor License Agreement](#contributor-license-agreement)
+ to the appropriate directory.
+    * If your function replicates logic from some other data warehouse UDF, place it in the relevant sub-directory in the
+ [migration](/udfs/migration) directory. Otherwise, place it in the [community](/udfs/community) directory.
+1. Add test cases for your UDFs.
+    * Edit the `test_cases.yaml` file to include test inputs and expected outputs for the function. 
+    * Make sure test cases provide full coverage of the function's expected behavior. For example, if integers
+      are the expected input, please provide test cases with the following inputs: negative numbers, zero, positive
+      numbers, and null values.
+1. Describe what your UDF does.
+    * Edit the `README.md` in the associated sub-directory to include a description of the function and make sure
+     your function is listed in alphabetical order amongst the other functions in the `README.md`.
+    * Make sure the same description is placed as a comment in your UDF file.  
+
+### Test your UDF
 1. Test your UDF locally using the test cases you added to the `test_cases.yaml` file. Please follow the instructions 
 in the [Testing UDFs Locally section](#testing-udfs-locally) to automatically test all inputs for the expected outputs 
 using the function.
+
+### Submit a Pull Request
 1. Submit a pull request and we will review the code as soon as possible. Please see the section on 
 [Code Reviews](#code-reviews) for more information.
 
