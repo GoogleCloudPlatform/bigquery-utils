@@ -1,54 +1,71 @@
 # Contributing UDFs
 
-Thank you for taking the time to contribute to this repository of user-defined functions (UDFs) for BigQuery.
+Thank you for taking the time to contribute to this repository of user-defined
+functions (UDFs) for BigQuery.
 
 The following is a set of guidelines for contributing a UDF to this repository.
 
 ## UDF Contribution Guidelines
 
-### Add your UDF 
+### Add your UDF
 
-1. Add your UDFs (**one** UDF per file) and a [Contributor License Agreement](#contributor-license-agreement)
- to the appropriate directory.
-    * If your function replicates logic from some other data warehouse UDF, place it in the relevant sub-directory in the
- [migration](/udfs/migration) directory. Otherwise, place it in the [community](/udfs/community) directory.
-1. Add test cases for your UDFs.
-    * Edit the `test_cases.yaml` file to include test inputs and expected outputs for the function. 
-    * Make sure test cases provide full coverage of the function's expected behavior. For example, if integers
-      are the expected input, please provide test cases with the following inputs: negative numbers, zero, positive
-      numbers, and null values.
-1. Describe what your UDF does.
-    * Edit the `README.md` in the associated sub-directory to include a description of the function and make sure
-     your function is listed in alphabetical order amongst the other functions in the `README.md`.
-    * Make sure the same description is placed as a comment in your UDF file.  
+1.  Add your UDFs (**one** UDF per file) and a
+    [Contributor License Agreement](#contributor-license-agreement) to the
+    appropriate directory.
+    *   If your function replicates logic from some other data warehouse UDF,
+        place it in the relevant sub-directory in the
+        [migration](/udfs/migration) directory. Otherwise, place it in the
+        [community](/udfs/community) directory.
+1.  Add test cases for your UDFs.
+    *   Edit the `test_cases.yaml` file to include test inputs and expected
+        outputs for the function.
+    *   Make sure test cases provide full coverage of the function's expected
+        behavior. For example, if integers are the expected input, please
+        provide test cases with the following inputs: negative numbers, zero,
+        positive numbers, and null values.
+1.  Describe what your UDF does.
+    *   Edit the `README.md` in the associated sub-directory to include a
+        description of the function and make sure your function is listed in
+        alphabetical order amongst the other functions in the `README.md`.
+    *   Make sure the same description is placed as a comment in your UDF file.
 
 ### Test your UDF
-1. Test your UDF locally using the test cases you added to the `test_cases.yaml` file. Please follow the instructions 
-in the [Testing UDFs Locally section](#testing-udfs-locally) to automatically test all inputs for the expected outputs 
-using the function.
+
+1.  Test your UDF locally using the test cases you added to the
+    `test_cases.yaml` file. Please follow the instructions in the
+    [Testing UDFs Locally section](#testing-udfs-locally) to automatically test
+    all inputs for the expected outputs using the function.
 
 ### Submit a Pull Request
-1. Submit a pull request and we will review the code as soon as possible. Please see the section on 
-[Code Reviews](#code-reviews) for more information.
+
+1.  Submit a pull request and we will review the code as soon as possible.
+    Please see the section on [Code Reviews](#code-reviews) for more
+    information.
+
+Note: Your pull request, and any following commits, will trigger a testing
+pipeline that will run unit tests on your submitted function as well as all the
+other existing functions. This is done by a Cloud Build Trigger which runs a
+Bash script. This Bash script unit tests the functions, running the contributed
+UDFs in BigQuery with the given input to check that it results in the expected
+output. If these tests pass, this will indicate to the reviewer that the
+functions work as expected. So testing these functions locally before submitting
+the pull request can ensure a successful review process.
 
 ## Testing UDFs Locally
 
-Please follow these instructions to confirm that the test cases being provided in your pull request work as expected.
+Please follow these instructions to confirm that the test cases being provided
+in your pull request work as expected.
 
-1. Change into the bigquery_utils top-level directory.
-1. Create a Python virtual environment and activate it:
-    * `python3 -m venv venv`
-    * `source venv/bin/activate`
-1. Run all tests by invoking the `run.sh` script
-    * `bash udfs/tests/run.sh` 
-1. If all the tests pass, submit your pull request to proceed to the code review process.
-
-The `run.sh` script performs unit testing on your one function. A continuous integration pipeline triggered by a pull request 
-to the repository will test your submitted function as well as all the existing functions. This is done by a 
-Cloud Build Trigger which runs a Bash script. This Bash script unit tests the functions, running the contributed UDFs
- in BigQuery with the given input to check that it results in the expected output. If these tests pass, this will 
- indicate to the reviewer that the functions work as expected. So testing these functions locally before submitting 
- the pull request can ensure a successful review process.
+1.  Change into the bigquery_utils top-level directory.
+1.  Create a Python virtual environment and activate it:
+    *   `python3 -m venv venv`
+    *   `source venv/bin/activate``
+1.  Run all tests by invoking the `run.sh` script
+    *   `bash udfs/tests/run.sh`
+        *   Note: The first step of this script installs the required python
+            packages
+1.  If all the tests pass, submit your pull request to proceed to the code
+    review process.
 
 ## Contributor License Agreement
 
