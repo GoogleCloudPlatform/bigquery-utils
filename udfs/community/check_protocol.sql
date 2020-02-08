@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+--Adds http:// to a url if it doesn't already have it
 CREATE OR REPLACE FUNCTION fn.check_protocol(url STRING)
 AS (
   CASE
