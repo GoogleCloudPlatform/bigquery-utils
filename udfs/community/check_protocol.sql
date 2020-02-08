@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 --Adds http:// to a url if it doesn't already have it
-CREATE OR REPLACE FUNCTION fn.check_protocol(url STRING)
+CREATE OR REPLACE FUNCTION fn.check_protocol(url STRING) RETURNS STRING
 AS (
   CASE
     WHEN REGEXP_CONTAINS(url, '^[a-zA-Z]+://') THEN url
