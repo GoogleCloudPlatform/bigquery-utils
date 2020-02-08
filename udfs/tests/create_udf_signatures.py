@@ -35,10 +35,10 @@ class CreateUDFSignatures(unittest.TestCase):
         job_config.default_dataset = (
             f'{client.project}.{bq_test_dataset}'
         )
-        udf_name = utils.extract_udf_signature(udf_path)
+        udf_signature = utils.extract_udf_signature(udf_path)
         udf_sql = utils.replace_with_test_datasets(
             project_id=client.project,
-            udf_sql=f'CREATE OR REPLACE FUNCTION {udf_name} AS (NULL)')
+            udf_sql=f'CREATE OR REPLACE FUNCTION {udf_signature} AS (NULL)')
         try:
             udf_creation_result = client.query(
                 udf_sql,

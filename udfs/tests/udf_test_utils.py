@@ -63,10 +63,10 @@ def extract_udf_signature(udf_path):
     with open(udf_path) as udf_file:
         udf_sql = udf_file.read()
     udf_sql = udf_sql.replace('\n', ' ')
-    pattern = re.compile(r'FUNCTION\s+(`?.+?`?.*?\)).*?\s+AS')
+    pattern = re.compile(r'FUNCTION\s+(`?.+?`?.*?\).*?\s+)AS')
     match = pattern.search(udf_sql)
     if match:
-        udf_name = match[1]
+        udf_name = match[1].replace('LANGUAGE', '').replace('js', '')
         return udf_name
     else:
         return udf_path
