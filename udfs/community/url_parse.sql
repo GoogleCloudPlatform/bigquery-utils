@@ -27,7 +27,7 @@ AS (
       IF(REGEXP_CONTAINS(url, r'\?'), SPLIT(fn.check_protocol(url), '?')[OFFSET(1)], NULL)
     WHEN UPPER(part) = 'REF' THEN
       IF(REGEXP_CONTAINS(url, '#'), SPLIT(fn.check_protocol(url), '#')[OFFSET(1)], NULL)
-    WHEN UPPER(part) = 'PROTOCOL' THEN RTRIM(REGEXP_EXTRACT(url, '^[a-zA-Z]+://'), '://')
+    WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, '^([a-zA-Z]+)://')
     ELSE ''
   END
 );
