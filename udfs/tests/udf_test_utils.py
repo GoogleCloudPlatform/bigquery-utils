@@ -16,6 +16,8 @@ import glob
 from os import path
 from os.path import dirname
 import re
+import argparse
+from google.cloud import bigquery
 
 from yaml import SafeLoader
 from yaml import load
@@ -90,3 +92,31 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
 def get_target_bq_dataset(udf_path):
     parent_dir_name = str(dirname(udf_path).split('/')[-1])
     return BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)
+
+
+def delete_datasets(client, datasets):
+    for dataset in datasets:
+        client.delete_dataset(dataset, delete_contents=True, not_found_ok=True)
+
+
+def create_datasets(client, datasets):
+    for dataset in datasets:
+        client.create_dataset(dataset, exists_ok=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Utils Class to support testing BigQuery UDFs')
+    parser.add_argument('--create_test_datasets', help='Create test datasets used for UDF function testing.',
+                        action='store_true')
+    parser.add_argument('--delete_test_datasets', help='Delete test datasets used for UDF function testing.',
+                        action='store_true')
+    args = parser.parse_args()
+    client = bigquery.Client()
+    if args.create_test_datasets:
+        create_datasets(client, BIGQUERY_TEST_DATASET_MAPPINGS.values())
+    elif args.delete_test_datasets:
+        delete_datasets(client, BIGQUERY_TEST_DATASET_MAPPINGS.values())
+
+
+if __name__ == '__main__':
+    main()

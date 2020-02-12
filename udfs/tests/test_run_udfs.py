@@ -29,9 +29,14 @@ class TestRunUDFs(unittest.TestCase):
     udfs/ directory. This class tests each UDF by running it in BigQuery with the inputs given in the test_cases.yaml
     file, and then asserting that the results equal the expected outputs given in the test_cases.yaml file.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._client = bigquery.Client()
+
     @parameterized.expand(utils.get_all_udf_paths())
     def test_run_udf_and_verify_expected_result(self, udf_path):
-        client = bigquery.Client()
+        client = self._client
         bq_test_dataset = utils.get_target_bq_dataset(udf_path)
         udf_name = utils.extract_udf_name(udf_path)
         test_cases = utils.load_test_cases(udf_path)

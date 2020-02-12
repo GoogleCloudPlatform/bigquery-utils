@@ -22,6 +22,8 @@
 #
 #########################################################################
 python3 -m pip install -r udfs/tests/requirements.txt
+python3 udfs/tests/udf_test_utils.py --create_test_datasets
 python3 -m pytest --workers 100 udfs/tests/create_udf_signatures.py
 python3 -m pytest --workers 100 udfs/tests/test_create_udfs.py
 python3 -m pytest --workers 100 udfs/tests/test_run_udfs.py
+python3 udfs/tests/udf_test_utils.py --delete_test_datasets

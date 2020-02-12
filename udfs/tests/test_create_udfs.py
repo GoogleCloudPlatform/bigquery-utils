@@ -29,11 +29,15 @@ class TestCreateUDFs(unittest.TestCase):
     create multiple python test function definitions (based off `test_create_udf`). It will effectively create a
     python test function for each UDF that it encounters as it walks through the udfs/ directory.
     """
+
+    @classmethod
+    def setUpClass(cls):
+        cls._client = bigquery.Client()
+
     @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf(self, udf_path):
-        client = bigquery.Client()
+        client = self._client
         bq_test_dataset = utils.get_target_bq_dataset(udf_path)
-        client.create_dataset(bq_test_dataset, exists_ok=True)
 
         job_config = QueryJobConfig()
         job_config.default_dataset = (

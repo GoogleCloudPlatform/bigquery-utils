@@ -25,11 +25,14 @@ import udf_test_utils as utils
 
 class CreateUDFSignatures(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls._client = bigquery.Client()
+
     @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf_signature(self, udf_path):
-        client = bigquery.Client()
+        client = self._client
         bq_test_dataset = utils.get_target_bq_dataset(udf_path)
-        client.create_dataset(bq_test_dataset, exists_ok=True)
 
         job_config = QueryJobConfig()
         job_config.default_dataset = (
