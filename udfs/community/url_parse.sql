@@ -20,14 +20,11 @@
 CREATE OR REPLACE FUNCTION fn.url_parse(url STRING, part STRING)
 AS (
   CASE
-    -- Return HOST part of the URL.
-    WHEN UPPER(part) = 'HOST' THEN SPLIT(fn.check_protocol(url), '/')[OFFSET(2)]
-    WHEN UPPER(part) = 'PATH' THEN REGEXP_EXTRACT(url, r'^[a-zA-Z]+://[a-zA-Z0-9.-]+/([a-zA-Z0-9.-/]+)') 
-    WHEN UPPER(part) = 'QUERY' THEN 
-      IF(REGEXP_CONTAINS(url, r'\?'), SPLIT(fn.check_protocol(url), '?')[OFFSET(1)], NULL)
-    WHEN UPPER(part) = 'REF' THEN
-      IF(REGEXP_CONTAINS(url, '#'), SPLIT(fn.check_protocol(url), '#')[OFFSET(1)], NULL)
-    WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, '^([a-zA-Z]+)://')
-    ELSE ''
+    WHEN UPPER(part) = 'HOST'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?([a-zA-Z0-9-.]+)/?')
+    WHEN UPPER(part) = 'PATH'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)')
+    WHEN UPPER(part) = 'QUERY' THEN REGEXP_EXTRACT(url, r'\?(.*)')
+    WHEN UPPER(part) = 'REF'   THEN REGEXP_EXTRACT(url, r'#(.*)')
+    WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, r'^([a-zA-Z]+)://')
+    ELSE NULL
   END
 );

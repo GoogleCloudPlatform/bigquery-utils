@@ -45,3 +45,18 @@ url_parse:
   - test:
     input: CAST('rpc://facebook.com/' AS STRING), CAST('PROTOCOL' AS STRING)
     expected_output: CAST('rpc' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('HOST' AS STRING)
+    expected_output: CAST('subdomain.facebook.com' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PATH' AS STRING)
+    expected_output: CAST('path1/p.php' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('QUERY' AS STRING)
+    expected_output: CAST('k1=v1&k2=v2#Ref1' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('REF' AS STRING)
+    expected_output: CAST('Ref1' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
+    expected_output: (NULL)
