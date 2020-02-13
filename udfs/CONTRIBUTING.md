@@ -63,7 +63,7 @@ in your pull request work as expected.
 1.  Create a Python virtual environment and activate it:
 
     *   `python3 -m venv venv`
-    *   `source venv/bin/activate``
+    *   `source venv/bin/activate`
     *   `pip install -r udfs/tests/requirements.txt`
 
 1.  Test your UDF by invoking the `run.sh` script and passing the name of the
