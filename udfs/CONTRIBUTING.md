@@ -18,7 +18,9 @@ The following is a set of guidelines for contributing a UDF to this repository.
         [community](/udfs/community) directory.
 1.  Add test cases for your UDFs.
     *   Edit the `test_cases.yaml` file to include test inputs and expected
-        outputs for the function.
+        outputs for the function. (take a look at the
+        [community test_cases.yaml](community/test_cases.yaml) file as an
+        example)
     *   Make sure test cases provide full coverage of the function's expected
         behavior. For example, if integers are the expected input, please
         provide test cases with the following inputs: negative numbers, zero,
@@ -57,13 +59,25 @@ Please follow these instructions to confirm that the test cases being provided
 in your pull request work as expected.
 
 1.  Change into the bigquery_utils top-level directory.
+
 1.  Create a Python virtual environment and activate it:
+
     *   `python3 -m venv venv`
     *   `source venv/bin/activate``
-1.  Run all tests by invoking the `run.sh` script
+    *   `pip install -r udfs/tests/requirements.txt`
+
+1.  Test your UDF by invoking the `run.sh` script and passing the name of the
+    UDF in lower caps as an argument.
+
+    *   `bash udfs/tests/run.sh url_parse`
+        *   Note: If your UDF name exists in multiple directories, you can add
+            the UDF's parent directory as a prefix \
+            `bash udfs/tests/run.sh community_url_parse`
+
+1.  Run all tests by invoking the `run.sh` script with no arguments
+
     *   `bash udfs/tests/run.sh`
-        *   Note: The first step of this script installs the required python
-            packages
+
 1.  If all the tests pass, submit your pull request to proceed to the code
     review process.
 
