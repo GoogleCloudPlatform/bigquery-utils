@@ -4,7 +4,7 @@ from jinja2 import Template
 
 def main(argv):
   if len(argv) < 2:
-    print('usage: bq_json2ddl.py <schema.json> <outputfile>')
+    print('Usage: bq_json2ddl.py <schema.json> <outputfile>')
     sys.exit()
   output_file = argv[1]
 
@@ -13,6 +13,31 @@ def main(argv):
   json_file.close()
 
   ddl_template = Template("""
+  {% macro get_options(options) %}
+  OPTIONS(
+    {%- for oname, ovalue in options.items() %}
+    {%- if oname == "labels" %} 
+    {{ oname }} = [
+      {%- for lname, lvalue in ovalue.items() %}
+      ( "{{ lname }}", "{{ lvalue }}" ) {%- if loop.nextitem is defined %}, {%- endif %}
+      {%- endfor %}]
+    {%- else %}
+    {{ oname }} = {{ ovalue }}
+  {%- endif %}
+  {%- if loop.nextitem is defined %}, {%- endif %}
+  {%- endfor %}
+  )
+  {% endmacro %}
+
+  {%- if schema.type == 'VIEW' %}
+  CREATE VIEW `{{ schema.tableReference.projectId }}`.{{ schema.tableReference.datasetId }}.{{ schema.tableReference.tableId }}
+  {%- if options %} 
+  {{- get_options(options) }}
+  {%- endif -%}
+  AS
+  {{ schema.view.query }}
+
+  {%- elif schema.type == 'TABLE' %}    
   CREATE TABLE `{{ schema.tableReference.projectId }}`.{{ schema.tableReference.datasetId }}.{{ schema.tableReference.tableId }}
   (
   {%- for field in schema.schema.fields recursive %}
@@ -60,19 +85,9 @@ def main(argv):
   {%- endif %}
 
   {%- if options %} 
-  OPTIONS(
-  {%- for oname, ovalue in options.items() %}
-    {%- if oname == "labels" %} 
-    {{ oname }} = [
-      {%- for lname, lvalue in ovalue.items() %}
-      ( "{{ lname }}", "{{ lvalue }}" ) {%- if loop.nextitem is defined %}, {%- endif %}
-      {%- endfor %}]
-    {%- else %}
-    {{ oname }} = {{ ovalue }}
-    {%- endif %}
-    {%- if loop.nextitem is defined %}, {%- endif %}
-  {%- endfor %}
-  )
+  {{- get_options(options) }}
+  {%- endif %}  
+
   {%- endif %}
   """)
 
