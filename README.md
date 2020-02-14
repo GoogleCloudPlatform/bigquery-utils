@@ -10,6 +10,7 @@ This repository is broken up into:
 
 * [Scripts](/scripts) - Python, Shell, & SQL scripts
   * [billing](/scripts/billing) - Example queries over the GCP billing export
+  * [json2ddl](/scripts/json2ddl) - Python script that converts BigQeuery schema definition from JSON into DDL statement
 * [Stored Procedures](/stored_procedures) - Example stored procedures
 * [UDFs](/udfs) - User-defined functions for common usage as well as migration
   * [community](/udfs/community) - Community contributed user-defined functions
