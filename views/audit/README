@@ -1,0 +1,7 @@
+There are two views in this folder: query_audit and query_audit_v2
+query_audit is a view that simplifies querying audit logs to power dashboards, where the logs are version 1
+query_audit_v2 is also a view that simplifies querying audit logs, but operates for version 2 logs (BigQueryAuditMetadata)
+
+query_audit_v2 queries on logs produced from this Stackdriver filter:
+
+protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata"
