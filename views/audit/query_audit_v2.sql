@@ -1,6 +1,6 @@
 /* Public BigQuery Audit View */
   WITH
-    BQAudit2_job AS (
+    query_audit AS (
     SELECT
       protopayload_auditlog.authenticationInfo.principalEmail AS principalEmail,
       resource.labels.project_id,
@@ -179,7 +179,7 @@
           
          
     FROM
-      `project_id.dataset_id.table_id` ),
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
     BQAudit2_data AS(
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -196,7 +196,7 @@
       OFFSET
         (3)]) AS data_jobid
     FROM
-      `project_id.dataset_id.table_id`) /* This code queries BQAudit2 */
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access`) /* This code queries BQAudit2 */
   SELECT
     principalEmail,
     callerIp,
@@ -320,7 +320,7 @@
       1,
       0) AS queries /* This ends the code snippet that queries columns specific to the Query operation in BQ */
   FROM
-    BQAudit2_job
+    query_audit
   LEFT JOIN
     BQAudit2_data
   ON
