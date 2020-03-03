@@ -179,7 +179,7 @@
 
 
     FROM
-      `project_id.dataset_id.table_id` ),
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
     data_audit AS(
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -196,7 +196,7 @@
       OFFSET
         (3)]) AS data_jobid
     FROM
-      `project_id.dataset_id.table_id`) /* This code queries BQAudit2 */
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access`) /* This code queries BQAudit2 */
   SELECT
     principalEmail,
     callerIp,
