@@ -171,16 +171,16 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.statementType') )AS statementType,
       REGEXP_EXTRACT(protopayload_auditlog.metadataJson, r'BigQueryAuditMetadata","(.*?)":') AS eventName,
-      
+
       COALESCE(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.labels.querytype'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.labels.querytype')) AS querytype
-          
-         
+
+
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
-    BQAudit2_data AS(
+      `project_id.dataset_id.table_id` ),
+    data_audit AS(
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.tableDataChange.insertedRowsCount') AS insertRowCount,
@@ -196,7 +196,7 @@
       OFFSET
         (3)]) AS data_jobid
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access`) /* This code queries BQAudit2 */
+      `project_id.dataset_id.table_id`) /* This code queries BQAudit2 */
   SELECT
     principalEmail,
     callerIp,
@@ -322,10 +322,10 @@
   FROM
     query_audit
   LEFT JOIN
-    BQAudit2_data
+    data_audit
   ON
     (data_jobid=jobId)
   WHERE
     statementType = "SCRIPT"
     OR jobChangeAfter= "DONE"
-    OR tableDataChangeReason ="QUERY" 
+    OR tableDataChangeReason ="QUERY"
