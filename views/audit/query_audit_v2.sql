@@ -179,7 +179,7 @@
 
 
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access_20200303` ),
     data_audit AS(
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -196,7 +196,7 @@
       OFFSET
         (3)]) AS data_jobid
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access`) /* This code queries BQAudit2 */
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access_20200303`) /* This code queries BQAudit2 */
   SELECT
     principalEmail,
     callerIp,
@@ -276,7 +276,7 @@
       1,
       0) AS numExtracts,
     /* This ends the code snippet that 
- columns specific to the Extract operation in BQ */ /* The following code queries data specific to the Query operation in BQ */ REGEXP_CONTAINS(jobconfig_query, 'cloudaudit_googleapis_com_data_access_') AS isAuditDashboardQuery,
+ columns specific to the Extract operation in BQ */ /* The following code queries data specific to the Query operation in BQ */ REGEXP_CONTAINS(jobconfig_query, 'cloudaudit_googleapis_com_data_access_20200303') AS isAuditDashboardQuery,
     errorCode IS NOT NULL AS isError,
     REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
     isCached,
