@@ -9,6 +9,8 @@
       protopayload_auditlog.serviceName AS serviceName,
       protopayload_auditlog.methodName AS methodName,
       resource.labels.project_id AS projectId,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+              '$.jobChange.job.jobStats.parentJobName') as parentJobName,
       COALESCE( CONCAT(SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson,
               '$.jobChange.job.jobName'),"/")[
         OFFSET
@@ -326,6 +328,7 @@
   ON
     (data_jobid=jobId)
   WHERE
-    statementType = "SCRIPT"
-    OR jobChangeAfter= "DONE"
-    OR tableDataChangeReason ="QUERY"
+   ( statementType = "SCRIPT"
+    OR (jobChangeAfter= "DONE" and parentJobName is not null)
+    OR tableDataChangeReason ="QUERY") 
+    )
