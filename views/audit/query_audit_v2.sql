@@ -326,9 +326,9 @@
   LEFT JOIN
     data_audit
   ON
-    (data_jobid=jobId)
+    data_jobid=jobId
   WHERE
-   ( statementType = "SCRIPT"
-    OR (jobChangeAfter= "DONE")
-    OR tableDataChangeReason ="QUERY") 
-    )
+    statementType = "SCRIPT"
+    OR jobChangeAfter= "DONE"
+    OR tableDataChangeReason ="QUERY"
+    
