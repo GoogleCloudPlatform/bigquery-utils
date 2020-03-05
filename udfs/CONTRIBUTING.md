@@ -55,8 +55,8 @@ the pull request can ensure a successful review process.
 
 ## Testing UDFs Locally
 
-Please follow these instructions to confirm that the test cases being provided
-in your pull request work as expected.
+Please follow these instructions to confirm that your test cases work as
+expected.
 
 1.  Change into the bigquery_utils top-level directory.
 
@@ -67,7 +67,9 @@ in your pull request work as expected.
     *   `pip install -r udfs/tests/requirements.txt`
 
 1.  Test your UDF by invoking the `run.sh` script and passing the name of the
-    UDF in lower caps as an argument.
+    UDF in lower caps as an argument. The `run.sh` script will create BigQuery
+    datasets in your GCP project in order to test your UDF, and will delete them
+    when finished testing.
 
     *   `bash udfs/tests/run.sh url_parse`
         *   Note: If your UDF name exists in multiple directories, you can add
