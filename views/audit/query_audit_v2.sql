@@ -240,9 +240,7 @@ SELECT
   /* This code queries data specific to the Copy operation */ CONCAT(
     dataset_id, '.', table_id
   ) AS tableCopyDestinationTableRelativePath,
-  CONCAT(
-    projectId, '.', dataset_id, '.', table_id
-  ) AS tableCopyDestinationTableAbsolutePath,
+  CONCAT(projectId, '.', dataset_id, '.', table_id) AS tableCopyDestinationTableAbsolutePath,
   IF(eventName = "jobChange", 1, 0) AS numCopies,
   /* This code queries data specific to the Copy operation */ /* The following code queries data specific to the Load operation in BQ */ totalLoadOutputBytes,
   (totalLoadOutputBytes / 1000000000) AS totalLoadOutputGigabytes,
