@@ -1,6 +1,6 @@
 There are two views in this folder: **query_audit** (query_audit in this folder) and **query_audit_new** (query_audit_v2.sql in this folder)
-query_audit is a view that simplifies querying audit logs to power dashboards, where the logs are old [Audit Data](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/AuditData)
-query_audit_new is also a view that simplifies querying BigQueryMetaData logs, but operates for new logs [BigQueryAuditMetadata](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata)
+query_audit is a view that simplifies querying audit logs to power dashboards, where the logs are old [(Audit Data)](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/AuditData)
+query_audit_new is also a view that simplifies querying BigQueryMetaData logs, but operates for new logs [(BigQueryAuditMetadata)](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata)
 
 Before **query_audit_v2** can be utilized, there must be at least one table with audit data from Stackdriver Logging. One way to generate this data is to connect Stackdriver Logging with BigQuery:
 
