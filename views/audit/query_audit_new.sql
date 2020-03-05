@@ -181,7 +181,7 @@
 
 
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access_20200303` ),
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
     data_audit AS(
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -198,7 +198,7 @@
       OFFSET
         (3)]) AS data_jobid
     FROM
-      `project_id.dataset_id.cloudaudit_googleapis_com_data_access_20200303`) /* This code queries BQAudit2 */
+      `project_id.dataset_id.cloudaudit_googleapis_com_data_access`) /* Best practice is to use a partitioned table */
   SELECT
     principalEmail,
     callerIp,
@@ -329,6 +329,6 @@
     (data_jobid=jobId)
   WHERE
    ( statementType = "SCRIPT"
-    OR (jobChangeAfter= "DONE" and parentJobName is not null)
+    OR (jobChangeAfter= "DONE")
     OR tableDataChangeReason ="QUERY") 
     )
