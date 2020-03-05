@@ -14,6 +14,8 @@
 
 import unittest
 
+from os.path import splitext
+from os.path import basename
 from parameterized import parameterized
 from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPICallError
@@ -38,7 +40,11 @@ class TestRunUDFs(unittest.TestCase):
     def test_run_udf_and_verify_expected_result(self, udf_path):
         client = self._client
         bq_test_dataset = utils.get_target_bq_dataset(udf_path)
+        file_name = splitext(basename(udf_path))[0]
         udf_name = utils.extract_udf_name(udf_path)
+        self.assertEqual(udf_name, file_name,
+                         msg=(f'\nFile name: {udf_path}'
+                              f'\nshould match the function name defined inside: {udf_name}'))
         test_cases = utils.load_test_cases(udf_path)
         if test_cases.get(udf_name) is None:
             self.skipTest(f'Test inputs and outputs are not provided for : {udf_path}')
