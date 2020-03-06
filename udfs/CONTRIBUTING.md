@@ -66,10 +66,16 @@ expected.
     *   `source venv/bin/activate`
     *   `pip install -r udfs/tests/requirements.txt`
 
+1.  The test framework in this repo will create BigQuery datasets in your
+    configured GCP project in order to test your UDF, and will delete them when
+    finished testing. Authenticate using the Cloud SDK and set the GCP project
+    in which you'll test your UDF(s):
+
+    *   `gcloud auth login`
+    *   `gcloud config set project YOUR_PROJECT_ID`
+
 1.  Test your UDF by invoking the `run.sh` script and passing the name of the
-    UDF in lower caps as an argument. The `run.sh` script will create BigQuery
-    datasets in your GCP project in order to test your UDF, and will delete them
-    when finished testing.
+    UDF in lower caps as an argument.
 
     *   `bash udfs/tests/run.sh url_parse`
         *   Note: If your UDF name exists in multiple directories, you can add
