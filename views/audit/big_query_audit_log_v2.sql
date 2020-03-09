@@ -80,8 +80,7 @@
                 TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
                   '$.jobInsertion.job.jobStats.startTime')),
                 SECOND) / 60 ) AS INT64),
-        CAST(
-          CEILING(
+        CAST(CEILING(
               TIMESTAMP_DIFF(
                 TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
                   '$.jobChange.job.jobStats.endTime')),
@@ -472,8 +471,7 @@ SELECT
   tableCopy,
   /* This code queries data specific to the Copy operation */ 
   CONCAT(
-    tableCopydataset_id, '.', tableCopytable_id
-  ) AS tableCopyDestinationTableRelativePath,
+    tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableRelativePath,
   CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableAbsolutePath,
   IF(eventName = "jobChange", 1, 0) AS numCopies,
   /* This code queries data specific to the Copy operation */ /* The following code queries data specific to the Load operation in BQ */ totalLoadOutputBytes,
@@ -591,10 +589,6 @@ SELECT
     ) as queryStats,
     STRUCT (
       totalLoadOutputBytes
-    ) as loadStats
-  ) as jobStats,
-    STRUCT (
-      totalOutputBytes
     ) as loadStats
   ) as jobStats,
       
