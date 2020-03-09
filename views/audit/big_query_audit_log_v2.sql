@@ -54,7 +54,6 @@
            '$.jobChange.job.jobStats.startTime')),
           MILLISECOND)
       ) AS runtimeMs,
-      
        /* The following code extracts columns specific to Load operation in BQ */ 
       CAST(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
@@ -95,20 +94,8 @@
                   '$.jobChange.job.jobStats.startTime')),
                 SECOND) / 60) AS INT64) 
       ) AS executionMinuteBuckets,
-      IF(
-        COALESCE(
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.totalProcessedBytes'),
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.totalSlotMs'),
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStatus.errorResult.code')
-        ) IS NULL,
-        TRUE,
-        FALSE
-      ) AS isCached,
-      CAST(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.totalSlotMs') 
         AS INT64) AS totalSlotMs,
       ARRAY_LENGTH(
@@ -161,8 +148,7 @@
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobStatus.errorResult.code') AS errorCode,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorMessage,
-        
+        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorMessage, 
       /* Queries related to loadConfig job*/
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -212,9 +198,7 @@
           '$.jobChange.job.jobConfig.loadConfig.destinationTableEncryption.kmsKeyName')
       ) AS loadkmsKeyName,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,'$.jobInsertion.job.jobConfig.loadConfig.load'),
-      
       /*Queries related to queryConfig job*/
-      
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.queryTruncated'),
@@ -316,7 +300,6 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.statementType')
       ) AS statementType,
-      
       /* Queries related to tableCopyConfig */
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.createDisposition') as tableCopycreateDisposition,
@@ -348,7 +331,6 @@
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
         ".")[OFFSET(2)] AS tableCopytable_id,
-
       /* Queries related to extractConfig */
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS extractdestinationUris,
@@ -392,8 +374,8 @@
       CONCAT(
         SPLIT(
           JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataChange.jobName'),
-        "/")[OFFSET(1)],
-      ":",
+        "/")[OFFSET(1)], 
+        ":",
         SPLIT(
           JSON_EXTRACT(protopayload_auditlog.metadataJson, 
             '$.tableDataChange.jobName'),
@@ -464,7 +446,8 @@ SELECT
   runtimeMs,
   runtimeSecs,
   tableCopy,
-  /* This code queries data specific to the Copy operation */ CONCAT(
+  /* This code queries data specific to the Copy operation */ 
+  CONCAT(
     tableCopydataset_id, '.', tableCopytable_id
   ) AS tableCopyDestinationTableRelativePath,
   CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableAbsolutePath,
@@ -527,7 +510,6 @@ SELECT
  columns specific to the Extract operation in BQ */ /* The following code queries data specific to the Query operation in BQ */ REGEXP_CONTAINS(
     jobconfig_query, 'cloudaudit_googleapis_com_data_access_20200303'
   ) AS isAuditDashboardQuery,
-  
   /*tableCopyConfig STRUCT*/
   STRUCT(
     tableCopysourceTables,
@@ -545,7 +527,6 @@ SELECT
       tableCopykmsKeyname
     ) AS destinationTableEncryption
   ) AS tableCopyConfig,
-  
   errorCode IS NOT NULL AS isError,
   REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
   isCached,
