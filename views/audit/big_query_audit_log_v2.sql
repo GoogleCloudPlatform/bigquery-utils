@@ -7,8 +7,6 @@
       protopayload_auditlog.serviceName AS serviceName,
       protopayload_auditlog.methodName AS methodName,
       resource.labels.project_id AS projectId,
-      JSON_EXTRACT_SCALAR(
-       protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.parentJobName') as parentJobName,
       COALESCE(
         CONCAT(
           SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.jobChange.job.jobName'),"/")[OFFSET(1)],
@@ -21,6 +19,9 @@
           SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.jobInsertion.job.jobName'),"/")[OFFSET(3)]
         )
       ) AS jobId,
+      /*All queries related to jobStats */
+      JSON_EXTRACT_SCALAR(
+       protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.parentJobName') as parentJobName,
       COALESCE(
         TIMESTAMP(JSON_EXTRACT_SCALAR(
          protopayload_auditlog.metadataJson,'$.jobInsertion.job.jobStats.createTime')),
@@ -54,8 +55,115 @@
           MILLISECOND)
       ) AS runtimeMs,
       
+       /* The following code extracts columns specific to Load operation in BQ */ 
+      CAST(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
+      ) AS totalLoadOutputBytes,
+      /* The following code extracts columns specific to Query operation in BQ */ 
+      COALESCE(
+        TIMESTAMP_DIFF(
+          TIMESTAMP(JSON_EXTRACT_SCALAR(
+           protopayload_auditlog.metadataJson,'$.jobInsertion.job.jobStats.endTime')
+          ),
+          TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.startTime')),
+        SECOND),
+        TIMESTAMP_DIFF(
+          TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.endTime')),
+          TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.startTime')),
+          SECOND
+        )
+      ) AS runtimeSecs,
+      COALESCE(
+        CAST(
+          CEILING(
+              TIMESTAMP_DIFF(
+                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+                  '$.jobInsertion.job.jobStats.endTime')),
+                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+                  '$.jobInsertion.job.jobStats.startTime')),
+                SECOND) / 60 ) AS INT64),
+        CAST(
+          CEILING(
+              TIMESTAMP_DIFF(
+                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+                  '$.jobChange.job.jobStats.endTime')),
+                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+                  '$.jobChange.job.jobStats.startTime')),
+                SECOND) / 60) AS INT64) 
+      ) AS executionMinuteBuckets,
+      IF(
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.totalProcessedBytes'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.totalSlotMs'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStatus.errorResult.code')
+        ) IS NULL,
+        TRUE,
+        FALSE
+      ) AS isCached,
+      CAST(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.totalSlotMs') 
+        AS INT64) AS totalSlotMs,
+      ARRAY_LENGTH(
+        SPLIT(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedTables'), 
+        ",")
+      ) AS totalTablesProcessed,
+      ARRAY_LENGTH(
+        SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),
+          ",")
+      ) AS totalViewsProcessed,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.totalProcessedBytes') AS totalProcessedBytes,
+      CAST(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.totalBilledBytes') AS INT64
+      ) AS totalBilledBytes,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.billingTier') AS billingTier,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[OFFSET(0)] AS refTable_project_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[OFFSET(1)] AS refTable_dataset_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedTables'),
+        "/"
+      )[OFFSET(2)] AS refTable_table_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/"
+      )[OFFSET(0)] AS refView_project_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),
+        "/"
+      )[OFFSET(1)] AS refView_dataset_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),
+      "/")[OFFSET(2)] AS refView_table_id,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.referencedViews') AS referencedViews,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.errorResult.code') AS errorCode,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorMessage,
+        
       /* Queries related to loadConfig job*/
-      
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.loadConfig.sourceUrisTruncated'),
@@ -113,20 +221,12 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.queryTruncated')) 
       AS queryTruncated,
-       
-        
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.schemaJsonUrisTruncated'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.schemaJsonUrisTruncated')) 
       AS queryschemaJsonTruncated,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.queryConfig.sourceUris'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobConfig.queryConfig.sourceUris')) 
-      AS querysourceUris,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.createDisposition'),
@@ -250,9 +350,6 @@
         ".")[OFFSET(2)] AS tableCopytable_id,
 
       /* Queries related to extractConfig */
-      
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS extractdestinationUris,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -272,116 +369,6 @@
           '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
         ".")[OFFSET(5)] AS extract_tableid,
       /* The following code extracts the columns specific to the Load operation in BQ */ 
-      CAST(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
-      ) AS totalLoadOutputBytes,
-      
-      /* The following code extracts columns specific to Query operation in BQ */ 
-      COALESCE(
-        TIMESTAMP_DIFF(
-          TIMESTAMP(JSON_EXTRACT_SCALAR(
-           protopayload_auditlog.metadataJson,'$.jobInsertion.job.jobStats.endTime')
-          ),
-          TIMESTAMPJ(SON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStats.startTime')),
-        SECOND),
-        TIMESTAMP_DIFF(
-          TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.endTime')),
-          TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.startTime')),
-          SECOND
-        )
-      ) AS runtimeSecs,
-      COALESCE(
-        CAST(
-          CEILING(
-              TIMESTAMP_DIFF(
-                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-                  '$.jobInsertion.job.jobStats.endTime')),
-                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-                  '$.jobInsertion.job.jobStats.startTime')),
-                SECOND) / 60 ) AS INT64),
-        CAST(
-          CEILING(
-              TIMESTAMP_DIFF(
-                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-                  '$.jobChange.job.jobStats.endTime')),
-                TIMESTAMP(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-                  '$.jobChange.job.jobStats.startTime')),
-                SECOND) / 60) AS INT64) 
-      ) AS executionMinuteBuckets,
-      IF(
-        COALESCE(
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.totalProcessedBytes'),
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.totalSlotMs'),
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStatus.errorResult.code')
-        ) IS NULL,
-        TRUE,
-        FALSE
-      ) AS isCached,
-      CAST(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.totalSlotMs') 
-        AS INT64) AS totalSlotMs,
-      ARRAY_LENGTH(
-        SPLIT(
-          JSON_EXTRACT(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.referencedTables'), 
-        ",")
-      ) AS totalTablesProcessed,
-      ARRAY_LENGTH(
-        SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),
-          ",")
-      ) AS totalViewsProcessed,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.totalProcessedBytes') AS totalProcessedBytes,
-      CAST(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.totalBilledBytes') AS INT64
-      ) AS totalBilledBytes,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.billingTier') AS billingTier,
-     
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[OFFSET(0)] AS refTable_project_id,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[OFFSET(1)] AS refTable_dataset_id,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedTables'),
-        "/"
-      )[OFFSET(2)] AS refTable_table_id,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/"
-      )[OFFSET(0)] AS refView_project_id,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),
-        "/"
-      )[OFFSET(1)] AS refView_dataset_id,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),
-      "/")[OFFSET(2)] AS refView_table_id,
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.referencedViews') AS referencedViews,
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
-     
-     
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStatus.errorResult.code') AS errorCode,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorMessage,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, "$.jobChange.after") AS jobChangeAfter,
       
       REGEXP_EXTRACT(protopayload_auditlog.metadataJson, 
@@ -421,6 +408,39 @@ SELECT
   methodName,
   eventName,
   tableDataChangeReason,
+  loadDestinationTable, 
+  loadKmsKeyName, 
+  loadcreateDisposition,
+  loadwriteDisposition,
+  loadschemaJson,
+  loadsourceUris,
+  loadsourceUrisTruncated,
+  loadschemaJsonTruncated,
+  query,
+  queryTruncated,
+  queryDestinationTable, 
+  queryKmsKeyName, 
+  querycreateDisposition,
+  querywriteDisposition,
+  queryschemaJson,
+  querysourceUris,
+  queryschemaJsonTruncated,
+  queryName,
+  queryPriority,
+  statementType,
+  extractdestinationUris,
+  extractdestinationUrisTruncated,
+  extract_projectid,
+  extract_datasetid,
+  extract_tableid,
+  tableCopysourceTables,
+  tableCopysourceTablesTruncated,
+  tableCopycreateDisposition,
+  tableCopywriteDisposition,
+  tableCopyproject_id,
+  tableCopydataset_id,
+  tableCopytable_id,
+  tableCopykmsKeyname,
   projectId,
   jobId,
   querytype,
@@ -428,7 +448,6 @@ SELECT
   deleteRowCount,
   errorCode,
   errorMessage,
-  statementType,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -446,45 +465,87 @@ SELECT
   runtimeSecs,
   tableCopy,
   /* This code queries data specific to the Copy operation */ CONCAT(
-    dataset_id, '.', table_id
+    tableCopydataset_id, '.', tableCopytable_id
   ) AS tableCopyDestinationTableRelativePath,
-  CONCAT(projectId, '.', dataset_id, '.', table_id) AS tableCopyDestinationTableAbsolutePath,
+  CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableAbsolutePath,
   IF(eventName = "jobChange", 1, 0) AS numCopies,
   /* This code queries data specific to the Copy operation */ /* The following code queries data specific to the Load operation in BQ */ totalLoadOutputBytes,
   (totalLoadOutputBytes / 1000000000) AS totalLoadOutputGigabytes,
   (totalLoadOutputBytes / 1000000000) / 1000 AS totalLoadOutputTerabytes,
+  /* loadConfig STRUCT */
   STRUCT(
-    sourceUris,
+    loadsourceUris,
+    loadsourceUrisTruncated,
+    loadcreateDisposition,
+    loadwriteDisposition,
+    loadschemaJson,
+    loadschemaJsonTruncated,
+    loadDestinationTable,
     STRUCT(
-      projectId,
-      dataset_id,
-      table_id,
-      CONCAT(dataset_id, '.', table_id) AS relativePath,
-      CONCAT(projectId, '.', dataset_id, '.', table_id) AS absolutePath
-    ) AS destinationTable,
-    createDisposition,
-    writeDisposition,
-    schemaJson
-  ) AS load,
+      loadKmskeyName
+    ) AS destinationTableEncryption
+  ) AS loadConfig,
   IF(eventName = "jobChange", 1, 0) AS numLoads,
   /* This ends the code snippet that queries columns specific to the Load operation in BQ */ /* The following code queries data specific to the Extract operation in BQ */ REGEXP_CONTAINS(
     jobId, 'beam'
   ) AS isBeamJob,
+  /*queryConfig STRUCT */
   STRUCT(
-    destinationUris,
+    query,
+    queryTruncated,
+    querycreateDisposition,
+    querywriteDisposition,
+    queryschemaJson,
+    queryschemaJsonTruncated,
+    querydestTable_project_id,
+    querydestTable_dataset_id,
+    querydestTable_table_id,
+    queryPriority,
+    querydefaultDataset,
     STRUCT(
-      srctable_projectid,
-      srctable_datasetid,
-      srctable_tableid,
-      CONCAT(srctable_datasetid, '.', srctable_tableid) AS relativeTableRef,
-      CONCAT(srctable_projectid, '.', srctable_datasetid, '.', srctable_tableid) AS absoluteTableRef
+      queryKmskeyName
+    ) AS destinationTableEncryption,
+    STRUCT(
+      queryName,
+      querysourceUris
+    ) AS tableDefinitions
+  ) AS queryConfig,
+  /* extractConfig STRUCT*/
+  STRUCT(
+    extractdestinationUris,
+    extractdestinationUrisTruncated,
+    STRUCT(
+      extract_projectid,
+      extract_datasetid,
+      extract_tableid,
+      CONCAT(extract_datasetid, '.', extract_tableid) AS relativeTableRef,
+      CONCAT(extract_projectid, '.', extract_datasetid, '.', extract_tableid) AS absoluteTableRef
     ) AS sourceTable
-  ) AS `extract`,
+  ) AS extractConfig,
   IF(eventName = "jobChange", 1, 0) AS numExtracts,
   /* This ends the code snippet that 
  columns specific to the Extract operation in BQ */ /* The following code queries data specific to the Query operation in BQ */ REGEXP_CONTAINS(
     jobconfig_query, 'cloudaudit_googleapis_com_data_access_20200303'
   ) AS isAuditDashboardQuery,
+  
+  /*tableCopyConfig STRUCT*/
+  STRUCT(
+    tableCopysourceTables,
+    tableCopysourceTablesTruncated,
+    tableCopycreateDisposition,
+    tableCopywriteDisposition,
+    STRUCT(
+      tableCopyproject_id,
+      tableCopydataset_id,
+      tableCopytable_id,
+      CONCAT(tableCopydataset_id, '.', tableCopytable_id) AS relativeTableRef,
+      CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) AS absoluteTableRef
+    ) AS destinationTable,
+    STRUCT(
+      tableCopykmsKeyname
+    ) AS destinationTableEncryption
+  ) AS tableCopyConfig,
+  
   errorCode IS NOT NULL AS isError,
   REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
   isCached,
@@ -513,9 +574,8 @@ SELECT
   (totalBilledBytes / 1000000000) / 1000 AS totalBilledTerabytes,
   ((totalBilledBytes / 1000000000) / 1000) * 5 AS estimatedCostUsd,
   billingTier,
-  query,
-  CONCAT(dataset_id, '.', table_id) AS queryDestinationTableRelativePath,
-  CONCAT(projectId, '.', dataset_id, '.', table_id) AS queryDestinationTableAbsolutePath,
+  CONCAT(querydestTable_dataset_id, '.', querydestTable_table_id) AS queryDestinationTableRelativePath,
+  CONCAT(querydestTable_project_id, '.', querydestTable_dataset_id, '.', querydestTable_table_id) AS queryDestinationTableAbsolutePath,
   referencedViews,
   referencedTables,
   refTable_project_id,
