@@ -54,11 +54,6 @@
            '$.jobChange.job.jobStats.startTime')),
           MILLISECOND)
       ) AS runtimeMs,
-       /* The following code extracts columns specific to Load operation in BQ */ 
-      CAST(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
-      ) AS totalLoadOutputBytes,
       /* The following code extracts columns specific to Query operation in BQ */ 
       COALESCE(
         TIMESTAMP_DIFF(
@@ -145,10 +140,34 @@
         '$.jobChange.job.jobStats.queryStats.referencedViews') AS referencedViews,
       JSON_EXTRACT(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.referencedRoutines') AS referencedRoutines,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.reservationUsage.name') AS name,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.reservationUsage.slotMs') AS slotMs,
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.outputRowCount') as outputRowCount,
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.cacheHit') as cacheHit, 
+        CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
+      ) AS totalLoadOutputBytes,
+      /* Queries related to JobStatus */
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStatus.errorResult.code') AS errorCode,
+        '$.jobInsertion.job.jobStatus.jobState') AS jobState,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorMessage, 
+        '$.jobInsertion.job.jobStatus.errorResult.code') AS errorResultCode,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.errorResult.message') AS errorResultMessage, 
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.errorResult.details') AS errorResultDetails,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.error.code') AS errorCode,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.error.message') AS errorMessage, 
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobStatus.error.details') AS errorDetails,
       /* Queries related to loadConfig job*/
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -423,13 +442,18 @@ SELECT
   tableCopydataset_id,
   tableCopytable_id,
   tableCopykmsKeyname,
+  jobState,
+  errorResultCode,
+  errorResultMessage,
+  errorResultDetails,
+  errorCode,
+  errorMessage,
+  errorDetails,
   projectId,
   jobId,
   querytype,
   insertRowCount,
   deleteRowCount,
-  errorCode,
-  errorMessage,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -527,10 +551,55 @@ SELECT
       tableCopykmsKeyname
     ) AS destinationTableEncryption
   ) AS tableCopyConfig,
+  /*JobStatus STRUCT*/
+  STRUCT(
+    jobState,
+    STRUCT (
+      errorResultCode,
+      errorResultMessage,
+      errorResultDetails
+    ) as errorResult,
+    STRUCT (
+      errorCode,
+      errorMessage,
+      errorDetails
+    ) as error
+  ) as JobStatus,
+  name,
+  slotMs,
+  cacheHit,
+  referencedRoutines,
+ /*JobStats STRUCT */
+  STRUCT(
+    createTime,
+    startTime,
+    endTime,
+    totalSlotMs,
+    STRUCT(
+      name,
+      slotMs
+    ) as reservationUsage,
+    STRUCT (
+      totalProcessedBytes,
+      totalBilledBytes,
+      billingTier,
+      referencedViews,
+      referencedTables,
+      referencedRoutines,
+      cacheHit,
+      outputRowCount
+    ) as queryStats,
+    STRUCT (
+      totalLoadOutputBytes
+    ) as loadStats
+  ) as jobStats,
+    STRUCT (
+      totalOutputBytes
+    ) as loadStats
+  ) as jobStats,
+      
   errorCode IS NOT NULL AS isError,
   REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
-  isCached,
-  IF(isCached, 1, 0) AS numCached,
   totalSlotMs,
   totalSlotMs / runtimeMs AS avgSlots,
   /* The following statement breaks down the query into minute buckets
