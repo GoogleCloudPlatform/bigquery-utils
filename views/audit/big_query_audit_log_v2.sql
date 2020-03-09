@@ -216,31 +216,61 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.statementType')
       ) AS statementType,
+      
+      /* Queries related to tableCopyConfig */
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-       '$.jobInsertion.job.jobConfig.tableCopyConfig') AS tableCopy,
+        '$.jobInsertion.job.jobConfig.createDisposition') as tableCopycreateDisposition,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-       '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables') AS sourceTables,
+        '$.jobInsertion.job.jobConfig.writeDisposition') as tableCopywriteDisposition,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated') AS sourceTablesTruncated,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig') AS tableCopy,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-       '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName') AS kmsKeyName,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables') AS tableCopysourceTables,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-       '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable') AS destinationTable,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-         '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[OFFSET(1)] AS project_id,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated') AS tableCopysourceTablesTruncated,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName')
+      ) AS tableCopykmsKeyName,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable') AS tableCopydestinationTable,
       SPLIT(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[OFFSET(3)] AS dataset_id,
+        ".")[OFFSET(0)] AS tableCopyproject_id,
       SPLIT(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
-         '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[OFFSET(5)] AS table_id,
-      /* This code extracts the column specific to the Extract operation in BQ */ 
+          '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
+        ".")[OFFSET(1)] AS tableCopydataset_id,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
+        ".")[OFFSET(2)] AS tableCopytable_id,
+
+      /* Queries related to extractConfig */
+      
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-       '$.jobInsertion.job.jobConfig.extractConfig.extract'),
+        '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS extractdestinationUris,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.destinationUrisTruncated') AS extractdestinationUrisTruncated,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS extractsourceTable,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ".")[OFFSET(1)] AS extract_projectid,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ".")[OFFSET(3)] AS extract_datasetid,
+      SPLIT(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ".")[OFFSET(5)] AS extract_tableid,
       /* The following code extracts the columns specific to the Load operation in BQ */ 
       CAST(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
@@ -346,22 +376,7 @@
         '$.jobChange.job.jobStats.queryStats.referencedViews') AS referencedViews,
       JSON_EXTRACT(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobStats.queryStats.referencedTables') AS referencedTables,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS destinationUris,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS sourceTable,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.destinationUris'),
-      ".")[OFFSET(0)] AS srctable_projectid,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.destinationUris'),
-        ".")[OFFSET(1)] AS srctable_datasetid,
-      SPLIT(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.destinationUris'),
-      ".")[OFFSET(2)] AS srctable_tableid,
+     
      
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobStatus.errorResult.code') AS errorCode,
