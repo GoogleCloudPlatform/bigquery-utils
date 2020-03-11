@@ -149,7 +149,7 @@
           '$.jobChange.job.jobStats.queryStats.outputRowCount') as outputRowCount,
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.cacheHit') as cacheHit, 
-        CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
       ) AS totalLoadOutputBytes,
       /* Queries related to JobStatus */
