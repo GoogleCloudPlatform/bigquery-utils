@@ -399,7 +399,7 @@
             '$.tableDataChange.jobName'),
           "/")[SAFE_OFFSET(3)]
       ) AS data_jobid
-    FROM `dataset_id.project_id.cloudaudit_googleapis_com_data_access`
+    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
   ) /* Best practice is to use a partitioned table */
 SELECT
   principalEmail,
