@@ -203,19 +203,24 @@
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[SAFE_OFFSET(5)]
       ) AS refTable_table_id,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/"
-      )[SAFE_OFFSET(1)] AS refView_project_id,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),
-        "/"
-      )[SAFE_OFFSET(3)] AS refView_dataset_id,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews'),
-      "/")[SAFE_OFFSET(5)] AS refView_table_id,
+      COALESCE(
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(1)],
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(1)]
+      ) AS refView_project_id,
+      COALESCE(
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(3)],
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(3)]
+      ) AS refView_dataset_id,
+      COALESCE(
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(5)],
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(5)]
+      ) AS refView_table_id,
       /* Queries related to JobStatus
       https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstatus*/
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
