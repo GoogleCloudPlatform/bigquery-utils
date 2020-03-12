@@ -94,12 +94,12 @@
         AS INT64) AS totalSlotMs,
       ARRAY_LENGTH(
         SPLIT(
-          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
             '$.jobChange.job.jobStats.queryStats.referencedTables'), 
         ",")
       ) AS totalTablesProcessed,
       ARRAY_LENGTH(
-        SPLIT(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.referencedViews'),
           ",")
       ) AS totalViewsProcessed,
