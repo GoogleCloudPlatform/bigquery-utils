@@ -701,10 +701,6 @@ SELECT
   refView_project_id,
   refView_dataset_id,
   refView_table_id,
-  IF(
-    eventName = "jobChange", 1, 0
-  )
-    AS queries /* This ends the code snippet that queries columns specific to the Query operation in BQ */
 FROM query_audit
 LEFT JOIN data_audit ON data_jobid = jobId
 WHERE
