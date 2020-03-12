@@ -143,12 +143,12 @@
         '$.jobChange.job.jobStats.queryStats.reservationUsage.name') AS name,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobStats.queryStats.reservationUsage.slotMs') AS slotMs,
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.outputRowCount') as outputRowCount,
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.cacheHit') as cacheHit, 
-        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.outputRowCount') as outputRowCount,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.queryStats.cacheHit') as cacheHit, 
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
       ) AS totalLoadOutputBytes,
       /* Queries related to JobStatus
       https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstatus*/
@@ -476,9 +476,10 @@ SELECT
   runtimeSecs,
   tableCopy,
   /* This code queries data specific to the Copy operation */ 
-  CONCAT(
-    tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableRelativePath,
-  CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) AS tableCopyDestinationTableAbsolutePath,
+  CONCAT(tableCopydataset_id, '.', tableCopytable_id) 
+    AS tableCopyDestinationTableRelativePath,
+  CONCAT(tableCopyproject_id, '.', tableCopydataset_id, '.', tableCopytable_id) 
+    AS tableCopyDestinationTableAbsolutePath,
   IF(eventName = "jobChange", 1, 0) AS numCopies,
   /* This code queries data specific to the Copy operation */ /* The following code queries data specific to the Load operation in BQ */ totalLoadOutputBytes,
   (totalLoadOutputBytes / 1000000000) AS totalLoadOutputGigabytes,
