@@ -503,7 +503,7 @@
   data_audit AS (
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.tableDataChange.insertedRowsCount') AS insertRowCount,
+        '$.datasetCreation.dataset.insertedRowsCount') AS insertRowCount,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
         '$.tableDataChange.deletedRowsCount') AS deleteRowCount,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
@@ -519,7 +519,7 @@
           "/")[SAFE_OFFSET(3)]
       ) AS data_jobid
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-  ) /* Best practice is to use a partitioned table */
+  ) 
 SELECT
   principalEmail,
   callerIp,
