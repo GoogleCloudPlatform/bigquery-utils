@@ -615,9 +615,9 @@ SELECT
     ) AS destinationTableEncryption
   ) AS loadConfig,
   IF(eventName = "jobChange", 1, 0) AS numLoads,
-  /* This ends the code snippet that queries columns specific to the Load operation in BQ */ /* The following code queries data specific to the Extract operation in BQ */ REGEXP_CONTAINS(
-    jobId, 'beam'
-  ) AS isBeamJob,
+  /* This ends the code snippet that queries columns specific to the Load operation in BQ */ 
+  /* The following code queries data specific to the Extract operation in BQ */ 
+  REGEXP_CONTAINS( jobId, 'beam') AS isBeamJob,
   /*queryConfig STRUCT */
   STRUCT(
     query,
