@@ -19,8 +19,7 @@
           SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobInsertion.job.jobName'),"/")[SAFE_OFFSET(3)]
         )
       ) AS jobId,
-      /*All queries related to jobStats 
-      https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstats */
+      /*All queries related to [jobStats](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstats) */
       JSON_EXTRACT_SCALAR(
        protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.parentJobName') as parentJobName,
       COALESCE(
@@ -151,7 +150,7 @@
         CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64
       ) AS totalLoadOutputBytes,
-      /* Queries related to JobStatus */
+      /* Queries related to [JobStatus](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstatus)*/
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobStatus.jobState') AS jobState,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -166,8 +165,7 @@
         '$.jobInsertion.job.jobStatus.error.message') AS errorMessage, 
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobStatus.error.details') AS errorDetails,
-      /* Queries related to loadConfig job
-      https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load*/
+      /* [Queries related to loadConfig job](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load)*/
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.loadConfig.sourceUrisTruncated'),
@@ -216,8 +214,7 @@
           '$.jobChange.job.jobConfig.loadConfig.destinationTableEncryption.kmsKeyName')
       ) AS loadkmsKeyName,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,'$.jobInsertion.job.jobConfig.loadConfig.load'),
-      /*Queries related to queryConfig job
-      https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query*/
+      /*[Queries related to queryConfig job](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query)*/
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.queryTruncated'),
@@ -319,8 +316,7 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.statementType')
       ) AS statementType,
-      /* Queries related to tableCopyConfig 
-      https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecopy*/
+      /* [Queries related to tableCopyConfig](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecopy)*/
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable') AS tableCopydestinationTable, 
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -351,8 +347,7 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
         ".")[SAFE_OFFSET(3)] AS tableCopytable_id,
-      /* Queries related to extractConfig 
-      https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract*/
+      /* Queries related to [extractConfig](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract)*/
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS extractdestinationUris,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
