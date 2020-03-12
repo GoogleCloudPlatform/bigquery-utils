@@ -715,7 +715,6 @@ SELECT
       totalLoadOutputBytes
     ) as loadStats
   ) as jobStats,
-      
   errorCode IS NOT NULL AS isError,
   REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
   totalSlotMs,
