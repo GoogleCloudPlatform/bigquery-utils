@@ -358,13 +358,13 @@
           '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions.name'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.tableDefinitions.name')) 
-      AS queryName,
+      AS tableDefinitionsName,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions.sourceUris'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.tableDefinitions.sourceUris')) 
-      AS querysourceUris,
+      AS tableDefinitionsSourceUris,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.priority'),
@@ -540,9 +540,9 @@ SELECT
   querycreateDisposition,
   querywriteDisposition,
   queryschemaJson,
-  querysourceUris,
+  tableDefinitionsSourceUris,
   queryschemaJsonTruncated,
-  queryName,
+  tableDefinitionsName,
   queryPriority,
   statementType,
   extractdestinationUris,
