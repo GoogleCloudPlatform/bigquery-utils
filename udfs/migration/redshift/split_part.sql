@@ -22,7 +22,6 @@ AS (
   CASE
     WHEN part < 1 THEN ERROR('The part argument must be an integer greater than 0!')
     WHEN ARRAY_LENGTH(SPLIT(string, delimiter)) < part THEN ""
-    WHEN string NOT LIKE CONCAT('%', delimiter, '%') THEN string
     ELSE SPLIT(string, delimiter)[OFFSET(part - 1)]
   END
 );
