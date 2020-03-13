@@ -422,8 +422,6 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.destinationTableEncryption.kmsKeyName')
       ) AS querykmsKeyName,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.queryConfig.query.query') AS jobconfig_query,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.query'),
@@ -654,7 +652,7 @@ SELECT
   IF(eventName = "jobChange", 1, 0) AS numExtracts,
   /* This ends the code snippet that 
  columns specific to the Extract operation in BQ */ /* The following code queries data specific to the Query operation in BQ */ REGEXP_CONTAINS(
-    jobconfig_query, 'cloudaudit_googleapis_com_data_access_20200303'
+    query, 'cloudaudit_googleapis_com_data_access'
   ) AS isAuditDashboardQuery,
   /*tableCopyConfig STRUCT*/
   STRUCT(
