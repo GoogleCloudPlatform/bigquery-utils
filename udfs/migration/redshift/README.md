@@ -56,7 +56,7 @@ SELECT bqutil.rs.initcap('À vaillant coeur rien d’impossible')
 
 
 ### [split_part(string STRING, delimiter STRING, part INT64)](split_part.sql)
-Splits a string on the specified delimiter and returns the part at the specified position. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/SPLIT_PART.html)
+Splits a string on the specified delimiter and returns the part at the specified position. Position of the portion to return (counting from 1). Must be an integer greater than 0. If part is larger than the number of string portions, SPLIT_PART returns an empty string. If delimiter is not found in string, then the returned value contains the contents of the specified part, which might be the entire string or an empty value. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/SPLIT_PART.html)
 ```sql
 SELECT bqutil.rs.split_part('2020-02-02', '-' , 1)
 

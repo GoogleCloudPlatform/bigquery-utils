@@ -19,5 +19,10 @@ CREATE OR REPLACE FUNCTION rs.split_part(
   delimiter STRING,
   part INT64)
 AS (
-  SPLIT(string, delimiter)[OFFSET(part - 1)]
+  CASE
+    WHEN part < 1 THEN ERROR('The part argument must be an integer greater than 0!')
+    WHEN ARRAY_LENGTH(SPLIT(string, delimiter)) < part THEN ""
+    WHEN string NOT LIKE CONCAT('%', delimiter, '%') THEN string
+    ELSE SPLIT(string, delimiter)[OFFSET(part - 1)]
+  END
 );
