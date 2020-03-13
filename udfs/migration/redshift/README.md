@@ -50,3 +50,11 @@ SELECT bqutil.rs.initcap('À vaillant coeur rien d’impossible')
 
 'À Vaillant Coeur Rien D’Impossible', '640 K!Ought To Be Enough~For_Anyone', 'Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline', 'One+One Is   "(Two-One)*[Two]"', '<Lorem>Ipsum@Gmail.Com'
 ```
+
+### [split_part(string STRING, delimiter STRING, part INT64)](split_part.sql)
+Splits a string on the specified delimiter and returns the part at the specified position. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/SPLIT_PART.html)
+```sql
+SELECT bqutil.rs.split_part('2020-02-02', '-' , 1)
+
+2020
+```

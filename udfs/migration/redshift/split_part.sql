@@ -19,5 +19,5 @@ CREATE OR REPLACE FUNCTION rs.split_part(
   delimiter STRING,
   part INT64)
 AS (
-  SPLIT(string, delimiter)[OFFSET(part)]
+  SPLIT(string, delimiter)[OFFSET(part - 1)]
 );
