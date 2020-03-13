@@ -20,7 +20,7 @@ CREATE OR REPLACE FUNCTION rs.split_part(
   part INT64)
 AS (
   CASE
-    WHEN part < 1 THEN ERROR('The part argument must be an integer greater than 0!')
+    WHEN part < 1 THEN ERROR('The part argument must be an integer greater than 1!')
     WHEN ARRAY_LENGTH(SPLIT(string, delimiter)) < part THEN ""
     ELSE SPLIT(string, delimiter)[OFFSET(part - 1)]
   END
