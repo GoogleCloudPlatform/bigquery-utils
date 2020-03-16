@@ -131,66 +131,13 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.billingTier')
       ) AS billingTier,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.queryStats.referencedTables'), 
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedTables')
-      ) AS referencedTables,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.queryStats.referencedViews'), 
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedViews')
-      ) AS referencedViews,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.queryStats.referencedRoutines'), 
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.referencedRoutines')
-      ) AS referencedRoutines,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.queryStats.outputRowCount'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.outputRowCount')
-      ) as outputRowCount,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.queryStats.cacheHit'), 
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.cacheHit')
-      ) as cacheHit, 
-      COALESCE(
-        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStats.loadStats.totalOutputBytes') AS INT64),
-        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64)
-      ) AS totalLoadOutputBytes,
-      ARRAY_LENGTH(SPLIT(
+      SPLIT(TRIM(TRIM(
         COALESCE(
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStats.queryStats.referencedTables'), 
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.referencedTables')
-        ), ",")
-      ) AS totalTablesProcessed,
-      ARRAY_LENGTH(SPLIT(
-        COALESCE(
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStats.queryStats.referencedViews'), 
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.referencedViews')
-        ), ",")
-      ) AS totalViewsProcessed,
-      ARRAY_LENGTH(SPLIT(
-        COALESCE(
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobInsertion.job.jobStats.queryStats.referencedRoutines'), 
-          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.jobChange.job.jobStats.queryStats.referencedRoutines')
-        ), ",")
-      ) AS totalRoutinesProcessed,
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedTables'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedTables')),
+          '["'),'"]'),'","') as referencedTables,
       COALESCE(
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobStats.queryStats.referencedTables'),"/")[SAFE_OFFSET(1)],
@@ -209,6 +156,21 @@
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.referencedTables'),"/")[SAFE_OFFSET(5)]
       ) AS refTable_table_id,
+      ARRAY_LENGTH(SPLIT(
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedTables'), 
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedTables')
+        ), ",")
+      ) AS totalTablesProcessed,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedViews'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedViews')),
+          '["'),'"]'),'","') as referencedViews,
       COALESCE(
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(1)],
@@ -227,6 +189,29 @@
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.referencedViews'),"/")[SAFE_OFFSET(5)]
       ) AS refView_table_id,
+      ARRAY_LENGTH(SPLIT(
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedViews'), 
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedViews')
+        ), ",")
+      ) AS totalViewsProcessed,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedRoutines'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedRoutines')),
+          '["'),'"]'),'","') as referencedRoutines,
+      ARRAY_LENGTH(SPLIT(
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.referencedRoutines'), 
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.referencedRoutines')
+        ), ",")
+      ) AS totalRoutinesProcessed,
       COALESCE(
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobStats.queryStats.referencedRoutines'),"/")[SAFE_OFFSET(1)],
@@ -245,6 +230,24 @@
         SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.queryStats.referencedRoutines'),"/")[SAFE_OFFSET(5)]
       ) AS refRoutine_table_id,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.queryStats.outputRowCount'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.outputRowCount')
+      ) as outputRowCount,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.queryStats.cacheHit'), 
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.cacheHit')
+      ) as cacheHit, 
+      COALESCE(
+        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.loadStats.totalOutputBytes') AS INT64),
+        CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64)
+      ) AS totalLoadOutputBytes,
       /* Queries related to JobStatus
       https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstatus*/
       COALESCE(
@@ -307,12 +310,13 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.loadConfig.schemaJsonUrisTruncated')) 
       AS loadschemaJsonTruncated,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.loadConfig.sourceUris'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobConfig.loadConfig.sourceUris')) 
-      AS loadsourceUris,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobStats.queryStats.sourceUris'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobChange.job.jobStats.queryStats.sourceUris')),
+          '["'),'"]'),'","') as loadSourceUris,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.loadConfig.createDisposition'),
@@ -454,8 +458,13 @@
         '$.jobInsertion.job.jobConfig.writeDisposition') as tableCopywriteDisposition,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.tableCopyConfig') AS tableCopy,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables') AS tableCopysourceTables,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables')),
+      '["'),'"]') ,'","') as tableCopysourceTables,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated') AS tableCopysourceTablesTruncated,
       COALESCE(
@@ -478,10 +487,19 @@
         ".")[SAFE_OFFSET(3)] AS tableCopytable_id,
       /* Queries related to extractConfig
       https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract */
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.extractConfig.destinationUris') AS extractdestinationUris,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobConfig.extractConfig.destinationUrisTruncated') AS extractdestinationUrisTruncated,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobConfig.extractConfig.destinationUris'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.jobInsertion.job.jobConfig.extractConfig.destinationUris')),
+          '["'),'"]'),'","') as extractdestinationUris,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.destinationUrisTruncated'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.extractConfig.destinationUrisTruncated')
+      AS extractdestinationUrisTruncated,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS extractsourceTable,
       SPLIT(
