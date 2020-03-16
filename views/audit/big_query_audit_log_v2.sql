@@ -502,18 +502,6 @@
       AS extractdestinationUrisTruncated,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS extractsourceTable,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
-        ".")[SAFE_OFFSET(1)] AS extract_projectid,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
-        ".")[SAFE_OFFSET(3)] AS extract_datasetid,
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
-        ".")[SAFE_OFFSET(5)] AS extract_tableid,
       /* The following code extracts the columns specific to the Load operation in BQ */ 
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, "$.jobChange.after") AS jobChangeAfter,
       REGEXP_EXTRACT(protopayload_auditlog.metadataJson, 
