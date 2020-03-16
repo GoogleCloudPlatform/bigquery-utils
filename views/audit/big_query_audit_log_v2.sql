@@ -95,6 +95,12 @@
         ) AS totalSlotMs,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStats.reservationUsage'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.reservationUsage')
+      ) AS reservationUsage,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobStats.reservationUsage.name'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStats.reservationUsage.name')
@@ -247,6 +253,10 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStatus.jobState')
       ) AS jobState,
+      SPLIT(COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStatus.errorResult),JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStatus.errorResult.code')),"/")[SAFE_OFFSET(1)],
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobStatus.errorResult.code'),
