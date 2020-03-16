@@ -258,7 +258,7 @@
       ) AS jobState,
       SPLIT(COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStatus.errorResult),JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobStatus.errorResult'),JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStatus.errorResult.code')),"/")[SAFE_OFFSET(1)],
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -498,7 +498,7 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.extractConfig.destinationUrisTruncated'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobConfig.extractConfig.destinationUrisTruncated')
+          '$.jobChange.job.jobConfig.extractConfig.destinationUrisTruncated'))
       AS extractdestinationUrisTruncated,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS extractsourceTable,
@@ -661,8 +661,8 @@ SELECT
       queryKmskeyName
     ) AS destinationTableEncryption,
     STRUCT(
-      queryName,
-      querysourceUris
+      tableDefinitionsName,
+      tableDefinitionsSourceUris
     ) AS tableDefinitions
   ) AS queryConfig,
   /* extractConfig STRUCT*/
