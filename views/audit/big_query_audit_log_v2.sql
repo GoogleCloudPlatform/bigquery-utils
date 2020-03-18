@@ -278,24 +278,20 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobStatus.errorResult.details')
       ) AS errorResultDetails,
-      COALESCE(
+      REGEXP_EXTRACT_ALL(COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStatus.error.code'),
+          '$.jobInsertion.job.jobStatus.error'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStatus.error.code') 
-      ) AS errorCode,
-      COALESCE(
+          '$.jobChange.job.jobStatus.error') 
+        ),r'"message":\"(.*?)\"}'
+      ) as errorMessage,
+      REGEXP_EXTRACT_ALL(COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStatus.error.message'),
+          '$.jobInsertion.job.jobStatus.error'),
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStatus.error.message')
-      ) AS errorMessage, 
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobStatus.error.details'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStatus.error.details')
-      ) AS errorDetails,
+          '$.jobChange.job.jobStatus.error') 
+        ),r'"code":\"(.*?)\"}'
+      ) as errorCode,
       /* Queries related to loadConfig job
       https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load */
       COALESCE(
@@ -367,18 +363,6 @@
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobChange.job.jobConfig.queryConfig.createDisposition')) 
       AS querycreateDisposition,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions.name'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobConfig.queryConfig.tableDefinitions.name')) 
-      AS tableDefinitionsName,
-      COALESCE(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions.sourceUris'),
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobConfig.queryConfig.tableDefinitions.sourceUris')) 
-      AS tableDefinitionsSourceUris,
       COALESCE(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
           '$.jobInsertion.job.jobConfig.queryConfig.priority'),
@@ -502,6 +486,18 @@
       AS extractdestinationUrisTruncated,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.sourceTable') AS extractsourceTable,
+      SPLIT(
+         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable')
+      ,",")[SAFE_OFFSET(1)] as extract_projectid,
+      SPLIT(
+         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable')
+      ,",")[SAFE_OFFSET(3)] as extract_datasetid,
+      SPLIT(
+         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable')
+      ,",")[SAFE_OFFSET(5)] as extract_tableid,
       /* The following code extracts the columns specific to the Load operation in BQ */ 
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, "$.jobChange.after") AS jobChangeAfter,
       REGEXP_EXTRACT(protopayload_auditlog.metadataJson, 
@@ -556,9 +552,7 @@ SELECT
   querycreateDisposition,
   querywriteDisposition,
   queryschemaJson,
-  tableDefinitionsSourceUris,
   queryschemaJsonTruncated,
-  tableDefinitionsName,
   queryPriority,
   statementType,
   extractdestinationUris,
@@ -582,7 +576,6 @@ SELECT
   errorResultDetails,
   errorCode,
   errorMessage,
-  errorDetails,
   projectId,
   jobId,
   data_jobid
@@ -647,11 +640,7 @@ SELECT
     querydefaultDataset,
     STRUCT(
       queryKmskeyName
-    ) AS destinationTableEncryption,
-    STRUCT(
-      tableDefinitionsName,
-      tableDefinitionsSourceUris
-    ) AS tableDefinitions
+    ) AS destinationTableEncryption
   ) AS queryConfig,
   /* extractConfig STRUCT*/
   STRUCT(
@@ -697,8 +686,7 @@ SELECT
     ) as errorResult,
     STRUCT (
       errorCode,
-      errorMessage,
-      errorDetails
+      errorMessage
     ) as error
   ) as JobStatus,
   name,
@@ -730,7 +718,6 @@ SELECT
     ) as loadStats
   ) as jobStats,
   errorCode IS NOT NULL AS isError,
-  REGEXP_CONTAINS(errorMessage, 'timeout') AS isTimeout,
   totalSlotMs,
   totalSlotMs / runtimeMs AS avgSlots,
   /* The following statement breaks down the query into minute buckets
