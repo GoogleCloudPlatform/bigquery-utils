@@ -530,45 +530,112 @@
       ) AS data_jobid
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
   ),
-  creation_audit AS (
+  table_audit AS (
     SELECT
-      CONCAT(
+      COALESCE(CONCAT(
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.tableCreation.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+        ":",
         SPLIT(
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
             '$.tableCreation.jobName'),
-        "/")[SAFE_OFFSET(1)], ":",
+              "/")[SAFE_OFFSET(3)]
+        ),
+       CONCAT(
         SPLIT(
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-            '$.tableDataChange.jobName'), 
-            "/")[SAFE_OFFSET(3)]
-      ) AS table_jobid,
+              '$.tableChange.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+        ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.tableChange.jobName'),
+              "/")[SAFE_OFFSET(3)]
+      )) as table_jobid,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.tableName'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.tableName')
+      ) AS tableName,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.tableInfo.friendlyName'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.tableInfo.friendlyName')
+      ) AS tableFriendlyName,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.tableInfo.description'), 
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.tableInfo.description')
+      ) AS tableDescription,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.schemaJson'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.schemaJson')
+      ) AS tableSchemaJson,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.schemaJsonTruncated'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.schemaJsonTruncated')
+      ) AS tableSchemaJsonTruncated,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.view.query'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.view.query')
+      ) AS tableQuery,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.view.queryTruncated'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.view.queryTruncated')
+      ) AS tableTruncated,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.expireTime'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.expireTime')
+      ) AS tableExpireTime,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.createTime'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.createTime')
+      ) AS tableCreateTime,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.updateTime'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCrhange.table.updateTime')
+      ) AS tableUpdateTime,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.truncateTime'), 
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.truncateTime')
+      ) AS tableTruncateTime,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.encryption.kmsKeyName'),
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableChange.table.encryption.kmsKeyName')
+      ) AS tableKmsKeyName,
+      COALESCE(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.tableCreation.table.reason'),
+         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+          '$.table.tableChange.reason') 
+      ) AS tableReason,
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.tableName') AS tableCreationName,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.tableInfo.friendlyName') AS tableCreationFriendlyName,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.tableInfo.description') AS tableCreationDescription,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.schemaJson') AS tableCreationSchemaJson,
-     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.schemaJsonTruncated') AS tableCreationSchemaJsonTruncated,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.view.query') AS tableCreationQuery,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.view.queryTruncated') AS tableCreationTruncated,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.expireTime') AS tableCreationExpireTime,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.createTime') AS tableCreationCreateTime,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.updateTime') AS tableCreationUpdateTime,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.truncateTime') AS tableCreationTruncateTime,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.encryption.kmsKeyName') AS tableCreationKmsKeyName,
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
-        '$.tableCreation.table.updateTime') AS tableCreationReason,
-    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
+          '$.tableChange.table.truncated')
+       AS tableChangeTruncated
+    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` )
 SELECT
   principalEmail,
   callerIp,
@@ -623,19 +690,20 @@ SELECT
   deleteRowCount,
   outputRowCount,
   table_jobid,
-  tableCreationName,
-  tableCreationFriendlyName,
-  tableCreationDescription,
-  tableCreationSchemaJson,
-  tableCreationSchemaJsonTruncated,
-  tableCreationQuery,
-  tableCreationTruncated,
-  tableCreationExpireTime,
-  tableCreationCreateTime,
-  tableCreationUpdateTime,
-  tableCreationTruncateTime,
-  tableCreationKmsKeyName,
-  tableCreationReason,
+  tableName,
+  tableFriendlyName,
+  tableDescription,
+  tableSchemaJson,
+  tableSchemaJsonTruncated,
+  tableQuery,
+  tableTruncated,
+  tableExpireTime,
+  tableCreateTime,
+  tableUpdateTime,
+  tableTruncateTime,
+  tableKmsKeyName,
+  tableReason,
+  tableChangeTruncated,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -807,7 +875,7 @@ SELECT
   refView_table_id,
 FROM query_audit
 LEFT JOIN data_audit ON data_jobid = jobId
-LEFT JOIN creation_audit ON data_jobid = table_jobId
+LEFT JOIN table_audit ON data_jobid = table_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
