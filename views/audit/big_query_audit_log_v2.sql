@@ -529,7 +529,46 @@
           "/")[SAFE_OFFSET(3)]
       ) AS data_jobid
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-  ) 
+  ),
+  creation_audit AS (
+    SELECT
+      CONCAT(
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.tableCreation.jobName'),
+        "/")[SAFE_OFFSET(1)], ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.tableDataChange.jobName'), 
+            "/")[SAFE_OFFSET(3)]
+      ) AS table_jobid,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.tableName') AS tableCreationName,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.tableInfo.friendlyName') AS tableCreationFriendlyName,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.tableInfo.description') AS tableCreationDescription,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.schemaJson') AS tableCreationSchemaJson,
+     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.schemaJsonTruncated') AS tableCreationSchemaJsonTruncated,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.view.query') AS tableCreationQuery,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.view.queryTruncated') AS tableCreationTruncated,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.expireTime') AS tableCreationExpireTime,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.createTime') AS tableCreationCreateTime,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.updateTime') AS tableCreationUpdateTime,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.truncateTime') AS tableCreationTruncateTime,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.encryption.kmsKeyName') AS tableCreationKmsKeyName,
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableCreation.table.updateTime') AS tableCreationReason,
+    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 SELECT
   principalEmail,
   callerIp,
@@ -754,6 +793,7 @@ SELECT
   refView_table_id,
 FROM query_audit
 LEFT JOIN data_audit ON data_jobid = jobId
+LEFT JOIN creation_audit ON data_jobid = table_jobId
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
