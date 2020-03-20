@@ -635,7 +635,33 @@
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
           '$.tableChange.table.truncated')
        AS tableChangeTruncated
-    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` )
+    FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
+  tableDeletion_audit as (
+    SELECT
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+        '$.tableDeletion.table.reason') as tableDeletionReason,
+      COALESCE(
+        CONCAT(
+          SPLIT(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, $.tableCreation.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+          ":",
+          SPLIT(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableCreation.jobName'),
+              "/")[SAFE_OFFSET(3)]
+          ),
+       CONCAT(
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.tableChange.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+        ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.tableChange.jobName'),
+              "/")[SAFE_OFFSET(3)]
+      )) as tableDeletion_jobid,
+    FROM `namratashah-ctr-sandbox.new_sink.cloudaudit_googleapis_com_data_access`
 SELECT
   principalEmail,
   callerIp,
@@ -704,6 +730,8 @@ SELECT
   tableKmsKeyName,
   tableReason,
   tableChangeTruncated,
+  tableDeletionReason,
+  tableDeletion_jobid,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -876,6 +904,7 @@ SELECT
 FROM query_audit
 LEFT JOIN data_audit ON data_jobid = jobId
 LEFT JOIN table_audit ON data_jobid = table_jobid
+LEFT JOIN tableDeletion_audit on data_jobid = tableDeletion_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
