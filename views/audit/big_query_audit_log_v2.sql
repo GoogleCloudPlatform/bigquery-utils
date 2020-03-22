@@ -714,7 +714,88 @@
               "/")[SAFE_OFFSET(3)]
       ) as modelDeletion_jobid,
      FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
-   )  
+   ),
+ model_audit as (
+     SELECT 
+       COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.modelMetadataChange.reason'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.modelCreation.reason')
+       ) as model_reason,
+       COALESCE(
+          CONCAT(
+            SPLIT(
+              JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.modelMetadataChange.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+            ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.modelMetadataChange.jobName'),
+              "/")[SAFE_OFFSET(3)]
+       ),
+          CONCAT(
+            SPLIT(
+              JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.modelCreation.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+            ":",
+            SPLIT(
+              JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.jobName'),
+                  "/")[SAFE_OFFSET(3)]
+        ))      as model_jobid,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.modelName'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.modelName') 
+        ) as modelName,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.modelInfo.friendlyName'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.modelInfo.friendlyName') 
+        ) as modelFriendlyName,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.modelInfo.description'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.modelInfo.description') 
+        ) as modelDescription,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.modelInfo.labels'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.modelInfo.labels') 
+        ) as modelLabels,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.expireTime'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.expireTime') 
+        ) as modelExpireTime,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.createTime'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.createTime') 
+        ) as modelCreateTime,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.updateTime'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.updateTime') 
+        ) as modelUpdateTime,
+        COALESCE(
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelCreation.model.encryption.kmsKeyName'),
+            JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelMetadataChange.model.encryption.kmsKeyName') 
+        ) as modelKmsKeyName,
+     FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
+   ) 
 SELECT
   principalEmail,
   callerIp,
@@ -794,6 +875,16 @@ SELECT
   sessionName,
   modelDeletion_reason,
   modelDeletion_jobid,
+  model_jobid,
+  model_reason,
+  modelName,
+  modelFriendlyName,
+  modelLabels,
+  modelCreateTime,
+  modelUpdateTime,
+  modelExpireTime,
+  modelDescription,
+  modelKmsKeyName,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -969,6 +1060,7 @@ LEFT JOIN table_audit ON jobid = table_jobid
 LEFT JOIN tableDeletion_audit on table_jobid = tableDeletion_jobid
 LEFT JOIN tableDataRead_audit on tableDeletion_jobid=tableDataRead_jobid
 LEFT JOIN modelDeletion_audit on tableDataRead_jobid = modelDeletion_jobid
+LEFT JOIN model_audit on  modelDeletion_jobid = model_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
