@@ -697,8 +697,24 @@
             '$.tableDataRead.sessionName') as sessionName         
     FROM 
     `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
-   )
-   
+   ),
+   modelDeletion_audit as (
+     SELECT 
+       JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.modelDeletion.reason') as modelDeletion_reason,
+       CONCAT(
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.modelDeletion.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+        ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.modelDeletion.jobName'),
+              "/")[SAFE_OFFSET(3)]
+      ) as modelDeletion_jobid,
+     FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
+   )  
 SELECT
   principalEmail,
   callerIp,
@@ -776,6 +792,8 @@ SELECT
   categoriesTruncated,
   tableDataReadReason,
   sessionName,
+  modelDeletion_reason,
+  modelDeletion_jobid,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -950,6 +968,7 @@ LEFT JOIN data_audit ON data_jobid = jobId
 LEFT JOIN table_audit ON jobid = table_jobid
 LEFT JOIN tableDeletion_audit on table_jobid = tableDeletion_jobid
 LEFT JOIN tableDataRead_audit on tableDeletion_jobid=tableDataRead_jobid
+LEFT JOIN modelDeletion_audit on tableDataRead_jobid = modelDeletion_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
