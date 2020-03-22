@@ -701,7 +701,7 @@
    modelDeletion_audit as (
      SELECT 
        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-            '$.modelDeletion.reason') as modelDeletion_reason,
+            '$.modelDeletion.reason') as modelDeletionReason,
        CONCAT(
         SPLIT(
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
@@ -722,7 +722,7 @@
               '$.modelMetadataChange.reason'),
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
               '$.modelCreation.reason')
-       ) as model_reason,
+       ) as modelReason,
        COALESCE(
           CONCAT(
             SPLIT(
@@ -873,10 +873,10 @@ SELECT
   categoriesTruncated,
   tableDataReadReason,
   sessionName,
-  modelDeletion_reason,
+  modelDeletionReason,
   modelDeletion_jobid,
   model_jobid,
-  model_reason,
+  modelReason,
   modelName,
   modelFriendlyName,
   modelLabels,
