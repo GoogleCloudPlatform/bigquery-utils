@@ -510,6 +510,8 @@
       ) AS querytype
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
   ),
+  /* Data from tableDataChange audit logs 
+  https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledatachange */
   data_audit AS (
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -530,6 +532,10 @@
       ) AS data_jobid
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
   ),
+  /* Data from TableCreation and TableChange audit logs
+  TableCreation: https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablechange
+  TableChange: https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablechange
+  */
   table_audit AS (
     SELECT
       COALESCE(CONCAT(
@@ -636,6 +642,8 @@
           '$.tableChange.table.truncated')
        AS tableChangeTruncated
     FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
+  /* Data from tableDeletion audit logs
+  https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion */
   tableDeletion_audit as (
     SELECT
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
@@ -662,7 +670,8 @@
               "/")[SAFE_OFFSET(3)]
       )) as tableDeletion_jobid
     FROM `project_id_.dataset_id.table_id.cloudaudit_googleapis_com_data_access`),
-   
+   /* Data from tableDataRead audit logs 
+   https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread */
    tableDataRead_audit as (
     SELECT
       CONCAT(
@@ -698,6 +707,8 @@
     FROM 
     `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
    ),
+   /* Data from modelDeletion audit logs
+   https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldeletion */
    modelDeletion_audit as (
      SELECT 
        JSON_EXTRACT(protopayload_auditlog.metadataJson,
@@ -796,6 +807,8 @@
         ) as modelKmsKeyName,
      FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
    ),
+  /* Data from modelDataChange audit logs: 
+  https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldatachange */
   modelDataChange_audit as (
       SELECT
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
