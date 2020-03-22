@@ -660,8 +660,45 @@
           JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
             '$.tableChange.jobName'),
               "/")[SAFE_OFFSET(3)]
-      )) as tableDeletion_jobid,
-    FROM `namratashah-ctr-sandbox.new_sink.cloudaudit_googleapis_com_data_access`
+      )) as tableDeletion_jobid
+    FROM `project_id_.dataset_id.table_id.cloudaudit_googleapis_com_data_access`),
+   
+   tableDataRead_audit as (
+    SELECT
+      CONCAT(
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.tableDataRead.jobName'),
+              "/")[SAFE_OFFSET(1)], 
+        ":",
+        SPLIT(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.tableDataRead.jobName'),
+              "/")[SAFE_OFFSET(3)]
+      ) as tableDataRead_jobid,
+      SPLIT(TRIM(TRIM(
+        COALESCE(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.fields'),
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.fields')),
+          '["'),'"]'),'","') as fieldsAccessed,  
+       JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.fieldsTruncated') as fieldsTruncated,
+       SPLIT(TRIM(TRIM(
+          JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.categories'),
+          '["'),'"]'),'","') as categories,  
+       JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.categoriesTruncated') as categoriesTruncated,
+       JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.reason') as tableDataReadReason,
+       JSON_EXTRACT(protopayload_auditlog.metadataJson,
+            '$.tableDataRead.sessionName') as sessionName         
+    FROM 
+    `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
+   )
+   
 SELECT
   principalEmail,
   callerIp,
@@ -732,6 +769,13 @@ SELECT
   tableChangeTruncated,
   tableDeletionReason,
   tableDeletion_jobid,
+  tableDataRead_jobid,
+  fieldsAccessed,
+  fieldsTruncated,
+  categories,
+  categoriesTruncated,
+  tableDataReadReason,
+  sessionName,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -903,8 +947,9 @@ SELECT
   refView_table_id,
 FROM query_audit
 LEFT JOIN data_audit ON data_jobid = jobId
-LEFT JOIN table_audit ON data_jobid = table_jobid
-LEFT JOIN tableDeletion_audit on data_jobid = tableDeletion_jobid
+LEFT JOIN table_audit ON jobid = table_jobid
+LEFT JOIN tableDeletion_audit on table_jobid = tableDeletion_jobid
+LEFT JOIN tableDataRead_audit on tableDeletion_jobid=tableDataRead_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
