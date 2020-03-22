@@ -795,7 +795,25 @@
                 '$.modelMetadataChange.model.encryption.kmsKeyName') 
         ) as modelKmsKeyName,
      FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
-   ) 
+   ),
+  modelDataChange_audit as (
+      SELECT
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.modelDataChange.reason')
+          as modelDataChangeReason,
+          CONCAT(
+            SPLIT(
+              JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.modelDataChange.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+            ":",
+            SPLIT(
+              JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                '$.modelDataChange.jobName'),
+                  "/")[SAFE_OFFSET(3)]
+          ) as modelDataChange_jobid,
+      FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
+   )
 SELECT
   principalEmail,
   callerIp,
@@ -885,6 +903,8 @@ SELECT
   modelExpireTime,
   modelDescription,
   modelKmsKeyName,
+  modelDataChangeReason,
+  modelDataChange_jobid,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -1061,6 +1081,7 @@ LEFT JOIN tableDeletion_audit on table_jobid = tableDeletion_jobid
 LEFT JOIN tableDataRead_audit on tableDeletion_jobid=tableDataRead_jobid
 LEFT JOIN modelDeletion_audit on tableDataRead_jobid = modelDeletion_jobid
 LEFT JOIN model_audit on  modelDeletion_jobid = model_jobid
+LEFT JOIN modelDataChange_audit on  model_jobid = modelDataChange_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
