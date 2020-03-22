@@ -1,4 +1,4 @@
-/* Public BigQuery Audit View */
+/* Public BigQuery Audit View, author: Namrata Shah */
  WITH query_audit AS (
     SELECT
       protopayload_auditlog.authenticationInfo.principalEmail AS principalEmail,
