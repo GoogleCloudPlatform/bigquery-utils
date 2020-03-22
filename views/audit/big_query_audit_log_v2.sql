@@ -813,6 +813,72 @@
                   "/")[SAFE_OFFSET(3)]
           ) as modelDataChange_jobid,
       FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
+   ),
+   routine_audit as (
+      SELECT
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+              '$.routine.reason')
+          as routineReason,
+          COALESCE(
+            CONCAT(
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineCreation.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+              ":",
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineCreation.jobName'),
+                    "/")[SAFE_OFFSET(3)]
+            ),
+            CONCAT(
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineChange.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+              ":",
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineChange.jobName'),
+                    "/")[SAFE_OFFSET(3)]
+            ),
+            CONCAT(
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineDeletion.jobName'),
+                  "/")[SAFE_OFFSET(1)], 
+              ":",
+              SPLIT(
+                JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+                  '$.routineDeletion.jobName'),
+                    "/")[SAFE_OFFSET(3)]
+            )
+          ) as routine_jobid,
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineCreation.routine.routineName'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineChange.routine.routineName'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineDeletion.routine.routineName')
+        ) as routineName,
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineCreation.routine.createTime'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineChange.routine.createTime'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineDeletion.routine.createTime')
+        ) as routineCreateTime,
+        COALESCE(
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineCreation.routine.updateTime'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineChange.routine.updateTime'),
+          JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, 
+            '$.routineDeletion.routine.updateTime')
+        ) as routineUpdateTime
+      FROM `project_id_.dataset_id.cloudaudit_googleapis_com_data_access`
    )
 SELECT
   principalEmail,
@@ -905,6 +971,11 @@ SELECT
   modelKmsKeyName,
   modelDataChangeReason,
   modelDataChange_jobid,
+  routine_jobid,
+  routineReason,
+  routineName,
+  routineCreateTime,
+  routineUpdateTime,
   STRUCT(
     EXTRACT(MINUTE FROM startTime) AS minuteOfDay,
     EXTRACT(HOUR FROM startTime) AS hourOfDay,
@@ -1082,6 +1153,7 @@ LEFT JOIN tableDataRead_audit on tableDeletion_jobid=tableDataRead_jobid
 LEFT JOIN modelDeletion_audit on tableDataRead_jobid = modelDeletion_jobid
 LEFT JOIN model_audit on  modelDeletion_jobid = model_jobid
 LEFT JOIN modelDataChange_audit on  model_jobid = modelDataChange_jobid
+LEFT JOIN routine_audit on  modelDataChange_jobid = routine_jobid
 WHERE
   statementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
