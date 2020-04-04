@@ -17,20 +17,20 @@
 -- typeof_literal:
 -- Input: A string that is a literal representation of a BigQuery value produced by FORMAT('%T', input)
 -- Output: Type of input or 'UNKNOWN' if input is unknown literal string
-CREATE OR REPLACE FUNCTION fn.typeof_literal(literal STRING)
+CREATE OR REPLACE FUNCTION fn.typeof_literal(input STRING)
 AS (
       CASE
         -- Process NUMERIC, DATE, DATETIME, TIME, TIMESTAMP,
-        WHEN REGEXP_CONTAINS(literal, r'^[A-Z]+ "') THEN REGEXP_EXTRACT(literal, r'^([A-Z]+) "')
-        WHEN REGEXP_CONTAINS(literal, r'^-?[0-9]*$') THEN 'INT64'
-        WHEN REGEXP_CONTAINS(literal, r'^(-?[0-9]+[.e].*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
-        WHEN literal IN ('true', 'false') THEN 'BOOL'
-        WHEN literal LIKE '"%' THEN 'STRING'
-        WHEN literal LIKE 'b"%' THEN 'BYTES'
-        WHEN literal LIKE '[%' THEN 'ARRAY'
-        WHEN REGEXP_CONTAINS(literal, r'^(STRUCT)?\(') THEN 'STRUCT'
-        WHEN literal LIKE 'ST_%' THEN 'GEOGRAPHY'
-        WHEN literal = 'NULL' THEN 'NULL'
+        WHEN REGEXP_CONTAINS(input, r'^[A-Z]+ "') THEN REGEXP_EXTRACT(input, r'^([A-Z]+) "')
+        WHEN REGEXP_CONTAINS(input, r'^-?[0-9]*$') THEN 'INT64'
+        WHEN REGEXP_CONTAINS(input, r'^(-?[0-9]+[.e].*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
+        WHEN input IN ('true', 'false') THEN 'BOOL'
+        WHEN input LIKE '"%' THEN 'STRING'
+        WHEN input LIKE 'b"%' THEN 'BYTES'
+        WHEN input LIKE '[%' THEN 'ARRAY'
+        WHEN REGEXP_CONTAINS(input, r'^(STRUCT)?\(') THEN 'STRUCT'
+        WHEN input LIKE 'ST_%' THEN 'GEOGRAPHY'
+        WHEN input = 'NULL' THEN 'NULL'
       ELSE
       'UNKNOWN'
     END );
