@@ -22,16 +22,13 @@ AS ((
     SELECT
       AS VALUE
       CASE
+        -- Process NUMERIC, DATE, DATETIME, TIME, TIMESTAMP,
+        WHEN REGEXP_CONTAINS(fmt, r'^[A-Z]+ "') THEN REGEXP_EXTRACT(fmt, r'^([A-Z]+) "')
         WHEN REGEXP_CONTAINS(fmt, r'^[0-9]*$') THEN 'INT64'
-        WHEN fmt LIKE 'NUMERIC "%' THEN 'NUMERIC'
         WHEN REGEXP_CONTAINS(fmt, r'^([0-9]*\.[0-9]*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
         WHEN fmt IN ('true', 'false') THEN 'BOOL'
         WHEN fmt LIKE '"%' THEN 'STRING'
         WHEN fmt LIKE 'b"%' THEN 'BYTES'
-        WHEN fmt LIKE 'DATE "%' THEN 'DATE'
-        WHEN fmt LIKE 'DATETIME "%' THEN 'DATETIME'
-        WHEN fmt LIKE 'TIME "%' THEN 'TIME'
-        WHEN fmt LIKE 'TIMESTAMP "%' THEN 'TIMESTAMP'
         WHEN fmt LIKE '[%' THEN 'ARRAY'
         WHEN REGEXP_CONTAINS(fmt, r'^(STRUCT)?\(') THEN 'STRUCT'
         WHEN fmt LIKE 'ST_%' THEN 'GEOGRAPHY'
