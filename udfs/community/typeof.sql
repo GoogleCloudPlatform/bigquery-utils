@@ -39,4 +39,4 @@ AS (
 -- Input: Any
 -- Output: Type of input or 'UNKNOWN' if input is unknown typed value
 CREATE OR REPLACE FUNCTION fn.typeof(input ANY TYPE)
-AS ( typeof_literal(FORMAT('%T', input)) );
+AS ( fn.typeof_literal(FORMAT('%T', input)) );
