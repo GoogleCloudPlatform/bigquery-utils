@@ -15,7 +15,7 @@
  */
 
 -- typeof_literal:
--- Input: A string that is a literal representation of a BigQuery value
+-- Input: A string that is a literal representation of a BigQuery value produced by FORMAT('%T', input)
 -- Output: Type of input or 'UNKNOWN' if input is unknown literal string
 CREATE OR REPLACE FUNCTION fn.typeof_literal(literal STRING)
 AS (
