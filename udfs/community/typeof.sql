@@ -22,8 +22,8 @@ AS (
       CASE
         -- Process NUMERIC, DATE, DATETIME, TIME, TIMESTAMP,
         WHEN REGEXP_CONTAINS(literal, r'^[A-Z]+ "') THEN REGEXP_EXTRACT(literal, r'^([A-Z]+) "')
-        WHEN REGEXP_CONTAINS(literal, r'^[0-9]*$') THEN 'INT64'
-        WHEN REGEXP_CONTAINS(literal, r'^([0-9]+[.e].*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
+        WHEN REGEXP_CONTAINS(literal, r'^-?[0-9]*$') THEN 'INT64'
+        WHEN REGEXP_CONTAINS(literal, r'^(-?[0-9]+[.e].*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
         WHEN literal IN ('true', 'false') THEN 'BOOL'
         WHEN literal LIKE '"%' THEN 'STRING'
         WHEN literal LIKE 'b"%' THEN 'BYTES'
