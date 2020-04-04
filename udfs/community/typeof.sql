@@ -15,7 +15,7 @@
  */
 
 -- typeof_literal:
--- Input: String which is a literal representation of BigQuery values
+-- Input: A string that is a literal representation of a BigQuery value
 -- Output: Type of input or 'UNKNOWN' if input is unknown literal string
 CREATE OR REPLACE FUNCTION fn.typeof_literal(literal STRING)
 AS (
