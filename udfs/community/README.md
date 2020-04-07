@@ -262,7 +262,7 @@ SELECT
 ```
 
 
-### [typeof(input ANY TYPE)](translate.sql)
+### [typeof(input ANY TYPE)](typeof.sql)
 
 Return the type of input or 'UNKNOWN' if input is unknown typed value.
 
@@ -277,7 +277,7 @@ STRING, BINARY, FLOAT64, STRUCT
 ```
 
 
-### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](typeof.sql)
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
 For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
 ```sql
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
