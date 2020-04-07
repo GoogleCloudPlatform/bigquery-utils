@@ -263,6 +263,9 @@ SELECT
 
 
 ### [typeof(input ANY TYPE)](translate.sql)
+
+Return the type of input or 'UNKNOWN' if input is unknown typed value.
+
 ```sql
 SELECT
   bqutil.fn.typeof(""),
