@@ -1,0 +1,62 @@
+int:
+  - test:
+    input: CAST(-1 AS STRING)
+    expected_output: CAST(-1 AS INT64)
+  - test:
+    input: CAST(1 AS INT64)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST(2.5 AS FLOAT64)
+    expected_output: CAST(2 AS INT64)
+  - test:
+    input: CAST(7 AS INT64)
+    expected_output: CAST(7 AS INT64)
+  - test:
+    input: CAST(7.8 AS FLOAT64)
+    expected_output: CAST(7 AS INT64)
+url_parse:
+  - test: # HOST extraction
+    input: CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('HOST' AS STRING)
+    expected_output: CAST('facebook.com' AS STRING)
+  - test:
+    input: CAST('rpc://facebook.com/' AS STRING), CAST('HOST' AS STRING)
+    expected_output: CAST('facebook.com' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('HOST' AS STRING)
+    expected_output: CAST('subdomain.facebook.com' AS STRING)
+  - test: # PATH extraction
+    input: CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PATH' AS STRING)
+    expected_output: CAST('path1/p.php' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PATH' AS STRING)
+    expected_output: CAST('path1/p.php' AS STRING)
+  - test:
+    input: CAST('rpc://facebook.com/' AS STRING), CAST('PATH' AS STRING)
+    expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
+  - test: # QUERY extraction
+    input: CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('QUERY' AS STRING)
+    expected_output: CAST('k1=v1&k2=v2#Ref1' AS STRING)
+  - test:
+    input: CAST('rpc://facebook.com/' AS STRING), CAST('QUERY' AS STRING)
+    expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('QUERY' AS STRING)
+    expected_output: CAST('k1=v1&k2=v2#Ref1' AS STRING)
+  - test: # REF extraction
+    input: CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('REF' AS STRING)
+    expected_output: CAST('Ref1' AS STRING)
+  - test:
+    input: CAST('rpc://facebook.com/' AS STRING), CAST('REF' AS STRING)
+    expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('REF' AS STRING)
+    expected_output: CAST('Ref1' AS STRING)
+  - test: # PROTOCOL extraction
+    input: CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
+    expected_output: CAST('http' AS STRING)
+  - test:
+    input: CAST('rpc://facebook.com/' AS STRING), CAST('PROTOCOL' AS STRING)
+    expected_output: CAST('rpc' AS STRING)
+  - test:
+    input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
+    expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
