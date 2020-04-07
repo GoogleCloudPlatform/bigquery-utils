@@ -26,6 +26,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
@@ -267,6 +268,21 @@ For a given expression, replaces all occurrences of specified characters with sp
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
 most tin
+```
+
+
+### [typeof(input ANY TYPE)](typeof.sql)
+
+Return the type of input or 'UNKNOWN' if input is unknown typed value.
+
+```sql
+SELECT
+  bqutil.fn.typeof(""),
+  bqutil.fn.typeof(b""),
+  bqutil.fn.typeof(1.0),
+  bqutil.fn.typeof(STRUCT()),
+
+STRING, BINARY, FLOAT64, STRUCT
 ```
 
 
