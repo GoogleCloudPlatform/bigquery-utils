@@ -13,12 +13,11 @@
 # limitations under the License.
 
 import unittest
+from pathlib import Path
 
-from os.path import splitext
-from os.path import basename
-from parameterized import parameterized
-from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPICallError
+from google.cloud import bigquery
+from parameterized import parameterized
 
 import udf_test_utils as utils
 
@@ -40,7 +39,7 @@ class TestRunUDFs(unittest.TestCase):
     def test_run_udf_and_verify_expected_result(self, udf_path):
         client = self._client
         bq_test_dataset = utils.get_target_bq_dataset(udf_path)
-        file_name = splitext(basename(udf_path))[0]
+        file_name = Path(udf_path).stem
         udf_name = utils.extract_udf_name(udf_path)
         self.assertEqual(udf_name, file_name,
                          msg=(f'\nFile name: {udf_path}'

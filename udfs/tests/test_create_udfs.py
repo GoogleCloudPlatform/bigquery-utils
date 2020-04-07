@@ -14,11 +14,11 @@
 
 import unittest
 
-from parameterized import parameterized
-from google.cloud import bigquery
 from google.api_core.exceptions import GoogleAPICallError
+from google.cloud import bigquery
 from google.cloud.bigquery import QueryJobConfig
 from google.cloud.bigquery.table import _EmptyRowIterator
+from parameterized import parameterized
 
 import udf_test_utils as utils
 

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import glob
-from os import path
-import pathlib
-import re
 import argparse
-from google.cloud import bigquery
+import glob
+import re
+from pathlib import Path
 
+from google.cloud import bigquery
 from yaml import SafeLoader
 from yaml import load
 
@@ -39,7 +38,7 @@ def get_all_udf_paths():
 
 
 def load_test_cases(udf_path):
-    udf_dir = pathlib.Path(udf_path).parent
+    udf_dir = Path(udf_path).parent
     yaml_test_data_path = udf_dir / 'test_cases.yaml'
     if yaml_test_data_path.is_file():
         with open(yaml_test_data_path, 'r') as yaml_file:
@@ -90,7 +89,7 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
 
 
 def get_target_bq_dataset(udf_path):
-    parent_dir_name = pathlib.Path(udf_path).parent.name
+    parent_dir_name = Path(udf_path).parent.name
     return BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)
 
 
