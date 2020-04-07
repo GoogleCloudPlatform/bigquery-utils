@@ -100,12 +100,13 @@ function create_dataset_if_not_exists() {
 function execute_query() {
   local file=$1
   local dry_run=$2
+  local dataset=$3
 
   printf "${BOLD}${file}${NORMAL}\n"
   if [[ $dry_run == true ]]; then
-    bq query --headless --nouse_legacy_sql --dry_run "$(cat $file)"
+    bq query --dataset_id $dataset --headless --nouse_legacy_sql --dry_run "$(cat $file)"
   else
-    bq query --headless --nouse_legacy_sql "$(cat $file)"
+    bq query --dataset_id $dataset --headless --nouse_legacy_sql "$(cat $file)"
   fi
 
   if [[ $? -gt 0 ]]; then
@@ -134,7 +135,8 @@ function build() {
     local dataset=$(get_dataset $file)
 
     if [[ ! -z $dataset ]]; then
-      execute_query $file true
+      create_dataset_if_not_exists $dataset
+      execute_query $file true $dataset
     fi
   done <<< "$sql_files"
 }
@@ -160,8 +162,7 @@ function deploy() {
 
     if [[ ! -z $dataset ]]; then
       create_dataset_if_not_exists $dataset
-
-      execute_query $file
+      execute_query $file false $dataset
     fi
   done <<< "$sql_files"
 }
