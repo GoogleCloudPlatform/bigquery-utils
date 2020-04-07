@@ -14,7 +14,7 @@
 
 import glob
 from os import path
-from os.path import dirname
+import pathlib
 import re
 import argparse
 from google.cloud import bigquery
@@ -39,9 +39,9 @@ def get_all_udf_paths():
 
 
 def load_test_cases(udf_path):
-    udf_dir = '/'.join(udf_path.split('/')[:-1])
-    yaml_test_data_path = f'{udf_dir}/test_cases.yaml'
-    if path.isfile(yaml_test_data_path):
+    udf_dir = pathlib.Path(udf_path).parent
+    yaml_test_data_path = udf_dir / 'test_cases.yaml'
+    if yaml_test_data_path.is_file():
         with open(yaml_test_data_path, 'r') as yaml_file:
             return load(yaml_file, Loader=SafeLoader)
     else:
@@ -90,7 +90,7 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
 
 
 def get_target_bq_dataset(udf_path):
-    parent_dir_name = str(dirname(udf_path).split('/')[-1])
+    parent_dir_name = pathlib.Path(udf_path).parent.name
     return BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)
 
 
