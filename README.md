@@ -20,11 +20,11 @@ This repository is broken up into:
         functions
     *   [migration](/udfs/migration) - UDFs which mimic the behavior of
         proprietary functions in the following databases:
-    *   [netezza](/udfs/migration/netezza)
-    *   [oracle](/udfs/migration/oracle)
-    *   [redshift](/udfs/migration/redshift)
-    *   [teradata](/udfs/migration/teradata)
-    *   [vertica](/udfs/migration/vertica)
+        *   [netezza](/udfs/migration/netezza)
+        *   [oracle](/udfs/migration/oracle)
+        *   [redshift](/udfs/migration/redshift)
+        *   [teradata](/udfs/migration/teradata)
+        *   [vertica](/udfs/migration/vertica)
 *   [Views](/views) - Views over system tables such as audit logs or the
     `INFORMATION_SCHEMA`
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
