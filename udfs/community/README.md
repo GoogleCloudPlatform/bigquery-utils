@@ -26,6 +26,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
@@ -261,7 +262,19 @@ SELECT
 ```
 
 
-### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+### [typeof(input ANY TYPE)](translate.sql)
+```sql
+SELECT
+  bqutil.fn.typeof(""),
+  bqutil.fn.typeof(b""),
+  bqutil.fn.typeof(1.0),
+  bqutil.fn.typeof(STRUCT()),
+
+STRING, BINARY, FLOAT64, STRUCT
+```
+
+
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](typeof.sql)
 For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
 ```sql
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
