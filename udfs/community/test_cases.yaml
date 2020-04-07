@@ -62,98 +62,101 @@ url_parse:
     expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
 typeof:
   - test:
-    input: b"test"
-    expected_output: '"BYTES"'
+    input: (b'test')
+    expected_output: ('BYTES')
   - test:
-    input: b''
-    expected_output: '"BYTES"'
+    input: (b'')
+    expected_output: ('BYTES')
   - test:
-    input: 'TRUE'
-    expected_output: '"BOOL"'
+    input: (TRUE)
+    expected_output: ('BOOL')
   - test:
-    input: 'FALSE'
-    expected_output: '"BOOL"'
+    input: (FALSE)
+    expected_output: ('BOOL')
   - test:
-    input: 'NULL'
-    expected_output: '"NULL"'
+    input: (NULL)
+    expected_output: ('NULL')
   - test:
-    input: 1
-    expected_output: '"INT64"'
+    input: (1)
+    expected_output: ('INT64')
   - test:
-    input: -1
-    expected_output: '"INT64"'
+    input: (-1)
+    expected_output: ('INT64')
   - test:
-    input: 0
-    expected_output: '"INT64"'
+    input: (0)
+    expected_output: ('INT64')
   - test:
-    input: 0.0
-    expected_output: '"FLOAT64"'
+    input: (0.0)
+    expected_output: ('FLOAT64')
   - test:
-    input: -1.0
-    expected_output: '"FLOAT64"'
+    input: (-1.0)
+    expected_output: ('FLOAT64')
   - test:
-    input: 1.0
-    expected_output: '"FLOAT64"'
+    input: (1.0)
+    expected_output: ('FLOAT64')
   - test:
-    input: +123e45
-    expected_output: '"FLOAT64"'
+    input: (+123e45)
+    expected_output: ('FLOAT64')
   - test:
-    input: -123e45
-    expected_output: '"FLOAT64"'
+    input: (-123e45)
+    expected_output: ('FLOAT64')
   - test:
-    input: 12e345
-    expected_output: '"FLOAT64"'
+    input: (12e345)
+    expected_output: ('FLOAT64')
   - test:
-    input: -12e345
-    expected_output: '"FLOAT64"'
+    input: (-12e345)
+    expected_output: ('FLOAT64')
   - test:
-    input: IEEE_DIVIDE(1, 0)
-    expected_output: '"FLOAT64"'
+    input: CAST('inf' AS FLOAT64)
+    expected_output: ('FLOAT64')
   - test:
-    input: IEEE_DIVIDE(-1, 0)
-    expected_output: '"FLOAT64"'
+    input: CAST('-inf' AS FLOAT64)
+    expected_output: ('FLOAT64')
   - test:
-    input: IEEE_DIVIDE(0, 0)
-    expected_output: '"FLOAT64"'
+    input: CAST('nan' AS FLOAT64)
+    expected_output: ('FLOAT64')
   - test:
-    input: DATE "1970-01-01"
-    expected_output: '"DATE"'
+    input: DATE '1970-01-01'
+    expected_output: ('DATE')
   - test:
-    input: DATETIME "1970-01-01T00:00:00"
-    expected_output: '"DATETIME"'
+    input: DATETIME '1970-01-01T00:00:00'
+    expected_output: ('DATETIME')
   - test:
-    input: TIMESTAMP "1970-01-01T00:00:00Z"
-    expected_output: '"TIMESTAMP"'
+    input: TIMESTAMP '1970-01-01T00:00:00Z'
+    expected_output: ('TIMESTAMP')
   - test:
-    input: TIME "00:00:00"
-    expected_output: '"TIME"'
+    input: TIME '00:00:00'
+    expected_output: ('TIME')
   - test:
     input: STRUCT()
-    expected_output: '"STRUCT"'
+    expected_output: ('STRUCT')
   - test:
     input: STRUCT(1)
-    expected_output: '"STRUCT"'
+    expected_output: ('STRUCT')
   - test:
     input: STRUCT(1, 2, 3)
-    expected_output: '"STRUCT"'
+    expected_output: ('STRUCT')
   - test:
     input: STRUCT<a INT64, b INT64, c INT64>(1, 2, 3)
-    expected_output: '"STRUCT"'
+    expected_output: ('STRUCT')
+  - test:
+    input: ([])
+    expected_output: ('ARRAY')
+  - test:
+    input: ([1, 2, 3])
+    expected_output: ('ARRAY')
   - test:
     input: ARRAY<INT64>[1, 2, 3]
-    expected_output: '"ARRAY"'
-  - test:
-    input: '[]'
-    expected_output: '"ARRAY"'
+    expected_output: ('ARRAY')
   - test:
     input: ST_GEOGPOINT(0, 0)
-    expected_output: '"GEOGRAPHY"'
+    expected_output: ('GEOGRAPHY')
   - test:
-    input: NUMERIC "0"
-    expected_output: '"NUMERIC"'
+    input: NUMERIC '0'
+    expected_output: ('NUMERIC')
   - test:
-    input: NUMERIC "1"
-    expected_output: '"NUMERIC"'
+    input: NUMERIC '1'
+    expected_output: ('NUMERIC')
   - test:
-    input: NUMERIC "-1"
-    expected_output: '"NUMERIC"'
+    input: NUMERIC '-1'
+    expected_output: ('NUMERIC')
