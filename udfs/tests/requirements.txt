@@ -1,0 +1,4 @@
+google-cloud-bigquery
+pytest-parallel
+parameterized
+pyyaml

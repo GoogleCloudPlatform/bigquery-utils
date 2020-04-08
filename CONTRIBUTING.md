@@ -3,6 +3,9 @@
 We'd love to accept your patches and contributions to this project. There are
 just a few small guidelines you need to follow.
 
+If you'd like to contribute UDFs to this repository, please see the
+[contributing instructions](/udfs/CONTRIBUTING.md) for UDFs to get started.
+
 ## Contributor License Agreement
 
 Contributions to this project must be accompanied by a Contributor License

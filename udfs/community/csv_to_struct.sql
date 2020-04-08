@@ -14,29 +14,6 @@
  * limitations under the License.
  */
 
--- string_to_struct:
--- helper funcitons for parsing key-value data from a string to struct
--- Input:
--- strList: string that has map in the format 'a:b,c:d....'
--- entry_delimiter: string that has the delimiter e.g. ','
--- kv_delimiter: string that has the delimiter between key and value e.g. ':'
--- Output: struct for the above map.
-CREATE OR REPLACE FUNCTION fn.string_to_struct(strList STRING, entry_delimiter STRING, kv_delimiter STRING)
-AS (
-  CASE
-    WHEN REGEXP_CONTAINS(strList, entry_delimiter) OR REGEXP_CONTAINS(strList, kv_delimiter) THEN
-      (ARRAY(
-        WITH list AS (
-          SELECT l FROM UNNEST(SPLIT(TRIM(strList), entry_delimiter)) l WHERE REGEXP_CONTAINS(l, kv_delimiter)
-        )
-        SELECT AS STRUCT
-            TRIM(SPLIT(l, kv_delimiter)[OFFSET(0)]) AS key, TRIM(SPLIT(l, kv_delimiter)[OFFSET(1)]) as value
-        FROM list
-      ))
-    ELSE NULL
-  END
-);
-
 -- csv_to_struct:
 -- Input:
 -- strList: string that has map in the format a:b,c:d....

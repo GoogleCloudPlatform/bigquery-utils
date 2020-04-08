@@ -13,7 +13,7 @@ SELECT bqutil.rs.translate('mint tea', 'inea', 'osin')
 
 ## UDFs
 
-
+* [initcap](#initcapstring_expr-string)
 * [interval_literal_to_seconds](#interval_literal_to_secondsinterval_literal-string)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [initcap](#initcapstring_expr-string)
@@ -53,7 +53,6 @@ SELECT bqutil.rs.initcap('À vaillant coeur rien d’impossible')
 
 'À Vaillant Coeur Rien D’Impossible', '640 K!Ought To Be Enough~For_Anyone', 'Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline', 'One+One Is   "(Two-One)*[Two]"', '<Lorem>Ipsum@Gmail.Com'
 ```
-
 
 ### [split_part(string STRING, delimiter STRING, part INT64)](split_part.sql)
 Splits a string on the specified delimiter and returns the part at the specified position. Position of the portion to return (counting from 1). Must be an integer greater than 0. If part is larger than the number of string portions, SPLIT_PART returns an empty string. If delimiter is not found in string, then the returned value contains the contents of the specified part, which might be the entire string or an empty value. [Redshift docs](https://docs.aws.amazon.com/redshift/latest/dg/SPLIT_PART.html)
