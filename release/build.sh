@@ -181,7 +181,7 @@ function main() {
   local branch=$1
   local base_branch=$2
   local pull_request_num=$3
-  printf "Branch: %s\n" "$base_branch"
+  printf "Branch: %s\n" "$branch"
   printf "Base Branch: %s\n" "$base_branch"
   printf "Pull Request #: %s\n" "$pull_request_num"
 
