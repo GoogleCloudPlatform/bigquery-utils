@@ -185,7 +185,7 @@ function main() {
   printf "Base Branch: %s\n" "$base_branch"
   printf "Pull Request #: %s\n" "$pull_request_num"
 
-  if [[ "$branch" == "master" && -n "$pull_request_num" ]]; then
+  if [[ "$branch" == "master" && -z "$pull_request_num" ]]; then
     deploy
   else
     build
