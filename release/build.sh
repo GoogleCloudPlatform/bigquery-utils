@@ -172,17 +172,16 @@ function deploy() {
 #   SCRIPT_DIR
 #   UDF_DIR
 # Arguments:
-#   None
+#   BRANCH_NAME
+#   _PR_NUMBER
 # Returns:
 #   None
 #######################################
 function main() {
   cd $SCRIPT_DIR/.. || exit
   local branch=$1
-  local base_branch=$2
-  local pull_request_num=$3
+  local pull_request_num=$2
   printf "Branch: %s\n" "$branch"
-  printf "Base Branch: %s\n" "$base_branch"
   printf "Pull Request #: %s\n" "$pull_request_num"
 
   if [[ "$branch" == "master" && -z "$pull_request_num" ]]; then
