@@ -181,9 +181,10 @@ function deploy() {
 function main() {
   cd $SCRIPT_DIR/..
   local branch=$1
+  local pull_request_num=$2
   printf "Branch: $branch\n"
 
-  if [[ "$branch" == "master" ]]; then
+  if [[ "$branch" == "master" && -z "$pull_request_num" ]]; then
     deploy
   else
     build
