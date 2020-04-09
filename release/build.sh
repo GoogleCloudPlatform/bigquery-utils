@@ -181,9 +181,9 @@ function main() {
   local branch=$1
   local base_branch=$2
   local pull_request_num=$3
-  printf "Branch: $base_branch\n"
-  printf "Base Branch: $base_branch\n"
-  printf "Pull Request #: $pull_request_num\n"
+  printf "Branch: %s\n" "$base_branch"
+  printf "Base Branch: %s\n" "$base_branch"
+  printf "Pull Request #: %s\n" "$pull_request_num"
 
   if [[ "$branch" == "master" && -n "$pull_request_num" ]]; then
     deploy
