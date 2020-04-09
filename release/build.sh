@@ -184,7 +184,6 @@ function main() {
   printf "Branch: $base_branch\n"
   printf "Base Branch: $base_branch\n"
   printf "Pull Request #: $pull_request_num\n"
-
   if [[ "$branch" == "master" && -n "$pull_request_num" ]]; then
     deploy
   else
