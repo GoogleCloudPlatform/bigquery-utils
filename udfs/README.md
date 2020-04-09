@@ -47,5 +47,5 @@ or
 
 ## Contributing UDFs
 
-If you are interested in contributing UDFs to this repository, please see the
-[instructions](/udfs/CONTRIBUTING.md) to get started.
+If you are interested in contributing UDFs to this repository,
+please see the [instructions](/udfs/CONTRIBUTING.md) to get started.
