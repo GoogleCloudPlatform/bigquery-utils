@@ -75,10 +75,8 @@ function get_dataset() {
 #######################################
 function create_dataset_if_not_exists() {
   local dataset=$1
-  bq show --headless $dataset > /dev/null 2>&1
-
   # If we failed to show the dataset, it doesn't exist so create it.
-  if [[ $? -gt 0 ]]; then
+  if ! bq show --headless $dataset > /dev/null 2>&1; then
     bq mk --headless -d --data_location=$LOCATION $dataset
   fi
 }
@@ -160,7 +158,7 @@ function deploy() {
   while read -r file; do
     local dataset=$(get_dataset $file)
 
-    if [[ ! -z $dataset ]]; then
+    if [[ -n $dataset ]]; then
       create_dataset_if_not_exists $dataset
       execute_query $file false $dataset
     fi
@@ -181,8 +179,11 @@ function deploy() {
 function main() {
   cd $SCRIPT_DIR/.. || exit
   local branch=$1
-  local pull_request_num=$2
-  printf "Branch: $branch\n"
+  local base_branch=$2
+  local pull_request_num=$3
+  printf "Branch: $base_branch\n"
+  printf "Base Branch: $base_branch\n"
+  printf "Pull Request #: $pull_request_num\n"
 
   if [[ "$branch" == "master" && -n "$pull_request_num" ]]; then
     deploy
