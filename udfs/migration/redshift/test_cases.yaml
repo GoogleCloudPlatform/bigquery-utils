@@ -33,3 +33,16 @@ translate:
   - test:
     input: CAST("Etiam.laoreet.libero@sodalesMaurisblandit.edu" AS STRING), CAST("@" AS STRING), CAST("." AS STRING)
     expected_output: CAST("Etiam.laoreet.libero.sodalesMaurisblandit.edu" AS STRING)
+split_part:
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(1 AS INT64)
+    expected_output: CAST("2020" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(2 AS INT64)
+    expected_output: CAST("02" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(3 AS INT64)
+    expected_output: CAST("01" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(5 AS INT64)
+    expected_output: CAST("" AS STRING)
