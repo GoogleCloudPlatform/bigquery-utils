@@ -23,10 +23,10 @@ json_typeof:
     expected_output: ('string')
   - test:
     input: ('true')
-    expected_output: ('true')
+    expected_output: ('boolean')
   - test:
     input: ('false')
-    expected_output: ('false')
+    expected_output: ('boolean')
   - test:
     input: ('null')
     expected_output: ('null')
