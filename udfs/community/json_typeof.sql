@@ -27,8 +27,7 @@ AS ( (
         WHEN REGEXP_CONTAINS(value, r'^[-0-9]') THEN 'number'
         WHEN value IN ('true', 'false') THEN 'boolean'
         WHEN value = 'null' THEN 'null'
-      ELSE
-      NULL
+      ELSE NULL
     END
     FROM
       UNNEST([TRIM(input)]) AS value));
