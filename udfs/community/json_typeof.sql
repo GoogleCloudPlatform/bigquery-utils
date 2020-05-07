@@ -17,7 +17,7 @@
 -- json_typeof:
 -- Input: JSON string
 -- Output: The JSON value type of the argument or 'unknown' if the argument is an unknown value
-CREATE OR REPLACE FUNCTION fn.json_typeof(json STRING)
+CREATE OR REPLACE FUNCTION fn.json_typeof(input STRING)
 AS ( (
     SELECT AS VALUE
       CASE
@@ -31,4 +31,4 @@ AS ( (
       'unknown'
     END
     FROM
-      UNNEST([TRIM(json)]) AS value));
+      UNNEST([TRIM(input)]) AS value));
