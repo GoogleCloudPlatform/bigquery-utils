@@ -66,6 +66,9 @@ json_typeof:
   - test:
     input: ('{"foo":"bar"}')
     expected_output: ('object')
+  - test:
+    input: ('')
+    expected_output: (NULL)
 typeof:
   - test:
     input: (b'test')
