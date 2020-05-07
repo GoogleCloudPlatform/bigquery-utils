@@ -189,6 +189,23 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 
+### [json_typeof(json string)](json_typeof.sql)
+
+Returns the type of JSON value.
+
+```sql
+SELECT
+       bqutil.fn.json_typeof(TO_JSON_STRING(("foo", "bar"))),
+       bqutil.fn.json_typeof(TO_JSON_STRING([1,2,3])),
+       bqutil.fn.json_typeof(TO_JSON_STRING("test")),
+       bqutil.fn.json_typeof(TO_JSON_STRING(123)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(TRUE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(FALSE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
+
+object, array, string, number, true, false, null
+```
+
 
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
