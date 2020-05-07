@@ -25,8 +25,7 @@ AS ( (
         WHEN value LIKE '[%' THEN 'array'
         WHEN value LIKE '"%' THEN 'string'
         WHEN REGEXP_CONTAINS(value, r'^[-0-9]') THEN 'number'
-        WHEN value = 'true' THEN 'true'
-        WHEN value = 'false' THEN 'false'
+        WHEN value IN ('true', 'false') THEN 'boolean'
         WHEN value = 'null' THEN 'null'
       ELSE
       'unknown'
