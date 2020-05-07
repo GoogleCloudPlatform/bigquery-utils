@@ -191,7 +191,7 @@ Note that CAST(x AS INT64) rounds the number, while this function truncates it. 
 
 ### [json_typeof(json string)](json_typeof.sql)
 
-Returns the type of JSON value.
+Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
 
 ```sql
 SELECT
@@ -203,7 +203,7 @@ SELECT
        bqutil.fn.json_typeof(TO_JSON_STRING(FALSE)),
        bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
 
-object, array, string, number, true, false, null
+object, array, string, number, boolean, boolean, null
 ```
 
 
