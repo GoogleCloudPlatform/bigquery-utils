@@ -1,12 +1,3 @@
-*/
- * Script: BQ Audit Version 2
- * Author: NamrataShah5, danieldeleo
- * Description:
- * This SQL script parses ETL job events from
- * the newer BigQueryAuditMetadata Stackdriver logs.
- * Reference for BigQueryAuditMetadata: https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata
- */
-
 WITH jobChangeEvent AS (
   SELECT
     protopayload_auditlog.authenticationInfo.principalEmail,
@@ -376,111 +367,6 @@ WITH jobChangeEvent AS (
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 ),
 /*
- * TableCreation: Table creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecreation
- */
-tableCreationEvent AS (
-  SELECT
-    CONCAT(
-     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableCreation.jobName'),"/")[SAFE_OFFSET(1)],
-       ":",
-     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableCreation.jobName'),"/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-    '$.tableCreation.jobName') AS tableCreationJobName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.tableName') AS tableCreationTableName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.tableInfo.friendlyName') AS tableCreationTableFriendlyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.tableInfo.description') AS tableCreationTableDescription,
-    JSON_EXTRACT(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.tableInfo.labels') AS tableCreationTableLabels,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.schemaJson') AS tableCreationTableSchemaJson,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableCreation.table.schemaJsonTruncated') AS BOOL) AS tableCreationTableSchemaJsonTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.view.query') AS tableCreationViewDefinitionQuery,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.view.queryTruncated') AS BOOL) AS tableCreationViewDefinitionTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.expireTime') AS tableCreationTableExpireTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.createTime') AS tableCreationTableCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCrhange.table.updateTime') AS tableCreationTableUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.truncateTime') AS tableCreationTableTruncateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.table.encryption.kmsKeyName') AS tableCreationTableKmsKeyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCreation.reason')  AS tableCreationReason,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
-/*
- * TableChange: Table metadata change event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#TableChange
- */
-tableChangeEvent AS (
-  SELECT
-    CONCAT(
-     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableChange.jobName'),"/")[SAFE_OFFSET(1)],
-       ":",
-     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableChange.jobName'),"/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-    '$.tableChange.jobName') AS tableChangeJobName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.tableName') AS tableChangeTableName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.tableInfo.friendlyName') AS tableChangeTableFriendlyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.tableInfo.description') AS tableChangeTableDescription,
-    JSON_EXTRACT(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.tableInfo.labels') AS tableChangeTableLabels,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.schemaJson') AS tableChangeTableSchemaJson,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-     '$.tableChange.table.schemaJsonTruncated') AS BOOL) AS tableChangeTableSchemaJsonTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.view.query') AS tableChangeViewDefinitionQuery,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.view.queryTruncated') AS BOOL) AS tableChangeViewDefinitionTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.expireTime') AS tableChangeTableExpireTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.createTime') AS tableChangeTableCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableCrhange.table.updateTime') AS tableChangeTableUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.truncateTime') AS tableChangeTableTruncateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.table.encryption.kmsKeyName') AS tableChangeTableKmsKeyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.reason')  AS tableChangeReason,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableChange.truncated') AS BOOL) AS tableChangeTruncated
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access` ),
-/*
- * TableDeletion: Table deletion event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
- */
-tableDeletionEvent AS (
-  SELECT
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName'),
-        "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName'),
-        "/")[SAFE_OFFSET(3)]
-      ) AS jobId,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName') AS tableDeletionJobName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableDeletion.table.reason') AS tableDeletionReason,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`),
-/*
  * TableDataRead: Data from tableDataRead audit logs
  * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
  */
@@ -549,107 +435,6 @@ tableDataChangeEvent AS (
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 ),
 /*
- * ModelDeletion: Model deletion event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldeletion
- */
-modelDeletionEvent AS (
-  SELECT
-    JSON_EXTRACT(protopayload_auditlog.metadataJson,
-         '$.modelDeletion.reason') AS modelDeletionReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-         '$.modelDeletion.jobName') AS modelDeletionJobName,
-    CONCAT(
-     SPLIT(
-       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-           '$.modelDeletion.jobName'),
-           "/")[SAFE_OFFSET(1)],
-     ":",
-     SPLIT(
-       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-         '$.modelDeletion.jobName'),
-           "/")[SAFE_OFFSET(3)]
-   ) AS jobId,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * ModelCreation: Model creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelcreation
- */
-modelCreationEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.reason')  AS modelCreationReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.jobName') AS modelCreationJobName,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.modelCreation.jobName'),
-           "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.modelCreation.jobName'),
-         "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.modelName')  AS modelCreationModelName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.modelInfo.entityInfo.friendlyName')  AS modelCreationEntityInfoFriendlyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.modelInfo.entityInfo.description')  AS modelCreationEntityInfoDescription,
-    JSON_EXTRACT(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.modelInfo.entityInfo.labels')  AS modelCreationEntityInfoLabels,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.expireTime')  AS modelCreationModelExpireTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.createTime')  AS modelCreationModelCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.updateTime')  AS modelCreationModelUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelCreation.model.encryption.kmsKeyName')  AS modelCreationEncryptionKmsKeyName,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * ModelMetadataChange: Model metadata change event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelmetadatachange
- */
-modelMetadataChangeEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.reason') AS modelMetadataChangeReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.jobName') AS modelMetadataChangeJobName,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.modelMetadataChange.jobName'),
-           "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.modelMetadataChange.jobName'),
-         "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.modelName') AS modelMetadataChangeModelName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.modelInfo.entityInfo.friendlyName') AS modelMetadataChangeEntityInfoFriendlyName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.modelInfo.entityInfo.description') AS modelMetadataChangeEntityInfoDescription,
-    JSON_EXTRACT(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.modelInfo.entityInfo.labels') AS modelMetadataChangeEntityInfoLabels,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.expireTime') AS modelMetadataChangeModelExpireTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.createTime') AS modelMetadataChangeModelCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.updateTime') AS modelMetadataChangeModelUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.modelMetadataChange.model.encryption.kmsKeyName') AS modelMetadataChangeEncryptionKmsKeyName,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
  * ModelDataChange: Model data change event.
  * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldatachange
  */
@@ -670,94 +455,8 @@ modelDataChangeEvent AS (
             "/")[SAFE_OFFSET(3)]
     ) AS jobId,
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * RoutineCreation: Routine creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinecreation
- */
-routineCreationEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineCreation.routine.routineName') AS routineCreationName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineCreation.routine.createTime') AS routineCreationCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineCreation.routine.updateTime') AS routineCreationUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineCreation.reason') AS routineCreationReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineCreation.jobName') AS routineCreationJobName,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.routineCreation.jobName'),
-            "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.routineCreation.jobName'),
-            "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * RoutineChange: Routine change event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinechange
- */
-routineChangeEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineChange.routine.routineName') AS routineChangeName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineChange.routine.createTime') AS routineChangeCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineChange.routine.updateTime') AS routineChangeUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineChange.reason') AS routineChangeReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineChange.jobName') AS routineChangeJobName,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.routineChange.jobName'),
-            "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.routineChange.jobName'),
-            "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * RoutineDeletion: Routine deletion event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinedeletion
- */
-routineDeletionEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineDeletion.routine.routineName') AS routineDeletionName,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineDeletion.routine.createTime') AS routineDeletionCreateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineDeletion.routine.updateTime') AS routineDeletionUpdateTime,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineDeletion.reason') AS routineDeletionReason,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.routineDeletion.jobName') AS routineDeletionJobName,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.routineDeletion.jobName'),
-            "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.routineDeletion.jobName'),
-            "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-) -- End of WITH clauses
+)
+ -- End of WITH clauses
 SELECT
   principalEmail,
   callerIp,
@@ -767,17 +466,9 @@ SELECT
   projectId,
   jobId,
   IF(jobChangeJobName IS NULL, False, True) AS hasJobChangeEvent,
-  IF(tableChangeJobName IS NULL, False, True) AS hasTableChangeEvent,
-  IF(tableCreationJobName IS NULL, False, True) AS hasTableCreationEvent,
-  IF(tableDeletionJobName IS NULL, False, True) AS hasTableDeletionEvent,
   IF(tableDataReadJobName IS NULL, False, True) AS hasTableDataReadEvent,
   IF(tableDataChangeJobName IS NULL, False, True) AS hasTableDataChangeEvent,
-  IF(modelDeletionJobName IS NULL, False, True) AS hasModelDeletionEvent,
-  IF(modelCreationJobName IS NULL, False, True) AS hasModelCreationEvent,
   IF(modelMetadataChangeJobName IS NULL, False, True) AS hasModelMetadataChangeEvent,
-  IF(routineCreationJobName IS NULL, False, True) AS hasRoutineCreationEvent,
-  IF(routineChangeJobName IS NULL, False, True) AS hasRoutineChangeEvent,
-  IF(routineDeletionJobName IS NULL, False, True) AS hasRoutineDeletionEvent,
   STRUCT(
     EXTRACT(MINUTE FROM jobStatsStartTime) AS minuteOfDay,
     EXTRACT(HOUR FROM jobStatsStartTime) AS hourOfDay,
@@ -943,72 +634,6 @@ SELECT
   (loadJobStatsTotalOutputBytes / pow(2,30)) AS totalLoadOutputGigabytes,
   (loadJobStatsTotalOutputBytes / pow(2,40)) AS totalLoadOutputTerabytes,
   /*
-   * tableChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#TableChange
-   */
-  STRUCT(
-    STRUCT(
-      tableChangeTableName,
-      STRUCT(
-        tableChangeTableFriendlyName AS friendlyName,
-        tableChangeTableDescription AS description,
-        tableChangeTableLabels AS labels
-      ) AS tableInfo,
-      tableChangeTableSchemaJson AS schemaJson,
-      tableChangeTableSchemaJsonTruncated AS schemaJsonTruncated,
-      STRUCT(
-        tableChangeViewDefinitionQuery AS query,
-        tableChangeViewDefinitionTruncated AS queryTruncated
-      ) AS view,
-      tableChangeTableExpireTime AS expireTime,
-      tableChangeTableCreateTime AS createTime,
-      tableChangeTableUpdateTime AS updateTime,
-      tableChangeTableTruncateTime AS truncateTime,
-      STRUCT(
-        tableChangeTableKmsKeyName AS kmsKeyName
-      ) AS encryption
-    ) AS table,
-    tableChangeReason AS reason,
-    tableChangeJobName AS jobName
-  ) AS tableChange,
-  /*
-   * tableCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecreation
-   */
-  STRUCT(
-    STRUCT(
-      tableCreationTableName,
-      STRUCT(
-        tableCreationTableFriendlyName AS friendlyName,
-        tableCreationTableDescription AS description,
-        tableCreationTableLabels AS labels
-      ) AS tableInfo,
-      tableCreationTableSchemaJson AS schemaJson,
-      tableCreationTableSchemaJsonTruncated AS schemaJsonTruncated,
-      STRUCT(
-        tableCreationViewDefinitionQuery AS query,
-        tableCreationViewDefinitionTruncated AS queryTruncated
-      ) AS view,
-      tableCreationTableExpireTime AS expireTime,
-      tableCreationTableCreateTime AS createTime,
-      tableCreationTableUpdateTime AS updateTime,
-      tableCreationTableTruncateTime AS truncateTime,
-      STRUCT(
-        tableCreationTableKmsKeyName AS kmsKeyName
-      ) AS encryption
-    ) AS table,
-    tableCreationReason AS reason,
-    tableCreationJobName AS jobName
-  ) AS tableCreation,
-  /*
-   * tableDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
-   */
-  STRUCT(
-    tableDeletionReason AS reason,
-    tableDeletionJobName AS jobName
-  ) AS tableDeletion,
-  /*
    * TableDataRead STRUCT
    * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
    */
@@ -1032,103 +657,9 @@ SELECT
     tableDataChangeReason AS reason,
     tableDataChangeJobName AS jobName
   ) AS tableDataChange,
-   /*
-   * ModelDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldeletion
-   */
-  STRUCT(
-    modelDeletionReason AS reason,
-    modelDeletionJobName AS jobName
-  ) AS modelDeletion,
-  /*
-   * ModelCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelcreation
-   */
-  STRUCT(
-    STRUCT(
-      modelCreationModelName AS modelName,
-      STRUCT(
-        modelCreationEntityInfoFriendlyName AS friendlyName,
-        modelCreationEntityInfoDescription AS description,
-        modelCreationEntityInfoLabels AS labels
-      ) AS entityInfo,
-      modelCreationModelExpireTime AS expireTime,
-      modelCreationModelCreateTime AS createTime,
-      modelCreationModelUpdateTime AS updateTime,
-      STRUCT(modelCreationEncryptionKmsKeyName AS kmsKeyName) AS encryptionInfo
-    ) AS model,
-    modelCreationReason AS reason,
-    modelCreationJobName AS jobName
-  ) AS modelCreation,
-  /*
-   * ModelMetadataChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelmetadatachange
-   */
-  STRUCT(
-    STRUCT(
-      modelMetadataChangeModelName AS modelName,
-      STRUCT(
-        modelMetadataChangeEntityInfoFriendlyName AS friendlyName,
-        modelMetadataChangeEntityInfoDescription AS description,
-        modelMetadataChangeEntityInfoLabels AS labels
-      ) AS entityInfo,
-      modelMetadataChangeModelExpireTime AS expireTime,
-      modelMetadataChangeModelCreateTime AS createTime,
-      modelMetadataChangeModelUpdateTime AS updateTime,
-      STRUCT(modelMetadataChangeEncryptionKmsKeyName AS kmsKeyName) AS encryptionInfo
-    ) AS model,
-    modelMetadataChangeReason AS reason,
-    modelMetadataChangeJobName AS jobName
-  ) AS modelMetadataChange,
-  /*
-   * RoutineCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinecreation
-   */
-  STRUCT(
-    STRUCT(
-      routineCreationName AS name,
-      routineCreationCreateTime AS createTime,
-      routineCreationUpdateTime AS updateTime
-    ) AS routine,
-    routineCreationReason AS reason,
-    routineCreationJobName AS jobName
-  ) AS routineCreation,
-  /*
-   * RoutineChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinechange
-   */
-  STRUCT(
-    STRUCT(
-      routineChangeName AS name,
-      routineChangeCreateTime AS createTime,
-      routineChangeUpdateTime AS updateTime
-    ) AS routine,
-    routineChangeReason AS reason,
-    routineChangeJobName AS jobName
-  ) AS routineChange,
-  /*
-   * RoutineDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinedeletion
-   */
-  STRUCT(
-    STRUCT(
-      routineDeletionName AS name,
-      routineDeletionCreateTime AS createTime,
-      routineDeletionUpdateTime AS updateTime
-    ) AS routine,
-    routineDeletionReason AS reason,
-    routineDeletionJobName AS jobName
-  ) AS routineDeletion
-
 FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
-LEFT JOIN tableCreationEvent USING(jobId)
-LEFT JOIN tableChangeEvent USING(jobId)
-LEFT JOIN tableDeletionEvent USING(jobId)
 LEFT JOIN tableDataReadEvent USING(jobId)
-LEFT JOIN modelDeletionEvent USING(jobId)
-LEFT JOIN modelMetadataChangeEvent USING(jobId)
-LEFT JOIN modelCreationEvent USING(jobId)
 LEFT JOIN modelDataChangeEvent USING(jobId)
 LEFT JOIN routineCreationEvent USING(jobId)
 LEFT JOIN routineChangeEvent USING(jobId)
