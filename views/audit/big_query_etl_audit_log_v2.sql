@@ -661,9 +661,6 @@ FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
 LEFT JOIN tableDataReadEvent USING(jobId)
 LEFT JOIN modelDataChangeEvent USING(jobId)
-LEFT JOIN routineCreationEvent USING(jobId)
-LEFT JOIN routineChangeEvent USING(jobId)
-LEFT JOIN routineDeletionEvent USING(jobId)
 WHERE
   /*
    * Currently, BigQuery Scripting jobs do not emit jobChange events, they only produce a jobInsertion event.
