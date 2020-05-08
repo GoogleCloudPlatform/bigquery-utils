@@ -1,4 +1,4 @@
-*
+*/
  * Script: BQ Audit Version 2
  * Author: NamrataShah5, danieldeleo
  * Description:
@@ -759,7 +759,7 @@ routineDeletionEvent AS (
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 ) -- End of WITH clauses
 SELECT
-  SHA1(principalEmail) AS principalEmail,
+  principalEmail,
   callerIp,
   serviceName,
   methodName,
