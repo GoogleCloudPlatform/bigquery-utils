@@ -196,6 +196,7 @@ Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https:
 
 ```sql
 SELECT
+       bqutil.fn.json_typeof('{"foo": "bar"}'),
        bqutil.fn.json_typeof(TO_JSON_STRING(("foo", "bar"))),
        bqutil.fn.json_typeof(TO_JSON_STRING([1,2,3])),
        bqutil.fn.json_typeof(TO_JSON_STRING("test")),
