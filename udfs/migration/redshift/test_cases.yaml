@@ -1,0 +1,48 @@
+initcap:
+  - test:
+    input: CAST("hello world" AS STRING)
+    expected_output: CAST("Hello World" AS STRING)
+  - test:
+    input: CAST("ALL CAPS" AS STRING)
+    expected_output: CAST("All Caps" AS STRING)
+  - test:
+    input: CAST("does comma's behavior affect anything?" AS STRING)
+    expected_output: CAST("Does Comma'S Behavior Affect Anything?" AS STRING)
+  - test:
+    input: CAST("All non-musical theatre" AS STRING)
+    expected_output: CAST("All Non-Musical Theatre" AS STRING)
+  - test:
+    input: CAST("All symphony, concerto, and choir concerts" AS STRING)
+    expected_output: CAST("All Symphony, Concerto, And Choir Concerts" AS STRING)
+  - test:
+    input: CAST("À vaillant coeur rien d’impossible" AS STRING)
+    expected_output: CAST("À Vaillant Coeur Rien D’Impossible" AS STRING)
+  - test:
+    input: CAST("640 k!ouGht tO BE enough~for_anyONE" AS STRING)
+    expected_output: CAST("640 K!Ought To Be Enough~For_Anyone" AS STRING)
+  - test:
+    input: CAST("Simplicity & élÉgance are unpopular because they require hard-work&discipline" AS STRING)
+    expected_output: CAST("Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline" AS STRING)
+  - test:
+    input: CAST("one+one is   '(two-one)*[two]'" AS STRING)
+    expected_output: CAST("One+One Is   '(Two-One)*[Two]'" AS STRING)
+  - test:
+    input: CAST("<lorem>ipsum@GMAIL.COM" AS STRING)
+    expected_output: CAST("<Lorem>Ipsum@Gmail.Com" AS STRING)
+translate:
+  - test:
+    input: CAST("Etiam.laoreet.libero@sodalesMaurisblandit.edu" AS STRING), CAST("@" AS STRING), CAST("." AS STRING)
+    expected_output: CAST("Etiam.laoreet.libero.sodalesMaurisblandit.edu" AS STRING)
+split_part:
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(1 AS INT64)
+    expected_output: CAST("2020" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(2 AS INT64)
+    expected_output: CAST("02" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(3 AS INT64)
+    expected_output: CAST("01" AS STRING)
+  - test:
+    input: CAST("2020-02-01" AS STRING), CAST("-" AS STRING), CAST(5 AS INT64)
+    expected_output: CAST("" AS STRING)

@@ -17,25 +17,14 @@
 --url_parse(string urlString, string partToExtract)
 --Returns the specified part from the URL. Valid values for partToExtract include PROTOCOL, HOST, PATH, QUERY, and REF.
 --For example, parse_url('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
-CREATE OR REPLACE FUNCTION fn.check_protocol(url STRING)
-AS (
-  CASE
-    WHEN REGEXP_CONTAINS(url, '^[a-zA-Z]+://') THEN url
-    ELSE CONCAT('http://', url)
-  END
-);
-
 CREATE OR REPLACE FUNCTION fn.url_parse(url STRING, part STRING)
 AS (
   CASE
-    -- Return HOST part of the URL.
-    WHEN UPPER(part) = 'HOST' THEN SPLIT(fn.check_protocol(url), '/')[OFFSET(2)]
-    WHEN UPPER(part) = 'PATH' THEN REGEXP_EXTRACT(url, r'^[a-zA-Z]+://[a-zA-Z0-9.-]+/([a-zA-Z0-9.-/]+)') 
-    WHEN UPPER(part) = 'QUERY' THEN 
-      IF(REGEXP_CONTAINS(url, r'\?'), SPLIT(fn.check_protocol(url), '?')[OFFSET(1)], NULL)
-    WHEN UPPER(part) = 'REF' THEN
-      IF(REGEXP_CONTAINS(url, '#'), SPLIT(fn.check_protocol(url), '#')[OFFSET(1)], NULL)
-    WHEN UPPER(part) = 'PROTOCOL' THEN RTRIM(REGEXP_EXTRACT(url, '^[a-zA-Z]+://'), '://')
-    ELSE ''
+    WHEN UPPER(part) = 'HOST'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?([a-zA-Z0-9-.]+)/?')
+    WHEN UPPER(part) = 'PATH'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)')
+    WHEN UPPER(part) = 'QUERY' THEN REGEXP_EXTRACT(url, r'\?(.*)')
+    WHEN UPPER(part) = 'REF'   THEN REGEXP_EXTRACT(url, r'#(.*)')
+    WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, r'^([a-zA-Z]+)://')
+    ELSE NULL
   END
 );
