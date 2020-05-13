@@ -58,6 +58,8 @@ function get_dataset() {
       dataset="td";;
     *"vertica"*)
       dataset="ve";;
+    *"snowflake"*)
+      dataset="sf";;
   esac
   echo "$dataset"
 }
