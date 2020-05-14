@@ -25,6 +25,7 @@ This repository is broken up into:
         *   [redshift](/udfs/migration/redshift)
         *   [teradata](/udfs/migration/teradata)
         *   [vertica](/udfs/migration/vertica)
+        *   [snowflake](/udfs/migration/snowflake)
 *   [Views](/views) - Views over system tables such as audit logs or the
     `INFORMATION_SCHEMA`
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
