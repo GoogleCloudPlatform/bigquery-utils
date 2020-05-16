@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+-- factorial:
+-- Computes the factorial of its input. The input argument must be an integer expression in the range of 0 to 27. 
+-- Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake. 
+-- Input:
+-- integer_expr: INT64
+-- Output: NUMERIC
 CREATE OR REPLACE FUNCTION sf.factorial(integer_expr INT64) 
 AS ((
   SELECT ARRAY<NUMERIC>[ 
