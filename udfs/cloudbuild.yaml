@@ -23,7 +23,7 @@ steps:
 ###########################################################
 # Step 2: Deploy if all tests pass
 ###########################################################
-- name: gcr.io/cloud-builders/gcloud
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: 'bash'
   args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
 
