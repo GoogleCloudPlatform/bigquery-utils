@@ -28,6 +28,7 @@ BIGQUERY_TEST_DATASET_MAPPINGS = {
     'teradata': 'td_test',
     'vertica': 've_test',
     'community': 'fn_test',
+    'snowflake': 'sf_test',
 }
 
 UDF_PARENT_DIR = 'udfs/'
