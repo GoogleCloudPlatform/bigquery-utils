@@ -8,7 +8,7 @@ factorial:
     expected_output: 1.0
   - test:
     input: 5
-    expected_output: 120
+    expected_output: 120.0
   - test:
     input: 10
-    expected_output: 3628800
+    expected_output: 3628800.0
