@@ -208,7 +208,7 @@ Get the date representing the last day of the month.
 
 ```sql
 SELECT fn.month_ceil(DATE("1987-12-25"))
-  , fn.month_ceil(DATETIME("1998-09-04"))
+  , fn.month_ceil(DATE("1998-09-04"))
   , fn.month_ceil(DATE("2020-02-21")) -- leap year
   , fn.month_ceil(DATE("2019-02-21")) -- non-leap year
 ```
