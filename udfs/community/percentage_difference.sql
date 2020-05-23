@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.percentage_difference(val1 NUMERIC, val2 NUMERIC) AS (
-  CASE WHEN val1 > 0 AND val2 > 0 THEN 
-    ABS(val1 - val2) / ((val1 + val2) / 2)
-  END
+CREATE OR REPLACE FUNCTION fn.percentage_difference(val1 FLOAT64, val2 FLOAT64) RETURNS FLOAT64
+AS (
+  ROUND(IF(val1 > 0 AND val2 > 0, ABS(val1 - val2) / ((val1 + val2) / 2), NULL), 4)
 );
