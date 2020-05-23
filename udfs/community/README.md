@@ -20,6 +20,7 @@ SELECT bqutil.fn.int(1.684)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [median](#medianarr-any-type)
+* [month_ceil](#month_ceildt-date)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [radians](#radiansx-any-type)
@@ -200,6 +201,23 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
 
 3.0, 2.0, 2.5
 ```
+
+
+### [month_ceil(dt DATE)](month_ceil.sql)
+Get the date representing the last day of the month.
+
+```sql
+SELECT fn.month_ceil(DATE("1987-12-25"))
+  , fn.month_ceil(DATETIME("1998-09-04"))
+  , fn.month_ceil(DATE("2020-02-21")) -- leap year
+  , fn.month_ceil(DATE("2019-02-21")) -- non-leap year
+```
+
+results:
+
+|     f0_    |     f1_    |     f2_    |     f3_    |
+|------------|------------|------------|------------|
+| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
 ### [nlp_compromise_number(str STRING)](nlp_compromise_number.sql)
