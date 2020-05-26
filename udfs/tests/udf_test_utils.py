@@ -14,12 +14,15 @@
 
 import argparse
 import glob
-import re
+
+import os
 from pathlib import Path
+import re
+
+from yaml import load
+from yaml import SafeLoader
 
 from google.cloud import bigquery
-from yaml import SafeLoader
-from yaml import load
 
 BIGQUERY_TEST_DATASET_MAPPINGS = {
     'netezza': 'nz_test',
@@ -80,7 +83,7 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
     udf_length_before_replacement = len(udf_sql)
     udf_sql = re.sub(
         r'(\w+\.)?(?P<bq_dataset>\w+)(?P<udf_name>\.\w+)\(',
-        f'`{project_id}.\\g<bq_dataset>_test\\g<udf_name>`(',
+        f'`{project_id}.\\g<bq_dataset>_test_{os.getenv("SHORT_SHA")}\\g<udf_name>`(',
         udf_sql)
     if udf_length_before_replacement == len(udf_sql):
         return None
@@ -90,16 +93,18 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
 
 def get_target_bq_dataset(udf_path):
     parent_dir_name = Path(udf_path).parent.name
-    return BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)
+    return f'{BIGQUERY_TEST_DATASET_MAPPINGS.get(parent_dir_name)}_{os.getenv("SHORT_SHA")}'
 
 
-def delete_datasets(client, datasets):
-    for dataset in datasets:
+def delete_datasets(client):
+    for dataset in BIGQUERY_TEST_DATASET_MAPPINGS.values():
+        dataset = f'{dataset}_{os.getenv("SHORT_SHA")}'
         client.delete_dataset(dataset, delete_contents=True, not_found_ok=True)
 
 
-def create_datasets(client, datasets):
-    for dataset in datasets:
+def create_datasets(client):
+    for dataset in BIGQUERY_TEST_DATASET_MAPPINGS.values():
+        dataset = f'{dataset}_{os.getenv("SHORT_SHA")}'
         client.create_dataset(dataset, exists_ok=True)
 
 
@@ -112,9 +117,9 @@ def main():
     args = parser.parse_args()
     client = bigquery.Client()
     if args.create_test_datasets:
-        create_datasets(client, BIGQUERY_TEST_DATASET_MAPPINGS.values())
+        create_datasets(client)
     elif args.delete_test_datasets:
-        delete_datasets(client, BIGQUERY_TEST_DATASET_MAPPINGS.values())
+        delete_datasets(client)
 
 
 if __name__ == '__main__':
