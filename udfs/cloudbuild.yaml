@@ -1,0 +1,32 @@
+# Google Cloud Build script for bqutils
+#
+# This build script is used to unit test the BigQuery UDFs for every
+# change pushed to the udfs/ directory.
+#
+# Manual Execution:
+# Use the below command to invoke the build manually. Note the substitutions for
+# BRANCH_NAME and REVISION_ID. These variables are normally populated when the
+# build is executed via build triggers but will be empty during manual
+# execution. Dummy branch and revisions can be passed during manual execution so
+# the artifacts can be uploaded upon build completion.
+#
+# gcloud builds submit . --config=cloudbuild.yaml
+#
+
+steps:
+###########################################################
+# Step 1: Run UDF Unit Tests
+###########################################################
+- name: python:3.8.0-slim
+  entrypoint: 'bash'
+  args: ['udfs/tests/run.sh', '--pip_install_before_run']
+  env: ['SHORT_SHA=$SHORT_SHA']
+###########################################################
+# Step 2: Deploy if all tests pass
+###########################################################
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: 'bash'
+  args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
+
+options:
+  machineType: 'N1_HIGHCPU_8'
