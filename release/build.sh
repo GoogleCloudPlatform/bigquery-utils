@@ -75,10 +75,8 @@ function get_dataset() {
 #######################################
 function create_dataset_if_not_exists() {
   local dataset=$1
-  bq show --headless $dataset > /dev/null 2>&1
-
   # If we failed to show the dataset, it doesn't exist so create it.
-  if [[ $? -gt 0 ]]; then
+  if ! bq show --headless $dataset > /dev/null 2>&1; then
     bq mk --headless -d --data_location=$LOCATION $dataset
   fi
 }
@@ -100,12 +98,13 @@ function create_dataset_if_not_exists() {
 function execute_query() {
   local file=$1
   local dry_run=$2
+  local dataset=$3
 
   printf "${BOLD}${file}${NORMAL}\n"
   if [[ $dry_run == true ]]; then
-    bq query --headless --nouse_legacy_sql --dry_run "$(cat $file)"
+    bq query --dataset_id $dataset --headless --nouse_legacy_sql --dry_run "$(cat $file)"
   else
-    bq query --headless --nouse_legacy_sql "$(cat $file)"
+    bq query --dataset_id $dataset --headless --nouse_legacy_sql "$(cat $file)"
   fi
 
   if [[ $? -gt 0 ]]; then
@@ -134,7 +133,8 @@ function build() {
     local dataset=$(get_dataset $file)
 
     if [[ ! -z $dataset ]]; then
-      execute_query $file true
+      create_dataset_if_not_exists $dataset
+      execute_query $file true $dataset
     fi
   done <<< "$sql_files"
 }
@@ -158,10 +158,9 @@ function deploy() {
   while read -r file; do
     local dataset=$(get_dataset $file)
 
-    if [[ ! -z $dataset ]]; then
+    if [[ -n $dataset ]]; then
       create_dataset_if_not_exists $dataset
-
-      execute_query $file
+      execute_query $file false $dataset
     fi
   done <<< "$sql_files"
 }
@@ -173,16 +172,19 @@ function deploy() {
 #   SCRIPT_DIR
 #   UDF_DIR
 # Arguments:
-#   None
+#   BRANCH_NAME
+#   _PR_NUMBER
 # Returns:
 #   None
 #######################################
 function main() {
-  cd $SCRIPT_DIR/..
+  cd $SCRIPT_DIR/.. || exit
   local branch=$1
-  printf "Branch: $branch\n"
+  local pull_request_num=$2
+  printf "Branch: %s\n" "$branch"
+  printf "Pull Request #: %s\n" "$pull_request_num"
 
-  if [[ "$branch" == "master" ]]; then
+  if [[ "$branch" == "master" && -z "$pull_request_num" ]]; then
     deploy
   else
     build

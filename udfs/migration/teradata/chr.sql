@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION td.chr(int_expr INT64) AS (
+  CODE_POINTS_TO_STRING([mod(int_expr, 256)])
 );

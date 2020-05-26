@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION fn.zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64) AS (
+  SAFE_DIVIDE(x - meanx, stddevx)
 );

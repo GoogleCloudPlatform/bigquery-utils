@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+-- csv_to_struct:
+-- Input:
+-- strList: string that has map in the format a:b,c:d....
+-- Output: struct for the above map.
+CREATE OR REPLACE FUNCTION fn.csv_to_struct(strList STRING)
+AS (
+  fn.string_to_struct(strList, ',', ':')
 );

@@ -15,5 +15,5 @@
  */
 
 CREATE OR REPLACE FUNCTION fn.random_int(min ANY TYPE, max ANY TYPE) AS (
-  `bigquery-utils`.fn.int(min + RAND() * (max - min))
+  bqutil.fn.int(min + RAND() * (max - min))
 );

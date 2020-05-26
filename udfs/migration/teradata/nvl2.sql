@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION td.nvl2(expr1 ANY TYPE, expr2 ANY TYPE, expr3 ANY TYPE) AS (
+  IF(expr1 IS NOT NULL, expr2, expr3)
 );

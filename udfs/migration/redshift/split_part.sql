@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION rs.split_part(
+  string STRING,
+  delimiter STRING,
+  part INT64)
+AS (
+  CASE
+    WHEN part < 1 THEN ERROR('The part argument must be an integer greater than 0.')
+    WHEN ARRAY_LENGTH(SPLIT(string, delimiter)) < part THEN ""
+    ELSE SPLIT(string, delimiter)[ORDINAL(part)]
+  END
 );

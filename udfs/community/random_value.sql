@@ -14,6 +14,27 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+/*
+ * Returns a random value from an array.
+ *
+ * Usage:
+ * SELECT
+ *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+ *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+ *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
+ *
+ * 'tino', 'julie', 'jordan'
+ */
+CREATE OR REPLACE FUNCTION fn.random_value(arr ANY TYPE)
+AS
+(
+  (
+    SELECT
+      value
+    FROM
+      UNNEST(arr) value
+    ORDER BY
+      RAND()
+    LIMIT 1
+  )
 );
