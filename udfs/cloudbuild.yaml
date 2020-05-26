@@ -20,6 +20,7 @@ steps:
 - name: python:3.8.0-slim
   entrypoint: 'bash'
   args: ['udfs/tests/run.sh', '--pip_install_before_run']
+  env: ['SHORT_SHA=$SHORT_SHA']
 ###########################################################
 # Step 2: Deploy if all tests pass
 ###########################################################
