@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+-- Given an key and a list of structs, returns the ARRAY type value.
+-- This can be used to get an array of values for a given key from
+-- an array of structs.
+CREATE OR REPLACE FUNCTION fn.get_array_value(get_key STRING, arr ANY TYPE) AS
+(
+  ARRAY(SELECT value FROM UNNEST(arr) WHERE key = get_key)
 );

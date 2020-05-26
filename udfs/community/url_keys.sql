@@ -20,7 +20,7 @@ LANGUAGE js AS """
   ret = []
   try {
     if(query) {
-      params = query.split('&').forEach(function(part) {
+      params = query.split('?')[1].split('&').forEach(function(part) {
         ret.push(part.split('=')[0]);
       });
     }

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION td.initcap(str_expr STRING) AS (
+  (
+    SELECT
+      STRING_AGG(CONCAT(UPPER(SUBSTR(w,1,1)), LOWER(SUBSTR(w,2))), ' ' ORDER BY pos)
+    FROM
+      UNNEST(SPLIT(str_expr, ' ')) w WITH OFFSET pos
+  )
 );

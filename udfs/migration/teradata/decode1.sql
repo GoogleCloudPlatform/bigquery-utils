@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
-);
+CREATE OR REPLACE FUNCTION td.decode1(expr ANY TYPE, s1 ANY TYPE, r1 ANY TYPE, def ANY TYPE) AS
+((
+  CASE 
+    WHEN expr = s1 OR (expr IS NULL AND s1 IS NULL) THEN r1
+    ELSE def
+  END 
+))

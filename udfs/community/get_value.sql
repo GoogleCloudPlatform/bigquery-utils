@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+-- Given a key and a list of key-value maps of the form [{'key': 'a', 'value': 'b'}, ...]
+-- returns the SCALAR type value.
+CREATE OR REPLACE FUNCTION fn.get_value(get_key STRING, arr ANY TYPE) AS
+(
+  (SELECT value FROM UNNEST(arr) WHERE key = get_key)
 );

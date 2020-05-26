@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
+CREATE OR REPLACE FUNCTION rs.translate(
+  expression STRING,
+  characters_to_replace STRING,
+  characters_to_substitute STRING) 
+AS (
+  bqutil.fn.translate(expression, characters_to_replace, characters_to_substitute)
 );

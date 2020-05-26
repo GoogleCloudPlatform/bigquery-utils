@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nullifzero(expr ANY TYPE) AS (
-  IF(CAST(expr AS INT64) = 0, NULL, expr)
-);
+CREATE OR REPLACE FUNCTION fn.freq_table(arr ANY TYPE) AS ((
+  SELECT 
+    STRUCT(x as value, COUNT(1) as freq) as entry
+  FROM UNNEST(arr) AS x
+  GROUP BY x
+  ORDER BY x
+));
