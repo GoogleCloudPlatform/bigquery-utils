@@ -19,6 +19,7 @@ SELECT bqutil.fn.int(1.684)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
+* [json_typeof](#json_typeofjson-string)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -26,6 +27,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
@@ -188,6 +190,24 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 
+### [json_typeof(json string)](json_typeof.sql)
+
+Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
+
+```sql
+SELECT
+       bqutil.fn.json_typeof('{"foo": "bar"}'),
+       bqutil.fn.json_typeof(TO_JSON_STRING(("foo", "bar"))),
+       bqutil.fn.json_typeof(TO_JSON_STRING([1,2,3])),
+       bqutil.fn.json_typeof(TO_JSON_STRING("test")),
+       bqutil.fn.json_typeof(TO_JSON_STRING(123)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(TRUE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(FALSE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
+
+object, array, string, number, boolean, boolean, null
+```
+
 
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
@@ -267,6 +287,21 @@ For a given expression, replaces all occurrences of specified characters with sp
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
 most tin
+```
+
+
+### [typeof(input ANY TYPE)](typeof.sql)
+
+Return the type of input or 'UNKNOWN' if input is unknown typed value.
+
+```sql
+SELECT
+  bqutil.fn.typeof(""),
+  bqutil.fn.typeof(b""),
+  bqutil.fn.typeof(1.0),
+  bqutil.fn.typeof(STRUCT()),
+
+STRING, BINARY, FLOAT64, STRUCT
 ```
 
 

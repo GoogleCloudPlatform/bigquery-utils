@@ -1,7 +1,7 @@
 # Google Cloud Build script for bqutils
 #
-# This build script is used to deploy the open-source bqutil GitHub repository
-# for every change pushed.
+# This build script is used to unit test the BigQuery UDFs for every
+# change pushed to the udfs/ directory.
 #
 # Manual Execution:
 # Use the below command to invoke the build manually. Note the substitutions for
@@ -15,7 +15,14 @@
 
 steps:
 ###########################################################
-# Step 1: Deploy
+# Step 1: Run UDF Unit Tests
+###########################################################
+- name: python:3.8.0-slim
+  entrypoint: 'bash'
+  args: ['udfs/tests/run.sh', '--pip_install_before_run']
+  env: ['SHORT_SHA=$SHORT_SHA']
+###########################################################
+# Step 2: Deploy if all tests pass
 ###########################################################
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: 'bash'
