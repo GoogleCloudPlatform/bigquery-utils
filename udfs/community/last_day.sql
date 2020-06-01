@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.month_ceil(dt DATE) RETURNS DATE AS
+CREATE OR REPLACE FUNCTION fn.last_day(dt DATE) RETURNS DATE AS
 (
   DATE_SUB(
     DATE_ADD(

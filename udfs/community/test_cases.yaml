@@ -166,7 +166,7 @@ url_parse:
   - test:
     input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
     expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
-month_ceil:
+last_day:
   - test:
     input: CAST("1987-12-25" AS DATE)
     expected_output: CAST("1987-12-31" AS DATE)

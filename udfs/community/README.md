@@ -13,29 +13,25 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
-- [Community UDFs](#community-udfs)
-  - [UDFs](#udfs)
-  - [Documentation](#documentation)
-    - [csv_to_struct(strList STRING)](#csvtostructstrlist-string)
-    - [find_in_set(str STRING, strList STRING)](#findinsetstr-string-strlist-string)
-    - [freq_table(arr ANY TYPE)](#freqtablearr-any-type)
-    - [get_array_value(k STRING, arr ANY TYPE)](#getarrayvaluek-string-arr-any-type)
-    - [get_value(k STRING, arr ANY TYPE)](#getvaluek-string-arr-any-type)
-    - [int(v ANY TYPE)](#intv-any-type)
-    - [median(arr ANY TYPE)](#medianarr-any-type)
-    - [month_ceil(dt DATE)](#monthceildt-date)
-    - [nlp_compromise_number(str STRING)](#nlpcompromisenumberstr-string)
-    - [nlp_compromise_people(str STRING)](#nlpcompromisepeoplestr-string)
-    - [radians(x ANY TYPE)](#radiansx-any-type)
-    - [random_int(min ANY TYPE, max ANY TYPE)](#randomintmin-any-type-max-any-type)
-    - [random_value(arr ANY TYPE)](#randomvaluearr-any-type)
-    - [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](#translateexpression-string-characterstoreplace-string-characterstosubstitute-string)
-    - [typeof(input ANY TYPE)](#typeofinput-any-type)
-    - [url_keys(query STRING)](#urlkeysquery-string)
-    - [url_param(query STRING, p STRING)](#urlparamquery-string-p-string)
-    - [url_parse(urlString STRING, partToExtract STRING)](#urlparseurlstring-string-parttoextract-string)
-    - [y4md_to_date(y4md STRING)](#y4mdtodatey4md-string)
-    - [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](#zeronormx-any-type-meanx-float64-stddevx-float64)
+* [csv_to_struct](#csv_to_structstrlist-string)
+* [find_in_set](#find_in_setstr-string-strlist-string)
+* [freq_table](#freq_tablearr-any-type)
+* [get_array_value](#get_array_valuek-string-arr-any-type)
+* [get_value](#get_valuek-string-arr-any-type)
+* [int](#intv-any-type)
+* [last_day](#lastdaydt-date)
+* [median](#medianarr-any-type)
+* [nlp_compromise_number](#nlp_compromise_numberstr-string)
+* [nlp_compromise_people](#nlp_compromise_peoplestr-string)
+* [radians](#radiansx-any-type)
+* [random_int](#random_intmin-any-type-max-any-type)
+* [random_value](#random_valuearr-any-type)
+* [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [typeof](#typeofinput-any-type)
+* [url_keys](#url_keysquery-string)
+* [url_param](#url_paramquery-string-p-string)
+* [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
 
@@ -194,6 +190,23 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 
+### [last_day(dt DATE)](last_day.sql)
+
+Get the date representing the last day of the month.
+
+```sql
+SELECT bqutil.fn.last_day(DATE("1987-12-25"))
+  , bqutil.fn.last_day(DATE("1998-09-04"))
+  , bqutil.fn.last_day(DATE("2020-02-21")) -- leap year
+  , bqutil.fn.last_day(DATE("2019-02-21")) -- non-leap year
+```
+
+results:
+
+|     f0_    |     f1_    |     f2_    |     f3_    |
+|------------|------------|------------|------------|
+| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
+
 
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
@@ -205,23 +218,6 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
 
 3.0, 2.0, 2.5
 ```
-
-
-### [month_ceil(dt DATE)](month_ceil.sql)
-Get the date representing the last day of the month.
-
-```sql
-SELECT bqutil.fn.month_ceil(DATE("1987-12-25"))
-  , bqutil.fn.month_ceil(DATE("1998-09-04"))
-  , bqutil.fn.month_ceil(DATE("2020-02-21")) -- leap year
-  , bqutil.fn.month_ceil(DATE("2019-02-21")) -- non-leap year
-```
-
-results:
-
-|     f0_    |     f1_    |     f2_    |     f3_    |
-|------------|------------|------------|------------|
-| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
 ### [nlp_compromise_number(str STRING)](nlp_compromise_number.sql)
