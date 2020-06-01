@@ -24,6 +24,7 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
+* [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
@@ -264,6 +265,22 @@ results:
 |-----|-----|-------|---------|
 | 1.0 | 2.0 |  -0.5 |  -1.125 |
 
+
+### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sql)
+Calculate the percentage difference between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_difference(0.2, 0.8)
+  , bqutil.fn.percentage_difference(4.0, 12.0)
+  , bqutil.fn.percentage_difference(100, 200)
+  , bqutil.fn.percentage_difference(1.0, 1000000000)
+```
+
+results:
+
+| f0_ | f1_ |   f2_   | f3_ |
+|-----|-----|---------|-----|
+| 1.2 | 1.0 |  0.6667 | 2.0 |
 
 
 ### [radians(x ANY TYPE)](radians.sql)

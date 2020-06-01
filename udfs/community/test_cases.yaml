@@ -249,3 +249,35 @@ percentage_change:
   - test:
     input: CAST(NULL AS INT64), CAST(10 AS INT64)
     expected_output: CAST(NULL AS FLOAT64)
+percentage_difference:
+  - test:
+    input: CAST(0.22222222 AS FLOAT64), CAST(0.88888888 AS FLOAT64)
+    expected_output: CAST(1.2 AS FLOAT64)
+  - test:
+    input: CAST(0.2 AS NUMERIC), CAST(0.8 AS NUMERIC)
+    expected_output: CAST(1.2 AS FLOAT64)
+  - test:
+    input: CAST(2 AS INT64), CAST(8 AS INT64)
+    expected_output: CAST(1.2 AS FLOAT64)
+  - test:
+    input: CAST(100 AS INT64), CAST(200 AS INT64)
+    expected_output: CAST(0.6667 AS FLOAT64)
+  - test:
+    input: CAST(-2 AS INT64), CAST(8 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(2 AS INT64), CAST(-8 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(0 AS INT64), CAST(0 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(0 AS INT64), CAST(100 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(100 AS INT64), CAST(0 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
+    expected_output: CAST(2.0 AS FLOAT64)
+ 
