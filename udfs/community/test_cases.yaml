@@ -14,6 +14,61 @@ int:
   - test:
     input: CAST(7.8 AS FLOAT64)
     expected_output: CAST(7 AS INT64)
+json_typeof:
+  - test:
+    input: ('""')
+    expected_output: ('string')
+  - test:
+    input: ('"test"')
+    expected_output: ('string')
+  - test:
+    input: ('true')
+    expected_output: ('boolean')
+  - test:
+    input: ('false')
+    expected_output: ('boolean')
+  - test:
+    input: ('null')
+    expected_output: ('null')
+  - test:
+    input: ('0')
+    expected_output: ('number')
+  - test:
+    input: ('1')
+    expected_output: ('number')
+  - test:
+    input: ('-1')
+    expected_output: ('number')
+  - test:
+    input: ('0.0')
+    expected_output: ('number')
+  - test:
+    input: ('1.0')
+    expected_output: ('number')
+  - test:
+    input: ('-1.0')
+    expected_output: ('number')
+  - test:
+    input: ('1e1')
+    expected_output: ('number')
+  - test:
+    input: ('-1e1')
+    expected_output: ('number')
+  - test:
+    input: ('[]')
+    expected_output: ('array')
+  - test:
+    input: ('[1, 2, 3]')
+    expected_output: ('array')
+  - test:
+    input: ('{}')
+    expected_output: ('object')
+  - test:
+    input: ('{"foo":"bar"}')
+    expected_output: ('object')
+  - test:
+    input: ('')
+    expected_output: (NULL)
 typeof:
   - test:
     input: (b'test')
