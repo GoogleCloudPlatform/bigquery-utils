@@ -221,3 +221,31 @@ url_parse:
   - test:
     input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
     expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
+percentage_change:
+  - test:
+    input: CAST(0.2 AS FLOAT64), CAST(0.4 AS FLOAT64)
+    expected_output: CAST(1.0 AS FLOAT64)
+  - test:
+    input: CAST(5 AS NUMERIC), CAST(15 AS NUMERIC)
+    expected_output: CAST(2.0 AS FLOAT64)
+  - test:
+    input: CAST(100 AS INT64), CAST(50 AS INT64)
+    expected_output: CAST(-0.5 AS FLOAT64)
+  - test:
+    input: CAST(-20 AS INT64), CAST(-45 AS INT64)
+    expected_output: CAST(-1.25 AS FLOAT64)
+  - test:
+    input: CAST(0 AS INT64), CAST(0 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(10 AS INT64), CAST(0 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(10 AS INT64), CAST(NULL AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(0 AS FLOAT64), CAST(10 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
+  - test:
+    input: CAST(NULL AS INT64), CAST(10 AS INT64)
+    expected_output: CAST(NULL AS FLOAT64)
