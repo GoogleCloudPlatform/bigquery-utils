@@ -19,10 +19,13 @@ SELECT bqutil.fn.int(1.684)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
+* [json_typeof](#json_typeofjson-string)
 * [last_day](#lastdaydt-date)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
+* [percentage_change](#percentage_changeval1-float64-val2-float64)
+* [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
@@ -190,6 +193,25 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 
+### [json_typeof(json string)](json_typeof.sql)
+
+Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
+
+```sql
+SELECT
+       bqutil.fn.json_typeof('{"foo": "bar"}'),
+       bqutil.fn.json_typeof(TO_JSON_STRING(("foo", "bar"))),
+       bqutil.fn.json_typeof(TO_JSON_STRING([1,2,3])),
+       bqutil.fn.json_typeof(TO_JSON_STRING("test")),
+       bqutil.fn.json_typeof(TO_JSON_STRING(123)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(TRUE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(FALSE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
+
+object, array, string, number, boolean, boolean, null
+```
+
+
 ### [last_day(dt DATE)](last_day.sql)
 
 Get the date representing the last day of the month.
@@ -244,6 +266,40 @@ SELECT bqutil.fn.nlp_compromise_people(
 
 ["felipe hoffa", "elliott brossard", "jordan tigani"]
 ```
+
+
+### [percentage_change(val1 FLOAT64, val2 FLOAT64)](percentage_change.sql)
+Calculate the percentage change (increase/decrease) between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_change(0.2, 0.4)
+  , bqutil.fn.percentage_change(5, 15)
+  , bqutil.fn.percentage_change(100, 50)
+  , bqutil.fn.percentage_change(-20, -45)
+```
+
+results:
+
+| f0_ | f1_ |  f2_  |   f3_   |
+|-----|-----|-------|---------|
+| 1.0 | 2.0 |  -0.5 |  -1.125 |
+
+
+### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sql)
+Calculate the percentage difference between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_difference(0.2, 0.8)
+  , bqutil.fn.percentage_difference(4.0, 12.0)
+  , bqutil.fn.percentage_difference(100, 200)
+  , bqutil.fn.percentage_difference(1.0, 1000000000)
+```
+
+results:
+
+| f0_ | f1_ |   f2_   | f3_ |
+|-----|-----|---------|-----|
+| 1.2 | 1.0 |  0.6667 | 2.0 |
 
 
 ### [radians(x ANY TYPE)](radians.sql)
