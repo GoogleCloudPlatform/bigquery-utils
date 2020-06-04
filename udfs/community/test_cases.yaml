@@ -221,6 +221,19 @@ url_parse:
   - test:
     input: CAST('subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING), CAST('PROTOCOL' AS STRING)
     expected_output: (NULL) # NULL is a type in YAML so wrap it in parenthesis
+last_day:
+  - test:
+    input: CAST("1987-12-25" AS DATE)
+    expected_output: CAST("1987-12-31" AS DATE)
+  - test:
+    input: CAST("1998-09-04" AS DATE)
+    expected_output: CAST("1998-09-30" AS DATE)
+  - test:
+    input: CAST("2020-02-21" AS DATE)
+    expected_output: CAST("2020-02-29" AS DATE) # leap year
+  - test:
+    input: CAST("2019-02-21" AS DATE)
+    expected_output: CAST("2019-02-28" AS DATE) # non-leap year
 percentage_change:
   - test:
     input: CAST(0.2 AS FLOAT64), CAST(0.4 AS FLOAT64)

@@ -20,6 +20,7 @@ SELECT bqutil.fn.int(1.684)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
+* [last_day](#lastdaydt-date)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -209,6 +210,24 @@ SELECT
 
 object, array, string, number, boolean, boolean, null
 ```
+
+
+### [last_day(dt DATE)](last_day.sql)
+
+Get the date representing the last day of the month.
+
+```sql
+SELECT bqutil.fn.last_day(DATE("1987-12-25"))
+  , bqutil.fn.last_day(DATE("1998-09-04"))
+  , bqutil.fn.last_day(DATE("2020-02-21")) -- leap year
+  , bqutil.fn.last_day(DATE("2019-02-21")) -- non-leap year
+```
+
+results:
+
+|     f0_    |     f1_    |     f2_    |     f3_    |
+|------------|------------|------------|------------|
+| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
 ### [median(arr ANY TYPE)](median.sql)
