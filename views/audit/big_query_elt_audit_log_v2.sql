@@ -367,6 +367,26 @@ WITH jobChangeEvent AS (
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 ),
 /*
+ * TableDeletion: Table deletion event
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
+ */
+tableDeletionEvent AS (
+  SELECT
+    CONCAT(
+      SPLIT(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName'),
+        "/")[SAFE_OFFSET(1)],
+      ":",
+      SPLIT(
+        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName'),
+        "/")[SAFE_OFFSET(3)]
+      ) AS jobId,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName') AS tableDeletionJobName,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableDeletion.table.reason') AS tableDeletionReason,
+  FROM `project_id.dataset_id.cloudaudit_googleapis_com_system_event`
+),
+/*
  * TableDataRead: Data from tableDataRead audit logs
  * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
  */
