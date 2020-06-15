@@ -269,98 +269,207 @@ WITH jobChangeEvent AS (
         '$.jobInsertion.job.jobConfig.queryConfig.statementType'),
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.queryConfig.statementType')) AS queryConfigStatementType,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.queryConfig.destinationTable'),
-      "/")[SAFE_OFFSET(1)] AS queryConfigDestinationTableProjectId,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobConfig.queryConfig.destinationTable'),
-      "/")[SAFE_OFFSET(3)] AS queryConfigDestinationTableDatasetId,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobConfig.queryConfig.destinationTable'),
-      "/")[SAFE_OFFSET(5)] AS queryConfigDestinationTableId,
+        "/")[SAFE_OFFSET(1)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.queryConfig.destinationTable'),
+        "/")[SAFE_OFFSET(1)]
+    ) AS queryConfigDestinationTableProjectId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.queryConfig.destinationTable'),
+          "/")[SAFE_OFFSET(3)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.queryConfig.destinationTable'),
+          "/")[SAFE_OFFSET(3)]
+    ) AS queryConfigDestinationTableDatasetId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.queryConfig.destinationTable'),
+          "/")[SAFE_OFFSET(5)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.queryConfig.destinationTable'),
+          "/")[SAFE_OFFSET(5)]
+    ) AS queryConfigDestinationTableId,
     /*
      * Describes a load job.
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load
      */
-    SPLIT(TRIM(TRIM(
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.sourceUris'),
-      '["'), '"]'), '","') AS loadConfigSourceUris,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.sourceUrisTruncated') AS BOOL) AS loadConfigSourceUrisTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.schemaJson') AS loadConfigSchemaJson,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL) AS loadConfigSchemaJsonTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.destinationTable') AS loadConfigDestinationTable,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.createDisposition') AS loadConfigCreateDisposition,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.writeDisposition') AS loadConfigWriteDisposition,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.destinationTableEncryption.kmsKeyName'
-      ) AS loadConfigDestinationTableEncryptionKmsKeyName,
+    COALESCE(
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobStats.queryStats.sourceUris'),
+        '["'), '"]'), '","'),
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables'),
+        '["'),'"]') ,'","')
+    ) AS tableCopySourceTables,
+    COALESCE(
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated') AS BOOL),
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated')AS BOOL)
+    ) AS tableCopyConfigSourceTablesTruncated,
+    COALESCE(
+       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.schemaJson'),
+       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.schemaJson')
+    ) AS loadConfigSchemaJson,
+    COALESCE(
+     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL,
+     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL
+    ) AS loadConfigSchemaJsonTruncated,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.destinationTable'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.destinationTable')
+    ) AS loadConfigDestinationTable,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.createDisposition'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.createDisposition')
+    ) AS loadConfigCreateDisposition,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.writeDisposition'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.writeDisposition')
+    ) AS loadConfigWriteDisposition,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobConfig.loadConfig.destinationTableEncryption.kmsKeyName'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobInsertion.job.jobConfig.loadConfig.destinationTableEncryption.kmsKeyName')
+    ) AS loadConfigDestinationTableEncryptionKmsKeyName,
     /*
      * Describes an extract job.
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract
      */
-    SPLIT(TRIM(TRIM(
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobConfig.extractConfig.destinationUris'),
-      '["'), '"]'), '","') AS extractConfigDestinationUris,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.extractConfig.destinationUrisTruncated')
-       AS BOOL) AS extractConfigDestinationUrisTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.extractConfig.sourceTable') AS extractConfigSourceTable,
-    SPLIT(
+    COALESCE(
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.extractConfig.destinationUris'),
+        '["'), '"]'), '","'),
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.destinationUris'),
+        '["'), '"]'), '","')
+    ) AS extractConfigDestinationUris,
+    COALESCE(
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.extractConfig.destinationUrisTruncated') AS BOOL),
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.destinationUrisTruncated') AS BOOL)
+    ) AS extractConfigDestinationUrisTruncated,
+    COALESCE(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.extractConfig.sourceTable'),
-      ",")[SAFE_OFFSET(1)] AS extractConfigSourceTableProjectId,
-    SPLIT(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable')
+    ) AS extractConfigSourceTable,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.extractConfig.sourceTable'),
+          ",")[SAFE_OFFSET(1)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ",")[SAFE_OFFSET(1)]
+    ) AS extractConfigSourceTableProjectId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.extractConfig.sourceTable'),
-      ",")[SAFE_OFFSET(3)] AS extractConfigSourceTableDatasetId,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        ",")[SAFE_OFFSET(3)],
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ",")[SAFE_OFFSET(3)]
+    ) AS extractConfigSourceTableDatasetId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.extractConfig.sourceTable'),
-      ",")[SAFE_OFFSET(5)] AS extractConfigSourceTableId,
+        ",")[SAFE_OFFSET(5)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
+        ",")[SAFE_OFFSET(5)]
+    ) AS extractConfigSourceTableId,
     /*
      * Describes a copy job, which copies an existing table to another table
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecopy
      */
-    SPLIT(TRIM(TRIM(
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobConfig.tableCopyConfig.sourceTables'),
-      '["'),'"]') ,'","') AS tableCopySourceTables,
-    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated')
-      AS BOOL) AS tableCopyConfigSourceTablesTruncated,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable') AS tableCopyConfigDestinationTable,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.createDisposition') AS tableCopyConfigCreateDisposition,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.writeDisposition') AS tableCopyConfigWriteDisposition,
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName'
+    COALESCE(
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobChange.job.jobConfig.tableCopyConfig.sourceTables'),
+        '["'),'"]') ,'","'),
+      SPLIT(TRIM(TRIM(
+        JSON_EXTRACT(protopayload_auditlog.metadataJson,
+          '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables'),
+        '["'),'"]') ,'","')
+    ) AS tableCopySourceTables,
+    COALESCE(
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated')
+      AS BOOL),
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated')
+      AS BOOL)
+    ) AS tableCopyConfigSourceTablesTruncated,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable')
+    ) AS tableCopyConfigDestinationTable,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.createDisposition'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.createDisposition')
+    ) AS tableCopyConfigCreateDisposition,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.writeDisposition'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.writeDisposition')
+    ) AS tableCopyConfigWriteDisposition,
+    COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTableEncryption.kmsKeyName')
     ) AS tableCopyConfigDestinationTableEncryptionKmsKeyName,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[SAFE_OFFSET(1)] AS tableCopyConfigProjectId,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      ".")[SAFE_OFFSET(1)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
+      ".")[SAFE_OFFSET(1)]
+    ) AS tableCopyConfigProjectId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[SAFE_OFFSET(2)] AS tableCopyConfigDatasetId,
-    SPLIT(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      ".")[SAFE_OFFSET(2)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
+      ".")[SAFE_OFFSET(2)]
+    ) AS tableCopyConfigDatasetId,
+    COALESCE(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable'),
-      ".")[SAFE_OFFSET(3)] AS tableCopyConfigTableId,
+      ".")[SAFE_OFFSET(3)],
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.tableCopyConfig.destinationTable'),
+      ".")[SAFE_OFFSET(3)]
+    ) AS tableCopyConfigTableId,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.before') AS jobChangeBefore,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.after') AS jobChangeAfter,
     REGEXP_EXTRACT(protopayload_auditlog.metadataJson, r'BigQueryAuditMetadata","(.*?)":') AS eventName,
