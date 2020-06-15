@@ -486,6 +486,7 @@ SELECT
   projectId,
   jobId,
   IF(jobChangeJobName IS NULL, False, True) AS hasJobChangeEvent,
+  IF(tableDeletionJobName is NULL, False, True) AS hasTableDeletionEvent,
   IF(tableDataReadJobName IS NULL, False, True) AS hasTableDataReadEvent,
   IF(tableDataChangeJobName IS NULL, False, True) AS hasTableDataChangeEvent,
   IF(modelMetadataChangeJobName IS NULL, False, True) AS hasModelMetadataChangeEvent,
@@ -654,6 +655,14 @@ SELECT
   (loadJobStatsTotalOutputBytes / pow(2,30)) AS totalLoadOutputGigabytes,
   (loadJobStatsTotalOutputBytes / pow(2,40)) AS totalLoadOutputTerabytes,
   /*
+   * TableDeletion STRUCT
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
+   */
+   STRUCT(
+     tableDeletionJobName as jobName,
+     tableDeletionReason as reason
+   ) AS tableDeletion,
+  /*
    * TableDataRead STRUCT
    * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
    */
@@ -679,6 +688,7 @@ SELECT
   ) AS tableDataChange,
 FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
+LEFT JOIN tableDeletionEvent USING(jobId)
 LEFT JOIN tableDataReadEvent USING(jobId)
 LEFT JOIN modelDataChangeEvent USING(jobId)
 WHERE
