@@ -308,6 +308,12 @@ WITH jobChangeEvent AS (
         '["'), '"]'), '","')
     ) AS loadConfigSourceUris,
     COALESCE(
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobChange.job.jobConfig.extractConfig.sourceUrisTruncated') AS BOOL),
+      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.extractConfig.sourceUrisTruncated') AS BOOL)
+    ) AS loadConfigSourceUrisTruncated,
+    COALESCE(
        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.loadConfig.schemaJson'),
        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
