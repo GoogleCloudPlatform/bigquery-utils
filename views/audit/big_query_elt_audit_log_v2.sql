@@ -597,7 +597,6 @@ SELECT
   IF(tableDeletionJobName is NULL, False, True) AS hasTableDeletionEvent,
   IF(tableDataReadJobName IS NULL, False, True) AS hasTableDataReadEvent,
   IF(tableDataChangeJobName IS NULL, False, True) AS hasTableDataChangeEvent,
-  IF(modelMetadataChangeJobName IS NULL, False, True) AS hasModelMetadataChangeEvent,
   STRUCT(
     EXTRACT(MINUTE FROM jobStatsStartTime) AS minuteOfDay,
     EXTRACT(HOUR FROM jobStatsStartTime) AS hourOfDay,
