@@ -300,19 +300,13 @@ WITH jobChangeEvent AS (
     COALESCE(
       SPLIT(TRIM(TRIM(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobChange.job.jobStats.queryStats.sourceUris'),
+          '$.jobChange.job.jobConfig.loadConfig.sourceUris'),
         '["'), '"]'), '","'),
       SPLIT(TRIM(TRIM(
         JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTables'),
-        '["'),'"]') ,'","')
-    ) AS tableCopySourceTables,
-    COALESCE(
-      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated') AS BOOL),
-      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobInsertion.job.jobConfig.tableCopyConfig.sourceTablesTruncated')AS BOOL)
-    ) AS tableCopyConfigSourceTablesTruncated,
+          '$.jobInsertion.job.jobConfig.loadConfig.sourceUris'),
+        '["'), '"]'), '","')
+    ) AS loadConfigSourceUris,
     COALESCE(
        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.loadConfig.schemaJson'),
