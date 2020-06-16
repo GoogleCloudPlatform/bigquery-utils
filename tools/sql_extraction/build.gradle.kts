@@ -8,8 +8,12 @@ plugins {
 group = "com.google.cloud.sqlecosystem"
 version = "1.0"
 
+// clean task = clean
+// build task = build
+// build and run task = run
+// test task = test
 application {
-    mainClassName = "com.google.cloud.sqlecosystem.sqlextraction.AppKt"
+    mainClassName = "com.google.cloud.sqlecosystem.sqlextraction.CliKt"
 }
 
 repositories {
@@ -22,6 +26,13 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:1.7.29")
     antlr("org.antlr:antlr4:4.7.2")
     implementation("org.antlr:antlr4-runtime:4.7.2")
+    implementation("com.github.ajalt:clikt:2.7.1")
+    implementation("com.google.code.gson:gson:2.8.5")
+
+    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    testImplementation("com.google.jimfs:jimfs:1.1")
 }
 
 task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
@@ -31,6 +42,7 @@ task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
     }
     src(listOf("https://raw.githubusercontent.com/antlr/grammars-v4/master/java/java9/Java9.g4"))
     dest("gen/main/antlr/")
+    overwrite(false) // no need to download a copy every time
     println(System.getProperty("user.dir"))
 }
 
