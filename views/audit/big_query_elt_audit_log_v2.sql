@@ -321,9 +321,9 @@ WITH jobChangeEvent AS (
     ) AS loadConfigSchemaJson,
     COALESCE(
      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL,
+      '$.jobChange.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL),
      CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobInsertion.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL
+      '$.jobInsertion.job.jobConfig.loadConfig.schemaJsonUrisTruncated') AS BOOL)
     ) AS loadConfigSchemaJsonTruncated,
     COALESCE(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -387,7 +387,6 @@ WITH jobChangeEvent AS (
       SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.extractConfig.sourceTable'),
         ",")[SAFE_OFFSET(3)],
-    COALESCE(
       SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.extractConfig.sourceTable'),
         ",")[SAFE_OFFSET(3)]
