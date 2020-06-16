@@ -18,7 +18,7 @@ How to use **big_query_elt_audit_log_v2**
 (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR (
 protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE")
 OR protoPayload.metadata.tableDataChange.reason="QUERY"
-) **
+)**
 3. Click on "Create Sink" at the top of the page, and choose BigQuery. 
 4. In "Create Sink", name your sink, indicate what dataset you want the table to be created in. It is recommended to have "Use partitioned tables" checked as this will store logs in one daily partitioned table. Leaving this unchecked will result in many tables being created, one for each day, and your queries will be subject to the following limitations: https://cloud.google.com/bigquery/docs/querying-wildcard-tables#limitations
 5. Once you run a BigQuery job, you will see a table appear in BigQuery with the logs. 
