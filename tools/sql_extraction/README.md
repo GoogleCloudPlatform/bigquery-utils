@@ -11,6 +11,9 @@ It can be used to locate embedded SQL query strings in your repository while mig
 ```
 Usage: sql_extraction [OPTIONS] [FILEPATHS]...
 
+  Command line application to extract raw SQL query strings and their usage
+  within code.
+
   Sample Usages:
 
   > sql_extraction path/to/file.java
@@ -20,13 +23,14 @@ Usage: sql_extraction [OPTIONS] [FILEPATHS]...
   > sql_extraction -r --exclude="*.cs" /
 
 Options:
-  -R, -r, --recursive  scan files in subdirectories recursively
+  -R, -r, --recursive  Scan files in subdirectories recursively
   --include GLOB       Search only files whose base name matches GLOB
   --exclude GLOB       Skip files whose base name matches GLOB
+  --pretty             Pretty-print output JSON
   -h, --help           Show this message and exit
 
 Arguments:
-  FILEPATHS  file and directory paths to code
+  FILEPATHS  File and directory paths to analyze
 ```
 
 ## Building

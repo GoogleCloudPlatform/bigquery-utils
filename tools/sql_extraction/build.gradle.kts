@@ -33,6 +33,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("com.google.jimfs:jimfs:1.1")
+    testImplementation("io.mockk:mockk:1.10.0")
 }
 
 task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
@@ -49,7 +50,11 @@ task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
 tasks {
     generateGrammarSource {
         dependsOn("downloadGrammars")
-        arguments = arguments + listOf("-package", "com.google.cloud.sqlecosystem.sqlextraction.antlr")
+        arguments = arguments + listOf(
+            "-package", "com.google.cloud.sqlecosystem.sqlextraction.antlr",
+            "-visitor",
+            "-no-listener"
+        )
         include("*.g4")
         source("gen/main/antlr")
         outputDirectory = File("gen/main/antlr")
