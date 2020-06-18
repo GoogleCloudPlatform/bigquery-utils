@@ -7,17 +7,31 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import com.google.gson.GsonBuilder
 import mu.KotlinLogging
 import java.nio.file.Path
 
-private val logger = KotlinLogging.logger { }
+private val LOGGER = KotlinLogging.logger { }
 
-fun main(args: Array<String>) = Cli().main(args)
+fun main(args: Array<String>) = Cli(
+    FileListExpander(),
+    SqlExtractor(
+        DataFlowSolver(
+            listOf(
+                JavaFrontEnd()
+            )
+        )
+    )
+).main(args)
 
-class Cli : CliktCommand(
-    name = "sql_extraction",
-    printHelpOnEmptyArgs = true,
-    help = """
+private class Cli(
+    private val fileListExpander: FileListExpander,
+    private val sqlExtractor: SqlExtractor
+) :
+    CliktCommand(
+        name = "sql_extraction",
+        printHelpOnEmptyArgs = true,
+        help = """
     Command line application to extract raw SQL query strings and their usage within code.
     
     Sample Usages:
@@ -29,31 +43,51 @@ class Cli : CliktCommand(
     > sql_extraction -r --exclude="*.cs" /
     ```
     """
-) {
-    val recursive: Boolean by option(
-        "-R", "-r", "--recursive",
-        help = "scan files in subdirectories recursively"
-    ).flag()
-    val filePaths: List<Path> by argument(help = "file and directory paths to analyze").path(
+    ) {
+    private val filePaths: List<Path> by argument(
+        help = "File and directory paths to analyze"
+    ).path(
         mustExist = true,
         canBeDir = true,
         canBeFile = true
     ).multiple()
-    val includes: List<String> by option(
+
+    private val recursive: Boolean by option(
+        "-R", "-r", "--recursive",
+        help = "Scan files in subdirectories recursively"
+    ).flag()
+
+    private val includes: List<String> by option(
         "--include",
         metavar = "GLOB",
         help = "Search only files whose base name matches GLOB"
     ).multiple()
-    val excludes: List<String> by option(
+
+    private val excludes: List<String> by option(
         "--exclude",
         metavar = "GLOB",
         help = "Skip files whose base name matches GLOB"
     ).multiple()
 
-    override fun run() {
-        logger.debug("Starting SQL Extraction from command line")
+    private val prettyPrint: Boolean by option(
+        "--pretty", help = "Pretty-print output JSON"
+    ).flag()
 
-        val files = FileListExpander().expandAndFilter(filePaths, recursive, includes, excludes)
-        logger.debug { "Files to analyze: $files" }
+    override fun run() {
+        LOGGER.debug("Starting SQL Extraction from command line")
+
+        val files = fileListExpander.expandAndFilter(filePaths, recursive, includes, excludes)
+        LOGGER.debug { "Files to analyze: $files" }
+
+        val output = sqlExtractor.process(files)
+
+        val builder = GsonBuilder()
+        if (prettyPrint) {
+            builder.setPrettyPrinting()
+        }
+        val json = builder.create().toJson(output)
+
+        LOGGER.debug { "output: $json" }
+        println(json)
     }
 }

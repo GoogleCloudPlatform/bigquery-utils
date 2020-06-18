@@ -4,7 +4,20 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
+/**
+ * Expands a collection of file and directory paths to a list of all applicable file paths
+ */
 class FileListExpander {
+    /**
+     * Converts a collection of file and directory paths to all applicable file paths
+     *
+     * @param[dirs] File and directory paths to consider
+     * @param[recursive] True of visit subdirectories recursively,
+     *     false to only visit the top-level directories
+     * @param[includes] List of GLOB patterns to limit added output file paths
+     * @param[excludes] List of GLOB patterns to filter out output file paths
+     * @return Expanded and filtered collection of file paths to analyze
+     */
     fun expandAndFilter(
         dirs: Collection<Path>,
         recursive: Boolean = false,
@@ -30,6 +43,6 @@ class FileListExpander {
                         matcher.matches(path) || matcher.matches(path.fileName)
                     }
                 }
-        }.collect(Collectors.toSet())
+        }.collect(Collectors.toSet()) // todo: return as distinct stream
     }
 }
