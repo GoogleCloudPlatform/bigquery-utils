@@ -8,4 +8,6 @@ To run the crawler, run the following command:
 ```
 python3 run_crawler.py <starting URLs>
 ```
-A log containing the websites will be saved in a subdirectory named "Logs". The queries themselves will be in a subdirectory titled "Queries".
+Multiple URLs should be separated by a space.
+
+After the crawler runs to completion, a log containing the websites will be saved in a subdirectory named "Logs". The queries themselves will be in a subdirectory titled "Queries".

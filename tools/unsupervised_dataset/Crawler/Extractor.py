@@ -1,5 +1,5 @@
-import bs4
 import urllib
+import bs4
 import ExtractionModules.GenericExtractionModule as GenericExtraction
 import ExtractionModules.GoogleExtractionModule as GoogleExtraction
 
@@ -7,17 +7,16 @@ import ExtractionModules.GoogleExtractionModule as GoogleExtraction
     content of a webpage.
 """
 
-
 def extractLinks(html):
     """ Extracts links from HTML content of a site.
-    
+
     Args:
         html: The HTML response which contains the HTML text.
-        
+
     Returns:
         A list of URLs (strings).
     """
-    
+
     content = bs4.BeautifulSoup(html.text, "html.parser")
     linkTags = content.find_all("a")
     links = set([])
@@ -31,31 +30,31 @@ def extractLinks(html):
                 links.add(trimmed)
             else:
                 links.add(absolutePath)
-            
+
     return links
-    
+
 def extractQueries(html):
     """ Extracts queries from HTML content of a site.
-    
+
     Args:
         html: The HTML response which contains the HTML text.
-        
+
     Returns:
         A list of queries (strings)
     """
-    
+
     extractorModule = retrieveModule(html.url)
     return extractorModule.findQueries(html)
-    # TO-DO: Parse these here before returning
+    # TODO(Noah): Parse these here before returning
 
 def retrieveModule(url):
     """ Retrieves the correct module to use for extracting queries
     from a specific site. If there is no module for pages under this
     domain, it returns a generic module.
-    
+
     Args:
         url: The URL for the site being crawled.
-        
+
     Returns:
         A extraction module, which contains a findQueries function for
         extracting queries.
@@ -63,6 +62,5 @@ def retrieveModule(url):
     if "cloud.google.com" in url:
         return GoogleExtraction.GoogleExtractionModule
     else:
-        # TO-DO: Add more modules and implement generic module
+        # TODO(Noah): Add more modules and implement generic module
         return GenericExtraction.GenericExtractionModule
-    

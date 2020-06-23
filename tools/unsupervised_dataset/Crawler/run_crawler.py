@@ -4,7 +4,7 @@ import Crawler
 
 # Initializes a crawler and starts the crawling process using command line arguments
 def start_crawler():
-    # TO-DO: Allow user to optionally define max size or max depth
+    # TODO(Noah): Allow user to optionally define max size or max depth
     urls = sys.argv[1:]
     crawler = Crawler.Crawler(urls, maxSize=100)
     crawler.crawl()
