@@ -1,6 +1,6 @@
 package com.google.cloud.sqlecosystem.sqlextraction
 
-import com.google.cloud.sqlecosystem.sqlextraction.output.Query
+import com.google.cloud.sqlecosystem.sqlextraction.output.QueryUsages
 import mu.KotlinLogging
 import java.nio.file.Path
 
@@ -20,11 +20,12 @@ class DataFlowSolver(private val frontends: List<FrontEnd>) {
      * @throws[IllegalArgumentException] If the given file cannot be
      *     analyzed by any registered frontend
      */
-    fun solveDataFlow(engine: DataFlowEngine, filePath: Path): Sequence<Query> {
+    fun solveDataFlow(engine: DataFlowEngine, filePath: Path): Sequence<QueryUsages> {
         for (frontEnd in frontends) {
             if (frontEnd.canSolve(filePath)) {
                 LOGGER.debug { "Using ${frontEnd.javaClass.simpleName} for $filePath" }
-                return frontEnd.solveDataFlow(engine, frontEnd.openFile(filePath))
+                frontEnd.solveDataFlow(engine, frontEnd.openFile(filePath))
+                return engine.getAllQueries()
             }
         }
 

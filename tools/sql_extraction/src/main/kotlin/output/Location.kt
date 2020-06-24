@@ -11,8 +11,13 @@ data class Location(
     val startColumn: Int,
     val endLine: Int,
     val endColumn: Int
-) {
+) : Comparable<Location> {
     companion object {
+        private val COMPARATOR = Comparator.comparingInt<Location> { it.startLine }
+            .thenComparingInt { it.startColumn }
+            .thenComparingInt { it.endLine }
+            .thenComparingInt { it.endColumn }
+
         /** Returns the union of [a] and [b] */
         fun combine(a: Location, b: Location): Location {
             return Location(
@@ -36,4 +41,6 @@ data class Location(
             return locations.reduce { a, b -> combine(a, b) }
         }
     }
+
+    override fun compareTo(other: Location) = COMPARATOR.compare(this, other)
 }

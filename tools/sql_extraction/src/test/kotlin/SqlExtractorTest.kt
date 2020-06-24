@@ -14,7 +14,7 @@ class SqlExtractorTest {
         val solver = mockk<DataFlowSolver>()
         every { solver.solveDataFlow(any(), any()) } returns emptySequence()
 
-        SqlExtractor(solver).process(listOf(mockk(relaxed = true)))
+        SqlExtractor(solver).process(sequenceOf(mockk(relaxed = true)))
         verify { solver.solveDataFlow(any(), any()) }
 
         confirmVerified()
@@ -25,9 +25,13 @@ class SqlExtractorTest {
         val solver = mockk<DataFlowSolver>()
         every { solver.solveDataFlow(any(), any()) } returns emptySequence()
 
-        val filePaths = listOf<Path>(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+        val filePaths = listOf<Path>(
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            mockk(relaxed = true)
+        )
 
-        SqlExtractor(solver).process(filePaths)
+        SqlExtractor(solver).process(filePaths.asSequence())
         verifyAll { filePaths.map { solver.solveDataFlow(any(), it) } }
 
         confirmVerified()
