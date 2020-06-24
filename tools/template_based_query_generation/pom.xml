@@ -13,7 +13,7 @@
     </properties>
 
     <groupId>org.example</groupId>
-    <artifactId>bigquery-utils</artifactId>
+    <artifactId>template_based_query_generation</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>

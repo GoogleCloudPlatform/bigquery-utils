@@ -25,3 +25,7 @@ hs_err_pid*
 # mac and vscode
 .DS_Store
 .vscode
+
+# maven
+target/
+*.iml
