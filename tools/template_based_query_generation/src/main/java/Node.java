@@ -1,3 +1,4 @@
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,7 @@ public class Node {
     private String query;
     private HashMap<Node, Double> neighbors;
     private ArrayList<Node> neighborList; // list of neighbors and corresponding cumulative probabilities
-    private ArrayList<Double> cprobabilities; // cumulative probabilities
+    private ArrayList<Double> cProbabilities; // cumulative probabilities
     private Random r = new Random(314);
 
     /**
@@ -52,17 +53,17 @@ public class Node {
             Set<Node> neighborSet = this.neighbors.keySet();
             double total = 0;
             ArrayList<Node> newNeighborList = new ArrayList<Node>();
-            ArrayList<Double> newCprobabilities = new ArrayList<Double>();
+            ArrayList<Double> newCProbabilities = new ArrayList<Double>();
             for (Node n: neighborSet) {
                 newNeighborList.add(n);
-                newCprobabilities.add(total);
+                newCProbabilities.add(total);
                 total += this.neighbors.get(n);
             }
             this.neighborList = newNeighborList;
-            this.cprobabilities = newCprobabilities;
+            this.cProbabilities = newCProbabilities;
         } else {
             this.neighborList = new ArrayList<Node>();
-            this.cprobabilities = new ArrayList<Double>();
+            this.cProbabilities = new ArrayList<Double>();
         }
     }
 
@@ -88,7 +89,7 @@ public class Node {
         int low = 0, high = this.neighborList.size();
         while (high - low > 1) {
             int mid = (low + high) / 2;
-            if (this.cprobabilities.get(mid) > randDouble) {
+            if (this.cProbabilities.get(mid) > randDouble) {
                 high = mid;
             } else {
                 low = mid;

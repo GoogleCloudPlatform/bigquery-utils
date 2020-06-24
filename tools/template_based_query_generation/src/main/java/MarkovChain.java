@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -5,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 /**
- * Class that represents MarkovChain encoding query and keyword dependencies
+ * Class that represents src.main.MarkovChain encoding query and keyword dependencies
  */
 public class MarkovChain {
     
@@ -13,14 +14,14 @@ public class MarkovChain {
     private Node root;
 
     /**
-     * Constructs MarkovChain from dependencies.txt
+     * Constructs src.main.MarkovChain from dependencies.txt
      * @param filename
      * @param root
      * @throws Exception
      */
     public MarkovChain(String filename, String root) throws Exception {
         // read in lines from filename, ignoring lines that begin with ' ' or '/'
-        // stores directed edges in depedencies
+        // stores directed edges in dependencies
         HashMap<String, HashSet<String>> dependencies = new HashMap<String, HashSet<String>>();
         BufferedReader br = new BufferedReader(new FileReader(filename));
         String line;
@@ -39,7 +40,7 @@ public class MarkovChain {
         }
         br.close();
 
-        // create a Node object for each query
+        // create a src.main.Node object for each query
         this.nodes = new HashMap<String, Node>();
         for (String query: dependencies.keySet()) {
             this.nodes.put(query, new Node(query));
