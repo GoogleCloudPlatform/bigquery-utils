@@ -1,11 +1,13 @@
+""" Contains the logic to extract links and SQL queries from HTML content.
+
+
+    This file contains functions to extract links or queries when given an HTML
+    response. It also dynamically extracts links based on the URL of the response.
+"""
 import urllib
 import bs4
-import ExtractionModules.GenericExtractionModule as GenericExtraction
-import ExtractionModules.GoogleExtractionModule as GoogleExtraction
-
-""" Contains the logic to extract links and SQL queries from HTML
-    content of a webpage.
-"""
+import SQLCrawler.ExtractionModules.GenericExtractionModule as GenericExtraction
+import SQLCrawler.ExtractionModules.GoogleExtractionModule as GoogleExtraction
 
 def extractLinks(html):
     """ Extracts links from HTML content of a site.

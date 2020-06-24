@@ -1,5 +1,5 @@
 """ Test CQNode functionality """
-import Crawler.CQNode as CQNode
+import SQLCrawler.CQNode as CQNode
 
 def mock_node():
     node = CQNode.CQNode("https://google.com", 5)
