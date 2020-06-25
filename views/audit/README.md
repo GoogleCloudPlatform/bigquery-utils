@@ -44,7 +44,7 @@ events.
     build dashboards.
     
 #### Usage Examples
-Where `project_id.dataset_id.table_id` is the path to the view. 
+Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
 * Retrieve Number of Inserted and Deleted Rows For a Given Table 
   ```  
   SELECT 
