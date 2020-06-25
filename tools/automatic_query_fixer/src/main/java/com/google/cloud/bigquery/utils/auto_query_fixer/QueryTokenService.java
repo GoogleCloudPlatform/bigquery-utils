@@ -45,16 +45,13 @@ public class QueryTokenService {
   }
 
   public String replaceToken(String sql, IToken token, String identifier) {
-    String[] lines = sql.split("\n");
-    validateToken(lines, token);
-
-    // the token's line and column number are 1-index,
-    // but the array and string index start with 0.
-    String line = lines[token.getBeginLine() - 1];
-    line = replaceStringBetweenIndex(line, token.getBeginCol() - 1, token.getEndCol(), identifier);
-    lines[token.getBeginLine() - 1] = line;
-
-    return String.join("\n", lines);
+    QueryPositionConverter converter = new QueryPositionConverter(sql);
+    int startIndex = converter.posToIndex(token.getBeginLine(), token.getBeginCol());
+    int endIndex = converter.posToIndex(token.getEndLine(), token.getEndCol());
+    if (startIndex == -1 || endIndex == -1) {
+      throw new IllegalArgumentException("token position does not fit in the input query");
+    }
+    return replaceStringBetweenIndex(sql, startIndex, endIndex + 1, identifier);
   }
 
   public String insertBeforeToken(String sql, IToken token, String identifier) {
@@ -63,16 +60,6 @@ public class QueryTokenService {
 
   public String deleteToken(String sql, IToken token) {
     return replaceToken(sql, token,  "");
-  }
-
-  private void validateToken(String[] lines, IToken token) {
-    if (token.getBeginLine() != token.getEndLine()) {
-      throw new IllegalArgumentException("Illegal Token");
-    }
-
-    if (token.getEndLine() > lines.length) {
-      throw new IllegalArgumentException("the end line of token exceeds the total length of query");
-    }
   }
 
   // end index is excluded!
