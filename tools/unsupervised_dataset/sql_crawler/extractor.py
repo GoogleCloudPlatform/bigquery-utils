@@ -6,10 +6,10 @@
 """
 import urllib
 import bs4
-import SQLCrawler.ExtractionModules.GenericExtractionModule as GenericExtraction
-import SQLCrawler.ExtractionModules.GoogleExtractionModule as GoogleExtraction
+import sql_crawler.extraction_modules.generic_extraction_module as generic_extraction
+import sql_crawler.extraction_modules.google_extraction_module as google_extraction
 
-def extractLinks(html):
+def extract_links(html):
     """ Extracts links from HTML content of a site.
 
     Args:
@@ -20,22 +20,22 @@ def extractLinks(html):
     """
 
     content = bs4.BeautifulSoup(html.text, "html.parser")
-    linkTags = content.find_all("a")
+    link_tags = content.find_all("a")
     links = set([])
 
-    for link in linkTags:
+    for link in link_tags:
         if link.has_attr('href'):
             # Fix relative paths and anchor links
-            absolutePath = urllib.parse.urljoin(html.url, link['href'])
-            if "#" in absolutePath:
-                trimmed = absolutePath.split("#", 1)[0]
+            absolute_path = urllib.parse.urljoin(html.url, link['href'])
+            if "#" in absolute_path:
+                trimmed = absolute_path.split("#", 1)[0]
                 links.add(trimmed)
             else:
-                links.add(absolutePath)
+                links.add(absolute_path)
 
     return links
 
-def extractQueries(html):
+def extract_queries(html):
     """ Extracts queries from HTML content of a site.
 
     Args:
@@ -45,11 +45,11 @@ def extractQueries(html):
         A list of queries (strings)
     """
 
-    extractorModule = retrieveModule(html.url)
-    return extractorModule.findQueries(html)
+    extractor_module = retrieve_module(html.url)
+    return extractor_module.find_queries(html)
     # TODO(Noah): Parse these here before returning
 
-def retrieveModule(url):
+def retrieve_module(url):
     """ Retrieves the correct module to use for extracting queries
     from a specific site. If there is no module for pages under this
     domain, it returns a generic module.
@@ -62,7 +62,7 @@ def retrieveModule(url):
         extracting queries.
     """
     if "cloud.google.com" in url:
-        return GoogleExtraction.GoogleExtractionModule
+        return google_extraction.GoogleExtractionModule
     else:
         # TODO(Noah): Add more modules and implement generic module
-        return GenericExtraction.GenericExtractionModule
+        return generic_extraction.GenericExtractionModule

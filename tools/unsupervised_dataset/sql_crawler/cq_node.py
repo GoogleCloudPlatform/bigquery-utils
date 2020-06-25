@@ -18,7 +18,7 @@ class CQNode(object):
         self.url = url
         self.depth = depth
 
-    def getURL(self):
+    def get_url(self):
         """ Returns the URL for the page referenced by the node.
 
         Returns:
@@ -26,7 +26,7 @@ class CQNode(object):
         """
         return self.url
 
-    def getDepth(self):
+    def get_depth(self):
         """ Returns the node depth.
 
         Returns:

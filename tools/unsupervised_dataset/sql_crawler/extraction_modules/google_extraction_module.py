@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 
 class GoogleExtractionModule(object):
 
-    def findQueries(html):
+    def find_queries(html):
         """ Finds queries and extracts them from Google SQL documentation on
         cloud.google.com.
 
@@ -17,8 +17,8 @@ class GoogleExtractionModule(object):
 
         soup = BeautifulSoup(html.text, "html.parser")
         queries = []
-        codeBlocks = soup.find_all("code")
-        for block in codeBlocks:
+        code_blocks = soup.find_all("code")
+        for block in code_blocks:
             if block.parent.name == "pre":
                 queries += [block.contents[0]]
         return queries

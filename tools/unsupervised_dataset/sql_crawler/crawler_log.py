@@ -19,28 +19,28 @@ class CrawlerLog(object):
             instantiates instance variables.
         """
 
-        self.startTime = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
+        self.start_time = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
         folder_path = str(pathlib.Path(__file__).parent)
-        log_folder_path = folder_path + "/Logs"
-        query_folder_path = folder_path + "/Queries"
+        log_folder_path = folder_path + "/logs"
+        query_folder_path = folder_path + "/queries"
 
         # Create directory for logs if it does not already exists
         if not os.path.exists(log_folder_path):
             os.mkdir(log_folder_path)
 
-        logName = "{0}/log-{1}.log".format(log_folder_path, self.startTime)
+        logName = "{0}/log-{1}.log".format(log_folder_path, self.start_time)
         logging.basicConfig(filename=logName, filemode="a", level=logging.INFO)
-        logging.info("Beginning crawl at time %s.", self.startTime)
+        logging.info("Beginning crawl at time %s.", self.start_time)
 
         if not os.path.exists(query_folder_path):
             os.mkdir(query_folder_path)
 
-        queryName = "{0}/queries-{1}.csv".format(query_folder_path, self.startTime)
-        self.csvFile = open(queryName, "a")
-        self.queries = csv.writer(self.csvFile)
+        query_name = "{0}/queries-{1}.csv".format(query_folder_path, self.start_time)
+        self.csv_file = open(query_name, "a")
+        self.queries = csv.writer(self.csv_file)
         self.queries.writerow(["Query", "URL"])
 
-    def logQuery(self, query, url):
+    def log_query(self, query, url):
         """ Logs query into CSV file.
 
         Args:
@@ -50,7 +50,7 @@ class CrawlerLog(object):
 
         self.queries.writerow([query, url])
 
-    def logPage(self, url, count):
+    def log_page(self, url, count):
         """ Logs results of crawling one page using provided arguments.
 
         Args:
@@ -60,7 +60,7 @@ class CrawlerLog(object):
 
         logging.info("Crawled %s. Found %s queries.", url, str(count))
 
-    def logError(self, errorMessage):
+    def log_error(self, errorMessage):
         """ Logs crawler error to logfile.
 
         Args:
@@ -73,4 +73,4 @@ class CrawlerLog(object):
         """ Closes the crawler log.
         """
         logging.info("Finished crawling.")
-        self.csvFile.close()
+        self.csv_file.close()

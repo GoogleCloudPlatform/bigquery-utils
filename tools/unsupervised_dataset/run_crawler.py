@@ -1,12 +1,12 @@
 """ Script to initialize the SQL crawler on a website of the user's choice """
 
 import sys
-from SQLCrawler import Crawler
+from sql_crawler import crawler
 
 def start_crawler():
     urls = sys.argv[1:]
-    crawler = Crawler.Crawler(urls, maxSize=50)
-    crawler.crawl()
+    new_crawler = crawler.Crawler(urls, max_size=50)
+    new_crawler.crawl()
 
 def main():
     start_crawler()

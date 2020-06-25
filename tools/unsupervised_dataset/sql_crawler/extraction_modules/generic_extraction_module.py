@@ -3,6 +3,6 @@ class GenericExtractionModule(object):
         format of a site.
     """
 
-    def findQueries(html):
+    def find_queries(html):
         #TODO(Noah): Implement generic module
         return []
