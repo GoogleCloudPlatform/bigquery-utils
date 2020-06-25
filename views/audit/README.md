@@ -44,13 +44,13 @@ events.
     build dashboards.
     
 #### Usage Examples
-
+Where `project_id.dataset_id.table_id` is the path to the view. 
 * Retrieve Number of Inserted and Deleted Rows For a Given Table 
   ```  
   SELECT 
     tableDataChange.deletedRowsCount,
     tableDataChange.insertedRowsCount,
     jobChange.jobStats.queryStats.referencedTables 
-  FROM `namratashah-ctr-sandbox.elt_sink.elt_view` 
+  FROM `project_id.dataset_id.table_id` 
   WHERE "projects/project_id/datasets/dataset_id/tables/table_id" in UNNEST(jobChange.jobStats.queryStats.referencedTables)
   ``` 
