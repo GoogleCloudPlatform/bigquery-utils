@@ -1,68 +1,38 @@
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.util.HashMap;
+import java.util.Random;
 
 /**
  * Class that represents src.main.MarkovChain encoding query and keyword dependencies
  */
-public class MarkovChain {
+public class MarkovChain<E> {
     
-    private HashMap<String, Node> nodes;
-    private Node root;
+    private HashSet<Node<E>> nodes;
+    private Random r;
 
     /**
-     * Constructs src.main.MarkovChain from dependencies.txt
-     * @param filename
-     * @param root
-     * @throws Exception
+     * constructs MarkovChain object from edge weights and random seed
+     * @param nodes
+     * @param seed
      */
-    public MarkovChain(String filename, String root) throws Exception {
-        // read in lines from filename, ignoring lines that begin with ' ' or '/'
-        // stores directed edges in dependencies
-        HashMap<String, HashSet<String>> dependencies = new HashMap<String, HashSet<String>>();
-        BufferedReader br = new BufferedReader(new FileReader(filename));
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (line.length() > 2 && line.charAt(0) != ' ' 
-                && !(line.charAt(0) == '/' && line.charAt(1) == '/')) {
-                String[] res = line.split(":");
-                if (!dependencies.keySet().contains(res[0])) {
-                    dependencies.put(res[0], new HashSet<String>());
-                } 
-                if (!dependencies.keySet().contains(res[1])) {
-                    dependencies.put(res[1], new HashSet<String>());
-                } 
-                dependencies.get(res[0]).add(res[1]);
-            }
+    public MarkovChain(HashMap<Node<E>, HashMap<Node<E>, Double>> nodes, int seed) {
+        this.r = new Random(seed);
+        this.nodes = (HashSet) nodes.keySet();
+        for (Node<E> n: nodes.keySet()){
+            n.setNeighbors(nodes.get(n));
         }
-        br.close();
-
-        // create a src.main.Node object for each query
-        this.nodes = new HashMap<String, Node>();
-        for (String query: dependencies.keySet()) {
-            this.nodes.put(query, new Node(query));
-        }
-
-        // for each query, correctly set neighbors and set root
-        for (String query: dependencies.keySet()) {
-            HashSet<Node> neighbors = new HashSet<Node>();
-            for (String s2: dependencies.get(query)) {
-                neighbors.add(this.nodes.get(s2));
-            }  
-            this.nodes.get(query).setNeighbors(neighbors);
-        }
-        this.root = this.nodes.get(root);
     }
 
     /**
-     * 
-     * @return list of nodes for a random walk from root
+     * constructs MarkovChain object from set of nodes and random seed
+     * @param nodes
+     * @param seed
      */
-    public ArrayList<Node> randomWalk() {
-        return randomWalk(this.root);
+    public MarkovChain(HashSet<Node<E>> nodes, int seed) {
+        this.r = new Random(seed);
+        this.nodes = nodes;
     }
 
     /**
@@ -70,24 +40,15 @@ public class MarkovChain {
      * @param start
      * @return list of nodes for a random walk from start node
      */
-    public ArrayList<Node> randomWalk(Node start) {
-        ArrayList<Node> walk = new ArrayList<Node>();
-        Node current = start;
-        // System.out.println(current.getNeighborList());
+    public ArrayList<E> randomWalk(Node<E> start) {
+        ArrayList<E> walk = new ArrayList<E>();
+        Node<E> current = start;
         while (current.hasNextNode()) {
-            walk.add(current);
+            walk.add(current.getObj());
             current = current.nextNode();
         }
-        walk.add(current);
+        walk.add(current.getObj());
         return walk;
-    }
-
-    /**
-     * 
-     * @return map of strings to nodes
-     */
-    public HashMap<String, Node> getNodes() {
-        return this.nodes;
     }
 
 }

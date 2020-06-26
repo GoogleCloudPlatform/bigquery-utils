@@ -8,53 +8,56 @@ import java.util.Random;
 /**
  * class representing node for a query in the markov chain
  */
-public class Node {
+public class Node<E> {
 
-    private String query;
-    private HashMap<Node, Double> neighbors;
-    private ArrayList<Node> neighborList; // list of neighbors and corresponding cumulative probabilities
+    private E obj;
+    private HashMap<Node<E>, Double> neighbors;
+    private ArrayList<Node<E>> neighborList; // list of neighbors and corresponding cumulative probabilities
     private ArrayList<Double> cProbabilities; // cumulative probabilities
-    private Random r = new Random(314);
+    private Random r;
 
     /**
      * constructs node from query
-     * @param query
+     * @param obj
      */
-    public Node(String query) {
-        this.query = query;
-        this.setNeighbors(new HashMap<Node, Double>());
+    public Node(E obj) {
+        this.obj = obj;
+        this.r = new Random(0);
+        this.setNeighbors(new HashMap<Node<E>, Double>());
     }
 
     /**
      * constructs node from query, and set of neighbors which can be reached with equiprobability
-     * @param query
-     * @param nodeSet
+     * @param obj
+     * @param neighbors
      */
-    public Node(String query, HashSet<Node> neighbors){
-        this.query = query;
+    public Node(E obj, HashSet<Node<E>> neighbors, int seed){
+        this.obj = obj;
+        this.r = new Random(seed);
         this.setNeighbors(neighbors);
     }
 
     /**
      * constructs node from query, and map of neighbors and transition probabilities
-     * @param query
+     * @param obj
      * @param neighbors
      */
-    public Node(String query, HashMap<Node, Double> neighbors) {
-        this.query = query;
+    public Node(E obj, HashMap<Node<E>, Double> neighbors, int seed) {
+        this.obj = obj;
+        this.r = new Random(seed);
         this.setNeighbors(neighbors);
     }
 
     /**
-     * updates neighborList and cprobabilities when neighbors is changed
+     * updates neighborList and cProbabilities when neighbors is changed
      */
     private void updateProbabilities() {
         if (this.neighbors.size() != 0) {
-            Set<Node> neighborSet = this.neighbors.keySet();
+            Set<Node<E>> neighborSet = this.neighbors.keySet();
             double total = 0;
-            ArrayList<Node> newNeighborList = new ArrayList<Node>();
+            ArrayList<Node<E>> newNeighborList = new ArrayList<Node<E>>();
             ArrayList<Double> newCProbabilities = new ArrayList<Double>();
-            for (Node n: neighborSet) {
+            for (Node<E> n: neighborSet) {
                 newNeighborList.add(n);
                 newCProbabilities.add(total);
                 total += this.neighbors.get(n);
@@ -62,7 +65,7 @@ public class Node {
             this.neighborList = newNeighborList;
             this.cProbabilities = newCProbabilities;
         } else {
-            this.neighborList = new ArrayList<Node>();
+            this.neighborList = new ArrayList<Node<E>>();
             this.cProbabilities = new ArrayList<Double>();
         }
     }
@@ -85,7 +88,7 @@ public class Node {
         }
         double randDouble = this.r.nextDouble();
 
-        // find largeset index such that cprob is less than randDouble
+        // find largest index such that cProbabilities is less than randDouble
         int low = 0, high = this.neighborList.size();
         while (high - low > 1) {
             int mid = (low + high) / 2;
@@ -99,22 +102,22 @@ public class Node {
     }
 
     public String toString() {
-        return this.query;
+        return this.obj.toString();
     }
 
-    public String getQuery() {
-        return this.query;
+    public E getObj() {
+        return this.obj;
     }
 
-    public void setQuery(String query) {
-        this.query = query;
+    public void setObj(String query) {
+        this.obj = obj;
     }
 
-    public HashMap<Node, Double> getNeighbors() {
+    public HashMap<Node<E>, Double> getNeighbors() {
         return this.neighbors;
     }
 
-    public void setNeighbors(HashMap<Node, Double> neighbors) {
+    public void setNeighbors(HashMap<Node<E>, Double> neighbors) {
         this.neighbors = neighbors;
         this.updateProbabilities();
     }
@@ -123,10 +126,10 @@ public class Node {
      * sets neighbors with 
      * @param neighbors
      */
-    public void setNeighbors(HashSet<Node> neighbors) {
-        HashMap<Node, Double> edges = new HashMap<Node, Double>();
+    public void setNeighbors(HashSet<Node<E>> neighbors) {
+        HashMap<Node<E>, Double> edges = new HashMap<Node<E>, Double>();
         double c = (neighbors.size() == 0) ? 0 : 1.0/neighbors.size();
-        for (Node n: neighbors) {
+        for (Node<E> n: neighbors) {
             edges.put(n, c);
         }
         this.neighbors = edges;

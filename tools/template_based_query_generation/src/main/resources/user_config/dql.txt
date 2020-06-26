@@ -1,0 +1,10 @@
+// dql syntax
+with:1
+select:1
+replace:1
+except:1
+as:1
+from:1
+where:1
+limit:1
+orderby:1

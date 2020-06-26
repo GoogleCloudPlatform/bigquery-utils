@@ -1,0 +1,21 @@
+// dql syntax
+dql:with
+dql:select
+with:select
+select:as
+select:replace
+select:except
+as:from
+as:where
+replace:from
+replace:where
+except:from
+except:where
+where:limit
+where:orderby
+from:limit
+from:orderby
+from:sink
+where:sink
+orderby:sink
+limit:sink

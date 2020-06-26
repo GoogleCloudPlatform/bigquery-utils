@@ -1,0 +1,10 @@
+// dml syntax
+insert:1
+delete:1
+wheredml:1
+updatedml:1
+into:1
+values:1
+updatedml:1
+set:1
+fromdml:1

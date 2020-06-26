@@ -1,0 +1,17 @@
+// ddl syntax
+ddl:create
+create:partition
+create:cluster
+create:options
+create:as
+partition:cluster
+partition:options
+partition:as
+cluster:options
+cluster:as
+options:as
+create:sink
+cluster:sink
+options:sink
+partition:sink
+as:sink

@@ -1,0 +1,6 @@
+// root syntax
+queryroot:1
+dml:1
+dql:1
+ddl:1
+sink:1
