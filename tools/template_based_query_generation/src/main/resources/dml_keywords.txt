@@ -1,0 +1,10 @@
+insert
+into
+values
+delete
+from
+where
+update
+from
+set
+merge
