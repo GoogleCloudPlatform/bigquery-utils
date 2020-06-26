@@ -1,13 +1,12 @@
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -55,10 +54,6 @@ public class Utils {
 		return sb.toString();
 	}
 
-	// refactor IO exception handling
-	// immutable objects required for thread safety?
-	// how much error handling should we account for?
-
 	/**
 	 * Writes generated outputs to a specified directory, creating one if it doesn't exist.
 	 *
@@ -66,19 +61,18 @@ public class Utils {
 	 * @param directoryName relative path of a specified directory
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
-	public static void writeDirectory(HashMap<String, List<String>> outputs, String directoryName) throws IOException {
+	public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, String directoryName) throws IOException {
 		String outputDirectory = getOutputDirectory(directoryName);
-		System.out.println(outputDirectory);
 		File file = new File(outputDirectory);
 
 		if (!file.exists() && !file.mkdir()) {
 			throw new FileNotFoundException("No such directory or the directory could not be created");
 		}
 
-		writeFile(getImmutableList(outputs.get("BQ_skeletons")), outputDirectory + "/bq_skeleton.txt");
-		writeFile(getImmutableList(outputs.get("BQ_tokenized")), outputDirectory + "/bq_tokenized.txt");
-		writeFile(getImmutableList(outputs.get("Postgre_skeletons")), outputDirectory + "/postgre_skeleton.txt");
-		writeFile(getImmutableList(outputs.get("Postgre_tokenized")), outputDirectory + "/postgre_tokenized.txt");
+		writeFile(outputs.get("BQ_skeletons"), outputDirectory + "/bq_skeleton.txt");
+		writeFile(outputs.get("BQ_tokenized"), outputDirectory + "/bq_tokenized.txt");
+		writeFile(outputs.get("Postgre_skeletons"), outputDirectory + "/postgre_skeleton.txt");
+		writeFile(outputs.get("Postgre_tokenized"), outputDirectory + "/postgre_tokenized.txt");
 		// TODO: write sample data to file
 
 		System.out.println("The output is stored at " + outputDirectory);
@@ -90,7 +84,7 @@ public class Utils {
 	 * @param outputs collection of statements to write
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
-	public static void writeDirectory(HashMap<String, List<String>> outputs) throws IOException {
+	public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs) throws IOException {
 		writeDirectory(outputs, "outputs");
 	}
 
@@ -101,7 +95,7 @@ public class Utils {
 	 * @param fileName   absolute path of a specified file
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
-	public static void writeFile(List<String> statements, String fileName) throws IOException {
+	public static void writeFile(ImmutableList<String> statements, String fileName) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), UTF_8)) {
 			for (String statement : statements) {
 				writer.write(statement);
@@ -121,36 +115,6 @@ public class Utils {
 		return workingDirectory + "/" + directoryName;
 	}
 
-	// make deep copy
-
-	/**
-	 * Returns an immutable copy of the specified List.
-	 *
-	 * @param statements the List to be copied
-	 * @return immutable copy of the specified List
-	 */
-	private static List<String> getImmutableList(List<String> statements) {
-		return Collections.unmodifiableList(statements);
-	}
-
-	public static void main(String[] args) {
-		ArrayList<String> bq_skeletons = new ArrayList<String>();
-		bq_skeletons.add("BQ Skeletons!");
-		ArrayList<String> bq_tokenized = new ArrayList<String>();
-		bq_tokenized.add("BQ Tokens!");
-		ArrayList<String> postgre_skeletons = new ArrayList<String>();
-		postgre_skeletons.add("PostgreSQL Skeletons!");
-		ArrayList<String> postgre_tokenized = new ArrayList<String>();
-		postgre_tokenized.add("PostgreSQL Tokens!");
-		HashMap<String, List<String>> outputs = new HashMap<String, List<String>>();
-		outputs.put("BQ_skeletons", bq_skeletons);
-		outputs.put("BQ_tokenized", bq_tokenized);
-		outputs.put("Postgre_skeletons", postgre_skeletons);
-		outputs.put("Postgre_tokenized", postgre_tokenized);
-		try {
-			writeDirectory(outputs);
-		} catch (IOException exception) {
-			System.out.println(exception);
-		}
-	}
+	// TODO: refactor IO exception handling
+	// how much error handling should we account for?
 }
