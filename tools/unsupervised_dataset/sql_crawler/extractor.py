@@ -64,5 +64,4 @@ def retrieve_module(url):
     if "cloud.google.com" in url:
         return google_extraction.GoogleExtractionModule
     else:
-        # TODO(Noah): Add more modules and implement generic module
         return generic_extraction.GenericExtractionModule
