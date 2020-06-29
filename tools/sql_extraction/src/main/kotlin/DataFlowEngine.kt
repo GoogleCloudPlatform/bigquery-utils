@@ -20,7 +20,12 @@ class DataFlowEngine {
             .map { QueryUsages(it.key, it.value.sorted()) }
     }
 
-    private fun registerUsage(usage: Location, query: QueryFragment) {
+    /**
+     * Marks [usage] as one of the part of code where [query] is used.
+     *
+     * Usage examples: method call argument, return, added to non-local data structure, etc
+     */
+    private fun addUsage(query: QueryFragment, usage: Location) {
         queryUsages.computeIfAbsent(query) { HashSet() }.add(usage)
     }
 }
