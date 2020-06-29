@@ -23,10 +23,9 @@ class DataFlowSolverTest {
         val filePath = mockk<Path>(relaxed = true)
         val stream = mockk<CharStream>(relaxed = true)
 
-        val frontEnd = mockk<FrontEnd>()
+        val frontEnd = mockk<FrontEnd>(relaxUnitFun = true)
         every { frontEnd.canSolve(any()) } returns true
         every { frontEnd.openFile(any()) } returns stream
-        every { frontEnd.solveDataFlow(any(), any()) } returns emptySequence()
 
         val solver = DataFlowSolver(listOf(frontEnd))
         solver.solveDataFlow(mockk(relaxed = true), filePath)
@@ -57,10 +56,9 @@ class DataFlowSolverTest {
         val invalidFrontEnd = mockk<FrontEnd>()
         every { invalidFrontEnd.canSolve(any()) } returns false
 
-        val frontEnd = mockk<FrontEnd>()
+        val frontEnd = mockk<FrontEnd>(relaxUnitFun = true)
         every { frontEnd.canSolve(any()) } returns true
         every { frontEnd.openFile(any()) } returns stream
-        every { frontEnd.solveDataFlow(any(), any()) } returns emptySequence()
 
         val solver = DataFlowSolver(listOf(invalidFrontEnd, frontEnd))
         solver.solveDataFlow(mockk(relaxed = true), filePath)

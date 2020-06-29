@@ -17,13 +17,11 @@ class JavaFrontEnd : FrontEnd {
         return filePath.toString().endsWith(".java", ignoreCase = true)
     }
 
-    override fun solveDataFlow(engine: DataFlowEngine, fileStream: CharStream): Sequence<Query> {
+    override fun solveDataFlow(engine: DataFlowEngine, fileStream: CharStream) {
         val lexer = Java9Lexer(fileStream)
         val tokens = CommonTokenStream(lexer as TokenSource)
         val parser = Java9Parser(tokens as TokenStream)
-        // todo: analyze compilationUnit
+        // todo: analyze compilationUnit using the engine
         parser.compilationUnit()
-
-        return emptySequence()
     }
 }

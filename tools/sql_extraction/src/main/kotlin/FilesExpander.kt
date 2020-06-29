@@ -2,12 +2,12 @@ package com.google.cloud.sqlecosystem.sqlextraction
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
+import kotlin.streams.asSequence
 
 /**
  * Expands a collection of file and directory paths to a list of all applicable file paths
  */
-class FileListExpander {
+class FilesExpander {
     /**
      * Converts a collection of file and directory paths to all applicable file paths
      *
@@ -23,16 +23,16 @@ class FileListExpander {
         recursive: Boolean = false,
         includes: List<String> = emptyList(),
         excludes: List<String> = emptyList()
-    ): Collection<Path> {
+    ): Sequence<Path> {
         assert(!dirs.isEmpty()) { "dirs cannot be empty" }
 
         val fileSystem = dirs.first().fileSystem
         val includeMatchers = includes.map { fileSystem.getPathMatcher("glob:$it") }
         val excludeMatchers = excludes.map { fileSystem.getPathMatcher("glob:$it") }
 
-        return dirs.stream().flatMap { basePath ->
+        return dirs.asSequence().flatMap { basePath ->
             Files.walk(basePath, if (recursive) Int.MAX_VALUE else 1)
-                .filter { Files.isRegularFile(it) }
+                .asSequence().filter { Files.isRegularFile(it) }
                 .filter { path ->
                     includeMatchers.isEmpty() || includeMatchers.any { matcher ->
                         matcher.matches(path) || matcher.matches(path.fileName)
@@ -43,6 +43,6 @@ class FileListExpander {
                         matcher.matches(path) || matcher.matches(path.fileName)
                     }
                 }
-        }.collect(Collectors.toSet()) // todo: return as distinct stream
+        }.distinct()
     }
 }
