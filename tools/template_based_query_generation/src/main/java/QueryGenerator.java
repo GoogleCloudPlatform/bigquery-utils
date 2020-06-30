@@ -1,12 +1,17 @@
+import com.opensymphony.xwork2.util.ClassLoaderUtil;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ArrayList;
 
 
 /**
- * Class that parses config file and creates queries
+ * Class that parses config file and creates queries from markov chain
  */
 public class QueryGenerator {
 
@@ -26,7 +31,9 @@ public class QueryGenerator {
         HashSet<String> activatedQueries = new HashSet<String>();
         String line;
         for (String path: userConfigPaths) {
-            BufferedReader br = new BufferedReader(new FileReader(path));
+            InputStream inputStream = ClassLoaderUtil.getResourceAsStream(path, QueryGenerator.class);
+            InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(streamReader);
             while ((line = br.readLine()) != null) {
                 if (line.length() > 2 && line.charAt(0) != ' '
                         && !(line.charAt(0) == '/' && line.charAt(1) == '/')) {
@@ -43,7 +50,9 @@ public class QueryGenerator {
         // stores directed edges in dependencies
         HashMap<String, HashSet<String>> dependencies = new HashMap<String, HashSet<String>>();
         for (String path: dialectConfigPaths) {
-            BufferedReader br = new BufferedReader(new FileReader(path));
+            InputStream inputStream = ClassLoaderUtil.getResourceAsStream(path, QueryGenerator.class);
+            InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(streamReader);
             while ((line = br.readLine()) != null) {
                 if (line.length() > 2 && line.charAt(0) != ' '
                         && !(line.charAt(0) == '/' && line.charAt(1) == '/')) {
@@ -78,7 +87,9 @@ public class QueryGenerator {
         }
 
         // parse lines from mainUserConfig, ignoring lines that begin with ' ' or '/'
-        BufferedReader br = new BufferedReader(new FileReader(mainUserConfig));
+        InputStream inputStream = ClassLoaderUtil.getResourceAsStream(mainUserConfig, QueryGenerator.class);
+        InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(streamReader);
         while ((line = br.readLine()) != null) {
             if (line.length() > 2 && line.charAt(0) != ' '
                     && !(line.charAt(0) == '/' && line.charAt(1) == '/')) {
@@ -89,7 +100,9 @@ public class QueryGenerator {
             }
         }
         br.close();
-        this.mcGenerator = new MarkovChain<Query>((HashSet<Node<Query>>) nodes.values(), 0);
+        HashSet<Node<Query>> nodeSet = new HashSet<Node<Query>>();
+        nodeSet.addAll(nodes.values());
+        this.mcGenerator = new MarkovChain<Query>(nodeSet, 0);
     }
 
     /**
@@ -110,11 +123,20 @@ public class QueryGenerator {
      * @param args
      */
     public static void main(String[] args) throws Exception {
-//        String[] dialectConfigPaths = new String[] {"dialect_config/ddl_dependencies.txt", "dialect_config/dml_dependencies.txt", "dialect_config/dql_dependencies.txt", "dialect_config/root_dependencies.txt"};
-//        String[] userConfigPaths = new String[] {"user_config/ddl.txt", "user_config/dml.txt", "user_config/dql.txt", "user_config/root.txt"};
-//        String mainUserConfig = "user_config/config.txt";
-//        QueryGenerator qg = new QueryGenerator(dialectConfigPaths, userConfigPaths, mainUserConfig);
-
+        String[] dialectConfigPaths = new String[] {"dialect_config/ddl_dependencies.txt",
+                "dialect_config/dml_dependencies.txt",
+                "dialect_config/dql_dependencies.txt",
+                "dialect_config/root_dependencies.txt"};
+        String[] userConfigPaths = new String[] {"user_config/ddl.txt",
+                "user_config/dml.txt",
+                "user_config/dql.txt",
+                "user_config/root.txt"};
+        String mainUserConfig = "user_config/config.txt";
+        QueryGenerator qg = new QueryGenerator(dialectConfigPaths, userConfigPaths, mainUserConfig);
+        ArrayList<ArrayList<Query>> queries = qg.generateQueries(50);
+        for (ArrayList<Query> query: queries) {
+            System.out.println(query);
+        }
     }
 
 }

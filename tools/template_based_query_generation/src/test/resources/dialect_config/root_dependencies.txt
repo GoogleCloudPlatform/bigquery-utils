@@ -1,0 +1,4 @@
+// root syntax
+QUERY_ROOT:DDL
+QUERY_ROOT:DML
+QUERY_ROOT:DQL

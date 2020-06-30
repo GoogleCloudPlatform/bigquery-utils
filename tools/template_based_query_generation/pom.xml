@@ -32,6 +32,12 @@
             <artifactId>google-collections</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.opensymphony/xwork-core -->
+        <dependency>
+            <groupId>com.opensymphony</groupId>
+            <artifactId>xwork-core</artifactId>
+            <version>2.1.5</version>
+        </dependency>
     </dependencies>
 
     <build>
