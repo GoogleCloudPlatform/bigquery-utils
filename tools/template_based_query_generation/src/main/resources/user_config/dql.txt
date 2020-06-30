@@ -1,10 +1,10 @@
 // dql syntax
-with:1
-select:1
-replace:1
-except:1
-as:1
-from:1
-where:1
-limit:1
-orderby:1
+DQL_WITH:1
+DQL_SELECT:1
+DQL_REPLACE:1
+DQL_EXCEPT:1
+DQL_AS:1
+DQL_FROM:1
+DQL_WHERE:1
+DQL_LIMIT:1
+DQL_ORDER:1

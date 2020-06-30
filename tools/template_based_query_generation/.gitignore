@@ -29,3 +29,6 @@ hs_err_pid*
 # maven
 target/
 *.iml
+
+# project specific
+outputs/

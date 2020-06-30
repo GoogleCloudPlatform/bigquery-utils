@@ -1,6 +1,6 @@
 // ddl syntax
-create:1
-partition:1
-cluster:1
-options:1
-as:1
+DDL_CREATE:1
+DDL_PARTITION:1
+DDL_CLUSTER:1
+DDL_OPTIONS:1
+DDL_AS:1

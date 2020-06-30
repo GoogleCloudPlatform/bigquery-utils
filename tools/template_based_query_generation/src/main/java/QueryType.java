@@ -3,14 +3,30 @@
  */
 public enum QueryType {
     QUERY_ROOT,
-    DDL,
     DML,
     DQL,
+    DDL,
+    SINK,
     DDL_CREATE,
     DDL_PARTITION,
     DDL_CLUSTER,
     DDL_OPTIONS,
     DDL_AS,
-    SINK;
-    // TODO: hardcode all or import from google spreadsheet
+    DML_INSERT,
+    DML_DELETE,
+    DML_WHERE,
+    DML_UPDATE,
+    DML_INTO,
+    DML_VALUES,
+    DML_SET,
+    DML_FROM,
+    DQL_WITH,
+    DQL_SELECT,
+    DQL_REPLACE,
+    DQL_EXCEPT,
+    DQL_AS,
+    DQL_FROM,
+    DQL_WHERE,
+    DQL_LIMIT,
+    DQL_ORDER,
 }
