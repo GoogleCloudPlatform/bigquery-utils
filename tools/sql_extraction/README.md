@@ -42,7 +42,7 @@ To run:
 
 To build:
 ```
-./gradlew run
+./gradlew build
 ```
 
 To clean build artifacts:

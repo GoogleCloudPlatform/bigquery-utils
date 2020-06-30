@@ -7,8 +7,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class FileListExpanderTest {
-    val expander = FileListExpander()
+class FilesExpanderTest {
+    val expander = FilesExpander()
 
     @Test
     fun `all files are included`() {
@@ -20,7 +20,7 @@ class FileListExpanderTest {
 
         val result = expander.expandAndFilter(listOf(fileA, fileB), false)
 
-        assertEquals(setOf(fileA, fileB), result)
+        assertEquals(setOf(fileA, fileB), result.toSet())
     }
 
     @Test
@@ -34,7 +34,7 @@ class FileListExpanderTest {
 
         val result = expander.expandAndFilter(listOf(fs.getPath("/dir")), false)
 
-        assertEquals(setOf(fileA, fileB), result)
+        assertEquals(setOf(fileA, fileB), result.toSet())
     }
 
     @Test
@@ -49,7 +49,7 @@ class FileListExpanderTest {
 
         val result = expander.expandAndFilter(listOf(fs.getPath("/dir")), false)
 
-        assertEquals(setOf(fileA), result)
+        assertEquals(setOf(fileA), result.toSet())
     }
 
     @Test
@@ -64,7 +64,7 @@ class FileListExpanderTest {
 
         val result = expander.expandAndFilter(listOf(fs.getPath("/dir")), true)
 
-        assertEquals(setOf(fileA, fileB), result)
+        assertEquals(setOf(fileA, fileB), result.toSet())
     }
 
     @Test
@@ -75,7 +75,7 @@ class FileListExpanderTest {
 
         val result = expander.expandAndFilter(listOf(fileA, fileA), false)
 
-        assertTrue(result.size == 1)
+        assertTrue(result.count() == 1)
     }
 
     @Test
@@ -86,9 +86,12 @@ class FileListExpanderTest {
         Files.createFile(fileA)
         Files.createFile(fileB)
 
-        val result = expander.expandAndFilter(listOf(fs.getPath("/")), false, includes = listOf("*.java"))
+        val result = expander.expandAndFilter(
+            listOf(fs.getPath("/")), false,
+            includes = listOf("*.java")
+        )
 
-        assertEquals(setOf(fileA), result)
+        assertEquals(setOf(fileA), result.toSet())
     }
 
     @Test
@@ -102,9 +105,12 @@ class FileListExpanderTest {
         Files.createFile(fileC)
 
         val result =
-            expander.expandAndFilter(listOf(fs.getPath("/")), false, includes = listOf("*.java", "*.maybejava"))
+            expander.expandAndFilter(
+                listOf(fs.getPath("/")), false,
+                includes = listOf("*.java", "*.maybejava")
+            )
 
-        assertEquals(setOf(fileA, fileB), result)
+        assertEquals(setOf(fileA, fileB), result.toSet())
     }
 
     @Test
@@ -115,9 +121,10 @@ class FileListExpanderTest {
         Files.createFile(fileA)
         Files.createFile(fileB)
 
-        val result = expander.expandAndFilter(listOf(fs.getPath("/")), false, excludes = listOf("*.notjava"))
+        val result =
+            expander.expandAndFilter(listOf(fs.getPath("/")), false, excludes = listOf("*.notjava"))
 
-        assertEquals(setOf(fileA), result)
+        assertEquals(setOf(fileA), result.toSet())
     }
 
     @Test
@@ -131,9 +138,12 @@ class FileListExpanderTest {
         Files.createFile(fileC)
 
         val result =
-            expander.expandAndFilter(listOf(fs.getPath("/")), false, excludes = listOf("*.notjava", "*.maybejava"))
+            expander.expandAndFilter(
+                listOf(fs.getPath("/")), false,
+                excludes = listOf("*.notjava", "*.maybejava")
+            )
 
-        assertEquals(setOf(fileA), result)
+        assertEquals(setOf(fileA), result.toSet())
     }
 
     @Test
@@ -153,7 +163,7 @@ class FileListExpanderTest {
             excludes = listOf("2.*")
         )
 
-        assertEquals(setOf(fileA), result)
+        assertEquals(setOf(fileA), result.toSet())
     }
 
     @Test
@@ -170,8 +180,11 @@ class FileListExpanderTest {
         Files.createFile(fileC)
         Files.createFile(fileD)
 
-        val result = expander.expandAndFilter(listOf(fs.getPath("/")), true, includes = listOf("*.java"))
+        val result = expander.expandAndFilter(
+            listOf(fs.getPath("/")), true,
+            includes = listOf("*.java")
+        )
 
-        assertEquals(setOf(fileA, fileB), result)
+        assertEquals(setOf(fileA, fileB), result.toSet())
     }
 }
