@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.last_day(date_expr DATE) AS (
-  fn.last_day(date_expr)
+CREATE OR REPLACE FUNCTION fn.percentage_change(val1 FLOAT64, val2 FLOAT64) RETURNS FLOAT64 AS 
+(
+  ROUND(IF(ABS(val1) > 0 AND ABS(val2) > 0, (val2 - val1) / ABS(val1), NULL), 4)
 );
