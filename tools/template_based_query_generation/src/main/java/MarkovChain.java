@@ -19,7 +19,8 @@ public class MarkovChain<E> {
      */
     public MarkovChain(HashMap<Node<E>, HashMap<Node<E>, Double>> nodes, int seed) {
         this.r = new Random(seed);
-        this.nodes = (HashSet) nodes.keySet();
+        this.nodes = new HashSet<Node<E>>();
+        this.nodes.addAll(nodes.keySet());
         for (Node<E> n: nodes.keySet()){
             n.setNeighbors(nodes.get(n));
         }

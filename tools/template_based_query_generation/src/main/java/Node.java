@@ -1,4 +1,3 @@
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,32 +19,10 @@ public class Node<E> {
      * constructs node from query
      * @param obj
      */
-    public Node(E obj) {
+    public Node(E obj, int seed) {
         this.obj = obj;
-        this.r = new Random(0);
+        this.r = new Random(seed);
         this.setNeighbors(new HashMap<Node<E>, Double>());
-    }
-
-    /**
-     * constructs node from query, and set of neighbors which can be reached with equiprobability
-     * @param obj
-     * @param neighbors
-     */
-    public Node(E obj, HashSet<Node<E>> neighbors, int seed){
-        this.obj = obj;
-        this.r = new Random(seed);
-        this.setNeighbors(neighbors);
-    }
-
-    /**
-     * constructs node from query, and map of neighbors and transition probabilities
-     * @param obj
-     * @param neighbors
-     */
-    public Node(E obj, HashMap<Node<E>, Double> neighbors, int seed) {
-        this.obj = obj;
-        this.r = new Random(seed);
-        this.setNeighbors(neighbors);
     }
 
     /**
@@ -134,6 +111,14 @@ public class Node<E> {
         }
         this.neighbors = edges;
         this.updateProbabilities();
+    }
+
+    public ArrayList<Node<E>> getNeighborList() {
+        return neighborList;
+    }
+
+    public ArrayList<Double> getCProbabilities() {
+        return cProbabilities;
     }
 
 }

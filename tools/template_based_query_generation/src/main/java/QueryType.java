@@ -1,3 +1,6 @@
+/**
+ * Types of queries in SQL language encoding
+ */
 public enum QueryType {
     QUERY_ROOT,
     DDL,
@@ -9,5 +12,5 @@ public enum QueryType {
     DDL_OPTIONS,
     DDL_AS,
     SINK;
-    // TODO: hardcode all
+    // TODO: hardcode all or import from google spreadsheet
 }

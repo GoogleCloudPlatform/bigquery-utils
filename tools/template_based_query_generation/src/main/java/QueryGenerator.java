@@ -65,7 +65,7 @@ public class QueryGenerator {
         // create a Node object for each query
         HashMap<String, Node<Query>> nodes = new HashMap<String, Node<Query>>();
         for (String query: activatedQueries) {
-            nodes.put(query, new Node(new Query(QueryType.valueOf(query))));
+            nodes.put(query, new Node(new Query(QueryType.valueOf(query)),0));
         }
 
         // for each query, correctly set neighbors and set root
@@ -103,6 +103,18 @@ public class QueryGenerator {
             queries.add(this.mcGenerator.randomWalk(this.queryRoot));
         }
         return queries;
+    }
+
+    /**
+     * temporary main method to test progress thus far
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+//        String[] dialectConfigPaths = new String[] {"dialect_config/ddl_dependencies.txt", "dialect_config/dml_dependencies.txt", "dialect_config/dql_dependencies.txt", "dialect_config/root_dependencies.txt"};
+//        String[] userConfigPaths = new String[] {"user_config/ddl.txt", "user_config/dml.txt", "user_config/dql.txt", "user_config/root.txt"};
+//        String mainUserConfig = "user_config/config.txt";
+//        QueryGenerator qg = new QueryGenerator(dialectConfigPaths, userConfigPaths, mainUserConfig);
+
     }
 
 }
