@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Comparator;
 
@@ -26,67 +27,74 @@ public class Main {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        Main main = new Main();
-        main.run(args);
-
-        System.exit(0);
-    }
-
-    public void run(String[] args) {
         CommandLine command = buildCommand(args);
         if (command == null) {
             return;
         }
 
-        QueryVerification queryVerification = new QueryVerification();
+        QueryVerificationQuery migratedQuery = null;
+        QueryVerificationSchema migratedSchema = null;
 
-        // Query
+        QueryVerificationQuery originalQuery = null;
+        QueryVerificationSchema originalSchema = null;
+
+        // Query input handling
         if (command.hasOption("q")) {
             String[] queryOptionValues = command.getOptionValues("q");
 
             if (queryOptionValues.length >= 1) {
                 String migratedQueryPath = queryOptionValues[0];
-                QVQuery migratedQuery = new QVQuery(getContentsOfFile(migratedQueryPath), migratedQueryPath);
-                queryVerification.setMigratedQuery(migratedQuery);
+                String migratedQueryContents = getContentsOfFile(migratedQueryPath);
+                if (migratedQueryContents != null) {
+                    migratedQuery = QueryVerificationQuery.create(migratedQueryContents, migratedQueryPath);
+                }
             }
 
             if (queryOptionValues.length >= 2) {
                 String originalQueryPath = queryOptionValues[1];
-                QVQuery originalQuery = new QVQuery(getContentsOfFile(originalQueryPath), originalQueryPath);
-                queryVerification.setMigratedQuery(originalQuery);
+                String originalQueryContents = getContentsOfFile(originalQueryPath);
+                if (originalQueryContents != null) {
+                    originalQuery = QueryVerificationQuery.create(originalQueryContents, originalQueryPath);
+                }
             }
         }
 
-        // Schema
+        // Schema input handling
         if (command.hasOption("s")) {
             String[] schemaOptionValues = command.getOptionValues("s");
 
             if (schemaOptionValues.length >= 1) {
                 String migratedSchemaPath = schemaOptionValues[0];
-                QVSchema migratedSchema = new QVSchema(getContentsOfFile(migratedSchemaPath), migratedSchemaPath);
-                queryVerification.setMigratedSchema(migratedSchema);
+                String migratedSchemaContents = getContentsOfFile(migratedSchemaPath);
+                if (migratedSchemaContents != null) {
+                    migratedSchema = QueryVerificationSchema.create(migratedSchemaContents, migratedSchemaPath);
+                }
             }
 
             if (schemaOptionValues.length >= 2) {
                 String originalSchemaPath = schemaOptionValues[1];
-                QVSchema originalSchema = new QVSchema(getContentsOfFile(originalSchemaPath), originalSchemaPath);
-                queryVerification.setOriginalSchema(originalSchema);
+                String originalSchemaContents = getContentsOfFile(originalSchemaPath);
+                if (originalSchemaContents != null) {
+                    originalSchema = QueryVerificationSchema.create(originalSchemaContents, originalSchemaPath);
+                }
             }
         }
 
-        // Data
+        // Data input handling
         if (command.hasOption("d")) {
             // TODO Data input for data aware verification
         }
+        QueryVerifier queryVerifier = new QueryVerifier(migratedQuery, migratedSchema, originalQuery, originalSchema);
+        queryVerifier.verify();
 
-        queryVerification.verify();
+        System.exit(0);
     }
 
     /**
      * @param args Command Line Arguments
      * @return Command parsed from arguments
      */
-    public CommandLine buildCommand(String[] args) {
+    public static CommandLine buildCommand(String[] args) {
         CommandLineParser parser = new DefaultParser();
         Options options = buildOptions();
 
@@ -122,7 +130,7 @@ public class Main {
     /**
      * @return CLI options
      */
-    public Options buildOptions() {
+    public static Options buildOptions() {
         Options options = new Options();
 
         options.addOption(Option.builder("q")
@@ -138,7 +146,7 @@ public class Main {
                 .numberOfArgs(Option.UNLIMITED_VALUES) // Allows for 2 arguments without both being required
                 .valueSeparator(' ')
                 .argName("PATH> <PATH") // Appears as "<PATH> <PATH>"
-                .desc("First argument is the path to the migrated schema path. Second argument is the path to the original schema query and is optional. Referenced files should be in a JSON format.")
+                .desc("First argument is the path to the migrated schema path. Second argument is the path to the original schema query and is optional. Referenced files should be DDL statements or in JSON format.")
                 .build());
         options.addOption(Option.builder("d")
                 .longOpt("data")
@@ -160,16 +168,17 @@ public class Main {
      * @param path The path to the file to be read
      * @return Text contents in file
      */
-    public String getContentsOfFile(String path) {
+    public static String getContentsOfFile(String path) {
         String contents = null;
         try {
             contents = new String(Files.readAllBytes(Paths.get(path)));
+        } catch (NoSuchFileException e) {
+            System.out.println("File Not Found: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("I/O Exception: " + e.getMessage());
         } finally {
             return contents;
         }
     }
 
 }
-
