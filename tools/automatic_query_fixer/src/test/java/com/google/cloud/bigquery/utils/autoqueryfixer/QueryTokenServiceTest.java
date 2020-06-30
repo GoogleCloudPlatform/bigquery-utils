@@ -1,26 +1,29 @@
-package com.google.cloud.bigquery.utils.auto_query_fixer;
+package com.google.cloud.bigquery.utils.autoqueryfixer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.cloud.bigquery.utils.auto_query_fixer.entity.IToken;
+import com.google.cloud.bigquery.utils.autoqueryfixer.entity.IToken;
 
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 public class QueryTokenServiceTest {
 
+  private QueryTokenService createService() {
+    return new QueryTokenService(new BigQueryParserFactory());
+  }
+
   @Test
   public void convertSqlToTokens() {
-    QueryTokenService tokenService = new QueryTokenService();
-    String sql = "Select col from t1 Join\n" +
-        "t2 on t1.id = t2.id\n" +
+    QueryTokenService tokenService = createService();
+    String sql = "Select col from `d1.t1` Join\n" +
+        "t2 on d1.t1.id = t2.id\n" +
         "where t1.col > 'val'";
 
-    List<IToken> tokens =  tokenService.getAllTokens(sql);
+    List<IToken> tokens = tokenService.getAllTokens(sql);
     for (IToken token : tokens) {
       System.out.println(token);
     }
@@ -28,7 +31,7 @@ public class QueryTokenServiceTest {
 
   @Test
   public void testNearbyTokens() {
-    QueryTokenService tokenService = new QueryTokenService();
+    QueryTokenService tokenService = createService();
     String sql = "Select col from t1 Join\n" +
         "t2 on t1.id = t2.id\n" +
         "where t1.col > 'val'";
@@ -44,7 +47,7 @@ public class QueryTokenServiceTest {
 
   @Test
   public void modifyQuery() {
-    QueryTokenService tokenService = new QueryTokenService();
+    QueryTokenService tokenService = createService();
     String sql = "Select col from t1 Join\n" +
         "t2 on t1.id = t2.id\n" +
         "where t1.col > 'val'";

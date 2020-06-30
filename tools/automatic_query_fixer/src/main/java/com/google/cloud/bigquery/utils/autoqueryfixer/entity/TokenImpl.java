@@ -1,7 +1,10 @@
-package com.google.cloud.bigquery.utils.auto_query_fixer.entity;
+package com.google.cloud.bigquery.utils.autoqueryfixer.entity;
 
 import org.apache.calcite.sql.parser.babel.Token;
 
+/**
+ * An implementation of token interface based on the Token class of Babel Calcite Parser.
+ * */
 public class TokenImpl implements IToken {
 
   private final Token token;

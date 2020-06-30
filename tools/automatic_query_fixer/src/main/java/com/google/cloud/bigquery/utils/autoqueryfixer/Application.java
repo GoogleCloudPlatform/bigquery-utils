@@ -1,4 +1,4 @@
-package com.google.cloud.bigquery.utils.auto_query_fixer;
+package com.google.cloud.bigquery.utils.autoqueryfixer;
 
 public class Application {
 

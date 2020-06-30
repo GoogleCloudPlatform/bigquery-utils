@@ -1,6 +1,8 @@
-package com.google.cloud.bigquery.utils.auto_query_fixer.entity;
+package com.google.cloud.bigquery.utils.autoqueryfixer.entity;
 
-
+/**
+ * A interface for queries' tokens.
+ * */
 public interface IToken {
 
   int getKind();
