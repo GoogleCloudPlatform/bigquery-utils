@@ -1,38 +1,19 @@
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
- * Keywords set for SQL DML
+ * Set of user-defined DML keywords
  */
 public class KeywordsDML implements Keywords {
 
-	private final String fileName = "../resources/dml_keywords.txt";
-	private final ImmutableSet<String> keywordsSet;
+	private final String fileNameDML = "../resources/user_config.txt/dml.txt";
+
+	private final ImmutableSet<String> keywordsSetDML;
 
 	/**
-	 * Constructor of SQL DML keywords, parsed from the config file
+	 * Constructor of user-defined keywords, parsed from the config file
 	 */
 	public KeywordsDML() {
-		ImmutableList.Builder<String> builder = ImmutableList.builder();
-
-		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
-			String word;
-			while ((word = reader.readLine()) != null) {
-				builder.add(word);
-			}
-		} catch (IOException exception) {
-			System.out.println(exception);
-		}
-		
-		ImmutableList<String> keywordsList = builder.build();
-		keywordsSet = ImmutableSet.copyOf(keywordsList);
+		keywordsSetDML = Utils.makeImmutableSet(fileNameDML);
 	}
 
 	/**
@@ -41,6 +22,16 @@ public class KeywordsDML implements Keywords {
 	 * @return the set of SQL DML keywords
 	 */
 	public ImmutableSet<String> getKeywordsSet() {
-		return keywordsSet;
+		return keywordsSetDML;
+	}
+
+	/**
+	 * Checks whether a word is in the set of user-specified keywords
+	 *
+	 * @param word the word to check
+	 * @return a boolean indicating if the word is in the DML keywords set
+	 */
+	public boolean inKeywordsSet(String word) {
+		return keywordsSetDML.contains(word);
 	}
 }
