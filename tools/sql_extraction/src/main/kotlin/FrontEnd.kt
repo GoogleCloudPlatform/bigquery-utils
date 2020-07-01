@@ -25,8 +25,6 @@ interface FrontEnd {
 
     /**
      * Solves data-flow analysis using the given [engine] for the given [fileStream]
-     *
-     * @return Detected queries
      */
-    fun solveDataFlow(engine: DataFlowEngine, fileStream: CharStream): Sequence<Query>
+    fun solveDataFlow(engine: DataFlowEngine, fileStream: CharStream)
 }

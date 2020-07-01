@@ -7,3 +7,8 @@ data class Query(
     val usages: List<Location>,
     val notes: String? = null
 )
+
+data class QueryUsages(
+    val query: QueryFragment,
+    val usages: List<Location>
+)
