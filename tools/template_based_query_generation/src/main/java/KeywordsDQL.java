@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class KeywordsDQL implements Keywords {
 
-	private final String fileNameDQL = "../resources/user_config.txt/dql.txt";
+	private final String fileNameDQL = "./src/main/resources/user_config/dql.txt";
 
 	private final ImmutableSet<String> keywordsSetDQL;
 

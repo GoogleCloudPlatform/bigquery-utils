@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class KeywordsDML implements Keywords {
 
-	private final String fileNameDML = "../resources/user_config.txt/dml.txt";
+	private final String fileNameDML = "./src/main/resources/user_config/dml.txt";
 
 	private final ImmutableSet<String> keywordsSetDML;
 

@@ -45,7 +45,7 @@ public class Utils {
 		if (length <= 0) {
 			throw new IllegalArgumentException("Random string must have positive length");
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
@@ -134,9 +134,11 @@ public class Utils {
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				String[] pair = line.split(":");
-				if (pair[1].equals("1")) {
-					builder.add(pair[0]);
+				if (!(line.charAt(0) == '/' && line.charAt(1) == '/')) {
+					String[] pair = line.split(":");
+					if (pair[1].equals("1")) {
+						builder.add(pair[0]);
+					}
 				}
 			}
 		} catch (IOException exception) {
@@ -160,9 +162,11 @@ public class Utils {
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				String[] pair = line.split(":");
-				if (keywordsSet.inKeywordsSet(pair[0])) {
-					builder.put(pair[0], pair[1]);
+				if (!(line.charAt(0) == '/' && line.charAt(1) == '/')) {
+					String[] pair = line.split(":");
+					if (keywordsSet.inKeywordsSet(pair[0])) {
+						builder.put(pair[0], pair[1]);
+					}
 				}
 			}
 		} catch (IOException exception) {

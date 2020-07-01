@@ -2,9 +2,9 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordsMappingDQL implements KeywordsMapping {
 
-	private final String fileNamePostgre = "../resources/dialect_config/dql_mapping_postgre.txt";
+	private final String fileNamePostgre = "./src/main/resources/dialect_config/dql_mapping_postgre.txt";
 
-	private final String fileNameBQ = "../resources/dialect_config/dql_mapping_BQ.text";
+	private final String fileNameBQ = "./src/main/resources/dialect_config/dql_mapping_BQ.txt";
 
 	private final KeywordsDQL keywordsSetDQL = new KeywordsDQL();
 

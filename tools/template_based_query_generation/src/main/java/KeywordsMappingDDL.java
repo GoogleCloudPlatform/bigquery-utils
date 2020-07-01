@@ -2,9 +2,9 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordsMappingDDL implements KeywordsMapping {
 
-	private final String fileNamePostgre = "../resources/dialect_config/ddl_mapping_postgre.txt";
+	private final String fileNamePostgre = "./src/main/resources/dialect_config/ddl_mapping_postgre.txt";
 
-	private final String fileNameBQ = "../resources/dialect_config/ddl_mapping_BQ.text";
+	private final String fileNameBQ = "./src/main/resources/dialect_config/ddl_mapping_BQ.txt";
 
 	private final KeywordsDDL keywordsSetDDL = new KeywordsDDL();
 
@@ -19,6 +19,8 @@ public class KeywordsMappingDDL implements KeywordsMapping {
 		keywordsMapPostgre = Utils.makeImmutableMap(fileNamePostgre, keywordsSetDDL);
 
 		keywordsMapBQ = Utils.makeImmutableMap(fileNameBQ, keywordsSetDDL);
+
+		System.out.println(System.getProperty("user.dir"));
 	}
 
 	/**
