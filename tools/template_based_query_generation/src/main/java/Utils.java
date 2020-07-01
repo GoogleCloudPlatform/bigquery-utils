@@ -16,17 +16,22 @@ public class Utils {
 
 	private static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
-	private static final int lowerBound = 1;
+	private static final int lowerBound = 0;
 
 	private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
 	/**
 	 * Returns a random integer between a lowerBound and an upperBound, inclusive
 	 *
-	 * @param upperBound a nonzero integer upper bound on the generated random integer, inclusive
+	 * @param upperBound a non-negative integer upper bound on the generated random integer, inclusive
 	 * @return a random integer between lowerBound and upperBound, inclusive
+	 * @throws IllegalArgumentException if upperBound is negative
 	 */
-	public static int getRandomInteger(int upperBound) {
+	public static int getRandomInteger(int upperBound) throws IllegalArgumentException {
+		if (upperBound < 0) {
+			throw new IllegalArgumentException("Upper bound cannot be negative");
+		}
+
 		return random.nextInt(lowerBound, upperBound + 1);
 	}
 
@@ -36,7 +41,11 @@ public class Utils {
 	 * @param length a nonzero integer specifying the desired length of the generated string
 	 * @return a random string that matches the regex '[a-zA-Z_]' and has the specified length
 	 */
-	public static String getRandomString(int length) {
+	public static String getRandomString(int length) throws IllegalArgumentException {
+		if (length <= 0) {
+			throw new IllegalArgumentException("Random string must have positive length");
+		}
+		
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
