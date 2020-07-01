@@ -1,18 +1,22 @@
-package com.google.cloud.bigquery.utils.autoqueryfixer;
+package com.google.cloud.bigquery.utils.queryfixer;
 
 import org.apache.calcite.sql.parser.babel.SqlBabelParserImpl;
 import org.apache.calcite.sql.parser.babel.Token;
 import org.apache.calcite.util.SourceStringReader;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.cloud.bigquery.utils.autoqueryfixer.entity.IToken;
-import com.google.cloud.bigquery.utils.autoqueryfixer.entity.TokenImpl;
+import com.google.cloud.bigquery.utils.queryfixer.entity.IToken;
+import com.google.cloud.bigquery.utils.queryfixer.entity.TokenImpl;
 
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A service provides methods for query and token. It can be used to tokenize queries, find tokens based on
+ * positions, and modify a query in token-level.
+ * */
 @AllArgsConstructor
 public class QueryTokenService {
 
@@ -55,6 +59,8 @@ public class QueryTokenService {
 
     Token token;
     final int EndKind = 0;
+    // Token kind means the category: it could be some keywords, identifier, literals, and etc.
+    // The end of a token stream is end token, whose value is zero.
     while ((token = parserImpl.getNextToken()).kind != EndKind) {
       tokens.add(new TokenImpl(token));
     }

@@ -1,8 +1,8 @@
-package com.google.cloud.bigquery.utils.autoqueryfixer;
+package com.google.cloud.bigquery.utils.queryfixer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.cloud.bigquery.utils.autoqueryfixer.entity.IToken;
+import com.google.cloud.bigquery.utils.queryfixer.entity.IToken;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.google.cloud.bigquery.utils.autoqueryfixer.entity;
+package com.google.cloud.bigquery.utils.queryfixer.entity;
 
 /**
  * A interface for queries' tokens.

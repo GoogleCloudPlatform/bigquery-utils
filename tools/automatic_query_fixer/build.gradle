@@ -26,6 +26,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     implementation 'org.apache.calcite.avatica:avatica-core:1.17.0'
     implementation "org.apache.commons:commons-lang3:3.1"
+    // google flogger dependencies
+    compile group: 'com.google.flogger', name: 'flogger', version: '0.1'
+    compile 'com.google.flogger:flogger-system-backend:0.4'
 
     // local jar
     implementation name: 'calcite-babel-1.23.0-SNAPSHOT'
@@ -34,6 +37,7 @@ dependencies {
     //dependency from local jar
     compile 'com.google.guava:guava:23.5-jre'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
