@@ -1,10 +1,8 @@
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.ThreadLocalRandom;
@@ -113,6 +111,60 @@ public class Utils {
 	private static String getOutputDirectory(String directoryName) {
 		final String workingDirectory = System.getProperty("user.dir");
 		return workingDirectory + "/" + directoryName;
+	}
+
+	/**
+	 * Creates an immutable set from the user-defined config file of keyword mappings
+	 *
+	 * @param fileName relative path of the config file
+	 * @return an immutable set of keywords from the config file
+	 */
+	public static ImmutableSet<String> makeImmutableSet(String fileName) {
+		ImmutableList.Builder<String> builder = ImmutableList.builder();
+
+		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String[] pair = line.split(":");
+				if (pair[1].equals("1")) {
+					builder.add(pair[0]);
+				}
+			}
+		} catch (IOException exception) {
+			System.out.println(exception);
+		}
+
+		ImmutableList<String> list = builder.build();
+
+		return ImmutableSet.copyOf(list);
+	}
+
+	/**
+	 * Creates an immutable map from the user-defined config file of keyword mappings
+	 *
+	 * @param fileName relative path of the config file
+	 * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
+	 */
+	public static ImmutableMap<String, String> makeImmutableMap(String fileName, Keywords keywordsSet) {
+		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+
+		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				String[] pair = line.split(":");
+				if (keywordsSet.inKeywordsSet(pair[0])) {
+					builder.put(pair[0], pair[1]);
+				}
+			}
+		} catch (IOException exception) {
+			System.out.println(exception);
+		}
+
+		ImmutableMap<String, String> map = builder.build();
+
+		return map;
+
+		// TODO: assert that duplicates are never inputted
 	}
 
 	// TODO: refactor IO exception handling
