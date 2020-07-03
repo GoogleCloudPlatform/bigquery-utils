@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.last_day(date_expr DATE) AS (
-  fn.last_day(date_expr)
+CREATE OR REPLACE FUNCTION fn.last_day(dt DATE) RETURNS DATE AS
+(
+  DATE_SUB(
+    DATE_ADD(
+      DATE_TRUNC(dt, MONTH)
+      ,INTERVAL 1 MONTH)
+    ,INTERVAL 1 DAY
+  )
 );
