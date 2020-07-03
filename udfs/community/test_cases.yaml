@@ -293,4 +293,19 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
- 
+to_binary:
+  - test:
+    input: CAST(123456 AS INT64)
+    expected_output: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
+from_binary:
+  - test:
+    input: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
+    expected_output: CAST(123456 AS INT64)
+to_hex:
+  - test:
+    input: CAST(123456 AS INT64)
+    expected_output: CAST('000000000001e240' AS STRING)
+from_hex:
+  - test:
+    input: CAST('000000000001e240' AS STRING)
+    expected_output: CAST(123456 AS INT64)
