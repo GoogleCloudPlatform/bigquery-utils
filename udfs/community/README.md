@@ -16,6 +16,8 @@ SELECT bqutil.fn.int(1.684)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
+* [from_binary](#from_binary)
+* [from_hex](#from_hex)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
@@ -29,6 +31,8 @@ SELECT bqutil.fn.int(1.684)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
+* [to_binary](#to_binary)
+* [to_hex](#to_hex)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
@@ -124,6 +128,47 @@ results:
 |         |       5    |     2     |
 |         |    1000    |     1     |
 
+
+### [from_binary(s STRING)](from_binary.sql)
+Returns a number in decimal form from its binary representation.
+
+```sql
+SELECT 
+  bqutil.fn.to_binary(x) AS binary,
+  bqutil.fn.from_binary(bqutil.fn.to_binary(x)) AS x
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|                              binary                              |     x      |
+|------------------------------------------------------------------|------------|
+| 0000000000000000000000000000000000000000000000000000000000000001 |          1 |
+| 0000000000000000000000000000000000000000000000011110001001000000 |     123456 |
+| 0000000000000000000000000000001001001100101100000001011011101010 | 9876543210 |
+| 1111111111111111111111111111111111111111111111111111110000010111 |      -1001 |
+
+
+### [from_hex(s STRING)](from_hex.sql)
+Returns a number in decimal form from its hexadecimal representation.
+
+```sql
+SELECT 
+  bqutil.fn.to_hex(x) AS hex, 
+  bqutil.fn.from_hex(bqutil.fn.to_hex(x)) AS x
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|       hex        |     x      |
+|------------------|------------|
+| 0000000000000001 |          1 |
+| 000000000001e240 |     123456 |
+| 000000024cb016ea | 9876543210 |
+| fffffffffffffc17 |      -1001 |
 
 
 ### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
@@ -334,6 +379,46 @@ SELECT
 
 'tino', 'julie', 'jordan'
 ```
+
+### [to_binary(x INT64)](to_binary.sql)
+Returns a binary representation of a number.
+
+```sql
+SELECT 
+  x, 
+  bqutil.fn.to_binary(x) AS binary
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|     x      |                              binary                              |
+|------------|------------------------------------------------------------------|
+|          1 | 0000000000000000000000000000000000000000000000000000000000000001 |
+|     123456 | 0000000000000000000000000000000000000000000000011110001001000000 |
+| 9876543210 | 0000000000000000000000000000001001001100101100000001011011101010 |
+|      -1001 | 1111111111111111111111111111111111111111111111111111110000010111 |
+
+
+### [to_hex(x INT64)](to_hex.sql)
+Returns a hexadecimal representation of a number.
+
+```sql
+SELECT 
+  x, 
+  bqutil.fn.to_hex(x) AS hex
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+|     x      |       hex        | 
+|------------|------------------|
+|          1 | 0000000000000001 |
+|     123456 | 000000000001e240 |
+| 9876543210 | 000000024cb016ea |
+|      -1001 | fffffffffffffc17 |
 
 
 ### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
