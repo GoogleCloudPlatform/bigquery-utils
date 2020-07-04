@@ -309,3 +309,7 @@ from_hex:
   - test:
     input: CAST('000000000001e240' AS STRING)
     expected_output: CAST(123456 AS INT64)
+getbit:
+  - test:
+    input: CAST(23 AS INT64), CAST(2 AS INT64)
+    expected_output: CAST(1 AS INT64)
