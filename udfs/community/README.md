@@ -14,6 +14,7 @@ SELECT bqutil.fn.int(1.684)
 ## UDFs
 
 * [csv_to_struct](#csv_to_structstrlist-string)
+* [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
@@ -34,6 +35,8 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [week_number_of_month](#week_number_of_monthdate_expression-any-type)
+* [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
@@ -72,6 +75,15 @@ results:
 | a   | b     |
 
 
+### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sql)
+Returns the n th occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
+```sql
+SELECT 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'), 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-08');
+  
+1 2  
+```
 
 ### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
 Returns the first occurance of str in strList where strList is a comma-delimited string.
@@ -403,6 +415,16 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
+### [week_number_of_month(date_expression ANY TYPE)](week_number_of_month.sql)
+Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
+
+```sql
+SELECT 
+  bqutil.fn.week_number_of_month(DATE '2020-07-01'), 
+  bqutil.fn.week_number_of_month(DATE '2020-07-08');
+  
+0 1  
+```
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
 Convert a STRING formatted as a YYYYMMDD to a DATE
