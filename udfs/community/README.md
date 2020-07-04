@@ -28,6 +28,7 @@ SELECT bqutil.fn.int(1.684)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
+* [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [typeof](#typeofinput-any-type)
@@ -333,6 +334,19 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+
+### [random_string(length INT64)](random_string.sql)
+Returns a random string of specified length. Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
+
+```sql
+SELECT
+  bqutil.fn.random_string(5),
+  bqutil.fn.random_string(7),
+  bqutil.fn.random_string(10)
+
+'mb3AP' 'aQG5XYB' '0D5WFVQuq6'
 ```
 
 
