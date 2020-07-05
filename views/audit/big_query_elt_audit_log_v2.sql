@@ -553,7 +553,7 @@ tableDataChangeEvent AS (
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.tableDataChange.deletedRowsCount') AS tableDataChangeDeletedRowsCount,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.datasetCreation.dataset.insertedRowsCount') AS tableDataChangeInsertedRowsCount,
+      '$.tableDataChange.insertedRowsCount') AS tableDataChangeInsertedRowsCount,
     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.tableDataChange.truncated') AS BOOL) AS tableDataChangeTruncated,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
