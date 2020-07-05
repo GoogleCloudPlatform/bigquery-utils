@@ -45,15 +45,17 @@ events.
     
 #### Usage Examples
 Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
-* Retrieve Number of Inserted and Deleted Rows For a Given Table 
+* Retrieve inserted rows, deleted rows, destination table, and jobName for given destination table. 
+  Replace `dest_project_id.dest_dataset_id.dest_table_id` with path to destination table.
   ```  
   SELECT 
     tableDataChange.deletedRowsCount,
     tableDataChange.insertedRowsCount,
-    jobChange.jobStats.queryStats.referencedTables 
+    queryDestinationTableAbsolutePath,
+    tableDataChange.jobName 
   FROM `project_id.dataset_id.table_id` 
-  WHERE jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
-  jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE"
+  WHERE queryDestinationTableAbsolutePath="dest_project_id.dest_dataset_id.dest_table_id" AND (jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
+  jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE")
   
   ``` 
 
