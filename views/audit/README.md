@@ -52,5 +52,6 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
     tableDataChange.insertedRowsCount,
     jobChange.jobStats.queryStats.referencedTables 
   FROM `project_id.dataset_id.table_id` 
-  WHERE "projects/project_id/datasets/dataset_id/tables/table_id" IN UNNEST(jobChange.jobStats.queryStats.referencedTables)
+  WHERE jobChange.jobConfig.queryConfig.statementType="INSERT" OR jobChange.jobConfig.queryConfig.statementType="DELETE" OR     jobChange.jobConfig.queryConfig.statementType="MERGE"
   ``` 
+
