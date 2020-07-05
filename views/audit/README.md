@@ -47,6 +47,7 @@ events.
 Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
 * Retrieve inserted rows, deleted rows, destination table, and jobName for given destination table. 
   Replace `dest_project_id.dest_dataset_id.dest_table_id` with path to destination table.
+  
   ```  
   SELECT 
     tableDataChange.deletedRowsCount,
@@ -58,4 +59,5 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE")
   
   ``` 
+* 
 
