@@ -60,18 +60,19 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE")
   
   ``` 
-* Retrieve job name, job create time, job start time, job end time, and processed bytes, given a job name. 
+* Retrieve job name, query, job create time, job start time, job end time, query, and total billed bytes for SELECT queries. 
   Replace project_id and job_id in `projects/project_id/jobs/job_id` with the respective project_id and job_id
   
   ```
   SELECT 
-   tableDataChange.jobName,
-   queryStats.createTime,
-   queryStats.startTime,
-   queryStats.endTime,
-   queryStats.totalBilledBytes
+   tableDataRead.jobName,
+   jobChange.jobConfig.queryConfig.query,
+   jobChange.jobStats.createTime,
+   jobChange.jobStats.startTime,
+   jobChange.jobStats.endTime,
+   jobChange.jobStats.queryStats.totalBilledBytes
   FROM `project_id.dataset_id.table_id`
-  WHERE tableDataChange.jobName="projects/project_id/jobs/job_id"
+  WHERE jobChange.jobConfig.queryConfig.statementType="SELECT"
 
   ```
 
