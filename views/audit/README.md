@@ -52,6 +52,8 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
     tableDataChange.insertedRowsCount,
     jobChange.jobStats.queryStats.referencedTables 
   FROM `project_id.dataset_id.table_id` 
-  WHERE jobChange.jobConfig.queryConfig.statementType="INSERT" OR jobChange.jobConfig.queryConfig.statementType="DELETE" OR     jobChange.jobConfig.queryConfig.statementType="MERGE"
+  WHERE jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
+  jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE"
+  
   ``` 
 
