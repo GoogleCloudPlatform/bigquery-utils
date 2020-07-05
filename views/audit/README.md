@@ -63,15 +63,15 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
 * Retrieve job name, job create time, job start time, job end time, and processed bytes, given a job name. 
   Replace project_id and job_id in `projects/project_id/jobs/job_id` with the respective project_id and job_id
   
-```
-SELECT 
+  ```
+  SELECT 
    tableDataChange.jobName,
    queryStats.createTime,
    queryStats.startTime,
    queryStats.endTime,
    queryStats.totalBilledBytes
-FROM `project_id.dataset_id.table_id`
-WHERE tableDataChange.jobName="projects/project_id/jobs/job_id"
+  FROM `project_id.dataset_id.table_id`
+  WHERE tableDataChange.jobName="projects/project_id/jobs/job_id"
 
-```
+  ```
 
