@@ -70,6 +70,7 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
    jobChange.jobStats.createTime,
    jobChange.jobStats.startTime,
    jobChange.jobStats.endTime,
+   jobRuntimeMs,
    jobChange.jobStats.queryStats.totalBilledBytes
   FROM `project_id.dataset_id.table_id`
   WHERE jobChange.jobConfig.queryConfig.statementType="SELECT"
