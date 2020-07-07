@@ -13,7 +13,6 @@ public class QueryFixerMain {
       return;
     }
 
-    String query = args[0];
     // TODO: this should act as a command line, which will be developed after the fixer component is ready.
   }
 }

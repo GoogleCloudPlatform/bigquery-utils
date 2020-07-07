@@ -8,24 +8,27 @@ import org.apache.calcite.sql.parser.babel.SqlBabelParserImpl;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.calcite.util.SourceStringReader;
+import org.apache.commons.lang3.reflect.FieldUtils;
+
+import com.google.cloud.bigquery.utils.queryfixer.exception.ParserCreationException;
 
 import java.io.Reader;
+import java.util.Objects;
 
 /**
  * A factory to generate parsers. The fault generated parser is Babel Parser with BigQuery dialect.
- * */
+ */
 public class BigQueryParserFactory {
 
   private final SqlParserImplFactory factory;
   private final Quoting quoting = Quoting.BACK_TICK;
-  private final Casing unquotedCasing = Casing.TO_UPPER;
+  private static final String BackTickQuotingMode = "BTID";
   private final Casing quotedCasing = Casing.UNCHANGED;
   private final SqlConformance conformance = SqlConformanceEnum.DEFAULT;
   private final SqlParser.Config parserConfig;
+  private final Casing unquotedCasing = Casing.UNCHANGED;
 
-  /**
-   * Default initialization with the Babel Parser factory.
-   * */
+  /** Default initialization with the Babel Parser factory. */
   public BigQueryParserFactory() {
     factory = SqlBabelParserImpl.FACTORY;
     this.parserConfig = buildConfig();
@@ -33,7 +36,9 @@ public class BigQueryParserFactory {
 
   /**
    * Initialization with customized factory
-   * @param factory customized factory */
+   *
+   * @param factory customized factory
+   */
   public BigQueryParserFactory(SqlParserImplFactory factory) {
     this.factory = factory;
     this.parserConfig = buildConfig();
@@ -41,6 +46,7 @@ public class BigQueryParserFactory {
 
   /**
    * Get the parser parsing the input query.
+   *
    * @param sql query to parse
    * @return a parser loaded with the query
    */
@@ -49,11 +55,27 @@ public class BigQueryParserFactory {
   }
 
   /**
-   * Get the config of the parser factory
-   * @return parser config
+   * Get the implementation of a parser parsing a query. The implementation provides functions to
+   * tokenize the query.
+   *
+   * @param query the query fed to the parser implementation.
+   * @return SqlBabelParserImpl the parser implementation
    */
-  public SqlParser.Config getParserConfig() {
-    return parserConfig;
+  public SqlBabelParserImpl getBabelParserImpl(String query) {
+    Objects.requireNonNull(query, "the input query should not be null");
+
+    Object parserImpl;
+    try {
+      parserImpl = FieldUtils.readField(getParser(query), "parser", true);
+    } catch (IllegalAccessException e) {
+      throw new ParserCreationException(
+          "unable to extract the parserImpl from the generated parser");
+    }
+
+    if (!(parserImpl instanceof SqlBabelParserImpl)) {
+      throw new ParserCreationException("the factory does not produce Babel Parser");
+    }
+    return (SqlBabelParserImpl) parserImpl;
   }
 
   protected SqlParser getParser(Reader source) {
@@ -71,4 +93,3 @@ public class BigQueryParserFactory {
     return configBuilder.build();
   }
 }
-
