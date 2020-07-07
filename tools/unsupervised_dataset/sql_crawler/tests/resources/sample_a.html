@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>This is a sample website with HTML queries.</h1>
+    <p>There will be queries within the HTML, like this.</p>
+    <p>SELECT a.col, b.col FROM table_a AS a, table_b AS b WHERE a.col = b.col;</p>
+    <p>SELECT a.col, b.col FROM table_a AS a, table_b AS b;</p>
+    <p>There will be other queries as well with different keywords.</p>
+    <p>CREATE TABLE Sample (<br>
+        &nbsp;&nbsp;ColumnA int,<br>
+        &nbsp;&nbsp;ColumnB varchar(255)<br>
+      );
+    </p>
+    <p>Sometimes it might use different tags as well.</p>
+    <h3>SELECT a.col, b.col FROM table_a AS a, table_b AS b WHERE a.col = b.col;</h3>
+    <h2>ALTER TABLE Sample ADD ColumnC varchar(255);</h2>
+    <p> Even if there are SELECT or other keywords, hopefully it should not pick these up.</p>
+  </body>
+</html>
