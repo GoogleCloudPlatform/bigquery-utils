@@ -23,3 +23,10 @@ def test_extract_queries():
     url = "https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax"
     mock_request = MockRequest(url, 200, reader.read())
     assert len(extractor.extract_queries(mock_request)) == 103
+    
+def test_generic_extraction():
+    reader = open("resources/sample_a.html", "r")
+    url = "https://fake.website"
+    mock_request = MockRequest(url, 200, reader.read())
+    queries = extractor.extract_queries(mock_request)
+    assert len(queries) == 5
