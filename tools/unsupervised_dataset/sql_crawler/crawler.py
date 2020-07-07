@@ -10,7 +10,7 @@ class Crawler(object):
         will explore websites to look for SQL queries.
     """
 
-    def __init__(self, links, max_depth=3, max_size=500):
+    def __init__(self, links, max_depth=3, max_size=100):
         """ Initializes the crawler and instance variables.
 
         Args:
