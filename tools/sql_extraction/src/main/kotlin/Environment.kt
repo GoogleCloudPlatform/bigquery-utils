@@ -3,50 +3,50 @@ package com.google.cloud.sqlecosystem.sqlextraction
 import com.google.cloud.sqlecosystem.sqlextraction.output.QueryFragment
 
 /**
- * A mapping from variable name to all possible query fragment values
+ * A mapping from variable name to all possible query fragment values.
  */
 class Environment {
     private var parentScope: Environment?
-    private var reachingDefs: HashMap<String, QueryFragment?>
+    private var variableReference: MutableMap<String, QueryFragment?>
 
     constructor() {
         this.parentScope = null
-        this.reachingDefs = HashMap()
+        this.variableReference = HashMap()
     }
 
     private constructor(copy: Environment) {
         this.parentScope = copy.parentScope
-        this.reachingDefs = copy.reachingDefs
+        this.variableReference = copy.variableReference
     }
 
     /**
      * Declare [varName] as a newly declared variable. Its initial reaching query is null.
-     * [setVariable] only runs successfully for declared variables.
+     * [setVariableReference] only runs successfully for declared variables.
      */
     fun declareVariable(varName: String) {
-        reachingDefs[varName] = null
+        variableReference[varName] = null
     }
 
     /**
      * Checks whether a variable of name [varName] was declared in this current scope.
      *
-     * @return true if variable was declared in this scope
+     * @return true if variable was declared in this scope.
      */
-    fun hasVariableInScope(varName: String): Boolean {
-        return varName in reachingDefs
+    fun isVariableDeclaredInScope(varName: String): Boolean {
+        return varName in variableReference
     }
 
     /**
      * Gets all possible queries for the variable [varName].
      * Variable can be declared in any reachable scope.
      *
-     * @throws[NullPointerException] if variable does not exist
+     * @throws[NullPointerException] if variable does not exist.
      */
-    fun getVariable(varName: String): QueryFragment? {
-        return if (hasVariableInScope(varName)) {
-            reachingDefs[varName]
+    fun getVariableReference(varName: String): QueryFragment? {
+        return if (isVariableDeclaredInScope(varName)) {
+            variableReference[varName]
         } else {
-            parentScope!!.getVariable(varName)
+            parentScope!!.getVariableReference(varName)
         }
     }
 
@@ -55,10 +55,13 @@ class Environment {
      * Variable can be declared in any reachable scope.
      * [default] is returned if variable doesn't exist in any reachable scope.
      */
-    fun getVariableOrDefault(varName: String, default: QueryFragment? = null): QueryFragment? {
+    fun getVariableReferenceOrDefault(
+        varName: String,
+        default: QueryFragment? = null
+    ): QueryFragment? {
         return when {
-            hasVariableInScope(varName) -> reachingDefs[varName]
-            parentScope != null -> parentScope!!.getVariableOrDefault(varName)
+            isVariableDeclaredInScope(varName) -> variableReference[varName]
+            parentScope != null -> parentScope!!.getVariableReferenceOrDefault(varName, default)
             else -> default
         }
     }
@@ -67,30 +70,30 @@ class Environment {
      * Overwrites the possible queries for the variable [varName] existing in the most recent scope.
      * Variable needs to be defined first to be set.
      *
-     * @throws[NullPointerException] if variable does not exist
+     * @throws[NullPointerException] if variable does not exist.
      */
-    fun setVariable(varName: String, query: QueryFragment?) {
-        if (hasVariableInScope(varName)) {
-            reachingDefs[varName] = query
+    fun setVariableReference(varName: String, query: QueryFragment?) {
+        if (isVariableDeclaredInScope(varName)) {
+            variableReference[varName] = query
         } else {
-            parentScope!!.setVariable(varName, query)
+            parentScope!!.setVariableReference(varName, query)
         }
     }
 
     /**
-     * Enter a new variable scope and set it as the most recent scope
+     * Enter a new variable scope and set it as the most recent scope.
      */
     fun pushScope() {
         parentScope = Environment(this)
-        reachingDefs = HashMap()
+        variableReference = HashMap()
     }
 
     /**
-     * Exit the most recent variable scope
+     * Exit the most recent variable scope.
      */
     fun popScope() {
         val prev = parentScope
         parentScope = prev!!.parentScope
-        reachingDefs = prev.reachingDefs
+        variableReference = prev.variableReference
     }
 }

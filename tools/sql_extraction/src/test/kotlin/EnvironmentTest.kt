@@ -13,22 +13,22 @@ internal class EnvironmentTest {
     fun `declareVariable causes hasVariableInScope`() {
         val env = Environment()
 
-        assertFalse(env.hasVariableInScope("test"))
+        assertFalse(env.isVariableDeclaredInScope("test"))
 
         env.declareVariable("test")
 
-        assertTrue(env.hasVariableInScope("test"))
+        assertTrue(env.isVariableDeclaredInScope("test"))
     }
 
     @Test
     fun `getVariable fails for undefined variables`() {
         val env = Environment()
 
-        assertThrows<RuntimeException> { env.getVariable("test") }
+        assertThrows<RuntimeException> { env.getVariableReference("test") }
 
         env.declareVariable("test")
 
-        assertEquals(null, env.getVariable("test"))
+        assertEquals(null, env.getVariableReference("test"))
     }
 
     @Test
@@ -36,12 +36,12 @@ internal class EnvironmentTest {
         val env = Environment()
         val default = mockk<QueryFragment>(relaxed = true)
 
-        assertEquals(default, env.getVariableOrDefault("test", default))
-        assertEquals(null, env.getVariableOrDefault("test2"))
+        assertEquals(default, env.getVariableReferenceOrDefault("test", default))
+        assertEquals(null, env.getVariableReferenceOrDefault("test2"))
 
         env.declareVariable("test")
 
-        assertEquals(null, env.getVariable("test"))
+        assertEquals(null, env.getVariableReference("test"))
     }
 
     @Test
@@ -49,11 +49,11 @@ internal class EnvironmentTest {
         val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
-        assertEquals(null, env.getVariable("test"))
+        assertEquals(null, env.getVariableReference("test"))
 
-        env.setVariable("test", stub)
+        env.setVariableReference("test", stub)
 
-        assertEquals(stub, env.getVariable("test"))
+        assertEquals(stub, env.getVariableReference("test"))
     }
 
     @Test
@@ -62,10 +62,10 @@ internal class EnvironmentTest {
         env.declareVariable("test")
 
         env.pushScope()
-        assertFalse(env.hasVariableInScope("test"))
+        assertFalse(env.isVariableDeclaredInScope("test"))
 
         env.popScope()
-        assertTrue(env.hasVariableInScope("test"))
+        assertTrue(env.isVariableDeclaredInScope("test"))
     }
 
     @Test
@@ -73,13 +73,13 @@ internal class EnvironmentTest {
         val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
-        env.setVariable("test", stub)
+        env.setVariableReference("test", stub)
 
         env.pushScope()
-        assertEquals(stub, env.getVariable("test"))
+        assertEquals(stub, env.getVariableReference("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariable("test"))
+        assertEquals(stub, env.getVariableReference("test"))
     }
 
     @Test
@@ -87,13 +87,13 @@ internal class EnvironmentTest {
         val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
-        env.setVariable("test", stub)
+        env.setVariableReference("test", stub)
 
         env.pushScope()
-        assertEquals(stub, env.getVariableOrDefault("test"))
+        assertEquals(stub, env.getVariableReferenceOrDefault("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariableOrDefault("test"))
+        assertEquals(stub, env.getVariableReferenceOrDefault("test"))
     }
 
     @Test
@@ -102,12 +102,12 @@ internal class EnvironmentTest {
         val env = Environment()
         env.declareVariable("test")
         env.pushScope()
-        assertEquals(null, env.getVariable("test"))
+        assertEquals(null, env.getVariableReference("test"))
 
-        env.setVariable("test", stub)
-        assertEquals(stub, env.getVariable("test"))
+        env.setVariableReference("test", stub)
+        assertEquals(stub, env.getVariableReference("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariable("test"))
+        assertEquals(stub, env.getVariableReference("test"))
     }
 }

@@ -8,15 +8,15 @@ import mu.KotlinLogging
 private val LOGGER = KotlinLogging.logger { }
 
 /**
- * Backend engine for running data-flow analysis
+ * Backend engine for running data-flow analysis.
  *
  * @see FrontEnd
  */
 class DataFlowEngine(private val environment: Environment = Environment()) {
-    private val queryUsages: HashMap<QueryFragment, HashSet<Location>> = HashMap()
+    private val queryUsages: MutableMap<QueryFragment, HashSet<Location>> = HashMap()
 
     /**
-     * Returns all query fragments and usages found by the engine thus far
+     * Returns all query fragments and usages found by the engine thus far.
      */
     fun getAllQueries(): Sequence<QueryUsages> {
         return queryUsages.asSequence()
@@ -25,26 +25,26 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
-     * Visits method scope from an Antlr visitor
+     * Visits method scope from an Antlr Visitor.
      *
-     * @param[visitChildren] function to visit the rest of the method
+     * @param[visitChildren] function to visit the rest of the method.
      */
     fun visitMethod(visitChildren: () -> Unit) {
         visitScope(visitChildren)
     }
 
     /**
-     * Associates [paramName] as a method argument for the most recently called [visitMethod]
+     * Associates [paramName] as a method argument for the most recently called [visitMethod].
      */
     fun addMethodParameter(paramName: String) {
-        LOGGER.debug("add method parameter $paramName")
+        LOGGER.debug("Add method parameter $paramName.")
         environment.declareVariable(paramName)
     }
 
     /**
-     * Visits a variable scope or a block from an Antlr visitor
+     * Visits a variable scope or a block from an Antlr visitor.
      *
-     * @param[visitChildren] function to visit the rest of the scope block
+     * @param[visitChildren] function to visit the rest of the scope block.
      */
     fun visitScope(visitChildren: () -> Unit) {
         environment.pushScope()
@@ -53,17 +53,17 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
-     * Visits a variable declaration with the namee [variableName]
+     * Visits a variable declaration with the namee [variableName].
      */
     fun declareVariable(variableName: String) {
-        LOGGER.debug("declare variable $variableName")
+        LOGGER.debug("Declare variable $variableName.")
         environment.declareVariable(variableName)
     }
 
     /**
      * Marks [usage] as one of the part of code where [query] is used.
      *
-     * Usage examples: method call argument, return, added to non-local data structure, etc
+     * Usage examples: method call argument, return, added to non-local data structure, etc.
      */
     private fun addUsage(query: QueryFragment, usage: Location) {
         queryUsages.computeIfAbsent(query) { HashSet() }.add(usage)
