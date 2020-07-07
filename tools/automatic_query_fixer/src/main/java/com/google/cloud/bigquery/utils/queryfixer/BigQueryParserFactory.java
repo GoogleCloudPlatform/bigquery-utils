@@ -20,18 +20,15 @@ import java.util.Objects;
  */
 public class BigQueryParserFactory {
 
-  private final SqlParserImplFactory factory;
-  private final Quoting quoting = Quoting.BACK_TICK;
-  private static final String BackTickQuotingMode = "BTID";
-  private final Casing quotedCasing = Casing.UNCHANGED;
-  private final SqlConformance conformance = SqlConformanceEnum.DEFAULT;
+  private static final Quoting quoting = Quoting.BACK_TICK;
+  private static final Casing quotedCasing = Casing.UNCHANGED;
+  private static final SqlConformance conformance = SqlConformanceEnum.DEFAULT;
   private final SqlParser.Config parserConfig;
-  private final Casing unquotedCasing = Casing.UNCHANGED;
+  private static final Casing unquotedCasing = Casing.UNCHANGED;
 
   /** Default initialization with the Babel Parser factory. */
   public BigQueryParserFactory() {
-    factory = SqlBabelParserImpl.FACTORY;
-    this.parserConfig = buildConfig();
+    this(SqlBabelParserImpl.FACTORY);
   }
 
   /**
@@ -40,8 +37,7 @@ public class BigQueryParserFactory {
    * @param factory customized factory
    */
   public BigQueryParserFactory(SqlParserImplFactory factory) {
-    this.factory = factory;
-    this.parserConfig = buildConfig();
+    this.parserConfig = buildConfig(factory);
   }
 
   /**
@@ -82,7 +78,7 @@ public class BigQueryParserFactory {
     return SqlParser.create(source, parserConfig);
   }
 
-  private SqlParser.Config buildConfig() {
+  private SqlParser.Config buildConfig(SqlParserImplFactory factory) {
     final SqlParser.ConfigBuilder configBuilder =
         SqlParser.configBuilder()
             .setParserFactory(factory)
