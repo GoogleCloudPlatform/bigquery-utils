@@ -47,17 +47,21 @@ events.
 Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
 
 * Given a destination table, Retrieve inserted rows, deleted rows, destination table, and jobName for DML queries. 
-  Replace `dest_project_id.dest_dataset_id.dest_table_id` with path to destination table.
+  
   
   ```  
   SELECT 
+    tableDataChange.jobName,
+    jobChange.jobConfig.queryConfig.query,
+    jobChange.jobStats.createTime,
+    jobChange.jobStats.startTime,
+    jobChange.jobStats.endTime,
+    jobRuntimeMs,
     tableDataChange.deletedRowsCount,
     tableDataChange.insertedRowsCount,
-    queryDestinationTableAbsolutePath,
-    tableDataChange.jobName 
-  FROM `project_id.dataset_id.table_id` 
-  WHERE queryDestinationTableAbsolutePath="dest_project_id.dest_dataset_id.dest_table_id" AND (jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
-  jobChange.jobConfig.queryConfig.statementType="DELETE" OR jobChange.jobConfig.queryConfig.statementType="MERGE")
+    jobChange.jobStats.queryStats.totalBilledBytes
+  FROM `project_id.dataset_id.table_id`  
+  GROUP BY jobChange.jobConfig.queryConfig.statementType
   
   ``` 
 * Retrieve job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
