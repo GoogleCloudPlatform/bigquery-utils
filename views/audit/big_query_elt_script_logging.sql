@@ -561,28 +561,6 @@ tableDataChangeEvent AS (
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.tableDataChange.jobName') AS tableDataChangeJobName,
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
-),
-/*
- * ModelDataChange: Model data change event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldatachange
- */
-modelDataChangeEvent AS (
-  SELECT
-    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.modelDataChange.reason')
-    AS modelDataChangeReason,
-    CONCAT(
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-            '$.modelDataChange.jobName'),
-            "/")[SAFE_OFFSET(1)],
-      ":",
-      SPLIT(
-        JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.modelDataChange.jobName'),
-            "/")[SAFE_OFFSET(3)]
-    ) AS jobId,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
 )
  -- End of WITH clauses
 SELECT
@@ -797,7 +775,6 @@ FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
 LEFT JOIN tableDeletionEvent USING(jobId)
 LEFT JOIN tableDataReadEvent USING(jobId)
-LEFT JOIN modelDataChangeEvent USING(jobId)
 WHERE
   /*
    * Currently, BigQuery Scripting jobs do not emit jobChange events, they only produce a jobInsertion event.
