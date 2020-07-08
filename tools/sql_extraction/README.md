@@ -1,5 +1,7 @@
 # SQL Extraction
 
+![SQL Extraction](https://github.com/GoogleCloudPlatform/bigquery-utils/workflows/SQL%20Extraction/badge.svg)
+
 This directory contains a command-line application that can
 - Locate raw SQL query strings and their usage within code
 - Extract and return the SQL query strings from the code
