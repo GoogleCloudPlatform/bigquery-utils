@@ -22,7 +22,7 @@ events.
         Note: gcloud **alpha** is needed in order to use the parameter `--use-partitioned-tables` 
     *   [Cloud Console Logs Viewer](https://cloud.google.com/logging/docs/export/configure_export_v2#dest-create)
         Use this filter:
-        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" OR protoPayload.metadata.modelDataChange.reason!="" )
+        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" )
         *   Make sure to select
             [partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
             for your BigQuery destination
@@ -61,8 +61,21 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
     tableDataChange.insertedRowsCount,
     jobChange.jobStats.queryStats.totalBilledBytes
   FROM `project_id.dataset_id.table_id`  
-  GROUP BY jobChange.jobConfig.queryConfig.statementType
-  
+  WHERE 
+   jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
+   jobChange.jobConfig.queryConfig.statementType="DELETE" OR 
+   jobChange.jobConfig.queryConfig.statementType="UPDATE" OR 
+   jobChange.jobConfig.queryConfig.statementType="MERGE"
+  GROUP BY 
+   jobChange.jobConfig.queryConfig.statementType,tableDataChange.jobName,
+   jobChange.jobConfig.queryConfig.query,
+   jobChange.jobStats.createTime,
+   jobChange.jobStats.startTime,
+   jobChange.jobStats.endTime,
+   jobRuntimeMs,
+   tableDataChange.deletedRowsCount,
+   tableDataChange.insertedRowsCount,
+   jobChange.jobStats.queryStats.totalBilledBytes
   ``` 
 * Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
   
