@@ -22,7 +22,7 @@ events.
         Note: gcloud **alpha** is needed in order to use the parameter `--use-partitioned-tables` 
     *   [Cloud Console Logs Viewer](https://cloud.google.com/logging/docs/export/configure_export_v2#dest-create)
         Use this filter:
-        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason="QUERY" )
+        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason="" OR protoPayload.metadata.tableDataRead.reason=""  OR protoPayload.metadata.tableDeletion.reason="" OR protoPayload.metadata.modelDataChange.reason="" 
         *   Make sure to select
             [partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
             for your BigQuery destination
