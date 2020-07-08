@@ -81,7 +81,7 @@ public class Utils {
 		writeFile(outputs.get("BQ_tokenized"), outputDirectory + "/bq_tokenized.txt");
 		writeFile(outputs.get("Postgre_skeletons"), outputDirectory + "/postgre_skeleton.txt");
 		writeFile(outputs.get("Postgre_tokenized"), outputDirectory + "/postgre_tokenized.txt");
-		// TODO: write sample data to file
+		// TODO(spoiledhua): write sample data to file
 
 		System.out.println("The output is stored at " + outputDirectory);
 	}
@@ -158,7 +158,7 @@ public class Utils {
 	 * @param fileName relative path of the config file
 	 * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
 	 */
-	public static ImmutableMap<String, String> makeImmutableMap(String fileName, Keywords keywordsSet) {
+	public static ImmutableMap<String, String> makeImmutableMap(String fileName, ImmutableSet<String> keywords) {
 		ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
@@ -166,7 +166,7 @@ public class Utils {
 			while ((line = reader.readLine()) != null) {
 				if (!(line.charAt(0) == '/' && line.charAt(1) == '/')) {
 					String[] pair = line.split(":");
-					if (keywordsSet.inKeywordsSet(pair[0])) {
+					if (keywords.contains(pair[0])) {
 						builder.put(pair[0], pair[1]);
 					}
 				}
