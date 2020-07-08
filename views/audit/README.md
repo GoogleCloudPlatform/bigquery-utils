@@ -46,7 +46,7 @@ events.
 #### Usage Examples
 Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
 
-* Given a destination table, Retrieve inserted rows, deleted rows, destination table, and jobName for DML queries. 
+* Run this query to see job name, query, create time, start time, end time, job runtime, count of inserted rows and deleted rows, and total billed bytes
   
   
   ```  
@@ -64,7 +64,7 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   GROUP BY jobChange.jobConfig.queryConfig.statementType
   
   ``` 
-* Retrieve job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
+* Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
   
   ```
   SELECT 
