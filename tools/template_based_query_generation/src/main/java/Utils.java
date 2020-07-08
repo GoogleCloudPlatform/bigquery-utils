@@ -1,6 +1,7 @@
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -50,10 +51,10 @@ public class Utils {
 
 		for (int i = 0; i < length; i++) {
 			int randomIndex = (int) (random.nextDouble() * CHARSET.length());
-			char randomChar = CHARSET.charAt(randomIndex);
+			char randomChar = CHARSET.charAt(random.nextInt(0, 63));
 			if (i == 0 && Character.isDigit(randomChar)) {
 				// SQL identifiers can't start with digits, so replace with an arbitrary character
-				randomChar = 'a';
+				randomChar = CHARSET.charAt(random.nextInt(0, 52));
 			}
 			sb.append(randomChar);
 		}
@@ -129,6 +130,7 @@ public class Utils {
 	 * @return an immutable set of keywords from the config file
 	 */
 	public static ImmutableSet<String> makeImmutableSet(String fileName) {
+		Gson gson = new Gson();
 		ImmutableList.Builder<String> builder = ImmutableList.builder();
 
 		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
@@ -176,10 +178,7 @@ public class Utils {
 		ImmutableMap<String, String> map = builder.build();
 
 		return map;
-
-		// TODO: assert that duplicates are never inputted
 	}
 
-	// TODO: refactor IO exception handling
-	// how much error handling should we account for?
+	// TODO(spoiledhua): refactor IO exception handling
 }
