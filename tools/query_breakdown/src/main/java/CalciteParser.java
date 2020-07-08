@@ -7,6 +7,10 @@ import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.sql.parser.babel.SqlBabelParserImpl;
 import org.apache.calcite.sql.dialect.CalciteSqlDialect;
 
+/**
+ * This class is where the logic for CalciteParser lives. Through instantiating the object, the
+ * Calcite Parser can be used as a blackbox.
+ */
 public class CalciteParser implements Parser {
   SqlParser.Config config;
 
