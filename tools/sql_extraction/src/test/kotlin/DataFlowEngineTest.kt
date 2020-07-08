@@ -2,7 +2,6 @@ package com.google.cloud.sqlecosystem.sqlextraction
 
 import io.mockk.confirmVerified
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
 import io.mockk.verifyOrder
 import kotlin.test.Test
@@ -11,14 +10,13 @@ class DataFlowEngineTest {
     @Test
     fun `visitScope pushes and pops env scope`() {
         val env = mockk<Environment>(relaxUnitFun = true)
-        val func = spyk<() -> Unit> {}
 
         val engine = DataFlowEngine(env)
-        engine.visitScope { func() }
+        engine.visitScope { env.declareVariable("<>_stub") }
 
         verifyOrder {
             env.pushScope()
-            func()
+            env.declareVariable("<>_stub")
             env.popScope()
         }
         confirmVerified()
@@ -27,14 +25,13 @@ class DataFlowEngineTest {
     @Test
     fun `visitMethod pushes and pops env scope`() {
         val env = mockk<Environment>(relaxUnitFun = true)
-        val func = spyk<() -> Unit> {}
 
         val engine = DataFlowEngine(env)
-        engine.visitMethod { func() }
+        engine.visitMethod { env.declareVariable("<>_stub") }
 
         verifyOrder {
             env.pushScope()
-            func()
+            env.declareVariable("<>_stub")
             env.popScope()
         }
         confirmVerified()
