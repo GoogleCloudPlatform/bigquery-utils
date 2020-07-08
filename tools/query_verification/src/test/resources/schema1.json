@@ -1,0 +1,11 @@
+[
+  {
+    "schema": {
+      "fields": []
+    },
+    "tableReference": {
+      "datasetId": "dataset",
+      "tableId": "table"
+    }
+  }
+]

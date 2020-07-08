@@ -1,6 +1,12 @@
 package com.google.bigquery;
 
+import com.google.cloud.bigquery.*;
+import com.google.gson.*;
+
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Contains the logic to run query verification.
@@ -38,7 +44,48 @@ public class QueryVerifier {
     public void verifyDataFree() {
         boolean verificationResult = false;
 
-        // TODO Implement data free verification
+        BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
+
+        List<Table> tables = new ArrayList<Table>();
+
+        // Create tables based on schema
+        if (migratedSchema != null) {
+            if (migratedSchema.isInJsonFormat()) {
+                try {
+                    TableInfo tableInfo = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
+                    Table table = bigQuery.create(tableInfo);
+                    tables.add(table);
+                } catch (NullPointerException e) {
+                    System.out.println(migratedSchema.path() + " is not correctly formatted.");
+                }
+            } else {
+                // TODO Load schema from DDL
+            }
+        }
+
+        // Create dry-run job
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(migratedQuery.query())
+                .setDryRun(true)
+                .build();
+        JobId jobId = JobId.of(UUID.randomUUID().toString());
+        JobInfo jobInfo = JobInfo.newBuilder(queryConfig)
+                .setJobId(jobId)
+                .build();
+
+        // TODO Support multiple queries
+
+        try {
+            // Run dry-run
+            Job queryJob = bigQuery.create(jobInfo);
+            verificationResult = queryJob.getStatistics() != null;
+        } catch (BigQueryException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Clear tables created
+        for (Table table : tables) {
+            BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId());
+        }
 
         System.out.printf("Data-Free Verification %s\n", verificationResult ? "Succeeded" : "Failed");
     }
@@ -52,6 +99,30 @@ public class QueryVerifier {
         // TODO Implement data aware verification
 
         System.out.printf("Data-Aware Verification %s\n", verificationResult ? "Succeeded" : "Failed");
+    }
+
+    /**
+     * Reads JSON schema to create table fields based on the schema
+     * @param queryVerificationSchema Schema to read from
+     * @return New table info
+     */
+    public static TableInfo getTableInfoFromJsonSchema(QueryVerificationSchema queryVerificationSchema) {
+        // TODO Support multiple table schema
+        JsonObject schemaObject = queryVerificationSchema.getJsonArray().get(0).getAsJsonObject();
+
+        JsonArray schemaFields = schemaObject.getAsJsonObject("schema").getAsJsonArray("fields");
+        JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
+
+        // Deserialize fields
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
+                .create();
+        FieldList fieldList = gson.fromJson(schemaFields, FieldList.class);
+        Schema schema = Schema.of(fieldList);
+        TableDefinition tableDefinition = StandardTableDefinition.of(schema);
+
+        TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
+        return TableInfo.newBuilder(tableId, tableDefinition).build();
     }
 
 }
