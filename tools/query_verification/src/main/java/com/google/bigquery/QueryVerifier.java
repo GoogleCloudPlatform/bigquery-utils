@@ -50,16 +50,16 @@ public class QueryVerifier {
 
         // Create tables based on schema
         if (migratedSchema != null) {
-            try {
-                if (migratedSchema.isInJsonFormat()) {
-                    TableInfo tableInfo = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
+            if (migratedSchema.isInJsonFormat()) {
+                TableInfo tableInfo = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
+                if (tableInfo != null) {
                     Table table = bigQuery.create(tableInfo);
                     tables.add(table);
                 } else {
-                    // TODO Load schema from DDL
+                    System.out.println(migratedSchema.path() + " is not correctly formatted.");
                 }
-            } catch (NullPointerException e) {
-                System.out.println(migratedSchema.path() + " is not correctly formatted.");
+            } else {
+                // TODO Load schema from DDL
             }
         }
 
@@ -77,8 +77,9 @@ public class QueryVerifier {
         try {
             // Run dry-run
             Job queryJob = bigQuery.create(jobInfo);
-            verificationResult = queryJob.getStatistics() != null;
+            verificationResult = queryJob.getStatus().getState() == JobStatus.State.DONE;
         } catch (BigQueryException e) {
+            // Print out syntax/semantic errors returned from BQ
             System.out.println(e.getMessage());
         }
 
@@ -115,19 +116,31 @@ public class QueryVerifier {
         // TODO Support multiple table schema
         JsonObject schemaObject = queryVerificationSchema.getJsonArray().get(0).getAsJsonObject();
 
+        if (!schemaObject.has("fields") || !schemaObject.has("tableReference")) {
+            return null;
+        }
         JsonArray schemaFields = schemaObject.getAsJsonArray("fields");
         JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
 
         // Deserialize fields
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
-                .create();
-        FieldList fieldList = gson.fromJson(schemaFields, FieldList.class);
+        FieldList fieldList;
+        try {
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
+                    .create();
+            fieldList = gson.fromJson(schemaFields, FieldList.class);
+        } catch (NullPointerException e) {
+            return null;
+        }
         Schema schema = Schema.of(fieldList);
         TableDefinition tableDefinition = StandardTableDefinition.of(schema);
 
-        TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
-        return TableInfo.newBuilder(tableId, tableDefinition).build();
+        if (tableReference.has("datasetId") && tableReference.has("tableId")) {
+            TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
+            return TableInfo.newBuilder(tableId, tableDefinition).build();
+        } else {
+            return null;
+        }
     }
 
 }
