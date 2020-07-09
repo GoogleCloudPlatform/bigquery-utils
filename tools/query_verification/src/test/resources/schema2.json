@@ -1,31 +1,29 @@
 [
   {
-    "schema": {
-      "fields": [
-        {
-          "name": "stringField",
-          "type": "STRING",
-          "mode": "NULLABLE"
-        },
-        {
-          "name": "integerField",
-          "type": "INT64",
-          "mode": "REQUIRED",
-          "description": "This field stores integers."
-        },
-        {
-          "name": "structField",
-          "type": "STRUCT",
-          "mode": "REPEATED",
-          "fields": [
-            {
-              "name": "integerField",
-              "type": "INT64"
-            }
-          ]
-        }
-      ]
-    },
+    "fields": [
+      {
+        "name": "stringField",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "integerField",
+        "type": "INT64",
+        "mode": "REQUIRED",
+        "description": "This field stores integers."
+      },
+      {
+        "name": "structField",
+        "type": "STRUCT",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "integerField",
+            "type": "INT64"
+          }
+        ]
+      }
+    ],
     "tableReference": {
       "datasetId": "dataset",
       "tableId": "table"

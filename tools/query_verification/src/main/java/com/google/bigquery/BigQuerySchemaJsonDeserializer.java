@@ -20,17 +20,19 @@ public class BigQuerySchemaJsonDeserializer implements JsonDeserializer<FieldLis
         for (JsonElement fieldElement : fieldsArray) {
             JsonObject fieldObject = fieldElement.getAsJsonObject();
 
-            // Field class uses LegacySQLTypeName for type
+            // Field class stores types as LegacySQLTypeName instead of StandardSQLTypeName
             if (fieldObject.has("type")) {
+                // Convert standard type to legacy type
                 StandardSQLTypeName standardType = StandardSQLTypeName.valueOf(fieldObject.get("type").getAsString());
                 LegacySQLTypeName legacyType = LegacySQLTypeName.legacySQLTypeName(standardType);
 
+                // Insert LegacySQLTypeName object so it can be used for type
                 JsonObject typeObject = new JsonObject();
                 typeObject.addProperty("constant", legacyType.name());
                 fieldObject.add("type", typeObject);
             }
 
-            // Field class uses subFields instead of fields
+            // Field class uses subFields instead of fields for STRUCT/RECORD type
             if (fieldObject.has("fields")) {
                 fieldObject.add("subFields", fieldObject.get("fields"));
                 fieldObject.remove("fields");

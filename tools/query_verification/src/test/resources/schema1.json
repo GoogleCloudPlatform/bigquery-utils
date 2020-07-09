@@ -1,8 +1,6 @@
 [
   {
-    "schema": {
-      "fields": []
-    },
+    "fields": [],
     "tableReference": {
       "datasetId": "dataset",
       "tableId": "table"

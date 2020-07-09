@@ -50,16 +50,16 @@ public class QueryVerifier {
 
         // Create tables based on schema
         if (migratedSchema != null) {
-            if (migratedSchema.isInJsonFormat()) {
-                try {
+            try {
+                if (migratedSchema.isInJsonFormat()) {
                     TableInfo tableInfo = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
                     Table table = bigQuery.create(tableInfo);
                     tables.add(table);
-                } catch (NullPointerException e) {
-                    System.out.println(migratedSchema.path() + " is not correctly formatted.");
+                } else {
+                    // TODO Load schema from DDL
                 }
-            } else {
-                // TODO Load schema from DDL
+            } catch (NullPointerException e) {
+                System.out.println(migratedSchema.path() + " is not correctly formatted.");
             }
         }
 
@@ -106,11 +106,16 @@ public class QueryVerifier {
      * @param queryVerificationSchema Schema to read from
      * @return New table info
      */
+    @Nullable
     public static TableInfo getTableInfoFromJsonSchema(QueryVerificationSchema queryVerificationSchema) {
+        if (queryVerificationSchema.getJsonArray().size() == 0) {
+            return null;
+        }
+
         // TODO Support multiple table schema
         JsonObject schemaObject = queryVerificationSchema.getJsonArray().get(0).getAsJsonObject();
 
-        JsonArray schemaFields = schemaObject.getAsJsonObject("schema").getAsJsonArray("fields");
+        JsonArray schemaFields = schemaObject.getAsJsonArray("fields");
         JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
 
         // Deserialize fields
