@@ -5,15 +5,15 @@ import org.apache.calcite.sql.parser.babel.Token;
 
 import com.google.cloud.bigquery.utils.queryfixer.entity.IToken;
 import com.google.cloud.bigquery.utils.queryfixer.entity.TokenImpl;
+import com.google.common.base.Preconditions;
 
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * A processor provides methods for query and token. It can be used to tokenize queries, find tokens based on
+ * A processor provides methods for queries and tokens. It can be used to tokenize queries, find tokens based on
  * positions, and modify a query in token-level.
  * */
 @AllArgsConstructor
@@ -22,17 +22,17 @@ public class QueryTokenProcessor {
   private final BigQueryParserFactory parserFactory;
 
   /**
-   * tokenize a query and return all its tokens.
-   * @param sql the query to be tokenized
+   * Tokenize a query and return all its tokens.
+   * @param query the query to be tokenized
    * @return a list of tokens of the query
    */
-  public List<IToken> getAllTokens(String sql) {
-    Objects.requireNonNull(sql, "input query should not be null");
+  public List<IToken> getAllTokens(String query) {
+    Preconditions.checkNotNull(query, "Input query should not be null.");
 
     List<IToken> tokens = new ArrayList<>();
 
     // SqlBabelParserImpl has a token manager to tokenize the input query.
-    SqlBabelParserImpl parserImpl = parserFactory.getBabelParserImpl(sql);
+    SqlBabelParserImpl parserImpl = parserFactory.getBabelParserImpl(query);
 
     Token token;
     final int EndKind = 0;

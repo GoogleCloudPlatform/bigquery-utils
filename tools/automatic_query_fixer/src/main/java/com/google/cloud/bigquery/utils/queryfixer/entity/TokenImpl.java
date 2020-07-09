@@ -21,19 +21,19 @@ public class TokenImpl implements IToken {
     return token.image;
   }
 
-  @Override public int getBeginLine() {
+  @Override public int getBeginRow() {
     return token.beginLine;
   }
 
-  @Override public int getBeginCol() {
+  @Override public int getBeginColumn() {
     return token.beginColumn;
   }
 
-  @Override public int getEndLine() {
+  @Override public int getEndRow() {
     return token.endLine;
   }
 
-  @Override public int getEndCol() {
+  @Override public int getEndColumn() {
     return token.endColumn;
   }
 
@@ -45,8 +45,4 @@ public class TokenImpl implements IToken {
   @Override public String toString() {
     return  String.format("%s [%d:%d]", token.image, token.beginLine, token.beginColumn);
   }
-
-  //  public static TokenImpl newToken(int ofKind) {
-//    return new TokenImpl(Token.newToken(ofKind));
-//  }
 }

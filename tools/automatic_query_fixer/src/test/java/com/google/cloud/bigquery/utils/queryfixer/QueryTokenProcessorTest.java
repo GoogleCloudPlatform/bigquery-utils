@@ -15,16 +15,16 @@ public class QueryTokenProcessorTest {
   }
 
   @Test
-  public void convertSqlToTokens() {
+  public void convertQueryToTokens() {
     QueryTokenProcessor tokenService = createService();
-    String sql = "Select col from `d1.t1`\n" +
-        "where t1.col>'val'";
+    String sql = "Select col from `d1.t1`\n" + "where t1.col>'val'";
 
     List<IToken> tokens = tokenService.getAllTokens(sql);
     assertEquals(10, tokens.size());
     for (IToken token : tokens) {
       System.out.println(token);
     }
+    assertEquals("Select", tokens.get(0).getImage());
+    assertEquals("'val'", tokens.get(tokens.size() - 1).getImage());
   }
-
 }
