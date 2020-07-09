@@ -84,7 +84,7 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   WHERE jobChange.jobConfig.queryConfig.statementType="SELECT"
 
   ```
-** Run this query to see reservation usage and runtime for jobs from a specific project. Replace ```project_id``` with respect project id.
+** Run this query to see reservation usage and runtime for jobs from a specific project. Replace ```project_id``` with respective project id.
 
 ```
 
