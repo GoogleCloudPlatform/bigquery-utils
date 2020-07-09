@@ -87,7 +87,6 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
 * Run this query to see reservation usage and runtime for jobs from a specific project. Replace ```project_id``` with respective project id.
   
   ```
-
   SELECT 
    tableDataChange.jobName,
    jobChange.jobStats.reservationUsage.name,
