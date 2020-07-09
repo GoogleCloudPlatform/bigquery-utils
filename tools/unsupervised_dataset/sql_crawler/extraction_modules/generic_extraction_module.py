@@ -2,7 +2,7 @@
 import html
 import re
 
-REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP|INSERT|UPDATE) (?:(?!;|[.:]\s).)*;"
+REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP|INSERT|UPDATE|EXEC|CALL|USING) (?:(?!;|[.:]\s).)*;"
 
 class GenericExtractionModule():
     """ A module to extract SQL queries from any website without knowing the HTML

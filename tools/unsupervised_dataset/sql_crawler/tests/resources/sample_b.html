@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>This is another sample website with HTML queries.</h1>
+    <p>There will be queries within the HTML, like this.</p>
+    <p>SELECT a.col, b.col FROM table_a AS a, table_b AS b WHERE a.col = b.col;</p>
+    <p>SELECT a.col, b.col FROM table_a AS a, table_b AS b;</p>
+    <p>There will be other queries as well with different keywords.</p>
+    <p>CREATE TABLE Sample (<br>
+        &nbsp;&nbsp;ColumnA int,<br>
+        &nbsp;&nbsp;ColumnB varchar(255)<br>
+      );
+    </p>
+    <p><a href="https://drive.google.com">Hyperlinks</a> like this should work.</p>
+    <p> Even if there are SELECT or other keywords in the middle of text, hopefully it should not think these are queries.</p>
+    <h3>SELECT a.col, b.col FROM table_a AS a, table_b AS b WHERE a.col = b.col;</h3>
+    <p> If there are multiple queries within the same tag, it should not be a problem.</p>
+    <p>ALTER TABLE Sample ADD ColumnC varchar(255);<br>
+    SELECT a.col, b.col FROM a, b WHERE a.col = 5;
+    </p>
+    <p> If the query is after a normal sentence, it should still work. SELECT c.col FROM table_c as c;</p>
+    <p> SELECT statements look like this: SELECT d.col from table_d as d;</p>
+    <a href="https://www.google.com">Hello.</a>
+  </body>
+</html>
