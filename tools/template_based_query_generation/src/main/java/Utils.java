@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -17,7 +18,7 @@ public class Utils {
 
 	private static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
-	private static final int lowerBound = 0;
+	private static final int lowerBound = 1;
 
 	private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
@@ -29,8 +30,8 @@ public class Utils {
 	 * @throws IllegalArgumentException if upperBound is negative
 	 */
 	public static int getRandomInteger(int upperBound) throws IllegalArgumentException {
-		if (upperBound < 0) {
-			throw new IllegalArgumentException("Upper bound cannot be negative");
+		if (upperBound < 1) {
+			throw new IllegalArgumentException("Upper bound cannot be nonpositive");
 		}
 
 		return random.nextInt(lowerBound, upperBound + 1);
@@ -50,8 +51,7 @@ public class Utils {
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < length; i++) {
-			int randomIndex = (int) (random.nextDouble() * CHARSET.length());
-			char randomChar = CHARSET.charAt(random.nextInt(0, 63));
+			char randomChar = CHARSET.charAt(random.nextInt(0, CHARSET.length()));
 			if (i == 0 && Character.isDigit(randomChar)) {
 				// SQL identifiers can't start with digits, so replace with an arbitrary character
 				randomChar = CHARSET.charAt(random.nextInt(0, 52));
@@ -65,22 +65,15 @@ public class Utils {
 	/**
 	 * Writes generated outputs to a specified directory, creating one if it doesn't exist.
 	 *
-	 * @param outputs       collection of statements to write
-	 * @param directoryName relative path of a specified directory
+	 * @param outputs         collection of statements to write
+	 * @param outputDirectory relative path of a specified directory
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
-	public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, String directoryName) throws IOException {
-		String outputDirectory = getOutputDirectory(directoryName);
-		File file = new File(outputDirectory);
-
-		if (!file.exists() && !file.mkdir()) {
-			throw new FileNotFoundException("No such directory or the directory could not be created");
-		}
-
-		writeFile(outputs.get("BQ_skeletons"), outputDirectory + "/bq_skeleton.txt");
-		writeFile(outputs.get("BQ_tokenized"), outputDirectory + "/bq_tokenized.txt");
-		writeFile(outputs.get("Postgre_skeletons"), outputDirectory + "/postgre_skeleton.txt");
-		writeFile(outputs.get("Postgre_tokenized"), outputDirectory + "/postgre_tokenized.txt");
+	public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Path outputDirectory) throws IOException {
+		writeFile(outputs.get("BQ_skeletons"), outputDirectory.resolve("bq_skeleton.txt"));
+		writeFile(outputs.get("BQ_tokenized"), outputDirectory.resolve("bq_tokenized.txt"));
+		writeFile(outputs.get("Postgre_skeletons"), outputDirectory.resolve("postgre_skeleton.txt"));
+		writeFile(outputs.get("Postgre_tokenized"), outputDirectory.resolve("postgre_tokenized.txt"));
 		// TODO(spoiledhua): write sample data to file
 
 		System.out.println("The output is stored at " + outputDirectory);
@@ -93,18 +86,25 @@ public class Utils {
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
 	public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs) throws IOException {
-		writeDirectory(outputs, "outputs");
+		String outputDirectory = getOutputDirectory("outputs");
+		File file = new File(outputDirectory);
+
+		if (!file.exists() && !file.mkdir()) {
+			throw new FileNotFoundException("The default \"output\" directory could not be created");
+		}
+
+		writeDirectory(outputs, file.toPath());
 	}
 
 	/**
 	 * Writes generated statements to a specified file and creates all necessary files.
 	 *
 	 * @param statements skeletons or tokenized queries to write
-	 * @param fileName   absolute path of a specified file
+	 * @param outputPath absolute path of a specified file
 	 * @throws IOException if the IO fails or creating the necessary files or folders fails
 	 */
-	public static void writeFile(ImmutableList<String> statements, String fileName) throws IOException {
-		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName), UTF_8)) {
+	public static void writeFile(ImmutableList<String> statements, Path outputPath) throws IOException {
+		try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
 			for (String statement : statements) {
 				writer.write(statement);
 				writer.write("\n");
