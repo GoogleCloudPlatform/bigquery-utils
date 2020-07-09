@@ -9,6 +9,8 @@ import bs4
 import sql_crawler.extraction_modules.generic_extraction_module as generic_extraction
 import sql_crawler.extraction_modules.google_extraction_module as google_extraction
 
+GOOGLE_CLOUD = "cloud.google.com"
+
 def extract_links(html):
     """ Extracts links from HTML content of a site.
 
@@ -61,8 +63,7 @@ def retrieve_module(url):
         A extraction module, which contains a findQueries function for
         extracting queries.
     """
-    if "cloud.google.com" in url:
+    if GOOGLE_CLOUD in url:
         return google_extraction.GoogleExtractionModule
     else:
-        # TODO(Noah): Add more modules and implement generic module
         return generic_extraction.GenericExtractionModule
