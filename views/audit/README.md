@@ -51,6 +51,7 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   
   ```  
   SELECT 
+    jobChange.jobConfig.queryConfig.statementType,
     tableDataChange.jobName,
     jobChange.jobConfig.queryConfig.query,
     jobChange.jobStats.createTime,
@@ -66,16 +67,7 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
    jobChange.jobConfig.queryConfig.statementType="DELETE" OR 
    jobChange.jobConfig.queryConfig.statementType="UPDATE" OR 
    jobChange.jobConfig.queryConfig.statementType="MERGE"
-  GROUP BY 
-   jobChange.jobConfig.queryConfig.statementType,tableDataChange.jobName,
-   jobChange.jobConfig.queryConfig.query,
-   jobChange.jobStats.createTime,
-   jobChange.jobStats.startTime,
-   jobChange.jobStats.endTime,
-   jobRuntimeMs,
-   tableDataChange.deletedRowsCount,
-   tableDataChange.insertedRowsCount,
-   jobChange.jobStats.queryStats.totalBilledBytes
+
   ``` 
 * Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
   
