@@ -713,6 +713,7 @@ SELECT
       jobStatsStartTime AS startTime,
       jobStatsEndTime AS endTime,
       jobStatsTotalSlotMs AS totalSlotMs,
+      jobStatsParentJobName as parentJobName
       STRUCT(
         jobStatsReservationUsageName AS name,
         jobStatsReservationUsageSlotMs AS slotMs
