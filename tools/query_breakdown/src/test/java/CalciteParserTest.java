@@ -32,4 +32,10 @@ public class CalciteParserTest {
     parser.parseQuery("SELECT a FROM A; BLAH SELECT");
   }
 
+  // the Calcite parser can handle trailing/leading spaces as well as spaces in the middle
+  @Test
+  public void parseQuerySpaceSuccess() throws SqlParseException {
+    assertEquals(parser.parseQuery("SELECT a FROM A"),
+        parser.parseQuery("  SELECT a                      FROM A  "));
+  }
 }
