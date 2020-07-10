@@ -43,7 +43,7 @@ Customers who run scripts in legacy data warehouses such as Teradata, understand
     build dashboards.
     
 #### Usage Examples
-Change all occurrences of `project_id.dataset_id.table_id` to the full path to the view. 
+Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
 * Run this query to see job name, query, create time, start time, end time, job runtime, count of inserted rows and deleted rows, and total billed bytes
   
