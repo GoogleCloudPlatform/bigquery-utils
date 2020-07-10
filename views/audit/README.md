@@ -100,7 +100,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    ARRAY_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
-  AND jobChange.jobStats.reservationUsage is not null
+  WHERE jobChange.jobStats.reservationUsage is not null
   AND jobChange.jobStats.parentJobName IS NOT NULL
   GROUP BY 1
   
