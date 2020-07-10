@@ -1,7 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.ArrayList;
+import java.util.TreeMap;
 import java.util.Random;
 
 /**
@@ -11,8 +10,7 @@ public class Node<E> {
 
     private E obj;
     private HashMap<Node<E>, Double> neighbors;
-    private ArrayList<Node<E>> neighborList; // list of neighbors and corresponding cumulative probabilities
-    private ArrayList<Double> cProbabilities; // cumulative probabilities
+    private TreeMap<Double, Node<E>> cumulativeProbabilities;
     private Random r;
 
     /**
@@ -29,22 +27,15 @@ public class Node<E> {
      * updates neighborList and cProbabilities when neighbors is changed
      */
     private void updateProbabilities() {
+        TreeMap<Double, Node<E>> newCumulativeProbabilities = new TreeMap<Double, Node<E>>();
         if (this.neighbors.size() != 0) {
-            Set<Node<E>> neighborSet = this.neighbors.keySet();
             double total = 0;
-            ArrayList<Node<E>> newNeighborList = new ArrayList<Node<E>>();
-            ArrayList<Double> newCProbabilities = new ArrayList<Double>();
-            for (Node<E> n: neighborSet) {
-                newNeighborList.add(n);
-                newCProbabilities.add(total);
+            for (Node<E> n: this.neighbors.keySet()) {
+                newCumulativeProbabilities.put(total, n);
                 total += this.neighbors.get(n);
             }
-            this.neighborList = newNeighborList;
-            this.cProbabilities = newCProbabilities;
-        } else {
-            this.neighborList = new ArrayList<Node<E>>();
-            this.cProbabilities = new ArrayList<Double>();
         }
+        this.cumulativeProbabilities = newCumulativeProbabilities;
     }
 
     /**
@@ -52,30 +43,18 @@ public class Node<E> {
      * @return if node is sink
      */
     public boolean hasNextNode() {
-        return (neighbors.size() > 0);
+        return (cumulativeProbabilities.size() > 0);
     }
 
     /**
      * 
      * @return next random node from current node, returns null if node is sink
      */
-    public Node nextNode() {
-        if (this.neighborList.size() == 0) {
+    public Node<E> nextNode() {
+        if (this.cumulativeProbabilities.size() == 0) {
             return null;
         }
-        double randDouble = this.r.nextDouble();
-
-        // find largest index such that cProbabilities is less than randDouble
-        int low = 0, high = this.neighborList.size();
-        while (high - low > 1) {
-            int mid = (low + high) / 2;
-            if (this.cProbabilities.get(mid) > randDouble) {
-                high = mid;
-            } else {
-                low = mid;
-            }
-        }
-        return this.neighborList.get(low);
+        return this.cumulativeProbabilities.floorEntry(this.r.nextDouble()).getValue();
     }
 
     public String toString() {
@@ -113,12 +92,8 @@ public class Node<E> {
         this.updateProbabilities();
     }
 
-    public ArrayList<Node<E>> getNeighborList() {
-        return neighborList;
-    }
-
-    public ArrayList<Double> getCProbabilities() {
-        return cProbabilities;
+    public TreeMap<Double, Node<E>> getCumulativeProbabilities() {
+        return this.cumulativeProbabilities;
     }
 
 }

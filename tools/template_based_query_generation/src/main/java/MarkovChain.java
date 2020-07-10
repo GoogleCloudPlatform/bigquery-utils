@@ -10,15 +10,12 @@ import java.util.Random;
 public class MarkovChain<E> {
     
     private HashSet<Node<E>> nodes;
-    private Random r;
 
     /**
      * constructs MarkovChain object from edge weights and random seed
      * @param nodes
-     * @param seed
      */
-    public MarkovChain(HashMap<Node<E>, HashMap<Node<E>, Double>> nodes, int seed) {
-        this.r = new Random(seed);
+    public MarkovChain(HashMap<Node<E>, HashMap<Node<E>, Double>> nodes) {
         this.nodes = new HashSet<Node<E>>();
         this.nodes.addAll(nodes.keySet());
         for (Node<E> n: nodes.keySet()){
@@ -29,10 +26,8 @@ public class MarkovChain<E> {
     /**
      * constructs MarkovChain object from set of nodes and random seed
      * @param nodes
-     * @param seed
      */
-    public MarkovChain(HashSet<Node<E>> nodes, int seed) {
-        this.r = new Random(seed);
+    public MarkovChain(HashSet<Node<E>> nodes) {
         this.nodes = nodes;
     }
 

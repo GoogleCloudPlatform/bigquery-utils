@@ -4,6 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.google.bigquery</groupId>
+    <artifactId>template_based_query_generation</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -12,9 +16,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <groupId>org.example</groupId>
-    <artifactId>template_based_query_generation</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -32,7 +33,6 @@
             <artifactId>google-collections</artifactId>
             <version>1.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.opensymphony/xwork-core -->
         <dependency>
             <groupId>com.opensymphony</groupId>
             <artifactId>xwork-core</artifactId>

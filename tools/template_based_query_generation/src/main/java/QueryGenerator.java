@@ -102,7 +102,7 @@ public class QueryGenerator {
         br.close();
         HashSet<Node<Query>> nodeSet = new HashSet<Node<Query>>();
         nodeSet.addAll(nodes.values());
-        this.mcGenerator = new MarkovChain<Query>(nodeSet, 0);
+        this.mcGenerator = new MarkovChain<Query>(nodeSet);
     }
 
     /**
