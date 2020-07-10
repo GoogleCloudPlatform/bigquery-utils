@@ -49,50 +49,63 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   
   
   ```  
-  SELECT 
-    jobChange.jobConfig.queryConfig.statementType,
-    tableDataChange.jobName,
-    jobChange.jobConfig.queryConfig.query,
-    jobChange.jobStats.createTime,
-    jobChange.jobStats.startTime,
-    jobChange.jobStats.endTime,
-    jobRuntimeMs,
-    tableDataChange.deletedRowsCount,
-    tableDataChange.insertedRowsCount,
-    jobChange.jobStats.queryStats.totalBilledBytes
-  FROM `project_id.dataset_id.table_id`  
-  WHERE 
-   jobChange.jobConfig.queryConfig.statementType="INSERT" OR 
-   jobChange.jobConfig.queryConfig.statementType="DELETE" OR 
-   jobChange.jobConfig.queryConfig.statementType="UPDATE" OR 
-   jobChange.jobConfig.queryConfig.statementType="MERGE"
+  SELECT
+   jobChange.jobStats.parentJobName,
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+  FROM YOUR_VIEW
+  WHERE
+  (jobChange.jobConfig.queryConfig.statementType="INSERT" OR
+  jobChange.jobConfig.queryConfig.statementType="DELETE" OR
+  jobChange.jobConfig.queryConfig.statementType="UPDATE" OR
+  jobChange.jobConfig.queryConfig.statementType="MERGE")
+  AND jobChange.jobStats.parentJobName IS NOT NULL
+  GROUP BY 1
 
   ``` 
 * Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
   
   ```
-  SELECT 
-   tableDataRead.jobName,
-   jobChange.jobConfig.queryConfig.query,
-   jobChange.jobStats.createTime,
-   jobChange.jobStats.startTime,
-   jobChange.jobStats.endTime,
-   jobRuntimeMs,
-   jobChange.jobStats.queryStats.totalBilledBytes
-  FROM `project_id.dataset_id.table_id`
-  WHERE jobChange.jobConfig.queryConfig.statementType="SELECT"
+  SELECT
+   jobChange.jobStats.parentJobName,
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+  FROM YOUR_VIEW
+  WHERE
+  (jobChange.jobConfig.queryConfig.statementType="SELECT")
+  AND jobChange.jobStats.parentJobName IS NOT NULL
+  GROUP BY 1
 
   ```
 * Run this query to see reservation usage and runtime for jobs from a specific project. Replace ```project_id``` with respective project id.
   
   ```
   SELECT 
-   tableDataChange.jobName,
-   jobChange.jobStats.reservationUsage.name,
-   jobChange.jobStats.reservationUsage.slotMs,
-   jobRuntimeMs,
-  FROM `project_id.dataset_id.table_id` 
-  WHERE tableDataChange.jobName like '%projects/project_id%' 
+   jobChange.jobStats.parentJobName
+   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.reservationUsage.name IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+  FROM YOUR_VIEW
   AND jobChange.jobStats.reservationUsage is not null
-
+  AND jobChange.jobStats.parentJobName IS NOT NULL
+  GROUP BY 1
+  
   ```
+  
