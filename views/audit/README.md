@@ -77,14 +77,12 @@ Change all occurrences of `project_id.dataset_id.table_id` to the full path to t
   SELECT
    jobChange.jobStats.parentJobName,
    ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataRead.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
   WHERE
