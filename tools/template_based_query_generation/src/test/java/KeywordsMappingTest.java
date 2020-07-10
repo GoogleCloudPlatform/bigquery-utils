@@ -6,41 +6,56 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class KeywordsMappingTest {
 
 	@Test
-	public void test_keywordsMappingDML() {
-		KeywordsMappingDML dml = new KeywordsMappingDML();
-		assertEquals("INSERT INTO", dml.getKeywordsMappingPostgre("DML_INSERT"));
-		assertEquals("INSERT", dml.getKeywordsMappingBQ("DML_INSERT"));
+	public void test_getMappingPostgreDDL() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("CREATE", km.getMappingPostgreDDL("DDL_CREATE"));
 		assertThrows(IllegalArgumentException.class, () -> {
-			dml.getKeywordsMappingPostgre("NON KEYWORD");
-		});
-		assertThrows(IllegalArgumentException.class, () -> {
-			dml.getKeywordsMappingBQ("NON KEYWORD");
+			km.getMappingPostgreDDL("NON KEYWORD");
 		});
 	}
 
 	@Test
-	public void test_keywordsMappingDQL() {
-		KeywordsMappingDQL dql = new KeywordsMappingDQL();
-		assertEquals("SELECT", dql.getKeywordsMappingPostgre("DQL_SELECT"));
-		assertEquals("SELECT", dql.getKeywordsMappingBQ("DQL_SELECT"));
+	public void test_getMappingBigQueryDDL() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("CREATE", km.getMappingBigQueryDDL("DDL_CREATE"));
 		assertThrows(IllegalArgumentException.class, () -> {
-			dql.getKeywordsMappingPostgre("NON KEYWORD");
-		});
-		assertThrows(IllegalArgumentException.class, () -> {
-			dql.getKeywordsMappingBQ("NON KEYWORD");
+			km.getMappingBigQueryDDL("NON KEYWORD");
 		});
 	}
 
 	@Test
-	public void test_keywordsMappingDDL() {
-		KeywordsMappingDDL ddl = new KeywordsMappingDDL();
-		assertEquals(ddl.getKeywordsMappingPostgre("DDL_CREATE"), "CREATE");
-		assertEquals(ddl.getKeywordsMappingBQ("DDL_CREATE"), "CREATE");
+	public void test_getMappingPostgreDML() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("INSERT INTO", km.getMappingPostgreDML("DML_INSERT"));
 		assertThrows(IllegalArgumentException.class, () -> {
-			ddl.getKeywordsMappingPostgre("NON KEYWORD");
+			km.getMappingPostgreDML("NON KEYWORD");
 		});
+	}
+
+	@Test
+	public void test_getMappingBigQueryDML() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("INSERT", km.getMappingBigQueryDML("DML_INSERT"));
 		assertThrows(IllegalArgumentException.class, () -> {
-			ddl.getKeywordsMappingBQ("NON KEYWORD");
+			km.getMappingBigQueryDML("NON KEYWORD");
+		});
+	}
+
+	@Test
+	public void test_getMappingPostgreDQL() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("SELECT", km.getMappingPostgreDQL("DQL_SELECT"));
+		assertThrows(IllegalArgumentException.class, () -> {
+			km.getMappingPostgreDQL("NON KEYWORD");
+		});
+	}
+
+	@Test
+	public void test_getMappingBigQueryDQL() {
+		KeywordsMapping km = new KeywordsMapping();
+		assertEquals("SELECT", km.getMappingBigQueryDQL("DQL_SELECT"));
+		assertThrows(IllegalArgumentException.class, () -> {
+			km.getMappingBigQueryDQL("NON KEYWORD");
 		});
 	}
 }
