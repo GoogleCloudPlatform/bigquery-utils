@@ -50,16 +50,16 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   ```  
   SELECT
    jobChange.jobStats.parentJobName,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as statementType,
+   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as query,
+   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as createTime,
+   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as startTime,
+   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as endTime,
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
+   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as deletedRowsCount,
+   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as insertedRowsCount,
+   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as totalBilledBytes,
   FROM YOUR_VIEW
   WHERE
   (jobChange.jobConfig.queryConfig.statementType="INSERT" OR
@@ -75,14 +75,14 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   ```
   SELECT
    jobChange.jobStats.parentJobName,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(tableDataRead.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as statementType,
+   ARRAY_AGG(tableDataRead.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
+   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as query,
+   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as createTime,
+   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as startTime,
+   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as endTime,
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
+   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as totalBilledBytes,
   FROM YOUR_VIEW
   WHERE
   (jobChange.jobConfig.queryConfig.statementType="SELECT") AND
@@ -95,10 +95,10 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   ```
   SELECT 
    jobChange.jobStats.parentJobName,
-   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name ORDER BY jobChange.jobStats.startTime),
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name ORDER BY jobChange.jobStats.startTime) as reservationName,
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs ORDER BY jobChange.jobStats.startTime) as reservationSlotMs,
+   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
   FROM YOUR_VIEW
   WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL AND
   jobChange.jobStats.parentJobName IS NOT NULL
