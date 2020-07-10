@@ -1,3 +1,4 @@
+CREATE OR REPLACE VIEW `project_id.dataset_id.view_name` AS (
 WITH jobChangeEvent AS (
   SELECT
     protopayload_auditlog.authenticationInfo.principalEmail,
@@ -783,3 +784,4 @@ WHERE
    */
   queryConfigStatementType = "SCRIPT"
   OR jobChangeAfter = "DONE"
+)
