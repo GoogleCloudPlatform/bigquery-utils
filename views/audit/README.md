@@ -96,8 +96,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   SELECT 
    jobChange.jobStats.parentJobName,
    ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name ORDER BY jobChange.jobStats.startTime),
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
   WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL
