@@ -660,7 +660,10 @@ SELECT
         queryConfigCreateDisposition AS createDisposition,
         queryConfigWriteDisposition AS writeDisposition,
         queryConfigDefaultDataset AS defaultDataset,
-        --TODO Add tableDefinitions
+        STRUCT(
+        tableDefinitionsName AS name,
+        tableDefinitionsSourceUris AS sourceUris
+        ) AS tableDefinitions,
         queryConfigPriority AS priority,
         STRUCT(
           queryConfigDestinationTableEncryptionKmsKeyName AS kmsKeyName
