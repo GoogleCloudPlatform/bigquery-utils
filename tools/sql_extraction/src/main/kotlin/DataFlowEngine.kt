@@ -1,5 +1,7 @@
 package com.google.cloud.sqlecosystem.sqlextraction
 
+import com.google.cloud.sqlecosystem.sqlextraction.output.ComplexType
+import com.google.cloud.sqlecosystem.sqlextraction.output.FragmentCount
 import com.google.cloud.sqlecosystem.sqlextraction.output.Location
 import com.google.cloud.sqlecosystem.sqlextraction.output.QueryFragment
 import com.google.cloud.sqlecosystem.sqlextraction.output.QueryUsages
@@ -13,6 +15,10 @@ private val LOGGER = KotlinLogging.logger { }
  * @see FrontEnd
  */
 class DataFlowEngine(private val environment: Environment = Environment()) {
+    /**
+     * The query related to the expression currently being computed.
+     */
+    private var currentQuery: QueryFragment? = null
     private val queryUsages: MutableMap<QueryFragment, HashSet<Location>> = HashMap()
 
     /**
@@ -53,7 +59,15 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
-     * Visits a variable declaration with the namee [variableName].
+     * Visits a statement from an Antlr visitor.
+     */
+    fun visitStatement(visitChildren: () -> Unit) {
+        visitChildren()
+        currentQuery = null
+    }
+
+    /**
+     * Visits a variable declaration with the name [variableName].
      */
     fun declareVariable(variableName: String) {
         LOGGER.debug("Declare variable $variableName.")
@@ -61,11 +75,149 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
+     * Visits a string literal found at [location] and spelling out [literal].
+     * This can potentially contain an embedded SQL query fragment.
+     */
+    fun visitStringLiteral(literal: String, location: Location) {
+        LOGGER.debug { "Literal \"$literal\" found at $location" }
+
+        // todo: count and complex type as defined by current control flow
+        val visitedLiteral = QueryFragment.createLiteral(FragmentCount.SINGLE, location, literal)
+        currentQuery = if (currentQuery == null) {
+            visitedLiteral
+        } else {
+            QueryFragment.combine(
+                FragmentCount.SINGLE,
+                currentQuery!!,
+                visitedLiteral,
+                ComplexType.UNKNOWN
+            )
+        }
+    }
+
+    /**
+     * Visits an assignment operator (=) or an concatenation assignment operator (+=).
+     *
+     * @param[variableName] Left-hand-side variable that is getting mutated.
+     * @param[visitRhs] Expression to set [variableName]
+     * @param[concatenate] Whether to replace the variable (if false)
+     *     or to append to the variable (if true)
+     */
+    fun visitAssignment(variableName: String, visitRhs: () -> Unit, concatenate: Boolean = false) {
+        visitRhs()
+
+        if (concatenate) {
+            environment.setVariableReference(
+                variableName, QueryFragment.combine(
+                    FragmentCount.SINGLE, // todo: count as defined by current control flow
+                    environment.getVariableReference(variableName),
+                    currentQuery,
+                    ComplexType.AND
+                )
+            )
+        } else {
+            environment.setVariableReference(variableName, currentQuery)
+        }
+
+        LOGGER.debug {
+            "variableName ${if (concatenate) "+=" else "="} " +
+                    environment.getVariableReference(variableName)?.toCombinedString()
+        }
+    }
+
+    /**
+     * Visits a concatenation operator (+), which operates on the current expression.
+     *
+     * @param[visitLhs] Left side of the operator.
+     * @param[visitRhs] Right side of the operator.
+     */
+    fun visitConcatenation(visitLhs: () -> Unit, visitRhs: () -> Unit) {
+        visitLhs()
+        val leftFragment = currentQuery
+        currentQuery = null
+
+        visitRhs()
+        val rightFragment = currentQuery
+
+        currentQuery = QueryFragment.combine(
+            FragmentCount.SINGLE, // todo: count as defined by current control flow
+            leftFragment,
+            rightFragment,
+            ComplexType.AND
+        )
+    }
+
+    /**
+     * Visits a return statement located at [location].
+     * This can be counted as a query usage.
+     *
+     * @param[visitChildren] the expression that is getting returned.
+     */
+    fun visitReturn(location: Location, visitChildren: () -> Unit) {
+        visitChildren()
+        if (currentQuery != null) {
+            addUsage(usage = location)
+            LOGGER.debug { "Return at $location: ${currentQuery?.toCombinedString()}" }
+        }
+    }
+
+    /**
+     * Visits a variable named [name] within an expression.
+     * This variable can potentially be related to a query fragment.
+     */
+    fun visitVariable(name: String) {
+        val value = environment.getVariableReferenceOrDefault(name)
+        if (value != null) {
+            currentQuery = if (currentQuery == null) {
+                value
+            } else {
+                QueryFragment.combine(
+                    FragmentCount.SINGLE, // todo: count as defined by current control flow
+                    currentQuery!!,
+                    value,
+                    ComplexType.UNKNOWN
+                )
+            }
+        }
+    }
+
+    /**
+     * Visits a method call located at [location].
+     * The combined argument list can be considered a usage.
+     *
+     * @param[visitChildren] Sequence of expressions for each method parameter.
+     */
+    fun visitMethodArguments(location: Location, visitChildren: Sequence<() -> Unit>) {
+        val prevQuery = currentQuery
+        var concatenated: QueryFragment? = null
+
+        for (arg in visitChildren) {
+            currentQuery = null
+            arg()
+
+            if (currentQuery != null) {
+                concatenated = QueryFragment.combine(
+                    FragmentCount.SINGLE, // todo: count as defined by current control flow
+                    concatenated,
+                    currentQuery
+                )
+            }
+        }
+
+        // who called the method? (who is `this`)
+        concatenated = QueryFragment.combine(FragmentCount.SINGLE, prevQuery, concatenated)
+        if (concatenated != null) {
+            addUsage(concatenated, location)
+        }
+        currentQuery = concatenated
+    }
+
+    /**
      * Marks [usage] as one of the part of code where [query] is used.
      *
      * Usage examples: method call argument, return, added to non-local data structure, etc.
      */
-    private fun addUsage(query: QueryFragment, usage: Location) {
+    private fun addUsage(query: QueryFragment = currentQuery!!, usage: Location) {
         queryUsages.computeIfAbsent(query) { HashSet() }.add(usage)
     }
 }
