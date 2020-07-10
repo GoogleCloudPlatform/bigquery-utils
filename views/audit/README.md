@@ -94,7 +94,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   
   ```
   SELECT 
-   jobChange.jobStats.parentJobName
+   jobChange.jobStats.parentJobName,
    ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.reservationUsage.name IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
