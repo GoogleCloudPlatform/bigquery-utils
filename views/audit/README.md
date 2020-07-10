@@ -85,8 +85,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
   WHERE
-  (jobChange.jobConfig.queryConfig.statementType="SELECT")
-  AND jobChange.jobStats.parentJobName IS NOT NULL
+  (jobChange.jobConfig.queryConfig.statementType="SELECT") AND
+  jobChange.jobStats.parentJobName IS NOT NULL
   GROUP BY 1
 
   ```
@@ -100,8 +100,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
-  WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL
-  AND jobChange.jobStats.parentJobName IS NOT NULL
+  WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL AND
+  jobChange.jobStats.parentJobName IS NOT NULL
   GROUP BY 1
   
   ```
