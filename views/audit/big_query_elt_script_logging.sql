@@ -97,17 +97,19 @@ WITH jobChangeEvent AS (
       CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobStats.totalSlotMs') AS INT64)
     ) AS jobStatsTotalSlotMs,
-    COALESCE(
+    REGEXP_EXTRACT_ALL(COALESCE(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStats.reservationUsage.name'),
+        '$.jobChange.job.jobStats.reservationUsage'),
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.reservationUsage.name')
+        '$.jobChange.job.jobStats.reservationUsage')
+      ),r'"name":\"(.*?)\"}'
     ) AS jobStatsReservationUsageName,
-    COALESCE(
+    REGEXP_EXTRACT_ALL(COALESCE(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobInsertion.job.jobStats.reservationUsage.slotMs'),
+        '$.jobChange.job.jobStats.reservationUsage'),
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.reservationUsage.slotMs')
+        '$.jobChange.job.jobStats.reservationUsage')
+      ),r'"slotMs":\"(.*?)\"}'
     ) AS jobStatsReservationUsageSlotMs,
     /*
      * Query: Query job statistics
