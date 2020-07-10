@@ -256,6 +256,20 @@ WITH jobChangeEvent AS (
         '$.jobInsertion.job.jobConfig.queryConfig.defaultDataset'),
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobChange.job.jobConfig.queryConfig.defaultDataset')) AS queryConfigDefaultDataset,
+    REGEXP_EXTRACT_ALL(COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions')
+      ),r'"name":\"(.*?)\"}'
+    ) AS tableDefinitionsName,
+    REGEXP_EXTRACT_ALL(COALESCE(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions'),
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+        '$.jobInsertion.job.jobConfig.queryConfig.tableDefinitions')
+      ),r'"sourceUris":\"(.*?)\"}'
+    ) AS tableDefinitionsSourceUris,
     COALESCE(
       JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
         '$.jobInsertion.job.jobConfig.queryConfig.priority'),
