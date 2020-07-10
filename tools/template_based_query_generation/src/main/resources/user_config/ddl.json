@@ -1,0 +1,7 @@
+{
+  "DDL_CREATE": true,
+  "DDL_PARTITION": true,
+  "DDL_CLUSTER": true,
+  "DDL_OPTIONS": true,
+  "DDL_AS": true
+}

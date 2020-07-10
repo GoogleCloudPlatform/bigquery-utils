@@ -1,0 +1,10 @@
+{
+  "DML_INSERT": true,
+  "DML_DELETE": true,
+  "DML_WHERE": true,
+  "DML_UPDATE": true,
+  "DML_INTO": true,
+  "DML_VALUES": true,
+  "DML_SET": true,
+  "DML_FROM": true
+}
