@@ -1,12 +1,12 @@
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeMap;
+import java.util.Set;
 import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 
 public class NodeTest {
 
@@ -21,12 +21,12 @@ public class NodeTest {
         node1Neighbors.add(node3);
         node1Neighbors.add(node4);
         node1.setNeighbors(node1Neighbors);
-        ArrayList<Node<String>> neighborList = node1.getNeighborList();
-        assertEquals(-1, neighborList.indexOf(node1));
-        assertEquals(3, neighborList.size());
-        assertNotEquals(-1, neighborList.indexOf(node2));
-        assertNotEquals(-1, neighborList.indexOf(node3));
-        assertNotEquals(-1, neighborList.indexOf(node4));
+        Set<Node<String>> neighborSet = node1.getNeighbors().keySet();
+        assertEquals(false, neighborSet.contains(node1));
+        assertEquals(3, neighborSet.size());
+        assertNotEquals(false, neighborSet.contains(node2));
+        assertNotEquals(false, neighborSet.contains(node3));
+        assertNotEquals(false, neighborSet.contains(node4));
     }
 
     @Test
@@ -63,10 +63,9 @@ public class NodeTest {
         node1Neighbors.add(node3);
         node1Neighbors.add(node4);
         node1.setNeighbors(node1Neighbors);
-        ArrayList<Double> cProbabilities = node1.getCProbabilities();
-        assertEquals(0, cProbabilities.get(0));
-        assertEquals(0.3333333, cProbabilities.get(1), 0.01);
-        assertEquals(0.6666666, cProbabilities.get(2), 0.01);
+        TreeMap<Double, Node<Integer>> cumulativeProbabilities = node1.getCumulativeProbabilities();
+        assertEquals(0, cumulativeProbabilities.firstEntry().getKey());
+        assertEquals(0.6666666, cumulativeProbabilities.lastEntry().getKey(), 0.01);
     }
 
     @Test
@@ -80,14 +79,13 @@ public class NodeTest {
         node1Neighbors.put(node3, 0.25);
         node1Neighbors.put(node4, 0.60);
         node1.setNeighbors(node1Neighbors);
-        ArrayList<Double> cProbabilities = node1.getCProbabilities();
-        cProbabilities.set(0, cProbabilities.get(1)-cProbabilities.get(0));
-        cProbabilities.set(1, cProbabilities.get(2)-cProbabilities.get(1));
-        cProbabilities.set(2, 1-cProbabilities.get(2));
-        Collections.sort(cProbabilities);
-        assertEquals(0.15, cProbabilities.get(0), 0.01);
-        assertEquals(0.25, cProbabilities.get(1), 0.01);
-        assertEquals(0.60, cProbabilities.get(2), 0.01);    }
+        ArrayList<Double> cumulativeProbabilities = new ArrayList<Double>();
+        cumulativeProbabilities.addAll(node1.getNeighbors().values());
+        Collections.sort(cumulativeProbabilities);
+        assertEquals(0.15, cumulativeProbabilities.get(0), 0.01);
+        assertEquals(0.25, cumulativeProbabilities.get(1), 0.01);
+        assertEquals(0.60, cumulativeProbabilities.get(2), 0.01);
+    }
 
     @Test
     public void test_nextNode() {
