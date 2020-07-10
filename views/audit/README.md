@@ -90,17 +90,17 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   GROUP BY 1
 
   ```
-* Run this query to see reservation usage and runtime for jobs from a specific project. Replace ```project_id``` with respective project id.
+* Run this query to see reservation usage and runtime for scripts.
   
   ```
   SELECT 
    jobChange.jobStats.parentJobName,
    ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.reservationUsage.name IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
-   ARRAY_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
+   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
    ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime),
   FROM YOUR_VIEW
-  WHERE jobChange.jobStats.reservationUsage is not null
+  WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL
   AND jobChange.jobStats.parentJobName IS NOT NULL
   GROUP BY 1
   
