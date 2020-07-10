@@ -22,9 +22,8 @@ Customers who run scripts in legacy data warehouses such as Teradata, understand
     *   [Cloud Console Logs Viewer](https://cloud.google.com/logging/docs/export/configure_export_v2#dest-create)
         Use this filter:
         #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobInsertion.job.jobConfig.queryConfig.statementType="SCRIPT" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" )
-        *   Make sure to select
-            [partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
-            for your BigQuery destination
+        *   [Partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
+            is not required, but it is strongly recommended to select it for your BigQuery destination
             
     Note: You can create a log sink at the folder, billing account, or organization level using an 
     [aggregated sink](https://cloud.google.com/logging/docs/export/aggregated_sinks#creating_an_aggregated_sink).
