@@ -1,8 +1,49 @@
 {
+<<<<<<< HEAD
   "DQL_SELECT": true,
   "DQL_EXCEPT": true,
   "DQL_FROM": true,
   "DQL_WHERE": true,
   "DQL_LIMIT": true,
   "DQL_ORDER": true
+=======
+  "keywordIndicators": [
+    {
+      "keyword": "DQL_WITH",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_SELECT",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_REPLACE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_EXCEPT",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_AS",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_FROM",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_WHERE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_LIMIT",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DQL_ORDER",
+      "isIncluded": true
+    }
+  ]
+>>>>>>> 33835babc5a545ddf0f7fbbd442e277e56124165
 }

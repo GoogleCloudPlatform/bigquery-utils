@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -21,6 +22,45 @@ public class Utils {
 	private static final int lowerBound = 1;
 
 	private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+
+	/**
+	 * Helper class that returns all KeywordIndicator(s) for JSON deserialization
+	 */
+	private class Config {
+		private List<KeywordIndicator> keywordIndicators;
+
+		public List<KeywordIndicator> getKeywordIndicators() {
+			return this.keywordIndicators;
+		}
+
+		public void setKeywords(List<KeywordIndicator> keywordIndicators) {
+			this.keywordIndicators = keywordIndicators;
+		}
+	}
+
+	/**
+	 * Helper class that indicates whether a keyword is included by the user via the user-defined config file
+	 */
+	private class KeywordIndicator {
+		private String keyword;
+		private boolean isIncluded;
+
+		public String getKeyword() {
+			return this.keyword;
+		}
+
+		public void setKeyword(String keyword) {
+			this.keyword = keyword;
+		}
+
+		public boolean getIsIncluded() {
+			return this.isIncluded;
+		}
+
+		public void setIsIncluded(boolean isIncluded) {
+			this.isIncluded = isIncluded;
+		}
+	}
 
 	/**
 	 * Returns a random integer between a lowerBound and an upperBound, inclusive
@@ -126,25 +166,20 @@ public class Utils {
 	/**
 	 * Creates an immutable set from the user-defined config file of keyword mappings
 	 *
-	 * @param fileName relative path of the config file
+	 * @param inputPath relative path of the config file
 	 * @return an immutable set of keywords from the config file
 	 */
-	public static ImmutableSet<String> makeImmutableSet(String fileName) {
+	public static ImmutableSet<String> makeImmutableSet(Path inputPath) throws IOException {
+		BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
 		Gson gson = new Gson();
+		Config config = gson.fromJson(reader, Config.class);
+
 		ImmutableList.Builder<String> builder = ImmutableList.builder();
 
-		try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				if (!(line.charAt(0) == '/' && line.charAt(1) == '/')) {
-					String[] pair = line.split(":");
-					if (pair[1].equals("1")) {
-						builder.add(pair[0]);
-					}
-				}
+		for (KeywordIndicator keywordIndicator : config.getKeywordIndicators()) {
+			if (keywordIndicator.getIsIncluded()) {
+				builder.add(keywordIndicator.getKeyword());
 			}
-		} catch (IOException exception) {
-			System.out.println(exception);
 		}
 
 		ImmutableList<String> list = builder.build();

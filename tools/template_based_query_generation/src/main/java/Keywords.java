@@ -1,25 +1,32 @@
 import com.google.common.collect.ImmutableSet;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 /**
  * Set of user-defined DDL, DML, and DQL keywords
  */
 public class Keywords {
 
-	private final String filePathDDL = "./src/main/resources/user_config/ddl.txt";
-	private final String filePathDML = "./src/main/resources/user_config/dml.txt";
-	private final String filePathDQL = "./src/main/resources/user_config/dql.txt";
+	private final String filePathDDL = "./src/main/resources/user_config/ddl.json";
+	private final String filePathDML = "./src/main/resources/user_config/dml.json";
+	private final String filePathDQL = "./src/main/resources/user_config/dql.json";
 
-	private final ImmutableSet<String> setDDL;
-	private final ImmutableSet<String> setDML;
-	private final ImmutableSet<String> setDQL;
+	private ImmutableSet<String> setDDL = new ImmutableSet.Builder<String>().build();
+	private ImmutableSet<String> setDML = new ImmutableSet.Builder<String>().build();
+	private ImmutableSet<String> setDQL = new ImmutableSet.Builder<String>().build();
 
 	/**
 	 * Constructor of user-defined keywords, parsed from the config file
 	 */
 	public Keywords() {
-		setDDL = Utils.makeImmutableSet(filePathDDL);
-		setDML = Utils.makeImmutableSet(filePathDML);
-		setDQL = Utils.makeImmutableSet(filePathDQL);
+		try {
+			setDDL = Utils.makeImmutableSet(Paths.get(filePathDDL));
+			setDML = Utils.makeImmutableSet(Paths.get(filePathDML));
+			setDQL = Utils.makeImmutableSet(Paths.get(filePathDQL));
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
 	}
 
 	/**
