@@ -1,4 +1,3 @@
-  
 /*
  * Copyright 2020 Google LLC
  *
@@ -15,13 +14,14 @@
  * limitations under the License.
  */
 
--- week_number_of_month: Returns the number of weeks from the beginning of the month to the specified date
+-- week_of_month: Returns the number of weeks from the beginning of the month to the specified date
 -- Input: date_expression DATE or TIMESTAMP
 -- Output: The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week
-CREATE OR REPLACE FUNCTION fn.week_number_of_month(date_expression ANY TYPE) AS 
+CREATE OR REPLACE FUNCTION fn.week_of_month(date_expression ANY TYPE) AS 
 (
   (
     SELECT 
-      EXTRACT(WEEK FROM date_expression) - EXTRACT(WEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
+      EXTRACT(WEEK FROM date_expression) 
+      - EXTRACT(WEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
   )
 );

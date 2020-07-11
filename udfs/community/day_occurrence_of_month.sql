@@ -1,4 +1,3 @@
-  
 /*
  * Copyright 2020 Google LLC
  *
@@ -22,7 +21,9 @@ CREATE OR REPLACE FUNCTION fn.day_occurrence_of_month(date_expression ANY TYPE) 
 (
   (
     SELECT 
-      IF(EXTRACT(DAYOFWEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH)) > EXTRACT(DAYOFWEEK FROM date_expression),
+      IF(
+      	EXTRACT(DAYOFWEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
+      	  > EXTRACT(DAYOFWEEK FROM date_expression),
         fn.week_number_of_month(date_expression),
         fn.week_number_of_month(date_expression) + 1)
   )
