@@ -17,7 +17,7 @@ import static org.junit.Assert.fail;
 public class ParserFactoryTest {
 
   @Test
-  public void getParser1() throws SqlParseException {
+  public void getParser_selectQuery() throws SqlParseException {
     BigQueryParserFactory factory = new BigQueryParserFactory();
     SqlParser parser = factory.getParser("select a from b");
     SqlNode node = parser.parseQuery();
@@ -25,7 +25,7 @@ public class ParserFactoryTest {
   }
 
   @Test
-  public void getParser2() throws SqlParseException {
+  public void getParser_selectWithSubQuery() throws SqlParseException {
     BigQueryParserFactory factory = new BigQueryParserFactory();
     SqlParser parser =
         factory.getParser(
@@ -35,7 +35,7 @@ public class ParserFactoryTest {
   }
 
   @Test
-  public void queryNotNull() {
+  public void getParser_nullQuery() {
     BigQueryParserFactory factory = new BigQueryParserFactory();
 
     try {

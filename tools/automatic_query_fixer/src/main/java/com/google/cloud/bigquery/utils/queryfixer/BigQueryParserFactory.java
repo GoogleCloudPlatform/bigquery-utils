@@ -16,7 +16,8 @@ import com.google.common.base.Preconditions;
 import java.io.Reader;
 
 /**
- * A factory to generate parsers. The fault generated parser is Babel Parser with BigQuery dialect.
+ * A factory to generate parsers. The default generated parser is Babel Parser with BigQuery
+ * dialect.
  */
 public class BigQueryParserFactory {
 
@@ -62,15 +63,17 @@ public class BigQueryParserFactory {
 
     Object parserImpl;
     try {
-      parserImpl = FieldUtils.readField(getParser(query), /* fieldName= */"parser", /* forceAccess= */true);
+      parserImpl =
+          FieldUtils.readField(
+              getParser(query), /* fieldName= */ "parser", /* forceAccess= */ true);
     } catch (IllegalAccessException e) {
       throw new ParserCreationException(
           "Unable to extract the parserImpl from the generated parser.");
     }
 
     if (!(parserImpl instanceof SqlBabelParserImpl)) {
-      throw new ParserCreationException("This factory does not produce Babel Parser. "
-          + "Use the BigQueryParserFactory with default initialization instead.");
+      throw new ParserCreationException(
+          "This factory does not produce Babel Parser. Use the BigQueryParserFactory with default initialization instead.");
     }
     return (SqlBabelParserImpl) parserImpl;
   }
