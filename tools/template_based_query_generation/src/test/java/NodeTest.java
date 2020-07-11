@@ -1,27 +1,25 @@
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.Collections;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeTest {
 
     @Test
     public void test_getNeighborList() {
-        Node<String> node1 = new Node<String>("node 1", 8535);
-        Node<String> node2 = new Node<String>("node 2", 8580);
-        Node<String> node3 = new Node<String>("node 3", 3488);
-        Node<String> node4 = new Node<String>("node 4", 8566);
+        Random r = new Random();
+        Node<String> node1 = new Node<String>("node 1", r);
+        Node<String> node2 = new Node<String>("node 2", r);
+        Node<String> node3 = new Node<String>("node 3", r);
+        Node<String> node4 = new Node<String>("node 4", r);
         HashSet<Node<String>> node1Neighbors = new HashSet<Node<String>>();
         node1Neighbors.add(node2);
         node1Neighbors.add(node3);
         node1Neighbors.add(node4);
         node1.setNeighbors(node1Neighbors);
-        Set<Node<String>> neighborSet = node1.getNeighbors().keySet();
+        HashSet<Node<String>> neighborSet = new HashSet<Node<String>>();
+        neighborSet.addAll(node1.getCumulativeProbabilities().values());
         assertEquals(false, neighborSet.contains(node1));
         assertEquals(3, neighborSet.size());
         assertNotEquals(false, neighborSet.contains(node2));
@@ -54,10 +52,11 @@ public class NodeTest {
 
     @Test
     public void test_setNeighbors_set() {
-        Node<Integer> node1 = new Node<Integer>(31, 4767);
-        Node<Integer> node2 = new Node<Integer>(-12, 3556);
-        Node<Integer> node3 = new Node<Integer>(0, 8924);
-        Node<Integer> node4 = new Node<Integer>(7777, 4490);
+        Random r = new Random();
+        Node<Integer> node1 = new Node<Integer>(31, r);
+        Node<Integer> node2 = new Node<Integer>(-12, r);
+        Node<Integer> node3 = new Node<Integer>(0, r);
+        Node<Integer> node4 = new Node<Integer>(7777, r);
         HashSet<Node<Integer>> node1Neighbors = new HashSet<Node<Integer>>();
         node1Neighbors.add(node2);
         node1Neighbors.add(node3);
@@ -80,19 +79,25 @@ public class NodeTest {
         node1Neighbors.put(node4, 0.60);
         node1.setNeighbors(node1Neighbors);
         ArrayList<Double> cumulativeProbabilities = new ArrayList<Double>();
-        cumulativeProbabilities.addAll(node1.getNeighbors().values());
+        cumulativeProbabilities.addAll(node1.getCumulativeProbabilities().keySet());
         Collections.sort(cumulativeProbabilities);
-        assertEquals(0.15, cumulativeProbabilities.get(0), 0.01);
-        assertEquals(0.25, cumulativeProbabilities.get(1), 0.01);
-        assertEquals(0.60, cumulativeProbabilities.get(2), 0.01);
+        ArrayList<Double> probabilities = new ArrayList<Double>();
+        probabilities.add(cumulativeProbabilities.get(1));
+        probabilities.add(cumulativeProbabilities.get(2) - cumulativeProbabilities.get(1));
+        probabilities.add(1 - cumulativeProbabilities.get(2));
+        Collections.sort(probabilities);
+        assertEquals(0.15, probabilities.get(0), 0.01);
+        assertEquals(0.25, probabilities.get(1), 0.01);
+        assertEquals(0.60, probabilities.get(2), 0.01);
     }
 
     @Test
     public void test_nextNode() {
-        Node<Integer> node1 = new Node<Integer>(31, 8987);
-        Node<Integer> node2 = new Node<Integer>(-12, 7620);
-        Node<Integer> node3 = new Node<Integer>(1, 1563);
-        Node<Integer> node4 = new Node<Integer>(7777, 7087);
+        Random r = new Random();
+        Node<Integer> node1 = new Node<Integer>(31, r);
+        Node<Integer> node2 = new Node<Integer>(-12, r);
+        Node<Integer> node3 = new Node<Integer>(1, r);
+        Node<Integer> node4 = new Node<Integer>(7777, r);
         HashSet<Node<Integer>> node1Neighbors = new HashSet<Node<Integer>>();
         HashSet<Node<Integer>> node2Neighbors = new HashSet<Node<Integer>>();
         node1Neighbors.add(node2);

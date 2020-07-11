@@ -1,9 +1,6 @@
 {
-  "DQL_WITH": true,
   "DQL_SELECT": true,
-  "DQL_REPLACE": true,
   "DQL_EXCEPT": true,
-  "DQL_AS": true,
   "DQL_FROM": true,
   "DQL_WHERE": true,
   "DQL_LIMIT": true,

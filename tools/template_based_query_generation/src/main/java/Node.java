@@ -4,17 +4,16 @@ import java.util.TreeMap;
 import java.util.Random;
 
 /**
- * class representing node for a query in the markov chain
+ * class representing node for a node in the markov chain
  */
 public class Node<E> {
 
     private E obj;
-    private HashMap<Node<E>, Double> neighbors;
     private TreeMap<Double, Node<E>> cumulativeProbabilities;
     private Random r;
 
     /**
-     * constructs node from query
+     * constructs node from E obj and int seed
      * @param obj
      */
     public Node(E obj, int seed) {
@@ -24,15 +23,25 @@ public class Node<E> {
     }
 
     /**
+     * constructs node from E obj and Random instance r
+     * @param obj
+     */
+    public Node(E obj, Random r) {
+        this.obj = obj;
+        this.r = r;
+        this.setNeighbors(new HashMap<Node<E>, Double>());
+    }
+
+    /**
      * updates neighborList and cProbabilities when neighbors is changed
      */
-    private void updateProbabilities() {
+    private void updateProbabilities(HashMap<Node<E>, Double> neighbors) {
         TreeMap<Double, Node<E>> newCumulativeProbabilities = new TreeMap<Double, Node<E>>();
-        if (this.neighbors.size() != 0) {
+        if (neighbors.size() != 0) {
             double total = 0;
-            for (Node<E> n: this.neighbors.keySet()) {
+            for (Node<E> n: neighbors.keySet()) {
                 newCumulativeProbabilities.put(total, n);
-                total += this.neighbors.get(n);
+                total += neighbors.get(n);
             }
         }
         this.cumulativeProbabilities = newCumulativeProbabilities;
@@ -69,13 +78,9 @@ public class Node<E> {
         this.obj = obj;
     }
 
-    public HashMap<Node<E>, Double> getNeighbors() {
-        return this.neighbors;
-    }
 
     public void setNeighbors(HashMap<Node<E>, Double> neighbors) {
-        this.neighbors = neighbors;
-        this.updateProbabilities();
+        this.updateProbabilities(neighbors);
     }
 
     /**
@@ -88,8 +93,7 @@ public class Node<E> {
         for (Node<E> n: neighbors) {
             edges.put(n, c);
         }
-        this.neighbors = edges;
-        this.updateProbabilities();
+        this.updateProbabilities(edges);
     }
 
     public TreeMap<Double, Node<E>> getCumulativeProbabilities() {
