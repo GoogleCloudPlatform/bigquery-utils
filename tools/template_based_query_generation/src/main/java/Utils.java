@@ -23,6 +23,9 @@ public class Utils {
 
 	private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
+	/**
+	 * Helper class that returns all KeywordIndicator(s) for JSON deserialization
+	 */
 	private class Config {
 		private List<KeywordIndicator> keywordIndicators;
 
@@ -35,6 +38,9 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Helper class that indicates whether a keyword is included by the user via the user-defined config file
+	 */
 	private class KeywordIndicator {
 		private String keyword;
 		private boolean isIncluded;
