@@ -11,4 +11,11 @@ public class InputReaderTest {
     System.out.println(InputReader.readInput(absPath +
         "/src/test/java/InputTestFiles/singleLine.txt"));
   }
+
+  @Test
+  public void inputReaderTestMultipleQuery() throws IOException {
+    String absPath = new File("").getAbsolutePath();
+    System.out.println(InputReader.readInput(absPath +
+        "/src/test/java/InputTestFiles/multipleLines.txt"));
+  }
 }
