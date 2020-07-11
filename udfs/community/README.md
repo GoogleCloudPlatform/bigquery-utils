@@ -200,10 +200,10 @@ results:
 
 
 ### [getbit(target_arg INT64, target_bit_arg INT64)](getbit.sql)
-Given an INTEGER value, returns the value of a bit at a specified position. The position of the bit starts from 1.
+Given an INTEGER value, returns the value of a bit at a specified position. The position of the bit starts from 0.
 
 ```sql
-SELECT bqutil.fn.getbit(23, 2), bqutil.fn.getbit(23, 4), bqutil.fn.getbit(null, 1)
+SELECT bqutil.fn.getbit(23, 2), bqutil.fn.getbit(23, 3), bqutil.fn.getbit(null, 1)
 
 1 0 NULL
 ```
