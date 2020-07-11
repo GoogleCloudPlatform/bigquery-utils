@@ -76,7 +76,7 @@ results:
 
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sql)
-Returns the n th occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
+Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
 ```sql
 SELECT 
   bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'), 
