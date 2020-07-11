@@ -16,17 +16,12 @@
  */
 
 -- gitbit: Given an INTEGER value, returns the value of a bit at a specified position.
--- Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 1 
+-- Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 0 
 -- Output: value of the bit (0 or 1) at the specified position.
 CREATE OR REPLACE FUNCTION fn.getbit(target_arg INT64, target_bit_arg INT64) AS 
 (
   (
-    SELECT 
-      if(
-        target_arg is null,
-        null,
-        BIT_AND(x) >> (target_bit_arg - 1))
-    FROM 
-      UNNEST([target_arg, 1 << (target_bit_arg - 1)]) as x
+    SELECT
+      (target_arg & 1 << target_bit_arg) >> target_bit_arg
   )
 );
