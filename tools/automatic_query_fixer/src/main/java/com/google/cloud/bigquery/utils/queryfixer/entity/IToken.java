@@ -1,7 +1,7 @@
 package com.google.cloud.bigquery.utils.queryfixer.entity;
 
 /**
- * A interface for queries' tokens.
+ * An interface for queries' tokens.
  * */
 public interface IToken {
 
@@ -9,12 +9,12 @@ public interface IToken {
 
   String getImage();
 
-  int getBeginLine();
+  int getBeginRow();
 
-  int getBeginCol();
+  int getBeginColumn();
 
-  int getEndLine();
+  int getEndRow();
 
-  int getEndCol();
+  int getEndColumn();
 
 }

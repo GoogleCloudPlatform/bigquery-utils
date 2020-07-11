@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.path
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import mu.KotlinLogging
 import java.nio.file.Path
@@ -14,7 +15,7 @@ import java.nio.file.Path
 private val LOGGER = KotlinLogging.logger { }
 
 fun main(args: Array<String>) = Cli(
-    FileListExpander(),
+    FilesExpander(),
     SqlExtractor(
         DataFlowSolver(
             listOf(
@@ -25,7 +26,7 @@ fun main(args: Array<String>) = Cli(
 ).main(args)
 
 private class Cli(
-    private val fileListExpander: FileListExpander,
+    private val filesExpander: FilesExpander,
     private val sqlExtractor: SqlExtractor
 ) :
     CliktCommand(
@@ -76,10 +77,10 @@ private class Cli(
     override fun run() {
         LOGGER.debug("Starting SQL Extraction from command line")
 
-        val files = fileListExpander.expandAndFilter(filePaths, recursive, includes, excludes)
-        LOGGER.debug { "Files to analyze: $files" }
+        val files = filesExpander.expandAndFilter(filePaths, recursive, includes, excludes)
 
         val output = sqlExtractor.process(files)
+        LOGGER.debug { "output: ${Gson().toJson(output)}" }
 
         val builder = GsonBuilder()
         if (prettyPrint) {
@@ -87,7 +88,6 @@ private class Cli(
         }
         val json = builder.create().toJson(output)
 
-        LOGGER.debug { "output: $json" }
         println(json)
     }
 }

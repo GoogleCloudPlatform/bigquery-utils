@@ -9,6 +9,7 @@ public class QueryFixerMain {
   public static void main(String[] args) {
 
     if (args.length == 0) {
+      // TODO: provide a more actionable info. This will be done once we finalize the input parameters.
       logger.atInfo().log("not enough arguments");
       return;
     }

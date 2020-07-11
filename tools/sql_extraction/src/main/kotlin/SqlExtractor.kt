@@ -16,11 +16,20 @@ class SqlExtractor(private val dataFlowSolver: DataFlowSolver) {
     /**
      * @return Detected SQL queries sorted by confidence
      */
-    fun process(filePaths: Collection<Path>): Output {
+    fun process(filePaths: Sequence<Path>): Output {
         val queries = ArrayList<Query>()
         for (filePath in filePaths) {
             LOGGER.debug { "Scanning $filePath" }
-            queries.addAll(dataFlowSolver.solveDataFlow(DataFlowEngine(), filePath))
+            queries.addAll(
+                dataFlowSolver.solveDataFlow(DataFlowEngine(), filePath)
+                    .map {
+                        Query(
+                            filePath.toString(),
+                            1.0, // todo: rank query confidence
+                            it.query,
+                            it.usages
+                        )
+                    })
         }
 
         return Output(queries)

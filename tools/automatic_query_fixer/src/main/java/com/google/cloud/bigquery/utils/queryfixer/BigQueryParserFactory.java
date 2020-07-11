@@ -11,12 +11,13 @@ import org.apache.calcite.util.SourceStringReader;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.google.cloud.bigquery.utils.queryfixer.exception.ParserCreationException;
+import com.google.common.base.Preconditions;
 
 import java.io.Reader;
-import java.util.Objects;
 
 /**
- * A factory to generate parsers. The fault generated parser is Babel Parser with BigQuery dialect.
+ * A factory to generate parsers. The default generated parser is Babel Parser with BigQuery
+ * dialect.
  */
 public class BigQueryParserFactory {
 
@@ -43,11 +44,11 @@ public class BigQueryParserFactory {
   /**
    * Get the parser parsing the input query.
    *
-   * @param sql query to parse
+   * @param query query to parse
    * @return a parser loaded with the query
    */
-  public SqlParser getParser(String sql) {
-    return getParser(new SourceStringReader(sql));
+  public SqlParser getParser(String query) {
+    return getParser(new SourceStringReader(query));
   }
 
   /**
@@ -58,18 +59,21 @@ public class BigQueryParserFactory {
    * @return SqlBabelParserImpl the parser implementation
    */
   public SqlBabelParserImpl getBabelParserImpl(String query) {
-    Objects.requireNonNull(query, "the input query should not be null");
+    Preconditions.checkNotNull(query, "The input query should not be null.");
 
     Object parserImpl;
     try {
-      parserImpl = FieldUtils.readField(getParser(query), "parser", true);
+      parserImpl =
+          FieldUtils.readField(
+              getParser(query), /* fieldName= */ "parser", /* forceAccess= */ true);
     } catch (IllegalAccessException e) {
       throw new ParserCreationException(
-          "unable to extract the parserImpl from the generated parser");
+          "Unable to extract the parserImpl from the generated parser.");
     }
 
     if (!(parserImpl instanceof SqlBabelParserImpl)) {
-      throw new ParserCreationException("the factory does not produce Babel Parser");
+      throw new ParserCreationException(
+          "This factory does not produce Babel Parser. Use the BigQueryParserFactory with default initialization instead.");
     }
     return (SqlBabelParserImpl) parserImpl;
   }
