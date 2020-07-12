@@ -293,4 +293,7 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
- 
+getbit:
+  - test:
+    input: CAST(23 AS INT64), CAST(2 AS INT64)
+    expected_output: CAST(1 AS INT64) 
