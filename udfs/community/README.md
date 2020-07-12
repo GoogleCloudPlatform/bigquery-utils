@@ -16,8 +16,8 @@ SELECT bqutil.fn.int(1.684)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
-* [from_binary](#from_binarys-string)
-* [from_hex](#from_hexs-string)
+* [from_binary](#from_binaryvalue-string)
+* [from_hex](#from_hexvalue-string)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
@@ -129,7 +129,7 @@ results:
 |         |    1000    |     1     |
 
 
-### [from_binary(s STRING)](from_binary.sql)
+### [from_binary(value STRING)](from_binary.sql)
 Returns a number in decimal form from its binary representation.
 
 ```sql
@@ -150,7 +150,7 @@ results:
 | 1111111111111111111111111111111111111111111111111111110000010111 |      -1001 |
 
 
-### [from_hex(s STRING)](from_hex.sql)
+### [from_hex(value STRING)](from_hex.sql)
 Returns a number in decimal form from its hexadecimal representation.
 
 ```sql
