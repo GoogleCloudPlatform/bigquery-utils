@@ -55,4 +55,32 @@ data class QueryFragment(
             return createComplex(count, list, type)
         }
     }
+
+    /**
+     * Converts a query fragment into a single String, annotated with special characters.
+     *
+     * If complex, fragments are separated by | ([ComplexType.OR]) or ?? ([ComplexType.UNKNOWN])
+     *
+     * If [FragmentCount.OPTIONAL], the fragment is appended by ?
+     *
+     * If [FragmentCount.MULTIPLE], the fragment is append by *
+     *
+     * If [FragmentCount.UNKNOWN], the fragment is append by ??
+     */
+    fun toCombinedString(): String {
+        return (if (type == null) {
+            literal!!
+        } else {
+            "(" + when (type) {
+                ComplexType.AND -> complex!!.joinToString("") { it.toCombinedString() }
+                ComplexType.OR -> complex!!.joinToString("|") { it.toCombinedString() }
+                ComplexType.UNKNOWN -> complex!!.joinToString("??") { it.toCombinedString() }
+            } + ")"
+        }) + when (count) {
+            FragmentCount.SINGLE -> ""
+            FragmentCount.OPTIONAL -> "?"
+            FragmentCount.MULTIPLE -> "*"
+            FragmentCount.UNKNOWN -> "??"
+        }
+    }
 }
