@@ -1,4 +1,3 @@
-  
 /*
  * Copyright 2020 Google LLC
  *
@@ -18,18 +17,14 @@
 -- from_hex:
 -- Input: STRING representing a number in hexadecimal form
 -- Output: INT64 number in decimal form
-CREATE OR REPLACE FUNCTION fn.from_hex(s STRING) AS 
+CREATE OR REPLACE FUNCTION fn.from_hex(value STRING) AS 
 (
   (
     SELECT 
       SUM(
       	CAST(
-      	  CONCAT(
-      	  	'0x', 
-      	  	SUBSTR(
-      	  	  s, 
-      	  	  byte * 2 + 1, 2)) 
-      	  AS INT64) << ((LENGTH(s) - (byte + 1) * 2) * 4))
-   FROM UNNEST(GENERATE_ARRAY(1, LENGTH(s) / 2)) WITH OFFSET byte
+      	  CONCAT('0x', SUBSTR(value, byte * 2 + 1, 2)) 
+      	    AS INT64) << ((LENGTH(value) - (byte + 1) * 2) * 4))
+    FROM UNNEST(GENERATE_ARRAY(1, LENGTH(value) / 2)) WITH OFFSET byte
   )
 );

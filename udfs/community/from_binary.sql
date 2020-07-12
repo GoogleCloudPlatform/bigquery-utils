@@ -1,4 +1,3 @@
-  
 /*
  * Copyright 2020 Google LLC
  *
@@ -18,13 +17,12 @@
 -- from_binary:
 -- Input: STRING representing a number in binary form
 -- Output: INT64 number in decimal form
-CREATE OR REPLACE FUNCTION fn.from_binary(s STRING) AS 
+CREATE OR REPLACE FUNCTION fn.from_binary(value STRING) AS 
 (
   (
     SELECT 
-      SUM(
-      	CAST(c AS INT64) << (LENGTH(s) - 1 - bit))
+      SUM(CAST(char AS INT64) << (LENGTH(value) - 1 - bit))
     FROM 
-      UNNEST(SPLIT(s, '')) AS c WITH OFFSET bit
+      UNNEST(SPLIT(value, '')) AS char WITH OFFSET bit
   )
 );

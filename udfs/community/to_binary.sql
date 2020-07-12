@@ -1,4 +1,3 @@
-  
 /*
  * Copyright 2020 Google LLC
  *
@@ -22,9 +21,7 @@ CREATE OR REPLACE FUNCTION fn.to_binary(x INT64) AS
 (
   (
     SELECT 
-      STRING_AGG(
-        CAST(x >> bit & 0x1 AS STRING), 
-        '' ORDER BY bit DESC)
+      STRING_AGG(CAST(x >> bit & 0x1 AS STRING), '' ORDER BY bit DESC)
     FROM 
       UNNEST(GENERATE_ARRAY(0, 63)) AS bit
   )

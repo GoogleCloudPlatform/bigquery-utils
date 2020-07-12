@@ -297,15 +297,27 @@ to_binary:
   - test:
     input: CAST(123456 AS INT64)
     expected_output: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
 from_binary:
   - test:
     input: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
     expected_output: CAST(123456 AS INT64)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
 to_hex:
   - test:
     input: CAST(123456 AS INT64)
     expected_output: CAST('000000000001e240' AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
 from_hex:
   - test:
     input: CAST('000000000001e240' AS STRING)
     expected_output: CAST(123456 AS INT64)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
