@@ -1,3 +1,4 @@
+// TODO: convert to proper .json (spoiledhua)
 DML_INSERT:INSERT INTO
 DML_DELETE:DELETE FROM
 DML_WHERE:WHERE
