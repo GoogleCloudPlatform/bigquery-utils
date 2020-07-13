@@ -12,8 +12,10 @@ public class QueryBreakdown {
 
   // the generated tree
   private Node root;
+  private Parser parser;
+
   /**
-   * This is the method that will run the UnparseableDetector given an original query and output
+   * This is the method that will run QueryBreakdown given an original query and output
    * it to the specified output file, or if that is null, generate a new file to put the output in.
    * The provided timeLimit will stop the tool from running over a certain time.
    */

@@ -30,7 +30,7 @@ public class Main {
     try {
       originalQuery = InputReader.readInput(inputFile);
     } catch (IOException e) {
-      e.printStackTrace();
+      System.out.println("there was an I/O error while reading the input");
     }
 
     /* this is where we feed in the original query to the UnparseableDetector, which will find
