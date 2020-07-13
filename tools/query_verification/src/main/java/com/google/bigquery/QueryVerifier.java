@@ -142,23 +142,22 @@ public class QueryVerifier {
                                 .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
                                 .create();
                         fieldList = gson.fromJson(schemaFields, FieldList.class);
-                    } catch (NullPointerException e) {
-                        // Error in formatting of fields
-                        System.out.println(tableId.toString() + " is not correctly formatted.");
-
-                        // Try to continue verification even without the fields
-                        fieldList = FieldList.of(new ArrayList<Field>());
                     } finally {
+                        if (fieldList == null || fieldList.isEmpty()) {
+                            // Error in formatting of fields
+                            System.out.println(tableId.getTable() + " is not correctly formatted.");
+
+                            // Skip table and try to continue verification even without this table
+                            continue;
+                        }
+
                         Schema schema = Schema.of(fieldList);
                         TableDefinition tableDefinition = StandardTableDefinition.of(schema);
 
                         tableInfos.add(TableInfo.newBuilder(tableId, tableDefinition).build());
-                    };
+                    }
                 }
             }
-        }
-        if (tableInfos.isEmpty()) {
-            System.out.println(queryVerificationSchema.path() + " is not correctly formatted.");
         }
         return tableInfos;
     }
