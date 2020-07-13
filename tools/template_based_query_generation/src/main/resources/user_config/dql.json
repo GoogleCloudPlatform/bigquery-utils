@@ -1,12 +1,4 @@
 {
-<<<<<<< HEAD
-  "DQL_SELECT": true,
-  "DQL_EXCEPT": true,
-  "DQL_FROM": true,
-  "DQL_WHERE": true,
-  "DQL_LIMIT": true,
-  "DQL_ORDER": true
-=======
   "keywordIndicators": [
     {
       "keyword": "DQL_WITH",
@@ -45,5 +37,4 @@
       "isIncluded": true
     }
   ]
->>>>>>> 33835babc5a545ddf0f7fbbd442e277e56124165
 }
