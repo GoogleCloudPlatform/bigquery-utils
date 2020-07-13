@@ -1,2 +1,19 @@
-// TODO (Allen): redo all config files in json format
-root:QUERY_ROOT
+{
+  "start": "QUERY_ROOT",
+  "end": "SINK",
+  "queryTypes": [
+    {
+      "queryType": "DDL",
+      "isIncluded": true
+    },
+    {
+      "queryType": "DML",
+      "isIncluded": true
+    },
+    {
+      "queryType": "DQL",
+      "isIncluded": true
+    }
+  ]
+}
+

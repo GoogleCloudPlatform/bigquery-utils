@@ -17,10 +17,6 @@
       "isIncluded": true
     },
     {
-      "keyword": "DQL_AS",
-      "isIncluded": true
-    },
-    {
       "keyword": "DQL_FROM",
       "isIncluded": true
     },
