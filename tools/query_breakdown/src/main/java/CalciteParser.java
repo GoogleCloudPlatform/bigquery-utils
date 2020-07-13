@@ -12,7 +12,7 @@ import org.apache.calcite.sql.dialect.CalciteSqlDialect;
  * Calcite Parser can be used as a blackbox.
  */
 public class CalciteParser implements Parser {
-  SqlParser.Config config;
+  private SqlParser.Config config;
 
   public CalciteParser() {
     // can change the field here to change the type of Calcite Parser

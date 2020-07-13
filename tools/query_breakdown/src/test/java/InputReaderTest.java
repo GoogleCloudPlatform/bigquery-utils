@@ -8,14 +8,15 @@ public class InputReaderTest {
   @Test
   public void inputReaderTest() throws IOException {
     String absPath = new File("").getAbsolutePath();
-    System.out.println(InputReader.readInput(absPath +
+    assertEquals("SELECT a FROM A", InputReader.readInput(absPath +
         "/src/test/java/InputTestFiles/singleLine.txt"));
   }
 
   @Test
   public void inputReaderTestMultipleQuery() throws IOException {
     String absPath = new File("").getAbsolutePath();
-    System.out.println(InputReader.readInput(absPath +
+    assertEquals("SELECT a FROM A;SELECT b FROM B;",
+        InputReader.readInput(absPath +
         "/src/test/java/InputTestFiles/multipleLines.txt"));
   }
 }

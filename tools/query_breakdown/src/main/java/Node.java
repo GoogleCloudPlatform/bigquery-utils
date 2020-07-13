@@ -7,22 +7,22 @@ import java.util.ArrayList;
 public class Node {
 
   // ensures tree structure
-  ArrayList<Node> children;
-  Node parent;
+  private ArrayList<Node> children;
+  private Node parent;
 
   // ensures that we know which location the error occurs in
-  int startLine;
-  int startColumn;
-  int endLine;
-  int endColumn;
+  private int startLine;
+  private int startColumn;
+  private int endLine;
+  private int endColumn;
 
   // ensures that we know how the error was handled
-  boolean errorHandlingType;
-  String replaceFrom;
-  String replaceTo;
+  private boolean errorHandlingType;
+  private String replaceFrom;
+  private String replaceTo;
 
   // ensures that we know what the performance measure is and how our current path is doing
-  int unparseableCount;
+  private int unparseableCount;
 
   /**
    * constructor for the node class
