@@ -1,3 +1,4 @@
+// TODO: convert to proper .json (spoiledhua)
 DDL_CREATE:CREATE
 DDL_PARTITION:PARTITION
 DDL_CLUSTER:CLUSTER
