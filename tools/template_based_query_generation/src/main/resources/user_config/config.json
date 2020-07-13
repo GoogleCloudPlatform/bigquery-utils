@@ -1,0 +1,19 @@
+{
+  "start": "QUERY_ROOT",
+  "end": "SINK",
+  "queryTypes": [
+    {
+      "queryType": "DDL",
+      "isIncluded": true
+    },
+    {
+      "queryType": "DML",
+      "isIncluded": true
+    },
+    {
+      "queryType": "DQL",
+      "isIncluded": true
+    }
+  ]
+}
+
