@@ -4,7 +4,7 @@
  */
 public class Query {
 
-    private QueryType type;
+	private QueryType type;
 
     public Query(QueryType type) {
         this.type = type;
