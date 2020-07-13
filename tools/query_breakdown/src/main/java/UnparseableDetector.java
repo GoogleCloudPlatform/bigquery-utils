@@ -4,18 +4,16 @@ import org.apache.calcite.sql.parser.SqlParseException;
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
  * also be in charge of outputting the results.
  */
-public class QueryBreakdown {
+public class UnparseableDetector {
 
   // global fields that keeps track of the minimum unparseable component so far
-  private int minimumUnparseableComp;
-  private Node solution;
+  int minimumUnparseableComp;
+  Node solution;
 
   // the generated tree
-  private Node root;
-  private Parser parser;
-
+  Node root;
   /**
-   * This is the method that will run QueryBreakdown given an original query and output
+   * This is the method that will run the UnparseableDetector given an original query and output
    * it to the specified output file, or if that is null, generate a new file to put the output in.
    * The provided timeLimit will stop the tool from running over a certain time.
    */
@@ -50,5 +48,5 @@ public class QueryBreakdown {
     // call ReplacementLogic
     ReplacementLogic.replace(inputQuery);
     return "";
-    }
+  }
 }

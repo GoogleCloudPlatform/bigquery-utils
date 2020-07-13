@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Node {
 
   // ensures tree structure
+
   private ArrayList<Node> children;
   private Node parent;
 
