@@ -11,7 +11,7 @@ public class MarkovChain<E> {
 
 	private HashSet<Node<E>> nodes;
 
-	/**å
+	/**
 	 * constructs MarkovChain object from edge weights and random seed
 	 * @param nodes
 	 */
