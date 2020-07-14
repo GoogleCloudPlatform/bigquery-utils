@@ -8,6 +8,7 @@ import java.nio.file.Paths;
  */
 public class Keywords {
 
+  // TODO (spoiledhua): double check new json file structure is compatible
   private final String filePathDDL = "./src/main/resources/user_config/ddl.json";
   private final String filePathDML = "./src/main/resources/user_config/dml.json";
   private final String filePathDQL = "./src/main/resources/user_config/dql.json";
