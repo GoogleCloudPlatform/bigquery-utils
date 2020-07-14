@@ -1,11 +1,18 @@
 package com.google.cloud.bigquery.utils.queryfixer.service;
 
+import com.google.api.gax.paging.Page;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.DatasetId;
 import com.google.cloud.bigquery.Job;
 import com.google.cloud.bigquery.JobInfo;
 import com.google.cloud.bigquery.QueryJobConfiguration;
+import com.google.cloud.bigquery.Table;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * A service to connect with the BigQuery server. It is used to communicate with the server like
@@ -58,5 +65,25 @@ public class BigQueryService {
     }
 
     return null;
+  }
+
+  /**
+   * Fetch the names of all table from the BigQuery given the project and dataset. If the project and/or dataset do
+   * not exist or not visible to the provided service account, {@link com.google.cloud.bigquery.BigQueryException} will
+   * be thrown.
+   * @param projectId project id
+   * @param datasetId dataset id
+   * @return list of table names belonging to the given project and dataset
+   */
+  public List<String> listTableNames(String projectId, String datasetId) throws BigQueryException {
+    DatasetId projectDatasetId = DatasetId.of(projectId, datasetId);
+    Page<Table> tables = bigquery.listTables(projectDatasetId);
+    return StreamSupport.stream(tables.iterateAll().spliterator(), /* parallel= */false)
+        .map(table -> table.getTableId().getTable())
+        .collect(Collectors.toList());
+  }
+
+  public BigQueryOptions getBigQueryOptions() {
+    return bigquery.getOptions();
   }
 }
