@@ -1,0 +1,24 @@
+{
+  "keywordIndicators": [
+    {
+      "keyword": "DDL_CREATE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DDL_PARTITION",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DDL_CLUSTER",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DDL_OPTIONS",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DDL_AS",
+      "isIncluded": true
+    }
+  ]
+}
