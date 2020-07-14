@@ -1,0 +1,36 @@
+{
+  "keywordIndicators": [
+    {
+      "keyword": "DML_INSERT",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_DELETE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_WHERE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_UPDATE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_INTO",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_VALUES",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_SET",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_FROM",
+      "isIncluded": true
+    }
+  ]
+}
