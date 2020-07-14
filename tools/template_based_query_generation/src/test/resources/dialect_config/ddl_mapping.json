@@ -1,68 +1,51 @@
 {
   "features": [
     {
-      "feature": "DML_INSERT",
+      "feature": "DDL_CREATE",
       "all_mappings": [
         {
-          "postgres": "INSERT",
-          "big_query": "INSERT",
+          "postgres": "CREATE TABLE",
+          "big_query": "CREATE TABLE",
           "tokens": [
             {
-              "token_name": "insert_exp",
+              "token_name": "table_name",
+              "required": true,
+              "count": 1
+            },
+            {
+              "token_name": "table_schema",
               "required": true,
               "count": 1
             }
           ]
         },
         {
-          "postgres": "INSERT INTO",
-          "big_query": "INSERT INTO",
-          "tokens": [
-            {
-              "token_name": "insert_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DML_DELETE",
-      "all_mappings": [
-        {
-          "postgres": "DELETE",
-          "big_query": "DELETE",
+          "postgres": "CREATE TABLE IF NOT EXISTS",
+          "big_query": "CREATE TABLE IF NOT EXISTS",
           "tokens": [
             {
               "token_name": "table_name",
+              "required": true,
+              "count": 1
+            },
+            {
+              "token_name": "table_schema",
               "required": true,
               "count": 1
             }
           ]
         },
         {
-          "postgres": "DELETE FROM",
-          "big_query": "DELETE FROM",
+          "postgres": "CREATE TABLE",
+          "big_query": "CREATE OR REPLACE TABLE",
           "tokens": [
             {
               "token_name": "table_name",
               "required": true,
               "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DML_UPDATE",
-      "all_mappings": [
-        {
-          "postgres": "UPDATE",
-          "big_query": "UPDATE",
-          "tokens": [
+            },
             {
-              "token_name": "table_name",
+              "token_name": "table_schema",
               "required": true,
               "count": 1
             }
@@ -71,14 +54,14 @@
       ]
     },
     {
-      "feature": "DML_SET",
+      "feature": "DDL_PARTITION",
       "all_mappings": [
         {
-          "postgres": "SET",
-          "big_query": "SET",
+          "postgres": "PARTITION BY",
+          "big_query": "PARTITION BY",
           "tokens": [
             {
-              "token_name": "update_item",
+              "token_name": "partition_exp",
               "required": true,
               "count": 1
             }
@@ -87,17 +70,28 @@
       ]
     },
     {
-      "feature": "DML_WHERE",
+      "feature": "DDL_CLUSTER",
       "all_mappings": [
         {
-          "postgres": "WHERE",
-          "big_query": "WHERE",
+          "postgres": "COLLATE",
+          "big_query": "CLUSTER BY",
           "tokens": [
             {
-              "token_name": "condition",
+              "token_name": "cluster_exp",
               "required": true,
               "count": 1
             }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DDL_AS",
+      "all_mappings": [
+        {
+          "postgres": "AS",
+          "big_query": "AS",
+          "tokens": [
           ]
         }
       ]

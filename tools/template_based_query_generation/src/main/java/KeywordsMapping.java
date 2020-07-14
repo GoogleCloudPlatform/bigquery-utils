@@ -2,9 +2,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordsMapping {
 
-  private final String filePathDDL = "./src/main/resources/dialect_config/ddl_mapping_postgre.json";
-  private final String filePathDML = "./src/main/resources/dialect_config/dml_mapping_postgre.json";
-  private final String filePathDQL = "./src/main/resources/dialect_config/dql_mapping_postgre.json";
+  // TODO (spoiledhua): refactor paths to take in new json config files
+  private final String filePathPostgreDDL = "./src/main/resources/dialect_config/ddl_mapping_postgre.json";
+  private final String filePathPostgreDML = "./src/main/resources/dialect_config/dml_mapping_postgre.json";
+  private final String filePathPostgreDQL = "./src/main/resources/dialect_config/dql_mapping_postgre.json";
   private final String filePathBigQueryDDL = "./src/main/resources/dialect_config/ddl_mapping_BQ.json";
   private final String filePathBigQueryDML = "./src/main/resources/dialect_config/dml_mapping_BQ.json";
   private final String filePathBigQueryDQL = "./src/main/resources/dialect_config/dql_mapping_BQ.json";

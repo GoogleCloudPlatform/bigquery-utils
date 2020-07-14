@@ -1,21 +1,68 @@
-// TODO: convert to proper .json (spoiledhua)
-DQL:DQL_WITH
-DQL:DQL_SELECT
-DQL_WITH:DQL_SELECT
-DQL_SELECT:DQL_AS
-DQL_SELECT:DQL_REPLACE
-DQL_SELECT:DQL_EXCEPT
-DQL_AS:DQL_FROM
-DQL_AS:DQL_WHERE
-DQL_REPLACE:DQL_FROM
-DQL_REPLACE:DQL_WHERE
-DQL_EXCEPT:DQL_FROM
-DQL_EXCEPT:DQL_WHERE
-DQL_WHERE:DQL_LIMIT
-DQL_WHERE:DQL_ORDER
-DQL_FROM:DQL_LIMIT
-DQL_FROM:DQL_ORDER
-DQL_FROM:SINK
-DQL_WHERE:SINK
-DQL_ORDER:SINK
-DQL_LIMIT:SINK
+{
+  "DQL": [
+    "DQL_SELECT"
+  ],
+  "DQL_SELECT": [
+    "DQL_FROM",
+    "DQL_WHERE",
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_FROM": [
+    "DQL_WHERE",
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_WHERE": [
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_GROUP": [
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_HAVING": [
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_WINDOW": [
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_ORDER": [
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_LIMIT": [
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_OFFSET": [
+    "SINK"
+  ]
+}
