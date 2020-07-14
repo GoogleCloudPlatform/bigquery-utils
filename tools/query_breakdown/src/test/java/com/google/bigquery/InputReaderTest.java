@@ -1,5 +1,8 @@
+package com.google.bigquery;
+
 import static org.junit.Assert.*;
 
+import com.google.bigquery.InputReader;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
@@ -9,7 +12,7 @@ public class InputReaderTest {
   public void inputReaderTest() throws IOException {
     String absPath = new File("").getAbsolutePath();
     assertEquals("SELECT a FROM A", InputReader.readInput(absPath +
-        "/src/test/java/InputTestFiles/singleLine.txt"));
+        "/src/test/java/com.google.bigquery.InputTestFiles/singleLine.txt"));
   }
 
   @Test
@@ -17,6 +20,6 @@ public class InputReaderTest {
     String absPath = new File("").getAbsolutePath();
     assertEquals("SELECT a FROM A;SELECT b FROM B;",
         InputReader.readInput(absPath +
-        "/src/test/java/InputTestFiles/multipleLines.txt"));
+        "/src/test/java/com.google.bigquery.InputTestFiles/multipleLines.txt"));
   }
 }

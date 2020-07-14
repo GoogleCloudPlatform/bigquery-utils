@@ -1,5 +1,7 @@
+package com.google.bigquery;
+
 /**
- * Interface for Parser to abstract out parser logic.
+ * Interface for com.google.bigquery.Parser to abstract out parser logic.
  */
 public interface Parser {
 

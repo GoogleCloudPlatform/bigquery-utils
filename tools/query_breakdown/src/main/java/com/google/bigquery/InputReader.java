@@ -1,8 +1,9 @@
+package com.google.bigquery;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 
 /**
  * This class will take care of the input handling logic, essentially parsing the input document

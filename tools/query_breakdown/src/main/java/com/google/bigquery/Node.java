@@ -1,3 +1,5 @@
+package com.google.bigquery;
+
 import java.util.ArrayList;
 
 /**

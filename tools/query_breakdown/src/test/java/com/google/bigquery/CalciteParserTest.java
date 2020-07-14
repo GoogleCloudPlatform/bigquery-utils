@@ -1,6 +1,9 @@
+package com.google.bigquery;
+
 import static org.junit.Assert.*;
 
 import org.apache.calcite.sql.parser.SqlParseException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +38,7 @@ public class CalciteParserTest {
   // the Calcite parser can handle trailing/leading spaces as well as spaces in the middle
   @Test
   public void parseQuerySpaceSuccess() throws SqlParseException {
-    assertEquals(parser.parseQuery("SELECT a FROM A"),
+    Assert.assertEquals(parser.parseQuery("SELECT a FROM A"),
         parser.parseQuery("  SELECT a                      FROM A  "));
   }
 }
