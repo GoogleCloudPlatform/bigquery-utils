@@ -1,0 +1,33 @@
+{
+  "DDL": [
+    "DDL_CREATE"
+  ],
+  "DDL_CREATE": [
+    "DDL_PARTITION",
+    "DDL_CLUSTER",
+    "DDL_OPTIONS",
+    "DDL_AS",
+    "SINK"
+  ],
+  "DDL_PARTITION": [
+    "DDL_CLUSTER",
+    "DDL_OPTIONS",
+    "DDL_AS",
+    "SINK"
+  ],
+  "DDL_CLUSTER": [
+    "DDL_OPTIONS",
+    "DDL_AS",
+    "SINK"
+  ],
+  "DDL_OPTIONS": [
+    "DDL_AS",
+    "SINK"
+  ],
+  "DDL_PARTITION": [
+    "SINK"
+  ],
+  "DDL_AS": [
+    "SINK"
+  ]
+}
