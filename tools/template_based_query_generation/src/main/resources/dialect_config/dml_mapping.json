@@ -1,0 +1,84 @@
+{
+  "DML_INSERT": {
+    "postgres": [
+      "INSERT",
+      "INSERT INTO"
+    ],
+    "big_query": [
+      "INSERT",
+      "INSERT INTO"
+    ],
+    "tokens": {
+      "insert_exp": {
+        "required": true,
+        "count": 1
+      }
+    }
+  },
+  "DML_DELETE": {
+    "postgres": [
+      "DELETE", "DELETE FROM"
+    ],
+    "big_query": [
+      "DELETE", "DELETE FROM"
+    ],
+    "tokens": {
+      "table_name": {
+        "required": true,
+        "count": 1
+      }
+    }
+  },
+  "DDL_CLUSTER": {
+    "postgres": [
+      "COLLATE"
+    ],
+    "big_query": [
+      "CLUSTER BY"
+    ],
+    "tokens": {
+      "cluster_exp": {
+        "required": true,
+        "count": 1
+      }
+    }
+  },
+  "DDL_AS": {
+    "postgres": [
+      "AS"
+    ],
+    "big_query": [
+      "AS"
+    ]
+  },
+
+    {
+      "keyword": "DML_DELETE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_WHERE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_UPDATE",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_INTO",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_VALUES",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_SET",
+      "isIncluded": true
+    },
+    {
+      "keyword": "DML_FROM",
+      "isIncluded": true
+    }
+  ]
+}
