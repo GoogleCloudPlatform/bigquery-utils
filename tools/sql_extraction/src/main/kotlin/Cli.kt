@@ -12,8 +12,6 @@ import com.google.gson.GsonBuilder
 import mu.KotlinLogging
 import java.nio.file.Path
 
-private val LOGGER = KotlinLogging.logger { }
-
 fun main(args: Array<String>) = Cli(
     FilesExpander(),
     SqlExtractor(
@@ -74,13 +72,28 @@ private class Cli(
         "--pretty", help = "Pretty-print output JSON"
     ).flag()
 
+    private val showProgress: Boolean by option(
+        "--progress", help = "Print progress to STDERR"
+    ).flag()
+
+    private val debug: Boolean by option(
+        "--debug", "--verbose", help = "Print debug logs to STDERR"
+    ).flag()
+
     override fun run() {
-        LOGGER.debug("Starting SQL Extraction from command line")
+        if (debug) {
+            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug")
+        }
+        val logger = KotlinLogging.logger {  }
+        logger.debug("Starting SQL Extraction from command line")
 
         val files = filesExpander.expandAndFilter(filePaths, recursive, includes, excludes)
+        if (showProgress) {
+            System.err.println("0.0% Analyzing files...")
+        }
 
-        val output = sqlExtractor.process(files)
-        LOGGER.debug { "output: ${Gson().toJson(output)}" }
+        val output = sqlExtractor.process(files, showProgress)
+        logger.debug { "output: ${Gson().toJson(output)}" }
 
         val builder = GsonBuilder()
         if (prettyPrint) {
