@@ -13,10 +13,6 @@
       "isIncluded": true
     },
     {
-      "keyword": "DDL_OPTIONS",
-      "isIncluded": true
-    },
-    {
       "keyword": "DDL_AS",
       "isIncluded": true
     }

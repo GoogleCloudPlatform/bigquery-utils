@@ -1,0 +1,106 @@
+{
+  "features": [
+    {
+      "feature": "DML_INSERT",
+      "all_mappings": [
+        {
+          "postgres": "INSERT",
+          "big_query": "INSERT",
+          "tokens": [
+            {
+              "token_name": "insert_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "postgres": "INSERT INTO",
+          "big_query": "INSERT INTO",
+          "tokens": [
+            {
+              "token_name": "insert_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_DELETE",
+      "all_mappings": [
+        {
+          "postgres": "DELETE",
+          "big_query": "DELETE",
+          "tokens": [
+            {
+              "token_name": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "postgres": "DELETE FROM",
+          "big_query": "DELETE FROM",
+          "tokens": [
+            {
+              "token_name": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_UPDATE",
+      "all_mappings": [
+        {
+          "postgres": "UPDATE",
+          "big_query": "UPDATE",
+          "tokens": [
+            {
+              "token_name": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_SET",
+      "all_mappings": [
+        {
+          "postgres": "SET",
+          "big_query": "SET",
+          "tokens": [
+            {
+              "token_name": "update_item",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_WHERE",
+      "all_mappings": [
+        {
+          "postgres": "WHERE",
+          "big_query": "WHERE",
+          "tokens": [
+            {
+              "token_name": "condition",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
