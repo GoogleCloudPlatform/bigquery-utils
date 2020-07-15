@@ -1,7 +1,0 @@
-{
-  "QUERY_ROOT": [
-    "DDL",
-    "DML",
-    "DQL"
-  ]
-}
