@@ -1,0 +1,52 @@
+{
+  "features": [
+    {
+      "feature": "DQL_SELECT",
+      "all_mappings": [
+        {
+          "postgres": "SELECT",
+          "big_query": "SELECT",
+          "tokens": [
+            {
+              "token_name": "select_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_FROM",
+      "all_mappings": [
+        {
+          "postgres": "FROM",
+          "big_query": "FROM",
+          "tokens": [
+            {
+              "token_name": "from_item",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_WHERE",
+      "all_mappings": [
+        {
+          "postgres": "WHERE",
+          "big_query": "WHERE",
+          "tokens": [
+            {
+              "token_name": "condition",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

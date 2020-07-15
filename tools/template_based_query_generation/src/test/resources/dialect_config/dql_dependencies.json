@@ -1,0 +1,17 @@
+{
+  "DQL": [
+    "DQL_SELECT"
+  ],
+  "DQL_SELECT": [
+    "DQL_FROM",
+    "DQL_WHERE",
+    "SINK"
+  ],
+  "DQL_FROM": [
+    "DQL_WHERE",
+    "SINK"
+  ],
+  "DQL_WHERE": [
+    "SINK"
+  ]
+}
