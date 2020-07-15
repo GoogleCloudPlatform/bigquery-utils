@@ -82,5 +82,21 @@ public class QueryBreakdown {
     // call ReplacementLogic
     ReplacementLogic.replace(inputQuery);
     return new ArrayList<>();
+  }
+
+  /**
+   * This helper method returns the index of the nth occurrence of key character in the input
+   * string. Returns -1 if there is no such instance.
+   */
+  static int findNthIndexOf(String string, char key, int n) {
+    int position = string.indexOf(key);
+    while (n > 1) {
+      if (position == -1) {
+        return position;
+      }
+      position = string.indexOf(key, position + 1);
+      n -= 1;
     }
+    return position;
+  }
 }
