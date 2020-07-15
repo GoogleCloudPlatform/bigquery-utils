@@ -27,6 +27,7 @@ dependencies {
     implementation 'org.apache.calcite.avatica:avatica-core:1.17.0'
     implementation "org.apache.commons:commons-lang3:3.1"
     compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    compile 'com.google.cloud:google-cloud-bigquery:1.116.3'
     // google flogger dependencies
     compile group: 'com.google.flogger', name: 'flogger', version: '0.1'
     compile 'com.google.flogger:flogger-system-backend:0.4'
