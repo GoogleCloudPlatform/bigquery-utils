@@ -23,7 +23,7 @@ class SqlExtractorTest(private val showProgress: Boolean) {
         val solver = mockk<DataFlowSolver>()
         every { solver.solveDataFlow(any(), any()) } returns emptySequence()
 
-        SqlExtractor(solver).process(sequenceOf(mockk(relaxed = true)), showProgress)
+        SqlExtractor(solver, mockk(relaxed = true)).process(sequenceOf(mockk(relaxed = true)), showProgress)
         verify { solver.solveDataFlow(any(), any()) }
 
         confirmVerified()
@@ -40,8 +40,22 @@ class SqlExtractorTest(private val showProgress: Boolean) {
             mockk(relaxed = true)
         )
 
-        SqlExtractor(solver).process(filePaths.asSequence(), showProgress)
+        SqlExtractor(solver, mockk(relaxed = true)).process(filePaths.asSequence(), showProgress)
         verifyAll { filePaths.map { solver.solveDataFlow(any(), it) } }
+
+        confirmVerified()
+    }
+
+    @Test
+    fun `detected queries are rated by the given confidence rater`() {
+        val solver = mockk<DataFlowSolver>()
+        every { solver.solveDataFlow(any(), any()) } returns sequenceOf(mockk(relaxed = true))
+
+        val rater = mockk<ConfidenceRater>()
+        every { rater.rate(any()) } returns 1.0
+
+        SqlExtractor(solver, rater).process(sequenceOf(mockk(relaxed = true)), showProgress)
+        verifyAll { rater.rate(any()) }
 
         confirmVerified()
     }

@@ -19,7 +19,7 @@ fun main(args: Array<String>) = Cli(
             listOf(
                 JavaFrontEnd()
             )
-        )
+        ), ConfidenceRater()
     )
 ).main(args)
 

@@ -12,7 +12,10 @@ private val LOGGER = KotlinLogging.logger { }
  *
  * @param[dataFlowSolver] Solver responsible for detecting query construction and usages
  */
-class SqlExtractor(private val dataFlowSolver: DataFlowSolver) {
+class SqlExtractor(
+    private val dataFlowSolver: DataFlowSolver,
+    private val confidenceRater: ConfidenceRater
+) {
     /**
      * @return Detected SQL queries sorted by confidence
      */
@@ -40,7 +43,7 @@ class SqlExtractor(private val dataFlowSolver: DataFlowSolver) {
                     .map {
                         Query(
                             filePath.toString(),
-                            1.0, // todo: rank query confidence
+                            confidenceRater.rate(it.query),
                             it.query,
                             it.usages
                         )
@@ -53,6 +56,6 @@ class SqlExtractor(private val dataFlowSolver: DataFlowSolver) {
             }
         }
 
-        return Output(queries)
+        return Output(queries.sortedByDescending { it.confidence })
     }
 }
