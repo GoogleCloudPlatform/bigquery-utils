@@ -1,0 +1,153 @@
+{
+  "features": [
+    {
+      "feature": "DQL_SELECT",
+      "allMappings": [
+        {
+          "postgres": "SELECT",
+          "bigQuery": "SELECT",
+          "tokens": [
+            {
+              "tokenName": "select_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_FROM",
+      "allMappings": [
+        {
+          "postgres": "FROM",
+          "bigQuery": "FROM",
+          "tokens": [
+            {
+              "tokenName": "from_item",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_WHERE",
+      "allMappings": [
+        {
+          "postgres": "WHERE",
+          "bigQuery": "WHERE",
+          "tokens": [
+            {
+              "tokenName": "condition",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_GROUP",
+      "allMappings": [
+        {
+          "postgres": "GROUP BY",
+          "bigQuery": "GROUP BY",
+          "tokens": [
+            {
+              "tokenName": "group_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_HAVING",
+      "allMappings": [
+        {
+          "postgres": "HAVING",
+          "bigQuery": "HAVING",
+          "tokens": [
+            {
+              "tokenName": "condition",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_WINDOW",
+      "allMappings": [
+        {
+          "postgres": "WINDOW",
+          "bigQuery": "WINDOW",
+          "tokens": [
+            {
+              "tokenName": "window_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_ORDER",
+      "allMappings": [
+        {
+          "postgres": "ORDER BY",
+          "bigQuery": "ORDER BY",
+          "tokens": [
+            {
+              "tokenName": "order_exp",
+              "required": true,
+              "count": 1
+            },
+            {
+              "tokenName": "asc_desc",
+              "required": false,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_LIMIT",
+      "allMappings": [
+        {
+          "postgres": "LIMIT",
+          "bigQuery": "LIMIT",
+          "tokens": [
+            {
+              "tokenName": "count",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_OFFSET",
+      "allMappings": [
+        {
+          "postgres": "OFFSET",
+          "bigQuery": "OFFSET",
+          "tokens": [
+            {
+              "tokenName": "skip_rows",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
