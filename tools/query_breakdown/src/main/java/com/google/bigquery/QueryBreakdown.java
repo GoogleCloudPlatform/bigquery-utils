@@ -48,9 +48,9 @@ public class QueryBreakdown {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndLineNum(), pos.getEndColumnNum());
+          pos.getEndColumnNum());
       List<String> replacementQueries = replacement(inputQuery, pos.getLineNum(),
-          pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum(),
+          pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
 
       // recursively loops through the new queries
@@ -67,9 +67,16 @@ public class QueryBreakdown {
    * This method implements the deletion mechanism: given the position of the component, it
    * generates a new query with that component deleted.
    */
-  private static String deletion(String inputQuery, int startLine, int startColumn, int endLine,
+  private static String deletion(String inputQuery, int startLine, int startColumn,
       int endColumn) {
-    return "";
+    StringBuilder sb = new StringBuilder(inputQuery);
+    if (startLine == 1) {
+      sb.delete(startColumn, endColumn + 1);
+      return sb.toString();
+    }
+    int position = findNthIndexOf(inputQuery, '\n', startLine -1);
+    sb.delete(position + startColumn, position + endColumn + 1);
+    return sb.toString();
   }
 
   /**
@@ -78,7 +85,7 @@ public class QueryBreakdown {
    * with and generates a new query with that component replaced.
    */
   private static List<String> replacement(String inputQuery, int startLine, int startColumn,
-      int endLine, int endColumn, Collection<String> expectedTokens) {
+      int endColumn, Collection<String> expectedTokens) {
     // call ReplacementLogic
     ReplacementLogic.replace(inputQuery);
     return new ArrayList<>();
