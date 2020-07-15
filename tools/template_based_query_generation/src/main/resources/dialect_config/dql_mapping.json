@@ -2,13 +2,13 @@
   "features": [
     {
       "feature": "DQL_SELECT",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "SELECT",
-          "big_query": "SELECT",
+          "bigQuery": "SELECT",
           "tokens": [
             {
-              "token_name": "select_exp",
+              "tokenName": "select_exp",
               "required": true,
               "count": 1
             }
@@ -18,13 +18,13 @@
     },
     {
       "feature": "DQL_FROM",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "FROM",
-          "big_query": "FROM",
+          "bigQuery": "FROM",
           "tokens": [
             {
-              "token_name": "from_item",
+              "tokenName": "from_item",
               "required": true,
               "count": 1
             }
@@ -34,13 +34,13 @@
     },
     {
       "feature": "DQL_WHERE",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "WHERE",
-          "big_query": "WHERE",
+          "bigQuery": "WHERE",
           "tokens": [
             {
-              "token_name": "condition",
+              "tokenName": "condition",
               "required": true,
               "count": 1
             }
@@ -50,13 +50,13 @@
     },
     {
       "feature": "DQL_GROUP",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "GROUP BY",
-          "big_query": "GROUP BY",
+          "bigQuery": "GROUP BY",
           "tokens": [
             {
-              "token_name": "group_exp",
+              "tokenName": "group_exp",
               "required": true,
               "count": 1
             }
@@ -66,13 +66,13 @@
     },
     {
       "feature": "DQL_HAVING",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "HAVING",
-          "big_query": "HAVING",
+          "bigQuery": "HAVING",
           "tokens": [
             {
-              "token_name": "condition",
+              "tokenName": "condition",
               "required": true,
               "count": 1
             }
@@ -82,13 +82,13 @@
     },
     {
       "feature": "DQL_WINDOW",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "WINDOW",
-          "big_query": "WINDOW",
+          "bigQuery": "WINDOW",
           "tokens": [
             {
-              "token_name": "window_exp",
+              "tokenName": "window_exp",
               "required": true,
               "count": 1
             }
@@ -98,18 +98,18 @@
     },
     {
       "feature": "DQL_ORDER",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "ORDER BY",
-          "big_query": "ORDER BY",
+          "bigQuery": "ORDER BY",
           "tokens": [
             {
-              "token_name": "order_exp",
+              "tokenName": "order_exp",
               "required": true,
               "count": 1
             },
             {
-              "token_name": "asc_desc",
+              "tokenName": "asc_desc",
               "required": false,
               "count": 1
             }
@@ -119,13 +119,13 @@
     },
     {
       "feature": "DQL_LIMIT",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "LIMIT",
-          "big_query": "LIMIT",
+          "bigQuery": "LIMIT",
           "tokens": [
             {
-              "token_name": "count",
+              "tokenName": "count",
               "required": true,
               "count": 1
             }
@@ -135,13 +135,13 @@
     },
     {
       "feature": "DQL_OFFSET",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "OFFSET",
-          "big_query": "OFFSET",
+          "bigQuery": "OFFSET",
           "tokens": [
             {
-              "token_name": "skip_rows",
+              "tokenName": "skip_rows",
               "required": true,
               "count": 1
             }

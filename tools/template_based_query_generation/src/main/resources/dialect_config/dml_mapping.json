@@ -2,13 +2,13 @@
   "features": [
     {
       "feature": "DML_INSERT",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "INSERT",
-          "big_query": "INSERT",
+          "bigQuery": "INSERT",
           "tokens": [
             {
-              "token_name": "insert_exp",
+              "tokenName": "insert_exp",
               "required": true,
               "count": 1
             }
@@ -16,10 +16,10 @@
         },
         {
           "postgres": "INSERT INTO",
-          "big_query": "INSERT INTO",
+          "bigQuery": "INSERT INTO",
           "tokens": [
             {
-              "token_name": "insert_exp",
+              "tokenName": "insert_exp",
               "required": true,
               "count": 1
             }
@@ -29,13 +29,13 @@
     },
     {
       "feature": "DML_DELETE",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "DELETE",
-          "big_query": "DELETE",
+          "bigQuery": "DELETE",
           "tokens": [
             {
-              "token_name": "table_name",
+              "tokenName": "table_name",
               "required": true,
               "count": 1
             }
@@ -43,10 +43,10 @@
         },
         {
           "postgres": "DELETE FROM",
-          "big_query": "DELETE FROM",
+          "bigQuery": "DELETE FROM",
           "tokens": [
             {
-              "token_name": "table_name",
+              "tokenName": "table_name",
               "required": true,
               "count": 1
             }
@@ -56,13 +56,13 @@
     },
     {
       "feature": "DML_UPDATE",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "UPDATE",
-          "big_query": "UPDATE",
+          "bigQuery": "UPDATE",
           "tokens": [
             {
-              "token_name": "table_name",
+              "tokenName": "table_name",
               "required": true,
               "count": 1
             }
@@ -72,13 +72,13 @@
     },
     {
       "feature": "DML_SET",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "SET",
-          "big_query": "SET",
+          "bigQuery": "SET",
           "tokens": [
             {
-              "token_name": "update_item",
+              "tokenName": "update_item",
               "required": true,
               "count": 1
             }
@@ -88,13 +88,13 @@
     },
     {
       "feature": "DML_WHERE",
-      "all_mappings": [
+      "allMappings": [
         {
           "postgres": "WHERE",
-          "big_query": "WHERE",
+          "bigQuery": "WHERE",
           "tokens": [
             {
-              "token_name": "condition",
+              "tokenName": "condition",
               "required": true,
               "count": 1
             }
