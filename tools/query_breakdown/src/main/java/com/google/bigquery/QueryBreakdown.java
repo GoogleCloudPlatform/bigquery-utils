@@ -67,15 +67,34 @@ public class QueryBreakdown {
    * This method implements the deletion mechanism: given the position of the component, it
    * generates a new query with that component deleted.
    */
-  private static String deletion(String inputQuery, int startLine, int startColumn,
+  static String deletion(String inputQuery, int startLine, int startColumn,
       int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
+
+    // delete the portion of the string from x (inclusive) to y (exclusive)
+    int x;
+    int y;
+
+    // when the exception occurs in line 1
     if (startLine == 1) {
-      sb.delete(startColumn, endColumn + 1);
-      return sb.toString();
+      x = startColumn - 1;
+      y = endColumn;
+      // deals with extra spacing when deleting
+      if (inputQuery.charAt(startColumn - 2) == ' ') {
+        x = startColumn - 2;
+      }
     }
-    int position = findNthIndexOf(inputQuery, '\n', startLine -1);
-    sb.delete(position + startColumn, position + endColumn + 1);
+    else {
+      int position = findNthIndexOf(inputQuery, '\n', startLine -1);
+      x = position + startColumn;
+      y = position + endColumn + 1;
+      // deals with extra spacing when deleting
+      if (inputQuery.charAt(position + startColumn - 1) == ' ') {
+        x = position + startColumn - 1;
+      }
+    }
+
+    sb.delete(x, y);
     return sb.toString();
   }
 
