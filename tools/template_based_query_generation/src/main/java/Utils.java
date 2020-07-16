@@ -214,7 +214,7 @@ public class Utils {
 
     ImmutableMap.Builder<String, ImmutableList<Mapping>> builder = ImmutableMap.builder();
 
-    for (Feature feature : features.getFeatures()) {
+    for (Feature feature : ImmutableList.copyOf(features.getFeatures())) {
       if (keywords.contains(feature.getFeature())) {
         builder.put(feature.getFeature(), ImmutableList.copyOf(feature.getAllMappings()));
       }

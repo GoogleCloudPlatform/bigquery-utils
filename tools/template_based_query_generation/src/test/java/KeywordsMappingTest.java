@@ -1,63 +1,72 @@
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KeywordsMappingTest {
 
-  // TODO (spoiledhua): fix tests here to correspond with new changes to KeywordsMapping
-
   @Test
-  public void test_getMappingPostgreDDL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("CREATE", km.getMappingPostgreDDL("DDL_CREATE"));
+  public void test_getMappingDDL() {
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("partition_exp");
+    ArrayList<TokenInfo> tokenInfos = new ArrayList<TokenInfo>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgre("PARTITION BY");
+    mapping.setBigQuery("PARTITION BY");
+    mapping.setTokens(tokenInfos);
+    ArrayList<Mapping> mappings = new ArrayList<Mapping>();
+
+    assertEquals(mappings, keywordsMapping.getMappingDDL("DDL_PARTITION"));
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingPostgreDDL("NON KEYWORD");
+      keywordsMapping.getMappingDDL("NON KEYWORD");
     });
   }
 
   @Test
-  public void test_getMappingBigQueryDDL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("CREATE", km.getMappingBigQueryDDL("DDL_CREATE"));
+  public void test_getMappingDML() {
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("update_item");
+    ArrayList<TokenInfo> tokenInfos = new ArrayList<TokenInfo>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgre("SET");
+    mapping.setBigQuery("SET");
+    mapping.setTokens(tokenInfos);
+    ArrayList<Mapping> mappings = new ArrayList<Mapping>();
+
+    assertEquals(mappings, keywordsMapping.getMappingDML("DML_SET"));
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingBigQueryDDL("NON KEYWORD");
+      keywordsMapping.getMappingDML("NON KEYWORD");
     });
   }
 
   @Test
-  public void test_getMappingPostgreDML() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("INSERT INTO", km.getMappingPostgreDML("DML_INSERT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingPostgreDML("NON KEYWORD");
-    });
-  }
+  public void test_getMappingDQL() {
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("select_exp");
+    ArrayList<TokenInfo> tokenInfos = new ArrayList<TokenInfo>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgre("SELECT");
+    mapping.setBigQuery("SELECT");
+    mapping.setTokens(tokenInfos);
+    ArrayList<Mapping> mappings = new ArrayList<Mapping>();
 
-  @Test
-  public void test_getMappingBigQueryDML() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("INSERT", km.getMappingBigQueryDML("DML_INSERT"));
+    assertEquals(mappings, keywordsMapping.getMappingDQL("DQL_SELECT"));
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingBigQueryDML("NON KEYWORD");
-    });
-  }
-
-  @Test
-  public void test_getMappingPostgreDQL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("SELECT", km.getMappingPostgreDQL("DQL_SELECT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingPostgreDQL("NON KEYWORD");
-    });
-  }
-
-  @Test
-  public void test_getMappingBigQueryDQL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("SELECT", km.getMappingBigQueryDQL("DQL_SELECT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingBigQueryDQL("NON KEYWORD");
+      keywordsMapping.getMappingDQL("NON KEYWORD");
     });
   }
 }
