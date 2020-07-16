@@ -15,8 +15,8 @@ public class TableNotFoundError extends BigQuerySemanticError {
 
   private final String tableName;
 
-  public TableNotFoundError(String tableName, Position errPos, BigQueryException errorSource) {
-    super(errPos, errorSource);
+  public TableNotFoundError(String tableName, Position errorPosition, BigQueryException errorSource) {
+    super(errorPosition, errorSource);
     this.tableName = tableName;
   }
 }

@@ -23,15 +23,15 @@ public class FunctionNotFoundError extends BigQuerySemanticError {
   private final String suggestion;
 
   public FunctionNotFoundError(
-      String functionName, Position errPos, String suggestion, BigQueryException errorSource) {
-    super(errPos, errorSource);
+      String functionName, Position errorPosition, String suggestion, BigQueryException errorSource) {
+    super(errorPosition, errorSource);
     this.functionName = functionName;
     this.suggestion = suggestion;
   }
 
   public FunctionNotFoundError(
-      String functionName, Position errPos, BigQueryException errorSource) {
-    super(errPos, errorSource);
+      String functionName, Position errorPosition, BigQueryException errorSource) {
+    super(errorPosition, errorSource);
     this.functionName = functionName;
     this.suggestion = null;
   }

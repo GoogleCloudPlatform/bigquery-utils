@@ -24,15 +24,15 @@ public class UnrecognizedColumnError extends BigQuerySemanticError {
   private final String suggestion;
 
   public UnrecognizedColumnError(
-      String columnName, Position errPos, String suggestion, BigQueryException errorSource) {
-    super(errPos, errorSource);
+      String columnName, Position errorPosition, String suggestion, BigQueryException errorSource) {
+    super(errorPosition, errorSource);
     this.columnName = columnName;
     this.suggestion = suggestion;
   }
 
   public UnrecognizedColumnError(
-      String columnName, Position errPos, BigQueryException errorSource) {
-    super(errPos, errorSource);
+      String columnName, Position errorPosition, BigQueryException errorSource) {
+    super(errorPosition, errorSource);
     this.columnName = columnName;
     this.suggestion = null;
   }
