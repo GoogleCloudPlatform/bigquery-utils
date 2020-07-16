@@ -25,9 +25,14 @@ public class BigQueryServiceTest {
    * Please modify this method if your BigQuery credential is not at default path or you would like
    * to use other options.
    *
+   * <p>To create a credential in the default path, users can execute `gcloud auth
+   * application-default login` in command line. Also, please modify the project ID to the one
+   * belonging to your account.
+   *
    * @return a default BigQuery options
    */
   private BigQueryOptions getOptions() {
+    // please modify this projectId to the one belonging to you.
     String projectId = "sql-gravity-internship";
     BigQueryOptions.Builder builder = BigQueryOptions.newBuilder().setProjectId(projectId);
     return builder.build();
@@ -39,7 +44,7 @@ public class BigQueryServiceTest {
   }
 
   @Test
-  public void dryRun1() {
+  public void dryRun_success() {
     String query =
         "SELECT corpus FROM `bigquery-public-data.samples.shakespeare` GROUP BY corpus limit 1000";
     Job job = service.dryRun(query);
@@ -49,7 +54,7 @@ public class BigQueryServiceTest {
   }
 
   @Test
-  public void dryRun2() {
+  public void dryRun_tableNotFound() {
     String query = "SELECT corpus FROM `bigquery-public-data.samples.shakespearex`";
     BigQueryException exception = service.catchExceptionFromDryRun(query);
     assertNotNull(exception);
