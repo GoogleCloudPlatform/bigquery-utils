@@ -34,10 +34,11 @@ def load_bigquery_table(project_id, dataset_id, table_id, filename):
     
     with open(filename, "rb") as source_file:
         job = client.load_table_from_file(source_file, table_ref, job_config=job_config)
-    
-    job.result()
-    
-    return "Loaded {} rows into {}:{}.".format(job.output_rows, dataset_id, table_id)
+    try:
+        job.result()
+    except Exception as e:
+        return False, job.errors
+    return True, "Loaded {} rows into {}:{}.".format(job.output_rows, dataset_id, table_id)
 
 def upload_gcs_file(project_id, bucket_id, destination_blob_name, filename):
     """ Uploads a file to Google Cloud Storage.
@@ -56,6 +57,9 @@ def upload_gcs_file(project_id, bucket_id, destination_blob_name, filename):
     bucket = storage_client.bucket(bucket_id)
     blob = bucket.blob(destination_blob_name)
 
-    blob.upload_from_filename(filename)
+    try:
+        blob.upload_from_filename(filename)
+    except Exception as e:
+        return False, e
 
-    return "File {} uploaded to {}.".format(filename, destination_blob_name)
+    return True, "File {} uploaded to {}.".format(filename, destination_blob_name)

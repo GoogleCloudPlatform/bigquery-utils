@@ -71,36 +71,36 @@ class CrawlerLog(object):
         Args:
             str: Error message to be logged.
         """
-        
+
         self.error_log_count += 1
         logging.error("ERROR: %s", errorMessage)
-        
+
     def parse_location_arg(self, location):
         """ Validates and splits location argument for cloud upload
         into two parts. Should be formatted as project_id.dataset.
         
         Args:
             location: String with name of project ID and dataset.
-            
+
         Returns
             List of separate strings after splitting location.
         """
         if location.count(".") != 1:
             self.log_error("Argument not formatted correctly: {0}".format(location))
             return None, None
-        
+
         return location.split(".")
-        
+
     def set_gcs(self, location):
         """ Sets variables for uploading data to Google Cloud Storage.
-            
+ 
         Args:
             location: String with name of project ID and bucket name,
             separated by a period.
         """
 
         self.gcs_project, self.gcs_bucket = self.parse_location_arg(location)
-        if self.gcs_project:
+        if self.gcs_project and self.gcs_bucket:
             self.save_to_gcs = True
         
     def set_bq(self, location):
@@ -110,29 +110,35 @@ class CrawlerLog(object):
             location: String with name of project ID and dataset name,
             separated by a period.
         """
-        
+
         self.bq_project, self.bq_dataset = self.parse_location_arg(location)
-        if self.bq_project:
+        if self.bq_project and self.bq_dataset:
             self.save_to_bq = True
 
     def close(self):
         """ Closes the crawler log. Uploads file to Google Cloud. Prints
             message if there are handled errors logged during crawling process.
         """
-        
+
         logging.info("Finished crawling.")
         self.csv_file.close()
         
         file_name = "queries_{0}".format(self.start_time)
         if self.save_to_gcs:
-            res = cloud_integration.upload_gcs_file(self.gcs_project,
+            status, message = cloud_integration.upload_gcs_file(self.gcs_project,
                 self.gcs_bucket, file_name, self.query_name)
-            logging.info(res)
-            
+            if status:
+                logging.info(message)
+            else:
+                self.log_error(message)
+
         if self.save_to_bq:
-            res = cloud_integration.load_bigquery_table(self.bq_project,
+            status, message = cloud_integration.load_bigquery_table(self.bq_project,
                 self.bq_dataset, file_name, self.query_name)
-            logging.info(res)
-            
+            if status:
+                logging.info(message)
+            else:
+                self.log_error(message)
+
         if self.error_log_count > 0:
             print("Logged {0} errors. See log for details.".format(self.error_log_count))
