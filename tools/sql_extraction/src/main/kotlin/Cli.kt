@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.types.path
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import mu.KotlinLogging
+import org.slf4j.impl.SimpleLogger
 import java.nio.file.Path
 
 fun main(args: Array<String>) = Cli(
@@ -82,9 +83,9 @@ private class Cli(
 
     override fun run() {
         if (debug) {
-            System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug")
+            System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug")
         }
-        val logger = KotlinLogging.logger {  }
+        val logger = KotlinLogging.logger { }
         logger.debug("Starting SQL Extraction from command line")
 
         val files = filesExpander.expandAndFilter(filePaths, recursive, includes, excludes)
