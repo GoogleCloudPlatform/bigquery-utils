@@ -29,6 +29,7 @@ public class Skeleton {
         // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (Postgres)
       }
     }
+    return null;
   }
 
   /**
@@ -42,5 +43,6 @@ public class Skeleton {
         // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (BQ)
       }
     }
+    return null;
   }
 }

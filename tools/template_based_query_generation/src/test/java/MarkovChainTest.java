@@ -1,3 +1,5 @@
+import graph.MarkovChain;
+import graph.Node;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public class MarkovChainTest {
 
 	/**
 	 * test for the randomWalk method when the graph consists of a bidirectional edge
-	 * an infinite loop happens in the MarkovChain class, so we expect an OutOfMemoryError.class
+	 * an infinite loop happens in the graph.MarkovChain class, so we expect an OutOfMemoryError.class
 	 */
 	@Test
 	public void test_randomWalk_nonDAG() {
