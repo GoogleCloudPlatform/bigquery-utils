@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KeywordsMappingTest {
 
+  // TODO (spoiledhua): fix tests here to correspond with new changes to KeywordsMapping
+
   @Test
   public void test_getMappingPostgreDDL() {
     KeywordsMapping km = new KeywordsMapping();
