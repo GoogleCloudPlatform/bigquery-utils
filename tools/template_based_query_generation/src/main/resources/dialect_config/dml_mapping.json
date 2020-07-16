@@ -1,0 +1,106 @@
+{
+  "features": [
+    {
+      "feature": "DML_INSERT",
+      "allMappings": [
+        {
+          "postgres": "INSERT",
+          "bigQuery": "INSERT",
+          "tokens": [
+            {
+              "tokenName": "insert_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "postgres": "INSERT INTO",
+          "bigQuery": "INSERT INTO",
+          "tokens": [
+            {
+              "tokenName": "insert_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_DELETE",
+      "allMappings": [
+        {
+          "postgres": "DELETE",
+          "bigQuery": "DELETE",
+          "tokens": [
+            {
+              "tokenName": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "postgres": "DELETE FROM",
+          "bigQuery": "DELETE FROM",
+          "tokens": [
+            {
+              "tokenName": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_UPDATE",
+      "allMappings": [
+        {
+          "postgres": "UPDATE",
+          "bigQuery": "UPDATE",
+          "tokens": [
+            {
+              "tokenName": "table_name",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_SET",
+      "allMappings": [
+        {
+          "postgres": "SET",
+          "bigQuery": "SET",
+          "tokens": [
+            {
+              "tokenName": "update_item",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DML_WHERE",
+      "allMappings": [
+        {
+          "postgres": "WHERE",
+          "bigQuery": "WHERE",
+          "tokens": [
+            {
+              "tokenName": "condition",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

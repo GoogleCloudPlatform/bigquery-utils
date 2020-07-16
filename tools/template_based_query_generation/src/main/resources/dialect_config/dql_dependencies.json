@@ -1,0 +1,68 @@
+{
+  "DQL": [
+    "DQL_SELECT"
+  ],
+  "DQL_SELECT": [
+    "DQL_FROM",
+    "DQL_WHERE",
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_FROM": [
+    "DQL_WHERE",
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_WHERE": [
+    "DQL_GROUP",
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_GROUP": [
+    "DQL_HAVING",
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_HAVING": [
+    "DQL_WINDOW",
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_WINDOW": [
+    "DQL_ORDER",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_ORDER": [
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_LIMIT": [
+    "DQL_OFFSET",
+    "SINK"
+  ],
+  "DQL_OFFSET": [
+    "SINK"
+  ]
+}
