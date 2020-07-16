@@ -90,4 +90,6 @@ public class UtilsTest {
 
     assertEquals(ImmutableList.copyOf(expected), ImmutableList.copyOf(actual));
   }
+
+  // TODO (spoiledhua): add unit tests for makeImmutableMap and makeImmutableSet
 }

@@ -26,7 +26,7 @@ public class Skeleton {
 
     for (ImmutableList<String> rawKeywordList : rawKeywordsLists) {
       for (String rawKeyword : rawKeywordList) {
-        // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings
+        // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (Postgres)
       }
     }
   }
@@ -35,6 +35,12 @@ public class Skeleton {
    *
    */
   public ImmutableList<String> BigQuerySkeleton() {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
 
+    for (ImmutableList<String> rawKeywordList : rawKeywordsLists) {
+      for (String rawKeyword : rawKeywordList) {
+        // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (BQ)
+      }
+    }
   }
 }
