@@ -1,5 +1,3 @@
-import com.sun.tools.javac.parser.Tokens;
-
 import java.util.List;
 
 /**
@@ -14,40 +12,7 @@ public class Mapping {
   private String bigQuery;
 
   /* All necessary tokens for a given keyword variant */
-  private List<Tokens> tokens;
-
-  /**
-   * Helper class that indicates what tokens need to follow the associated keyword
-   */
-  private class Token {
-    private String tokenName;
-    private boolean required;
-    private int count;
-
-    public String getTokenName() {
-      return this.tokenName;
-    }
-
-    public void setTokenName(String tokenName) {
-      this.tokenName = tokenName;
-    }
-
-    public boolean getRequired() {
-      return this.required;
-    }
-
-    public void setRequired(boolean required) {
-      this.required = required;
-    }
-
-    public int getCount() {
-      return this.count;
-    }
-
-    public void setCount(int count) {
-      this.count = count;
-    }
-  }
+  private List<TokenInfo> tokens;
 
   public String getPostgre() {
     return this.postgre;
@@ -65,11 +30,11 @@ public class Mapping {
     this.bigQuery = bigQuery;
   }
 
-  public List<Tokens> getTokens() {
+  public List<TokenInfo> getTokens() {
     return this.tokens;
   }
 
-  public void setTokens(List<Tokens> tokens) {
+  public void setTokens(List<TokenInfo> tokens) {
     this.tokens = tokens;
   }
 }
