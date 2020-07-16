@@ -2,8 +2,14 @@
  * Helper class that indicates what tokens need to follow the associated keyword
  */
 public class TokenInfo {
+
+  /* token name */
   private String tokenName;
+
+  /* indicates whether the token is required */
   private boolean required;
+
+  /* indicates how many tokens of this type are needed */
   private int count;
 
   public String getTokenName() {
