@@ -1,9 +1,20 @@
-
 {
-  "DML": ["DML_INSERT", "DML_DELETE", "DML_UPDATE"],
-  "DML_DELETE": ["DML_WHERE"],
-  "DML_UPDATE" : ["DML_SET"],
-  "DML_SET": ["DML_WHERE", "DML_FROM", "SINK"],
-  "DML_FROM": ["DML_WHERE", "SINK"],
-  "DML_WHERE": ["SINK"]
+  "DML": [
+    "DML_INSERT",
+    "DML_DELETE",
+    "DML_UPDATE"
+  ],
+  "DML_DELETE": [
+    "DML_WHERE"
+  ],
+  "DML_UPDATE" : [
+    "DML_SET"
+  ],
+  "DML_SET": [
+    "DML_WHERE",
+    "SINK"
+  ],
+  "DML_WHERE": [
+    "SINK"
+  ]
 }
