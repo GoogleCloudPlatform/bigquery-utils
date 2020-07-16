@@ -6,6 +6,7 @@ import com.google.gson.*;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -42,8 +43,6 @@ public class QueryVerifier {
      * Verifies migrated query by sending a dry-run query job to BQ to check for syntax and semantic errors.
      */
     public void verifyDataFree() {
-        boolean verificationResult = false;
-
         BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
 
         List<Table> tables = new ArrayList<Table>();
@@ -54,10 +53,7 @@ public class QueryVerifier {
                 // Schema is JSON
                 List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
                 if (tableInfos != null) {
-                    for (TableInfo tableInfo : tableInfos) {
-                        Table table = bigQuery.create(tableInfo);
-                        tables.add(table);
-                    }
+                    tableInfos.forEach(tableInfo -> tables.add(bigQuery.create(tableInfo)));
                 }
             } else {
                 // Schema is DDL
@@ -70,10 +66,7 @@ public class QueryVerifier {
                 }
 
                 List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
-                for (TableId tableId : tableIds) {
-                    Table table = bigQuery.getTable(tableId);
-                    tables.add(table);
-                }
+                tableIds.forEach(tableId -> tables.add(bigQuery.getTable(tableId)));
             }
 
             if (tables.isEmpty()) {
@@ -81,18 +74,31 @@ public class QueryVerifier {
             }
         }
 
-        // Create dry-run job
-        JobInfo jobInfo = configureJob(migratedQuery.query(), true);
+        // Create dry-run jobs
+        List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, true);
+        ListIterator<JobInfo> jobInfoListIterator = jobInfos.listIterator();
 
-        // TODO Support multiple queries
+        // Store results for every successful dry-run
+        List<QueryJobResults<JobStatistics>> jobResults = new ArrayList<QueryJobResults<JobStatistics>>();
 
-        try {
-            // Run dry-run
-            Job queryJob = bigQuery.create(jobInfo);
-            verificationResult = queryJob.getStatus().getState() == JobStatus.State.DONE;
-        } catch (BigQueryException e) {
-            // Print out syntax/semantic errors returned from BQ
-            System.out.println(e.getMessage());
+        while (jobInfoListIterator.hasNext()) {
+            JobInfo jobInfo = jobInfoListIterator.next();
+
+            // Retrieve query
+            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
+            String query = queryJobConfiguration.getQuery();
+
+            try {
+                // Run dry-run
+                Job queryJob = bigQuery.create(jobInfo);
+
+                // Store results from dry-run
+                JobStatistics results = queryJob.getStatistics();
+                jobResults.add(QueryJobResults.create(query, results));
+            } catch (BigQueryException e) {
+                // Print out syntax/semantic errors returned from BQ
+                System.out.printf("Error in Query #%d from %s\n%s\n\n", jobInfoListIterator.nextIndex(), migratedQuery.path(), e.getMessage());
+            }
         }
 
         // Clear tables created
@@ -100,7 +106,9 @@ public class QueryVerifier {
             BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId());
         }
 
-        System.out.printf("Data-Free Verification %s\n", verificationResult ? "Succeeded" : "Failed");
+        System.out.println();
+        System.out.printf("%d/%d (%.2f%%) Queries Verified\n", jobResults.size(), jobInfos.size(), jobResults.size() * 100.0f / jobInfos.size());
+        System.out.printf("Data-Free Verification %s\n", jobResults.size() == jobInfos.size() ? "Succeeded" : "Failed");
     }
 
     /**
@@ -192,6 +200,28 @@ public class QueryVerifier {
             }
         }
         return tableIds;
+    }
+
+    /**
+     * Creates jobs for each query from a file
+     * @param queryVerificationQuery
+     * @param dryRun indicating if the query should be run
+     * @return
+     */
+    public static List<JobInfo> getJobInfosFromQuery(QueryVerificationQuery queryVerificationQuery, boolean dryRun) {
+        List<JobInfo> jobInfos = new ArrayList<JobInfo>();
+
+        // Separate query into individual statements
+        String[] statements = queryVerificationQuery.query().split(";");
+
+        for (String statement : statements) {
+            statement = statement.trim();
+
+            JobInfo jobInfo = configureJob(statement, dryRun);
+            jobInfos.add(jobInfo);
+        }
+
+        return jobInfos;
     }
 
     /**
