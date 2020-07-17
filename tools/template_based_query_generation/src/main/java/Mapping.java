@@ -6,20 +6,20 @@ import java.util.List;
 public class Mapping {
 
   /* Equivalent PostgreSQL mapping to a keyword */
-  private String postgre;
+  private String postgres;
 
   /* Equivalent BigQuery mapping to a keyword */
   private String bigQuery;
 
   /* All necessary tokens for a given keyword variant */
-  private List<TokenInfo> tokens;
+  private List<TokenInfo> tokenInfos;
 
-  public String getPostgre() {
-    return this.postgre;
+  public String getPostgres() {
+    return this.postgres;
   }
 
-  public void setPostgre(String postgre) {
-    this.postgre = postgre;
+  public void setPostgres(String postgres) {
+    this.postgres = postgres;
   }
 
   public String getBigQuery() {
@@ -30,11 +30,11 @@ public class Mapping {
     this.bigQuery = bigQuery;
   }
 
-  public List<TokenInfo> getTokens() {
-    return this.tokens;
+  public List<TokenInfo> getTokenInfos() {
+    return this.tokenInfos;
   }
 
-  public void setTokens(List<TokenInfo> tokens) {
-    this.tokens = tokens;
+  public void setTokenInfos(List<TokenInfo> tokenInfos) {
+    this.tokenInfos = tokenInfos;
   }
 }

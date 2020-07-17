@@ -6,7 +6,7 @@
         {
           "postgres": "INSERT",
           "bigQuery": "INSERT",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "insert_exp",
               "required": true,
@@ -17,7 +17,7 @@
         {
           "postgres": "INSERT INTO",
           "bigQuery": "INSERT INTO",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "insert_exp",
               "required": true,
@@ -33,7 +33,7 @@
         {
           "postgres": "DELETE",
           "bigQuery": "DELETE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -44,7 +44,7 @@
         {
           "postgres": "DELETE FROM",
           "bigQuery": "DELETE FROM",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -60,7 +60,7 @@
         {
           "postgres": "UPDATE",
           "bigQuery": "UPDATE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -76,7 +76,7 @@
         {
           "postgres": "SET",
           "bigQuery": "SET",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "update_item",
               "required": true,
@@ -92,7 +92,7 @@
         {
           "postgres": "WHERE",
           "bigQuery": "WHERE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "condition",
               "required": true,
