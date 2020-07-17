@@ -12,7 +12,7 @@ public class Mapping {
   private String bigQuery;
 
   /* All necessary tokens for a given keyword variant */
-  private List<TokenInfo> tokens;
+  private List<TokenInfo> tokenInfos;
 
   public String getPostgre() {
     return this.postgre;
@@ -30,11 +30,11 @@ public class Mapping {
     this.bigQuery = bigQuery;
   }
 
-  public List<TokenInfo> getTokens() {
-    return this.tokens;
+  public List<TokenInfo> getTokenInfos() {
+    return this.tokenInfos;
   }
 
-  public void setTokens(List<TokenInfo> tokens) {
-    this.tokens = tokens;
+  public void setTokenInfos(List<TokenInfo> tokenInfos) {
+    this.tokenInfos = tokenInfos;
   }
 }
