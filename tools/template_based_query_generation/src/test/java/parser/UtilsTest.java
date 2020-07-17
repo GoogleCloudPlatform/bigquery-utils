@@ -1,7 +1,10 @@
+package parser;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;

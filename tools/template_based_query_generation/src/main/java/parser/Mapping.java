@@ -1,3 +1,5 @@
+package parser;
+
 import token.TokenInfo;
 
 import java.util.List;
