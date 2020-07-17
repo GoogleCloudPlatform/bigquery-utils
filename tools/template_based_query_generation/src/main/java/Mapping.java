@@ -6,7 +6,7 @@ import java.util.List;
 public class Mapping {
 
   /* Equivalent PostgreSQL mapping to a keyword */
-  private String postgre;
+  private String postgres;
 
   /* Equivalent BigQuery mapping to a keyword */
   private String bigQuery;
@@ -14,12 +14,12 @@ public class Mapping {
   /* All necessary tokens for a given keyword variant */
   private List<TokenInfo> tokenInfos;
 
-  public String getPostgre() {
-    return this.postgre;
+  public String getPostgres() {
+    return this.postgres;
   }
 
-  public void setPostgre(String postgre) {
-    this.postgre = postgre;
+  public void setPostgres(String postgres) {
+    this.postgres = postgres;
   }
 
   public String getBigQuery() {
