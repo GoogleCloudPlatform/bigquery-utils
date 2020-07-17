@@ -50,8 +50,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   ```  
   SELECT
    jobChange.jobStats.parentJobName,
+   jobChange.jobName,
    ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as statementType,
-   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
    ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as query,
    ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as createTime,
    ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as startTime,
@@ -67,7 +67,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   jobChange.jobConfig.queryConfig.statementType="UPDATE" OR
   jobChange.jobConfig.queryConfig.statementType="MERGE")
   AND jobChange.jobStats.parentJobName IS NOT NULL
-  GROUP BY 1
+  GROUP BY 1,2
 
   ``` 
 * Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
