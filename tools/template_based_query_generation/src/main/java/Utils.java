@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,9 +23,9 @@ public class Utils {
   private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
   /**
-   * Helper class that returns all KeywordIndicator(s) for JSON deserialization
+   * Helper class that contains all KeywordIndicator(s) for JSON deserialization
    */
-  private class Config {
+  private class KeywordIndicators {
     private List<KeywordIndicator> keywordIndicators;
 
     public List<KeywordIndicator> getKeywordIndicators() {
@@ -59,6 +58,21 @@ public class Utils {
 
     public void setIsIncluded(boolean isIncluded) {
       this.isIncluded = isIncluded;
+    }
+  }
+
+  /**
+   * Helper class that contains all Feature(s) for JSON deserialization
+   */
+  private class Features {
+    private List<Feature> features;
+
+    public List<Feature> getFeatures() {
+      return this.features;
+    }
+
+    public void setFeatures(List<Feature> features) {
+      this.features = features;
     }
   }
 
@@ -172,11 +186,11 @@ public class Utils {
   public static ImmutableSet<String> makeImmutableSet(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
-    Config config = gson.fromJson(reader, Config.class);
+    KeywordIndicators keywordIndicators = gson.fromJson(reader, KeywordIndicators.class);
 
     ImmutableList.Builder<String> builder = ImmutableList.builder();
 
-    for (KeywordIndicator keywordIndicator : config.getKeywordIndicators()) {
+    for (KeywordIndicator keywordIndicator : keywordIndicators.getKeywordIndicators()) {
       if (keywordIndicator.getIsIncluded()) {
         builder.add(keywordIndicator.getKeyword());
       }
@@ -190,27 +204,23 @@ public class Utils {
   /**
    * Creates an immutable map from the user-defined config file of keyword mappings
    *
-   * @param fileName relative path of the config file
+   * @param inputPath relative path of the config file
    * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<String, String> makeImmutableMap(String fileName, ImmutableSet<String> keywords) {
-    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    Features features = gson.fromJson(reader, Features.class);
 
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get(fileName), UTF_8)) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        if (!(line.charAt(0) == '/' && line.charAt(1) == '/')) {
-          String[] pair = line.split(":");
-          if (keywords.contains(pair[0])) {
-            builder.put(pair[0], pair[1]);
-          }
-        }
+    ImmutableMap.Builder<String, ImmutableList<Mapping>> builder = ImmutableMap.builder();
+
+    for (Feature feature : features.getFeatures()) {
+      if (keywords.contains(feature.getFeature())) {
+        builder.put(feature.getFeature(), ImmutableList.copyOf(feature.getAllMappings()));
       }
-    } catch (IOException exception) {
-      System.out.println(exception);
     }
 
-    ImmutableMap<String, String> map = builder.build();
+    ImmutableMap<String, ImmutableList<Mapping>> map = builder.build();
 
     return map;
   }

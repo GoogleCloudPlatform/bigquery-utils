@@ -17,19 +17,7 @@
       "isIncluded": true
     },
     {
-      "keyword": "DML_INTO",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_VALUES",
-      "isIncluded": true
-    },
-    {
       "keyword": "DML_SET",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_FROM",
       "isIncluded": true
     }
   ]
