@@ -33,6 +33,21 @@ public class InputReader {
 
     reader.close();
 
-    return sb.toString();
+    String parsedInput = sb.toString();
+    int len = parsedInput.length();
+    boolean lastSemicolon = false;
+
+    // deals with case where last query ends with a semicolon
+    if (parsedInput.charAt(len - 1) == ';') {
+      parsedInput = parsedInput.substring(0, len - 1);
+      lastSemicolon = true;
+    }
+
+    parsedInput = parsedInput.replaceAll(";", ";\n");
+    if (lastSemicolon) {
+      parsedInput = parsedInput + ';';
+    }
+
+    return parsedInput;
   }
 }

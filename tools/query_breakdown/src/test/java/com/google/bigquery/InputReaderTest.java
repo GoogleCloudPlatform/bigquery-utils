@@ -12,14 +12,22 @@ public class InputReaderTest {
   public void inputReaderTest() throws IOException {
     String absPath = new File("").getAbsolutePath();
     assertEquals("SELECT a FROM A", InputReader.readInput(absPath +
-        "/src/test/java/com.google.bigquery.InputTestFiles/singleLine.txt"));
+        "/src/test/java/com/google/bigquery/InputTestFiles/singleLine.txt"));
   }
 
   @Test
   public void inputReaderTestMultipleQuery() throws IOException {
     String absPath = new File("").getAbsolutePath();
-    assertEquals("SELECT a FROM A;SELECT b FROM B;",
+    assertEquals("SELECT a FROM A;\nSELECT b FROM B;",
         InputReader.readInput(absPath +
-        "/src/test/java/com.google.bigquery.InputTestFiles/multipleLines.txt"));
+        "/src/test/java/com/google/bigquery/InputTestFiles/multipleLines.txt"));
+  }
+
+  @Test
+  public void inputReaderTestSpaceWithoutSemicolon() throws IOException {
+    String absPath = new File("").getAbsolutePath();
+    assertEquals("SELECT a FROM A;\nSELECT b FROM B",
+            InputReader.readInput(absPath +
+                    "/src/test/java/com/google/bigquery/InputTestFiles/multipleLinesNoSemicolon.txt"));
   }
 }
