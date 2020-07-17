@@ -1,0 +1,28 @@
+[
+  {
+    "fields": [
+      {
+        "name": "integerField",
+        "type": "INT64",
+        "mode": "REQUIRED"
+      }
+    ],
+    "tableReference": {
+      "datasetId": "dataset",
+      "tableId": "firstTable"
+    }
+  },
+  {
+    "fields": [
+      {
+        "name": "integerField",
+        "type": "INT64",
+        "mode": "REQUIRED"
+      }
+    ],
+    "tableReference": {
+      "datasetId": "dataset",
+      "tableId": "secondTable"
+    }
+  }
+]

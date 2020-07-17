@@ -51,26 +51,38 @@ public class QueryVerifier {
         // Create tables based on schema
         if (migratedSchema != null) {
             if (migratedSchema.isInJsonFormat()) {
-                TableInfo tableInfo = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
-                if (tableInfo != null) {
-                    Table table = bigQuery.create(tableInfo);
-                    tables.add(table);
-                } else {
-                    System.out.println(migratedSchema.path() + " is not correctly formatted.");
+                // Schema is JSON
+                List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
+                if (tableInfos != null) {
+                    for (TableInfo tableInfo : tableInfos) {
+                        Table table = bigQuery.create(tableInfo);
+                        tables.add(table);
+                    }
                 }
             } else {
-                // TODO Load schema from DDL
+                // Schema is DDL
+                JobInfo jobInfo = configureJob(migratedSchema.schema(), false);
+                Job schemaJob = bigQuery.create(jobInfo);
+                try {
+                    schemaJob.waitFor();
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
+                for (TableId tableId : tableIds) {
+                    Table table = bigQuery.getTable(tableId);
+                    tables.add(table);
+                }
+            }
+
+            if (tables.isEmpty()) {
+                System.out.println(migratedSchema.path() + " is not correctly formatted.");
             }
         }
 
         // Create dry-run job
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(migratedQuery.query())
-                .setDryRun(true)
-                .build();
-        JobId jobId = JobId.of(UUID.randomUUID().toString());
-        JobInfo jobInfo = JobInfo.newBuilder(queryConfig)
-                .setJobId(jobId)
-                .build();
+        JobInfo jobInfo = configureJob(migratedQuery.query(), true);
 
         // TODO Support multiple queries
 
@@ -105,42 +117,98 @@ public class QueryVerifier {
     /**
      * Reads JSON schema to create table fields based on the schema
      * @param queryVerificationSchema Schema to read from
-     * @return New table info
+     * @return List of new table info
      */
-    @Nullable
-    public static TableInfo getTableInfoFromJsonSchema(QueryVerificationSchema queryVerificationSchema) {
-        if (queryVerificationSchema.getJsonArray().size() == 0) {
-            return null;
-        }
+    public static List<TableInfo> getTableInfoFromJsonSchema(QueryVerificationSchema queryVerificationSchema) {
+        List<TableInfo> tableInfos = new ArrayList<TableInfo>();
+        for (JsonElement schemaElement : queryVerificationSchema.getJsonArray()) {
+            if (queryVerificationSchema.getJsonArray().size() == 0) {
+                return null;
+            }
+            JsonObject schemaObject = schemaElement.getAsJsonObject();
 
-        // TODO Support multiple table schema
-        JsonObject schemaObject = queryVerificationSchema.getJsonArray().get(0).getAsJsonObject();
+            if (schemaObject.has("tableReference")) {
+                JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
 
-        if (!schemaObject.has("fields") || !schemaObject.has("tableReference")) {
-            return null;
-        }
-        JsonArray schemaFields = schemaObject.getAsJsonArray("fields");
-        JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
+                if (tableReference.has("datasetId") && tableReference.has("tableId")) {
+                    TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
 
-        // Deserialize fields
-        FieldList fieldList;
-        try {
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
-                    .create();
-            fieldList = gson.fromJson(schemaFields, FieldList.class);
-        } catch (NullPointerException e) {
-            return null;
-        }
-        Schema schema = Schema.of(fieldList);
-        TableDefinition tableDefinition = StandardTableDefinition.of(schema);
+                    // Deserialize fields
+                    FieldList fieldList = null;
+                    try {
+                        JsonArray schemaFields = schemaObject.getAsJsonArray("fields");
 
-        if (tableReference.has("datasetId") && tableReference.has("tableId")) {
-            TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
-            return TableInfo.newBuilder(tableId, tableDefinition).build();
-        } else {
-            return null;
+                        Gson gson = new GsonBuilder()
+                                .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
+                                .create();
+                        fieldList = gson.fromJson(schemaFields, FieldList.class);
+                    } finally {
+                        if (fieldList == null || fieldList.isEmpty()) {
+                            // Error in formatting of fields
+                            System.out.println(tableId.getTable() + " is not correctly formatted.");
+
+                            // Skip table and try to continue verification even without this table
+                            continue;
+                        }
+
+                        Schema schema = Schema.of(fieldList);
+                        TableDefinition tableDefinition = StandardTableDefinition.of(schema);
+
+                        tableInfos.add(TableInfo.newBuilder(tableId, tableDefinition).build());
+                    }
+                }
+            }
         }
+        return tableInfos;
+    }
+
+    /**
+     * Read DDL schema to identify tables being created
+     * @param queryVerificationSchema Schema to read from
+     * @return List of new table ids
+     */
+    public static List<TableId> getTableIdsFromDdlSchema(QueryVerificationSchema queryVerificationSchema) {
+        List<TableId> tableIds = new ArrayList<TableId>();
+
+        // Separate DDL schema into statements
+        // TODO Account for edge case where semicolon could be inside statement
+        String[] statements = queryVerificationSchema.schema().split(";");
+
+        for (String statement : statements) {
+            statement = statement.trim().replaceAll("\\s+", " ");
+
+            // Basic validation for DDL
+            if (statement.toUpperCase().startsWith("CREATE TABLE")) {
+                String[] schema = statement.split(" ");
+                if (schema.length >= 3) {
+                    String[] tableName = schema[2].split("\\.");
+
+                    // Table name may appear as project.dataset.table or dataset.table
+                    if (tableName.length == 2 || tableName.length == 3) {
+                        TableId tableId = TableId.of(tableName[tableName.length - 2], tableName[tableName.length - 1]);
+                        tableIds.add(tableId);
+                    }
+                }
+            }
+        }
+        return tableIds;
+    }
+
+    /**
+     * Create configuration for query jobs
+     * @param query to run
+     * @param dryRun indicating if the query should be run
+     * @return Generated query job info
+     */
+    public static JobInfo configureJob(String query, boolean dryRun) {
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query)
+                .setDryRun(dryRun)
+                .build();
+        JobId jobId = JobId.of(UUID.randomUUID().toString());
+        JobInfo jobInfo = JobInfo.newBuilder(queryConfig)
+                .setJobId(jobId)
+                .build();
+        return jobInfo;
     }
 
 }
