@@ -20,12 +20,17 @@ public class Node {
   private int endColumn;
 
   // ensures that we know how the error was handled
-  private boolean errorHandlingType;
   private String replaceFrom;
   private String replaceTo;
 
   // ensures that we know what the performance measure is and how our current path is doing
   private int unparseableCount;
+
+  // indicates how we handled the error
+  enum errorHandlingType {
+    DELETION,
+    REPLACEMENT
+  }
 
   /**
    * constructor for the node class
