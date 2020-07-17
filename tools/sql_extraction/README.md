@@ -29,6 +29,8 @@ Options:
   --include GLOB       Search only files whose base name matches GLOB
   --exclude GLOB       Skip files whose base name matches GLOB
   --pretty             Pretty-print output JSON
+  --progress           Print progress to STDERR
+  --debug, --verbose   Print debug logs to STDERR
   -h, --help           Show this message and exit
 
 Arguments:
