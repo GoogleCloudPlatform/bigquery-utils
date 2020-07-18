@@ -24,7 +24,7 @@ public class BigQueryService {
 
   private static final int TableFetchSize = 1000;
 
-  private final BigQuery bigquery;
+  private final BigQuery bigQuery;
 
   /**
    * Initialize a connection to BigQuery server with the customized options.
@@ -32,7 +32,7 @@ public class BigQueryService {
    * @param options customized options
    */
   public BigQueryService(@NonNull BigQueryOptions options) {
-    this.bigquery = new BigQueryOptions.DefaultBigQueryFactory().create(options);
+    this.bigQuery = new BigQueryOptions.DefaultBigQueryFactory().create(options);
   }
 
   /**
@@ -43,7 +43,7 @@ public class BigQueryService {
    */
   public BigQueryService(@NonNull String projectId) {
     BigQueryOptions options = BigQueryOptions.newBuilder().setProjectId(projectId).build();
-    this.bigquery = options.getService();
+    this.bigQuery = options.getService();
   }
 
   /**
@@ -57,7 +57,7 @@ public class BigQueryService {
   public Job dryRun(String query) throws BigQueryException {
     QueryJobConfiguration queryConfig =
         QueryJobConfiguration.newBuilder(query).setDryRun(true).build();
-    return bigquery.create(JobInfo.of(queryConfig));
+    return bigQuery.create(JobInfo.of(queryConfig));
   }
 
   /**
@@ -92,13 +92,13 @@ public class BigQueryService {
   public List<String> listTableNames(String projectId, String datasetId) throws BigQueryException {
     DatasetId projectDatasetId = DatasetId.of(projectId, datasetId);
     Page<Table> tables =
-        bigquery.listTables(projectDatasetId, BigQuery.TableListOption.pageSize(TableFetchSize));
+        bigQuery.listTables(projectDatasetId, BigQuery.TableListOption.pageSize(TableFetchSize));
     return StreamSupport.stream(tables.iterateAll().spliterator(), /* parallel= */ false)
         .map(table -> table.getTableId().getTable())
         .collect(Collectors.toList());
   }
 
   public BigQueryOptions getBigQueryOptions() {
-    return bigquery.getOptions();
+    return bigQuery.getOptions();
   }
 }
