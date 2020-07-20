@@ -6,7 +6,6 @@ import com.google.gson.*;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.UUID;
 
 /**
@@ -76,13 +75,12 @@ public class QueryVerifier {
 
         // Create dry-run jobs
         List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, true);
-        ListIterator<JobInfo> jobInfoListIterator = jobInfos.listIterator();
 
         // Store results for every successful dry-run
         List<QueryJobResults<JobStatistics>> jobResults = new ArrayList<QueryJobResults<JobStatistics>>();
 
-        while (jobInfoListIterator.hasNext()) {
-            JobInfo jobInfo = jobInfoListIterator.next();
+        for (int i = 0; i < jobInfos.size(); i++) {
+            JobInfo jobInfo = jobInfos.get(i);
 
             // Retrieve query
             QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
@@ -97,7 +95,7 @@ public class QueryVerifier {
                 jobResults.add(QueryJobResults.create(query, results));
             } catch (BigQueryException e) {
                 // Print out syntax/semantic errors returned from BQ
-                System.out.printf("Error in Query #%d from %s\n%s\n\n", jobInfoListIterator.nextIndex(), migratedQuery.path(), e.getMessage());
+                System.out.printf("Error in Query #%d from %s\n%s\n\n", i, migratedQuery.path(), e.getMessage());
             }
         }
 
