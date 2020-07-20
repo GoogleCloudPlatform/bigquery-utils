@@ -1,7 +1,7 @@
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -14,13 +14,13 @@ public class KeywordsMappingTest {
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
     tokenInfo.setTokenName("partition_exp");
-    ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
+    List<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
     mapping.setPostgres("PARTITION BY");
     mapping.setBigQuery("PARTITION BY");
     mapping.setTokenInfos(tokenInfos);
-    ArrayList<Mapping> mappings = new ArrayList<>();
+    List<Mapping> mappings = new ArrayList<>();
     mappings.add(mapping);
     ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
 
@@ -44,13 +44,13 @@ public class KeywordsMappingTest {
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
     tokenInfo.setTokenName("update_item");
-    ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
+    List<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
     mapping.setPostgres("SET");
     mapping.setBigQuery("SET");
     mapping.setTokenInfos(tokenInfos);
-    ArrayList<Mapping> mappings = new ArrayList<>();
+    List<Mapping> mappings = new ArrayList<>();
     mappings.add(mapping);
     ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
 
@@ -74,13 +74,13 @@ public class KeywordsMappingTest {
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
     tokenInfo.setTokenName("select_exp");
-    ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
+    List<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
     mapping.setPostgres("SELECT");
     mapping.setBigQuery("SELECT");
     mapping.setTokenInfos(tokenInfos);
-    ArrayList<Mapping> mappings = new ArrayList<>();
+    List<Mapping> mappings = new ArrayList<>();
     mappings.add(mapping);
     ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
 
