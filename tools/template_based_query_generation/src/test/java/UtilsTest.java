@@ -22,10 +22,7 @@ public class UtilsTest {
     int randomInt = Utils.getRandomInteger(10);
     assertTrue(randomInt > 0);
     assertTrue(randomInt <= 10);
-    assertEquals(1, Utils.getRandomInteger(1));
-    assertThrows(IllegalArgumentException.class, () -> {
-      Utils.getRandomInteger(0);
-    });
+    assertEquals(0, Utils.getRandomInteger(0));
     assertThrows(IllegalArgumentException.class, () -> {
       Utils.getRandomInteger(-1);
     });
