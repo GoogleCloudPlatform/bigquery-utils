@@ -19,10 +19,25 @@ class SqlExtractor(
     /**
      * @return Detected SQL queries sorted by confidence
      */
-    fun process(filePaths: Sequence<Path>): Output {
+    fun process(filePaths: Sequence<Path>, showProgress: Boolean = false): Output {
         val queries = ArrayList<Query>()
-        for (filePath in filePaths) {
+
+        var numCompleted = 0
+        val (length, processedFilePaths) = if (showProgress) {
+            // iterate paths to count up the length
+            val list = filePaths.toList()
+            Pair(list.size, list.iterator().asSequence())
+        } else {
+            Pair(1, filePaths)
+        }
+
+        for (filePath in processedFilePaths) {
             LOGGER.debug { "Scanning $filePath" }
+            if (showProgress) {
+                System.err.printf("%.1f%% Analyzing %s...", numCompleted * 100.0 / length, filePath)
+                System.err.println()
+            }
+
             queries.addAll(
                 dataFlowSolver.solveDataFlow(DataFlowEngine(), filePath)
                     .map {
@@ -33,6 +48,12 @@ class SqlExtractor(
                             it.usages
                         )
                     })
+            numCompleted++
+
+            if (showProgress) {
+                System.err.printf("%.1f%% Analyzed %s.", numCompleted * 100.0 / length, filePath)
+                System.err.println()
+            }
         }
 
         return Output(queries.sortedByDescending { it.confidence })
