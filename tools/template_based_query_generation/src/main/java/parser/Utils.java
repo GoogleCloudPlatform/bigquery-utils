@@ -17,7 +17,7 @@ public class Utils {
 
   private static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
-  private static final int lowerBound = 1;
+  private static final int lowerBound = 0;
 
   private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
 
@@ -29,8 +29,8 @@ public class Utils {
    * @throws IllegalArgumentException if upperBound is negative
    */
   public static int getRandomInteger(int upperBound) throws IllegalArgumentException {
-    if (upperBound < 1) {
-      throw new IllegalArgumentException("Upper bound cannot be nonpositive");
+    if (upperBound < 0) {
+      throw new IllegalArgumentException("Upper bound cannot be negative");
     }
 
     return random.nextInt(lowerBound, upperBound + 1);
@@ -129,7 +129,6 @@ public class Utils {
    * @return an immutable set of keywords from the config file
    */
   public static ImmutableSet<String> makeImmutableSet(Path inputPath) throws IOException {
-
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
