@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SkeletonTest {
 
-  // TODO (spoiledhua): Write unit tests for Skeleton class
-
   @Test
   public void test_getPostgreSkeleton() {
     ImmutableList.Builder<String> keywordsBuilder = ImmutableList.builder();

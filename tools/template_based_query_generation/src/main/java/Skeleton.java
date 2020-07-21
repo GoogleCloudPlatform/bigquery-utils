@@ -24,12 +24,14 @@ public class Skeleton {
 
     for (String rawKeyword : rawKeywordsList) {
       ImmutableList<Mapping> mappingList = getLanguageMap(rawKeyword);
+
       // choose a random variant from the list of possible keyword variants
       int randomIndex = Utils.getRandomInteger(mappingList.size() - 1);
       Mapping keywordVariant = mappingList.get(randomIndex);
       postgresBuilder.add(keywordVariant.getPostgres());
       bigQueryBuilder.add(keywordVariant.getBigQuery());
       List<TokenInfo> tokens = keywordVariant.getTokenInfos();
+
       for (TokenInfo token : tokens) {
         // if token is required, add it to the skeleton, otherwise add it with a 1/2 probability
         if (token.getRequired()) {
