@@ -4,8 +4,11 @@ import com.google.cloud.bigquery.*;
 import com.google.gson.*;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -19,12 +22,20 @@ public class QueryVerifier {
     private final QueryVerificationQuery originalQuery;
     private final QueryVerificationSchema originalSchema;
 
-    public QueryVerifier(QueryVerificationQuery migratedQuery, @Nullable QueryVerificationSchema migratedSchema, @Nullable QueryVerificationQuery originalQuery, @Nullable QueryVerificationSchema originalSchema) {
+    private final List<QueryVerificationData> data;
+
+    private final BigQuery bigQuery;
+
+    public QueryVerifier(QueryVerificationQuery migratedQuery, @Nullable QueryVerificationSchema migratedSchema, @Nullable QueryVerificationQuery originalQuery, @Nullable QueryVerificationSchema originalSchema, @Nullable List<QueryVerificationData> data) {
         this.migratedQuery = migratedQuery;
         this.migratedSchema = migratedSchema;
 
         this.originalQuery = originalQuery;
         this.originalSchema = originalSchema;
+
+        this.data = data;
+
+        bigQuery = BigQueryOptions.getDefaultInstance().getService();
     }
 
     /**
@@ -42,36 +53,7 @@ public class QueryVerifier {
      * Verifies migrated query by sending a dry-run query job to BQ to check for syntax and semantic errors.
      */
     public void verifyDataFree() {
-        BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
-
-        List<Table> tables = new ArrayList<Table>();
-
-        // Create tables based on schema
-        if (migratedSchema != null) {
-            if (migratedSchema.isInJsonFormat()) {
-                // Schema is JSON
-                List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
-                if (tableInfos != null) {
-                    tableInfos.forEach(tableInfo -> tables.add(bigQuery.create(tableInfo)));
-                }
-            } else {
-                // Schema is DDL
-                JobInfo jobInfo = configureJob(migratedSchema.schema(), false);
-                Job schemaJob = bigQuery.create(jobInfo);
-                try {
-                    schemaJob.waitFor();
-                } catch (InterruptedException e) {
-                    System.out.println(e.getMessage());
-                }
-
-                List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
-                tableIds.forEach(tableId -> tables.add(bigQuery.getTable(tableId)));
-            }
-
-            if (tables.isEmpty()) {
-                System.out.println(migratedSchema.path() + " is not correctly formatted.");
-            }
-        }
+        List<Table> tables = getBigQueryTablesFromSchema();
 
         // Create dry-run jobs
         List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, true);
@@ -100,9 +82,7 @@ public class QueryVerifier {
         }
 
         // Clear tables created
-        for (Table table : tables) {
-            BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId());
-        }
+        tables.forEach(table -> BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId()));
 
         System.out.println();
         System.out.printf("%d/%d (%.2f%%) Queries Verified\n", jobResults.size(), jobInfos.size(), jobResults.size() * 100.0f / jobInfos.size());
@@ -113,11 +93,122 @@ public class QueryVerifier {
      * Verifies migrated query by sending query jobs to BQ and TD to check for differences in the query results.
      */
     public void verifyDataAware() {
-        boolean verificationResult = false;
+        List<Table> tables = getBigQueryTablesFromSchema();
+        populateBigQueryTablesFromData(tables);
 
-        // TODO Implement data aware verification
+        // Create query jobs
+        List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, false);
 
-        System.out.printf("Data-Aware Verification %s\n", verificationResult ? "Succeeded" : "Failed");
+        // Store results from every job
+        List<QueryJobResults<TableResult>> bigQueryJobResults = new ArrayList<QueryJobResults<TableResult>>();
+
+        for (int i = 0; i < jobInfos.size(); i++) {
+            JobInfo jobInfo = jobInfos.get(i);
+
+            // Retrieve query
+            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
+            String query = queryJobConfiguration.getQuery();
+
+            QueryJobResults results = null;
+            try {
+                // Run query job
+                Job queryJob = bigQuery.create(jobInfo);
+
+                results = QueryJobResults.create(query, queryJob.getQueryResults());
+            } catch (BigQueryException | InterruptedException e) {
+                // Print out syntax/semantic errors returned from BQ
+                System.out.printf("Error in Query #%d from %s\n%s\n\n", i, migratedQuery.path(), e.getMessage());
+            } finally {
+                // Store results
+                bigQueryJobResults.add(results);
+            }
+        }
+
+        // Clear tables created
+        tables.forEach(table -> BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId()));
+
+        // TODO Run queries in TD
+
+        // TODO Compare results
+
+        bigQueryJobResults.removeIf(Objects::isNull);
+
+        System.out.println();
+        System.out.printf("%d/%d (%.2f%%) Queries Verified\n", bigQueryJobResults.size(), jobInfos.size(), bigQueryJobResults.size() * 100.0f / jobInfos.size());
+        System.out.printf("Data-Aware Verification %s\n", bigQueryJobResults.size() == jobInfos.size() ? "Succeeded" : "Failed");
+    }
+
+    /**
+     * Creates BQ tables based on the provided schema
+     * @return List of newly created tables
+     */
+    public List<Table> getBigQueryTablesFromSchema() {
+        List<Table> tables = new ArrayList<Table>();
+
+        if (migratedSchema != null) {
+            if (migratedSchema.isInJsonFormat()) {
+                // Schema is JSON
+                List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
+                if (tableInfos != null) {
+                    tableInfos.forEach(tableInfo -> tables.add(bigQuery.create(tableInfo)));
+                }
+            } else {
+                // Schema is DDL
+                JobInfo jobInfo = configureJob(migratedSchema.schema(), false);
+                Job schemaJob = bigQuery.create(jobInfo);
+                try {
+                    schemaJob.waitFor();
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
+                tableIds.forEach(tableId -> tables.add(bigQuery.getTable(tableId)));
+            }
+
+            if (tables.isEmpty()) {
+                System.out.println(migratedSchema.path() + " is not correctly formatted.");
+            }
+        }
+
+        return tables;
+    }
+
+    /**
+     * Populates BQ tables based on the provided table data
+     * @param tables
+     */
+    public void populateBigQueryTablesFromData(List<Table> tables) {
+        for (QueryVerificationData queryVerificationData : data) {
+            Table table = bigQuery.getTable(queryVerificationData.datasetName(), queryVerificationData.tableName());
+
+            // Check if no schema was provided for this table
+            if (table == null) {
+                System.out.println(queryVerificationData.tableName() + " has no provided schema.");
+
+                // Try to continue verification
+                continue;
+            }
+
+            TableId tableId = table.getTableId();
+
+            // Copy contents of CSV file
+            WriteChannelConfiguration writeChannelConfiguration = WriteChannelConfiguration.newBuilder(tableId).setFormatOptions(FormatOptions.csv()).build();
+            TableDataWriteChannel writer = bigQuery.writer(writeChannelConfiguration);
+            try {
+                writer.write(ByteBuffer.wrap(queryVerificationData.contents().getBytes()));
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("I/O Exception: " + e.getMessage());
+            }
+
+            // Run table data writing job
+            try {
+                writer.getJob().waitFor();
+            } catch (InterruptedException e) {
+                System.out.println(queryVerificationData.path() + " is not correctly formatted.");
+            }
+        }
     }
 
     /**
