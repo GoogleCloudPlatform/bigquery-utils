@@ -40,13 +40,15 @@ public class Query {
 
   /**
    *
-   * @return whether FeatureType type is kind of query (not one of ROOT, DDL, DML, DQL)
+   * @return whether FeatureType type is kind of query
+   * not one of feature_root, ddl_feature_root, dml_feature_root, dql_feature_root, feature_sink
    */
   public boolean isQuery() {
-    return !(this.type == FeatureType.ROOT ||
-        this.type == FeatureType.DDL ||
-        this.type == FeatureType.DML ||
-        this.type == FeatureType.DQL);
+    return !(this.type == FeatureType.feature_root ||
+        this.type == FeatureType.ddl_feature_root ||
+        this.type == FeatureType.dml_feature_root ||
+        this.type == FeatureType.dql_feature_root ||
+        this.type == FeatureType.feature_sink);
   }
 
 }

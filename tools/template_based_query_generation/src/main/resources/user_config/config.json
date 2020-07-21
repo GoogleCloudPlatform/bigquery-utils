@@ -1,17 +1,17 @@
 {
-  "start": "QUERY_ROOT",
-  "end": "SINK",
+  "start": "feature_root",
+  "end": "feature_sink",
   "queryTypes": [
     {
-      "queryType": "DDL",
+      "queryType": "ddl_feature_root",
       "isIncluded": true
     },
     {
-      "queryType": "DML",
+      "queryType": "dml_feature_root",
       "isIncluded": true
     },
     {
-      "queryType": "DQL",
+      "queryType": "dql_feature_root",
       "isIncluded": true
     }
   ]
