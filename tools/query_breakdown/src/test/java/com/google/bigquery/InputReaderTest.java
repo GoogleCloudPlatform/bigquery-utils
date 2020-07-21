@@ -28,6 +28,7 @@ public class InputReaderTest {
     String absPath = new File("").getAbsolutePath();
     assertEquals("SELECT a FROM A;\nSELECT b FROM B",
             InputReader.readInput(absPath +
-                    "/src/test/java/com/google/bigquery/InputTestFiles/multipleLinesNoSemicolon.txt"));
+                    "/src/test/java/com/google/bigquery"
+                + "/InputTestFiles/multipleLinesNoSemicolon.txt"));
   }
 }
