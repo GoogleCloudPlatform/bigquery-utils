@@ -1,23 +1,23 @@
 {
-  "ddl_feature_root": [
+  "DDL_FEATURE_ROOT": [
     "DDL_CREATE"
   ],
   "DDL_CREATE": [
     "DDL_PARTITION",
     "DDL_CLUSTER",
     "DDL_AS",
-    "feature_sink"
+    "FEATURE_SINK"
   ],
   "DDL_PARTITION": [
     "DDL_CLUSTER",
     "DDL_AS",
-    "feature_sink"
+    "FEATURE_SINK"
   ],
   "DDL_CLUSTER": [
     "DDL_AS",
-    "feature_sink"
+    "FEATURE_SINK"
   ],
   "DDL_AS": [
-    "feature_sink"
+    "FEATURE_SINK"
   ]
 }
