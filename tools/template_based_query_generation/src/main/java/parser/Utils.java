@@ -1,7 +1,11 @@
+package parser;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import parser.Feature;
+import parser.Mapping;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -62,7 +66,7 @@ public class Utils {
   }
 
   /**
-   * Helper class that contains all Feature(s) for JSON deserialization
+   * Helper class that contains all parser.Feature(s) for JSON deserialization
    */
   private class Features {
     private List<Feature> features;

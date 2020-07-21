@@ -1,4 +1,5 @@
 import com.google.common.collect.ImmutableList;
+import parser.KeywordsMapping;
 
 /**
  * keyword parser that adds token placeholders to randomized keywords
@@ -29,6 +30,7 @@ public class Skeleton {
         // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (Postgres)
       }
     }
+    return null;
   }
 
   /**
@@ -42,5 +44,6 @@ public class Skeleton {
         // TODO (spoiledhua): splice token placeholders given raw keywords using keywords mappings (BQ)
       }
     }
+    return null;
   }
 }

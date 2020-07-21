@@ -1,10 +1,12 @@
+package parser;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FeatureTest {
+public class MappingTest {
 
-  // TODO (spoiledhua): Write unit tests for Feature class
+  // TODO (spoiledhua): Write unit tests for parser.Mapping class
 
   @Test
   public void test_Feature() {
