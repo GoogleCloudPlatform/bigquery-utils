@@ -11,6 +11,11 @@ public class Query {
   private boolean special;
   private Token token;
 
+  /**
+   * special is set to be true if type is one of ROOT, DDL, DML, DQL
+   * @param type
+   * @param special
+   */
   public Query(QueryType type, boolean special) {
       this.type = type;
       this.special = special;
