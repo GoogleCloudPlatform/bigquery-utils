@@ -29,6 +29,7 @@ class DataFlowSolver(private val frontends: List<FrontEnd>) {
             }
         }
 
-        throw IllegalArgumentException("Cannot analyze $filePath. No frontend available.")
+        LOGGER.warn { "Cannot analyze $filePath. No frontend available. Skipping file..." }
+        return emptySequence()
     }
 }

@@ -3,6 +3,7 @@ import csv
 import os
 import logging
 import pathlib
+from sql_crawler import cloud_integration
 
 class CrawlerLog(object):
     """ Logs the status of the SQL crawler, including websites and queries.
@@ -19,7 +20,7 @@ class CrawlerLog(object):
             instantiates instance variables.
         """
 
-        self.start_time = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M")
+        self.start_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
         folder_path = str(pathlib.Path(__file__).parent)
         log_folder_path = folder_path + "/logs"
         query_folder_path = folder_path + "/queries"
@@ -35,10 +36,14 @@ class CrawlerLog(object):
         if not os.path.exists(query_folder_path):
             os.mkdir(query_folder_path)
 
-        query_name = "{0}/queries-{1}.csv".format(query_folder_path, self.start_time)
-        self.csv_file = open(query_name, "a")
+        self.query_name = "{0}/queries_{1}.csv".format(query_folder_path, self.start_time)
+        self.csv_file = open(self.query_name, "a")
         self.queries = csv.writer(self.csv_file)
         self.queries.writerow(["Query", "URL"])
+        
+        self.save_to_gcs = False
+        self.save_to_bq = False
+        self.error_log_count = 0
 
     def log_query(self, query, url):
         """ Logs query into CSV file.
@@ -47,7 +52,7 @@ class CrawlerLog(object):
             query: Query to be logged
             url: URL for page containing query
         """
-
+        
         self.queries.writerow([query, url])
 
     def log_page(self, url, count):
@@ -67,10 +72,73 @@ class CrawlerLog(object):
             str: Error message to be logged.
         """
 
+        self.error_log_count += 1
         logging.error("ERROR: %s", errorMessage)
 
-    def close(self):
-        """ Closes the crawler log.
+    def parse_location_arg(self, location):
+        """ Validates and splits location argument for cloud upload
+        into two parts. Should be formatted as project_id.dataset.
+        
+        Args:
+            location: String with name of project ID and dataset.
+
+        Returns
+            List of separate strings after splitting location.
         """
+        if location.count(".") != 1:
+            self.log_error("Argument not formatted correctly: {0}".format(location))
+            return None, None
+
+        return location.split(".")
+
+    def set_gcs(self, location):
+        """ Sets variables for uploading data to Google Cloud Storage.
+ 
+        Args:
+            location: String with name of project ID and bucket name,
+            separated by a period.
+        """
+
+        self.gcs_project, self.gcs_bucket = self.parse_location_arg(location)
+        if self.gcs_project and self.gcs_bucket:
+            self.save_to_gcs = True
+        
+    def set_bq(self, location):
+        """ Sets variables for uploading data to Google BigQuery.
+            
+        Args:
+            location: String with name of project ID and dataset name,
+            separated by a period.
+        """
+
+        self.bq_project, self.bq_dataset = self.parse_location_arg(location)
+        if self.bq_project and self.bq_dataset:
+            self.save_to_bq = True
+
+    def close(self):
+        """ Closes the crawler log. Uploads file to Google Cloud. Prints
+            message if there are handled errors logged during crawling process.
+        """
+
         logging.info("Finished crawling.")
         self.csv_file.close()
+        
+        file_name = "queries_{0}".format(self.start_time)
+        if self.save_to_gcs:
+            status, message = cloud_integration.upload_gcs_file(self.gcs_project,
+                self.gcs_bucket, file_name, self.query_name)
+            if status:
+                logging.info(message)
+            else:
+                self.log_error(message)
+
+        if self.save_to_bq:
+            status, message = cloud_integration.load_bigquery_table(self.bq_project,
+                self.bq_dataset, file_name, self.query_name)
+            if status:
+                logging.info(message)
+            else:
+                self.log_error(message)
+
+        if self.error_log_count > 0:
+            print("Logged {0} errors. See log for details.".format(self.error_log_count))
