@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
  */
 public class BigQueryService {
 
-  private static final int TableFetchSize = 1000;
+  private static final int TABLE_FETCH_SIZE = 1000;
 
   private final BigQuery bigQuery;
 
@@ -85,14 +85,17 @@ public class BigQueryService {
    * <p>It is possible that a dataset contains a large amount of tables, so this method will only
    * fetch maximum 1000 of them.
    *
-   * @param projectId project id
-   * @param datasetId dataset id
+   * @param projectId project to fetch tables
+   * @param datasetId dataset to fetch tables
    * @return list of table names belonging to the given project and dataset
    */
   public List<String> listTableNames(String projectId, String datasetId) throws BigQueryException {
     DatasetId projectDatasetId = DatasetId.of(projectId, datasetId);
     Page<Table> tables =
-        bigQuery.listTables(projectDatasetId, BigQuery.TableListOption.pageSize(TableFetchSize));
+        bigQuery.listTables(projectDatasetId, BigQuery.TableListOption.pageSize(TABLE_FETCH_SIZE));
+
+    // The reason to turn off parallel is to avoid this program using too many thread resources. Stream does not allow
+    // users to specify the max threads to use. It may cause the program to occupy too much CPU resource.
     return StreamSupport.stream(tables.iterateAll().spliterator(), /* parallel= */ false)
         .map(table -> table.getTableId().getTable())
         .collect(Collectors.toList());
