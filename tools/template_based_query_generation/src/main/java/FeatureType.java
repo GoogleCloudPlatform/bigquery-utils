@@ -2,7 +2,7 @@
  * Types of queries in SQL language encoding
  * ROOT, DDL, DML, DQL are special and will be indicated in the Query class
  */
-public enum QueryType {
+public enum FeatureType {
 	ROOT,
 	DDL,
 	DML,
