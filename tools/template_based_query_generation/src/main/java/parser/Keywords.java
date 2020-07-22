@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
- * Set of user-defined DDL, DML, and DQL keywords
+ * Set of user-specified DDL, DML, and DQL keywords
  */
 public class Keywords {
 

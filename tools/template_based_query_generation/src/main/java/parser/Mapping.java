@@ -8,16 +8,22 @@ import java.util.List;
  * Helper class that lists PostgreSQL and BigQuery mappings and necessary tokens for all keyword variants
  */
 public class Mapping {
-  private String postgre;
+
+  /* Equivalent PostgreSQL mapping to a keyword */
+  private String postgres;
+
+  /* Equivalent BigQuery mapping to a keyword */
   private String bigQuery;
+
+  /* All necessary tokens for a given keyword variant */
   private List<TokenInfo> tokenInfos;
 
-  public String getPostgre() {
-    return this.postgre;
+  public String getPostgres() {
+    return this.postgres;
   }
 
-  public void setPostgre(String postgre) {
-    this.postgre = postgre;
+  public void setPostgres(String postgres) {
+    this.postgres = postgres;
   }
 
   public String getBigQuery() {
