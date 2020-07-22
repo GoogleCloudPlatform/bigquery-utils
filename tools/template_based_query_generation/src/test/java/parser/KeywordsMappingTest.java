@@ -1,66 +1,104 @@
 package parser;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
-import parser.KeywordsMapping;
+import token.TokenInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KeywordsMappingTest {
 
-  // TODO (spoiledhua): fix tests here to correspond with new changes to parser.KeywordsMapping
-
   @Test
-  public void test_getMappingPostgreDDL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("CREATE", km.getMappingDDL("DDL_CREATE"));
+  public void test_getMappingDDL() {
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("partition_exp");
+    List<TokenInfo> tokenInfos = new ArrayList<>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgres("PARTITION BY");
+    mapping.setBigQuery("PARTITION BY");
+    mapping.setTokenInfos(tokenInfos);
+    List<Mapping> mappings = new ArrayList<>();
+    mappings.add(mapping);
+    ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
+
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    ImmutableList<Mapping> actual = keywordsMapping.getMappingDDL("DDL_PARTITION");
+
+    assertEquals(expected.get(0).getTokenInfos().get(0).getCount(), actual.get(0).getTokenInfos().get(0).getCount());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getRequired(), actual.get(0).getTokenInfos().get(0).getRequired());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getTokenName(), actual.get(0).getTokenInfos().get(0).getTokenName());
+    assertEquals(expected.get(0).getPostgres(), actual.get(0).getPostgres());
+    assertEquals(expected.get(0).getBigQuery(), actual.get(0).getBigQuery());
+
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDDL("NON KEYWORD");
+      keywordsMapping.getMappingDDL("NON KEYWORD");
     });
   }
 
   @Test
-  public void test_getMappingBigQueryDDL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("CREATE", km.getMappingDDL("DDL_CREATE"));
+  public void test_getMappingDML() {
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("update_item");
+    List<TokenInfo> tokenInfos = new ArrayList<>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgres("SET");
+    mapping.setBigQuery("SET");
+    mapping.setTokenInfos(tokenInfos);
+    List<Mapping> mappings = new ArrayList<>();
+    mappings.add(mapping);
+    ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
+
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    ImmutableList<Mapping> actual = keywordsMapping.getMappingDML("DML_SET");
+
+    assertEquals(expected.get(0).getTokenInfos().get(0).getCount(), actual.get(0).getTokenInfos().get(0).getCount());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getRequired(), actual.get(0).getTokenInfos().get(0).getRequired());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getTokenName(), actual.get(0).getTokenInfos().get(0).getTokenName());
+    assertEquals(expected.get(0).getPostgres(), actual.get(0).getPostgres());
+    assertEquals(expected.get(0).getBigQuery(), actual.get(0).getBigQuery());
+
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDDL("NON KEYWORD");
+      keywordsMapping.getMappingDML("NON KEYWORD");
     });
   }
 
   @Test
-  public void test_getMappingPostgreDML() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("INSERT INTO", km.getMappingDML("DML_INSERT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDML("NON KEYWORD");
-    });
-  }
+  public void test_getMappingDQL() {
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setCount(1);
+    tokenInfo.setRequired(true);
+    tokenInfo.setTokenName("select_exp");
+    List<TokenInfo> tokenInfos = new ArrayList<>();
+    tokenInfos.add(tokenInfo);
+    Mapping mapping = new Mapping();
+    mapping.setPostgres("SELECT");
+    mapping.setBigQuery("SELECT");
+    mapping.setTokenInfos(tokenInfos);
+    List<Mapping> mappings = new ArrayList<>();
+    mappings.add(mapping);
+    ImmutableList<Mapping> expected = ImmutableList.copyOf(mappings);
 
-  @Test
-  public void test_getMappingBigQueryDML() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("INSERT", km.getMappingDML("DML_INSERT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDML("NON KEYWORD");
-    });
-  }
+    KeywordsMapping keywordsMapping = new KeywordsMapping();
+    ImmutableList<Mapping> actual = keywordsMapping.getMappingDQL("DQL_SELECT");
 
-  @Test
-  public void test_getMappingPostgreDQL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("SELECT", km.getMappingDQL("DQL_SELECT"));
-    assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDQL("NON KEYWORD");
-    });
-  }
+    assertEquals(expected.get(0).getTokenInfos().get(0).getCount(), actual.get(0).getTokenInfos().get(0).getCount());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getRequired(), actual.get(0).getTokenInfos().get(0).getRequired());
+    assertEquals(expected.get(0).getTokenInfos().get(0).getTokenName(), actual.get(0).getTokenInfos().get(0).getTokenName());
+    assertEquals(expected.get(0).getPostgres(), actual.get(0).getPostgres());
+    assertEquals(expected.get(0).getBigQuery(), actual.get(0).getBigQuery());
 
-  @Test
-  public void test_getMappingBigQueryDQL() {
-    KeywordsMapping km = new KeywordsMapping();
-    assertEquals("SELECT", km.getMappingDQL("DQL_SELECT"));
     assertThrows(IllegalArgumentException.class, () -> {
-      km.getMappingDQL("NON KEYWORD");
+      keywordsMapping.getMappingDQL("NON KEYWORD");
     });
   }
 }
