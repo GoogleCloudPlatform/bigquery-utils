@@ -1,3 +1,5 @@
+package parser;
+
 /**
  * Helper class that indicates whether a feature is included by the user via the user-defined config file
  */

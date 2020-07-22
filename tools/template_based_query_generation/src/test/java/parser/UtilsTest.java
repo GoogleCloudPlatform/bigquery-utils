@@ -1,9 +1,12 @@
+package parser;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import token.TokenInfo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

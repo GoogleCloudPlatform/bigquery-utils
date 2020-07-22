@@ -2,7 +2,7 @@
 import html
 import re
 
-REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP)[^;#]*;"
+REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP|INSERT|UPDATE|EXEC|CALL|USING) (?:(?!;|[.:]\s).)*;"
 
 class GenericExtractionModule():
     """ A module to extract SQL queries from any website without knowing the HTML
@@ -25,10 +25,5 @@ class GenericExtractionModule():
         tags_removed = re.sub('<[^<]+?>', '', converted)
 
         # Look for text that matches common SQL queries
-        matches = re.findall(REGEX_SEARCH, tags_removed)
-        cleaned_matches = []
-        for match in matches:
-            if re.search(r"\.\s", match):
-                continue
-            cleaned_matches += [match]
-        return cleaned_matches
+        matches = re.findall(REGEX_SEARCH, tags_removed, re.DOTALL)
+        return matches

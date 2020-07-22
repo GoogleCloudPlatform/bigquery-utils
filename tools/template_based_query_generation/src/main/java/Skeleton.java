@@ -1,6 +1,11 @@
 import com.google.common.collect.ImmutableList;
+import parser.Keywords;
+import parser.KeywordsMapping;
+import parser.Mapping;
+import parser.Utils;
+import token.TokenInfo;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * keyword parser that adds token placeholders to randomized keywords

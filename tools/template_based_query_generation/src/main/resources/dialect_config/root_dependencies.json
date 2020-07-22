@@ -1,7 +1,7 @@
 {
-  "QUERY_ROOT": [
-    "DDL",
-    "DML",
-    "DQL"
+  "FEATURE_ROOT": [
+    "DDL_FEATURE_ROOT",
+    "DML_FEATURE_ROOT",
+    "DQL_FEATURE_ROOT"
   ]
 }
