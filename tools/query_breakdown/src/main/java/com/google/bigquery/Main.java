@@ -8,14 +8,19 @@ import java.util.Comparator;
 /**
  * This file is the main file for the command line tool.
  * Usage: query_breakdown -r <PATH> [-w <PATH>] [-l <INTEGER>]
- * -i, --input, PATH: this command specifies the path to the file containing queries to be
+ * -i, --inputFile, PATH: this command specifies the path to the file containing queries to be
  *                    inputted into the tool. It is therefore mandatory
- * -o, --output, PATH: this command specifies the path to the file that the tool can write
+ * -o, --outputFile, PATH: this command specifies the path to the file that the tool can write
  *                    its results to. If not specified, the tool will simply print results on the
  *                    console. It is therefore optional
  * -l, --limit, PATH: this command specifies the path to an integer that the tool takes as a
  *                    limit for the number of errors to be explored, thereby controlling the
  *                    runtime. It is therefore optional
+ *
+ * Sample Usage: query_breakdown -r input.txt
+ *               query_breakdown -r input2.txt -w output.txt -l 3
+ *               query_breakdown -r input3.txt -w output2.txt
+ *               query_breakdown -r input4.txt -l 6
  */
 public class Main {
   public static void main(String[] args) {
@@ -72,7 +77,7 @@ public class Main {
           return 0;
         }
         else {
-          return (option1.getLongOpt().equals("output")) ? -1 : 1;
+          return (option1.getLongOpt().equals("outputFile")) ? -1 : 1;
         }
       }
     });
@@ -93,11 +98,11 @@ public class Main {
    */
   public static Options createOptions() {
     Options options = new Options();
-    options.addOption(Option.builder("i").required(true).longOpt("input").hasArg(true)
+    options.addOption(Option.builder("i").required(true).longOpt("inputFile").hasArg(true)
         .argName("PATH").desc("this command specifies the path to the file "
             + "containing queries to be inputted into the tool. It is therefore mandatory")
         .build());
-    options.addOption(Option.builder("o").longOpt("output").hasArg(true).argName("PATH")
+    options.addOption(Option.builder("o").longOpt("outputFile").hasArg(true).argName("PATH")
         .desc("this command specifies the path to the file that the tool can write "
             + "its results to. If not specified, the tool will simply print results"
             + "on the console. It is therefore optional").build());

@@ -14,7 +14,7 @@ import org.apache.calcite.sql.dialect.CalciteSqlDialect;
  * Calcite Parser can be used as a blackbox.
  */
 public class CalciteParser implements Parser {
-  private SqlParser.Config config;
+  private final SqlParser.Config config;
 
   public CalciteParser() {
     // can change the field here to change the type of Calcite com.google.bigquery.Parser
