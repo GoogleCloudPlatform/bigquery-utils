@@ -10,7 +10,7 @@ The dashboard is comprised of the following reports:
 
 The above links will direct you to documentation for each individual report which will describe its contents in more detail.
 
-The underlying SQL queries for each report can be found [here](./sql). These queries reference tables in a sample public dataset that was generated from real INFORMATION_SCHEMA usage data but was slightly modified to anonymize values and clean some data.
+The underlying SQL queries for each report can be found [here](./sql). These queries reference tables in a sample public dataset that was generated from real `INFORMATION_SCHEMA` usage data but was slightly modified to anonymize values and clean some data.
 
 #### The following steps describe how to make a copy of this dashboard and the underlying data sources for use as-is.
 
@@ -45,6 +45,7 @@ Update the data source to reference your project's `INFORMATION_SCHEMA` tables a
 
 where `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.
 
+
 If you are using a billing project that is **different** from the administration project, update the data source as follows:
 
 ```
@@ -53,9 +54,11 @@ If you are using a billing project that is **different** from the administration
 
 where `{project_id}` is the project id of the billing project and `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.
 
+
 When copying the Reservation Utilization data sources, you must also do the following:
 1. Replace all instances `"admin-project:US."` with `"{project_id}:{location}."`
 2. Replace all instances of `TIMESTAMP("2020-07-15 23:59:59.000 UTC")` with `CURRENT_TIMESTAMP()`
+
 
 Once all modifications are complete and a Billing Project is specified, click "Reconnect".
 
