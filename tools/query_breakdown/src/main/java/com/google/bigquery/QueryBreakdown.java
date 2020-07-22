@@ -60,7 +60,6 @@ public class QueryBreakdown {
       }
     }
     // termination condition: if the parsing doesn't throw exceptions, then the leaf is reached
-    return;
   }
 
   /**

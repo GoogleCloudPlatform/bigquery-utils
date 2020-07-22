@@ -14,6 +14,8 @@ public class InputReader {
   /**
    * This method will take in a txt file name, use BufferedReader to parse the input, and return
    * all the queries in a string format
+   *
+   * TODO: more robust method for input parsing needed (ex: semicolons in strings, comments)
    */
   public static String readInput(String filename) throws IOException {
     List<String> lines = Files.readAllLines(Paths.get(filename));
