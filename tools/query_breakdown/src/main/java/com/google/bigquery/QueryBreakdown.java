@@ -9,6 +9,9 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 /**
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
  * also be in charge of outputting the results.
+ *
+ * Note: functions in this class are left as package private for testing purposes. The visibility
+ * (public/private) will properly be set in upcoming PR's.
  */
 public class QueryBreakdown {
 
@@ -34,7 +37,6 @@ public class QueryBreakdown {
     loop(originalQuery, errorLimit);
 
     // write termination logic for output (tracing the node back, reconstructing path, output)
-    return;
   }
 
   /**
