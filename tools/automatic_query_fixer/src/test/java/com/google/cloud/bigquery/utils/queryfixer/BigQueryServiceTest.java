@@ -99,7 +99,8 @@ public class BigQueryServiceTest {
    */
   private void injectBigQueryMockIntoService() {
     try {
-      FieldUtils.writeField(service, "bigQuery", bigQueryMock, true);
+      FieldUtils.writeField(
+          service, /* fieldName= */ "bigQuery", bigQueryMock, /* forceAccess= */ true);
     } catch (IllegalAccessException ignored) {
     }
   }
