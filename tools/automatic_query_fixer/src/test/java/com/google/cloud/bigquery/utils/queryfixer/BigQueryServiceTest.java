@@ -43,18 +43,12 @@ public class BigQueryServiceTest {
   private static final String TABLE_1 = "311_request";
   private static final String TABLE_2 = "311_service_requests";
 
-  @Mock
-  BigQuery bigQueryMock;
-  @Mock
-  Job jobMock;
-  @Mock
-  JobStatistics.QueryStatistics queryStatisticsMock;
-  @Mock
-  Page<Table> tablePageMock;
-  @Mock
-  Table tableMock1;
-  @Mock
-  Table tableMock2;
+  @Mock BigQuery bigQueryMock;
+  @Mock Job jobMock;
+  @Mock JobStatistics.QueryStatistics queryStatisticsMock;
+  @Mock Page<Table> tablePageMock;
+  @Mock Table tableMock1;
+  @Mock Table tableMock2;
 
   @Before
   public void setup() {
