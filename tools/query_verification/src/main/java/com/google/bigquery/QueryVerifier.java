@@ -77,7 +77,7 @@ public class QueryVerifier {
                 jobResults.add(QueryJobResults.create(query, results));
             } catch (BigQueryException e) {
                 // Print out syntax/semantic errors returned from BQ
-                System.out.printf("Error in Query #%d from %s\n%s\n\n", i, migratedQuery.path(), e.getMessage());
+                System.err.printf("Error in Query #%d from %s\n%s\n\n", i + 1, migratedQuery.path(), e.getMessage());
             }
         }
 
@@ -94,7 +94,7 @@ public class QueryVerifier {
      */
     public void verifyDataAware() {
         List<Table> tables = getBigQueryTablesFromSchema();
-        populateBigQueryTablesFromData(tables);
+        populateBigQueryTablesFromData();
 
         // Create query jobs
         List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, false);
@@ -113,11 +113,14 @@ public class QueryVerifier {
             try {
                 // Run query job
                 Job queryJob = bigQuery.create(jobInfo);
+                queryJob.waitFor();
 
                 results = QueryJobResults.create(query, queryJob.getQueryResults());
-            } catch (BigQueryException | InterruptedException e) {
+            } catch (BigQueryException e) {
                 // Print out syntax/semantic errors returned from BQ
-                System.out.printf("Error in Query #%d from %s\n%s\n\n", i, migratedQuery.path(), e.getMessage());
+                System.err.printf("Error in Query #%d from %s\n%s\n\n", i + 1, migratedQuery.path(), e.getMessage());
+            } catch (InterruptedException e) {
+                System.err.println(e.getMessage());
             } finally {
                 // Store results
                 bigQueryJobResults.add(results);
@@ -159,7 +162,7 @@ public class QueryVerifier {
                 try {
                     schemaJob.waitFor();
                 } catch (InterruptedException e) {
-                    System.out.println(e.getMessage());
+                    System.err.println(e.getMessage());
                 }
 
                 List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
@@ -167,7 +170,7 @@ public class QueryVerifier {
             }
 
             if (tables.isEmpty()) {
-                System.out.println(migratedSchema.path() + " is not correctly formatted.");
+                System.err.println(migratedSchema.path() + " is not correctly formatted.");
             }
         }
 
@@ -176,15 +179,14 @@ public class QueryVerifier {
 
     /**
      * Populates BQ tables based on the provided table data
-     * @param tables
      */
-    public void populateBigQueryTablesFromData(List<Table> tables) {
+    public void populateBigQueryTablesFromData() {
         for (QueryVerificationData queryVerificationData : data) {
             Table table = bigQuery.getTable(queryVerificationData.datasetName(), queryVerificationData.tableName());
 
             // Check if no schema was provided for this table
             if (table == null) {
-                System.out.println(queryVerificationData.tableName() + " has no provided schema.");
+                System.err.println(queryVerificationData.tableName() + " has no provided schema.");
 
                 // Try to continue verification
                 continue;
@@ -199,14 +201,21 @@ public class QueryVerifier {
                 writer.write(ByteBuffer.wrap(queryVerificationData.contents().getBytes()));
                 writer.close();
             } catch (IOException e) {
-                System.out.println("I/O Exception: " + e.getMessage());
+                System.err.println("I/O Exception: " + e.getMessage());
             }
 
             // Run table data writing job
+            Job writeJob = writer.getJob();
             try {
-                writer.getJob().waitFor();
+                writeJob = writeJob.waitFor();
+
+                // Check for errors in writing table data
+                if (writeJob.getStatus().getError() != null) {
+                    BigQueryError error = writeJob.getStatus().getError();
+                    System.err.printf("%s is not correctly formatted.\n%s\n", queryVerificationData.path(), error.getMessage());
+                }
             } catch (InterruptedException e) {
-                System.out.println(queryVerificationData.path() + " is not correctly formatted.");
+                System.err.println(e.getMessage());
             }
         }
     }
@@ -242,7 +251,7 @@ public class QueryVerifier {
                     } finally {
                         if (fieldList == null || fieldList.isEmpty()) {
                             // Error in formatting of fields
-                            System.out.println(tableId.getTable() + " is not correctly formatted.");
+                            System.err.println(tableId.getTable() + " is not correctly formatted.");
 
                             // Skip table and try to continue verification even without this table
                             continue;
