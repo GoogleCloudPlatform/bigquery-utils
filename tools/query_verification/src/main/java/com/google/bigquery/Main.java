@@ -94,13 +94,9 @@ public class Main {
             for (String dataFilePath : dataOptionValues) {
                 String dataFileName = new File(dataFilePath).getName();
                 String dataContents = getContentsOfFile(dataFilePath);
+                String[] dataTableId = dataFileName.split("\\.");
 
-                // Check file format
-                if (dataFileName.substring(dataFileName.lastIndexOf(".") + 1).toLowerCase().equals("csv")) {
-                    String[] dataTableId = dataFileName.split("\\.");
-
-                    data.add(QueryVerificationData.create(dataTableId[0], dataTableId[1], dataFilePath, dataContents));
-                }
+                data.add(QueryVerificationData.create(dataTableId[0], dataTableId[1], dataFilePath, dataContents));
             }
         }
 
