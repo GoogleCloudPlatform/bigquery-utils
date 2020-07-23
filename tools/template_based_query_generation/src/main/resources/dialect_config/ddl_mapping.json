@@ -6,7 +6,7 @@
         {
           "postgres": "CREATE TABLE",
           "bigQuery": "CREATE TABLE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -22,7 +22,7 @@
         {
           "postgres": "CREATE TABLE IF NOT EXISTS",
           "bigQuery": "CREATE TABLE IF NOT EXISTS",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -38,7 +38,7 @@
         {
           "postgres": "CREATE TABLE",
           "bigQuery": "CREATE OR REPLACE TABLE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "table_name",
               "required": true,
@@ -59,7 +59,7 @@
         {
           "postgres": "PARTITION BY",
           "bigQuery": "PARTITION BY",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "partition_exp",
               "required": true,
@@ -75,7 +75,7 @@
         {
           "postgres": "COLLATE",
           "bigQuery": "CLUSTER BY",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "cluster_exp",
               "required": true,
@@ -91,7 +91,7 @@
         {
           "postgres": "AS",
           "bigQuery": "AS",
-          "tokens": [
+          "tokenInfos": [
           ]
         }
       ]

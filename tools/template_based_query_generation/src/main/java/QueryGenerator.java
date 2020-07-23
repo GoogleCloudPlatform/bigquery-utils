@@ -13,7 +13,7 @@ public class QueryGenerator {
 	 */
 	public QueryGenerator(String[] dialectConfigPaths, String[] userConfigPaths, String mainUserConfig) throws Exception {
 		// TODO (Allen):
-		//  1. Use Utils to parse user json and create MarkovChain and nodes
+		//  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
 		//  2. Generate number of queries given in config
 		//  3. pass to them to Keyword or Skeleton
 	}
