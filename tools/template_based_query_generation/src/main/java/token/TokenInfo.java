@@ -1,3 +1,5 @@
+package token;
+
 /**
  * Helper class that indicates what tokens need to follow the associated keyword
  */

@@ -1,7 +1,11 @@
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
+import parser.KeywordsMapping;
+import parser.Mapping;
+import token.TokenInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

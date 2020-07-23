@@ -6,16 +6,19 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
 import org.antlr.v4.runtime.CharStream
-import org.junit.jupiter.api.assertThrows
 import java.nio.file.Path
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class DataFlowSolverTest {
     @Test
-    fun `solver throws without any frontends`() {
+    fun `solver returns empty sequence without any frontends`() {
         val solver = DataFlowSolver(emptyList())
 
-        assertThrows<IllegalArgumentException> { solver.solveDataFlow(mockk(relaxed = true), mockk(relaxed = true)) }
+        assertEquals(
+            emptySequence(),
+            solver.solveDataFlow(mockk(relaxed = true), mockk(relaxed = true))
+        )
     }
 
     @Test
@@ -39,13 +42,16 @@ class DataFlowSolverTest {
     }
 
     @Test
-    fun `solver throws without any valid frontends`() {
+    fun `solver returns empty sequence without any valid frontends`() {
         val frontEnd = mockk<FrontEnd>()
         every { frontEnd.canSolve(any()) } returns false
 
         val solver = DataFlowSolver(listOf(frontEnd))
 
-        assertThrows<IllegalArgumentException> { solver.solveDataFlow(mockk(relaxed = true), mockk(relaxed = true)) }
+        assertEquals(
+            emptySequence(),
+            solver.solveDataFlow(mockk(relaxed = true), mockk(relaxed = true))
+        )
     }
 
     @Test

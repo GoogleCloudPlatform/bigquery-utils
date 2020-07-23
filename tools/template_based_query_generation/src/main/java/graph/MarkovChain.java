@@ -1,16 +1,18 @@
+package graph;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * Class that represents src.main.MarkovChain encoding query and keyword dependencies
+ * Class that represents src.main.graph.MarkovChain encoding query and keyword dependencies
  */
 public class MarkovChain<E> {
 
   private HashSet<Node<E>> nodes;
 
   /**
-   * constructs MarkovChain object from edge weights and random seed
+   * constructs graph.MarkovChain object from edge weights and random seed
    *
    * @param nodes
    */
@@ -23,7 +25,7 @@ public class MarkovChain<E> {
   }
 
   /**
-   * constructs MarkovChain object from set of nodes and random seed
+   * constructs graph.MarkovChain object from set of nodes and random seed
    *
    * @param nodes
    */

@@ -30,3 +30,10 @@ def test_generic_extraction():
     mock_request = MockRequest(url, 200, reader.read())
     queries = extractor.extract_queries(mock_request)
     assert len(queries) == 5
+
+def test_generic_extraction_with_links():
+    reader = open("resources/sample_b.html", "r")
+    url = "https://fake.website"
+    mock_request = MockRequest(url, 200, reader.read())
+    assert len(extractor.extract_links(mock_request)) == 2
+    assert len(extractor.extract_queries(mock_request)) == 8
