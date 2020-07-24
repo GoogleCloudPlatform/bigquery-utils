@@ -1,6 +1,10 @@
 package data;
 
+import parser.Utils;
+
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * class representing a data table
@@ -49,6 +53,21 @@ public class Table {
 
   public int getNumRows() {
     return this.numRows;
+  }
+
+  /**
+   *
+   * @param datatype
+   * @return name of random column of given datatype
+   */
+  public String getRandomColumn(DataType datatype) {
+    Set<String> s = new HashSet<>();
+    for (String col: this.schema.keySet()){
+      if (this.schema.get(col) == datatype) {
+        s.add(col);
+      }
+    }
+    return Utils.getRandomElement(s);
   }
 
 }
