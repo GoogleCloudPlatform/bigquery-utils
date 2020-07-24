@@ -23,9 +23,9 @@ public class Keywords {
    */
   public Keywords() {
     try {
-      setDDL = Utils.makeImmutableSet(Paths.get(filePathDDL));
-      setDML = Utils.makeImmutableSet(Paths.get(filePathDML));
-      setDQL = Utils.makeImmutableSet(Paths.get(filePathDQL));
+      setDDL = Utils.makeImmutableKeywordSet(Paths.get(filePathDDL));
+      setDML = Utils.makeImmutableKeywordSet(Paths.get(filePathDML));
+      setDQL = Utils.makeImmutableKeywordSet(Paths.get(filePathDQL));
     } catch (IOException exception) {
       exception.printStackTrace();
     }
