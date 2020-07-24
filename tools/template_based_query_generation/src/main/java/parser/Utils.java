@@ -1,12 +1,14 @@
+package parser;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import data.DataType;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,63 +20,9 @@ public class Utils {
 
   private static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
-  private static final int lowerBound = 1;
+  private static final int lowerBound = 0;
 
   private static final String CHARSET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-
-  /**
-   * Helper class that contains all KeywordIndicator(s) for JSON deserialization
-   */
-  private class KeywordIndicators {
-    private List<KeywordIndicator> keywordIndicators;
-
-    public List<KeywordIndicator> getKeywordIndicators() {
-      return this.keywordIndicators;
-    }
-
-    public void setKeywords(List<KeywordIndicator> keywordIndicators) {
-      this.keywordIndicators = keywordIndicators;
-    }
-  }
-
-  /**
-   * Helper class that indicates whether a keyword is included by the user via the user-defined config file
-   */
-  private class KeywordIndicator {
-    private String keyword;
-    private boolean isIncluded;
-
-    public String getKeyword() {
-      return this.keyword;
-    }
-
-    public void setKeyword(String keyword) {
-      this.keyword = keyword;
-    }
-
-    public boolean getIsIncluded() {
-      return this.isIncluded;
-    }
-
-    public void setIsIncluded(boolean isIncluded) {
-      this.isIncluded = isIncluded;
-    }
-  }
-
-  /**
-   * Helper class that contains all Feature(s) for JSON deserialization
-   */
-  private class Features {
-    private List<Feature> features;
-
-    public List<Feature> getFeatures() {
-      return this.features;
-    }
-
-    public void setFeatures(List<Feature> features) {
-      this.features = features;
-    }
-  }
 
   /**
    * Returns a random integer between a lowerBound and an upperBound, inclusive
@@ -84,8 +32,8 @@ public class Utils {
    * @throws IllegalArgumentException if upperBound is negative
    */
   public static int getRandomInteger(int upperBound) throws IllegalArgumentException {
-    if (upperBound < 1) {
-      throw new IllegalArgumentException("Upper bound cannot be nonpositive");
+    if (upperBound < 0) {
+      throw new IllegalArgumentException("Upper bound cannot be negative");
     }
 
     return random.nextInt(lowerBound, upperBound + 1);
@@ -183,16 +131,16 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable set of keywords from the config file
    */
-  public static ImmutableSet<String> makeImmutableSet(Path inputPath) throws IOException {
+  public static ImmutableSet<String> makeImmutableKeywordSet(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
-    KeywordIndicators keywordIndicators = gson.fromJson(reader, KeywordIndicators.class);
+    FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
 
     ImmutableList.Builder<String> builder = ImmutableList.builder();
 
-    for (KeywordIndicator keywordIndicator : keywordIndicators.getKeywordIndicators()) {
-      if (keywordIndicator.getIsIncluded()) {
-        builder.add(keywordIndicator.getKeyword());
+    for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
+      if (featureIndicator.getIsIncluded()) {
+        builder.add(featureIndicator.getFeature());
       }
     }
 
@@ -202,12 +150,12 @@ public class Utils {
   }
 
   /**
-   * Creates an immutable map from the user-defined config file of keyword mappings
+   * Creates an immutable map from the config file of keyword mappings
    *
    * @param inputPath relative path of the config file
    * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
+  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableKeywordMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     Features features = gson.fromJson(reader, Features.class);
@@ -221,6 +169,28 @@ public class Utils {
     }
 
     ImmutableMap<String, ImmutableList<Mapping>> map = builder.build();
+
+    return map;
+  }
+
+  /**
+   * Creates an immutable map from the config file of datatype mappings
+   *
+   * @param inputPath relative path of the config file
+   * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
+   */
+  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
+
+    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+
+    for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
+      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+    }
+
+    ImmutableMap<DataType, DataTypeMap> map = builder.build();
 
     return map;
   }

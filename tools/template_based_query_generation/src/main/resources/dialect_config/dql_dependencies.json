@@ -1,5 +1,5 @@
 {
-  "DQL": [
+  "DQL_FEATURE_ROOT": [
     "DQL_SELECT"
   ],
   "DQL_SELECT": [
@@ -11,7 +11,7 @@
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_FROM": [
     "DQL_WHERE",
@@ -21,7 +21,7 @@
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_WHERE": [
     "DQL_GROUP",
@@ -30,7 +30,7 @@
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_GROUP": [
     "DQL_HAVING",
@@ -38,31 +38,31 @@
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_HAVING": [
     "DQL_WINDOW",
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_WINDOW": [
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_ORDER": [
     "DQL_LIMIT",
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_LIMIT": [
     "DQL_OFFSET",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DQL_OFFSET": [
-    "SINK"
+    "FEATURE_SINK"
   ]
 }
