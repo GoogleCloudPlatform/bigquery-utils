@@ -1,13 +1,21 @@
+package graph;
+
+import graph.MarkovChain;
+import graph.Node;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MarkovChainTest {
 
+	/**
+	 * test for the randomWalk method when the graph consists of isolated vertices (islands)
+	 */
 	@Test
 	public void test_randomWalk_islands() {
 		Node<String> node1 = new Node<String>("node 1", 4440);
@@ -29,6 +37,9 @@ public class MarkovChainTest {
 		assertEquals(node3.getObj(), walk3.get(0));
 	}
 
+	/**
+	 * test for the randomWalk method when the graph consists of one directed edge
+	 */
 	@Test
 	public void test_randomWalk_anEdge() {
 		Node<String> node1 = new Node<String>("node 1", 3408);
@@ -49,8 +60,35 @@ public class MarkovChainTest {
 		assertEquals(node2.getObj(), walk2.get(0));
 	}
 
+	/**
+	 * test for the randomWalk method when the graph consists of a bidirectional edge
+	 * an infinite loop happens in the graph.MarkovChain class, so we expect an OutOfMemoryError.class
+	 */
+	@Test
+	public void test_randomWalk_nonDAG() {
+		Node<String> node1 = new Node<String>("node 1", 3408);
+		Node<String> node2 = new Node<String>("node 2", 9642);
+		HashSet<Node<String>> node1Neighbors = new HashSet<Node<String>>();
+		node1Neighbors.add(node2);
+		node1.setNeighbors(node1Neighbors);
+		HashSet<Node<String>> node2Neighbors = new HashSet<Node<String>>();
+		node2Neighbors.add(node1);
+		node2.setNeighbors(node2Neighbors);
+		HashSet<Node<String>> nodeSet = new HashSet<Node<String>>();
+		nodeSet.add(node1);
+		nodeSet.add(node2);
+		MarkovChain mc = new MarkovChain(nodeSet);
+		assertThrows(OutOfMemoryError.class, () -> {
+			ArrayList<String> walk1 = mc.randomWalk(node1);
+		});
+	}
+
+	/**
+	 * test for the randomWalk method when the graph is a small DAG
+	 */
 	@Test
 	public void test_randomWalk_smallDAG() {
+		Random r = new Random();
 		Node<String> node1 = new Node<String>("node 1", 6033);
 		Node<String> node2 = new Node<String>("node 2", 8509);
 		Node<String> node3 = new Node<String>("node 3", 5991);

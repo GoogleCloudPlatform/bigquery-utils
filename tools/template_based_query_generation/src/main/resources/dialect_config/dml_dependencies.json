@@ -1,5 +1,5 @@
 {
-  "DML": [
+  "DML_FEATURE_ROOT": [
     "DML_INSERT",
     "DML_DELETE",
     "DML_UPDATE"
@@ -12,9 +12,9 @@
   ],
   "DML_SET": [
     "DML_WHERE",
-    "SINK"
+    "FEATURE_SINK"
   ],
   "DML_WHERE": [
-    "SINK"
+    "FEATURE_SINK"
   ]
 }
