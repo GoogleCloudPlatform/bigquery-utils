@@ -7,7 +7,9 @@ import java.util.HashMap;
  * contains data table and schema
  */
 public class Table {
+
   private String name;
+  private int numRows;
   private HashMap<String, DataType> schema;
 
   /**
@@ -16,6 +18,7 @@ public class Table {
    */
   public Table(String name) {
     this.name = name;
+    this.numRows = 0;
     this.schema = new HashMap<String, DataType>();
   }
 
@@ -40,5 +43,12 @@ public class Table {
     return this.name;
   }
 
+  public void setNumRows(int numRows) {
+    this.numRows = numRows;
+  }
+
+  public int getNumRows() {
+    return this.numRows;
+  }
 
 }
