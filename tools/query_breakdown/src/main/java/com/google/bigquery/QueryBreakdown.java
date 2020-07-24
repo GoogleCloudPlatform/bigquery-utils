@@ -2,8 +2,6 @@ package com.google.bigquery;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
 
@@ -17,12 +15,23 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 public class QueryBreakdown {
 
   // global fields that keeps track of the minimum unparseable component so far
-  private static int minimumUnparseableComp = Integer.MAX_VALUE;
-  private static Node solution;
+  private int minimumUnparseableComp;
+  private Node solution;
 
   // the generated tree
-  private static Node root = new Node();
-  private static Parser parser;
+  private Node root;
+  private Parser parser;
+
+  /**
+   * Constructor for the QueryBreakdown object. We model this class as an object rather than
+   * through static methods because the user should be able to call QueryBreakdown multiple
+   * times and create multiple instances of it.
+   */
+  public QueryBreakdown(Parser parser) {
+    minimumUnparseableComp = Integer.MAX_VALUE;
+    root = new Node();
+    this.parser = parser;
+  }
 
   /**
    * This is the method that will run QueryBreakdown given an original query and output
@@ -31,12 +40,10 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public static void run(String originalQuery, String outputFile, int errorLimit) {
-
-    // determines which parser to use
-    parser = new CalciteParser();
+  public void run(String originalQuery, String outputFile, int errorLimit) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
+    // this will set the variable solution
     loop(originalQuery, errorLimit, root, 0);
 
     // case where entire query can be parsed
@@ -65,25 +72,25 @@ public class QueryBreakdown {
    * constantly inputs a new query after adequate error handling. The loop terminates once
    * the parsing doesn't throw any errors, and in the case that it went through a smaller
    * number of unparseable components than the global minimum, it sets the solution as
-   * the global solution.
+   * the global solution and also alters the minimumUnparseableComp variable.
    *
-   * TODO: implement errorLimit logic
+   * TODO: implement errorLimit logic, deal with exception casting
    */
-  private static void loop(String inputQuery, int errorLimit, Node parent, int depth) {
+  private void loop(String inputQuery, int errorLimit, Node parent, int depth) {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
-      //deletion
+      //deletion: gets the new query, creates a node, and calls the loop again
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1);
       loop(deletionQuery, errorLimit, deletionNode, depth + 1);
 
-      // replacement
+      // replacement: gets the new queries, creates nodes, and calls the loop for each of them
       ArrayList<ReplacedComponent> replacementQueries= replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
@@ -134,8 +141,8 @@ public class QueryBreakdown {
   /**
    * This method implements the replacement mechanism: given the position of the component, and
    * given the help of the ReplacementLogic class, it determines what to replace the component
-   * with and generates the new query based on it. It then returns a ReplacedComponent containing
-   * the new query and the two components that we replace from/to.
+   * with and generates the new query based on it. It then returns a list of ReplacedComponents
+   * containing the new query and the two components that we replace from/to.
    *
    * This is a design decision made due to the fact that we need to expose to the loop the word
    * being replaced and the word we're replacing with.
@@ -150,11 +157,11 @@ public class QueryBreakdown {
 
     ArrayList<ReplacedComponent> result = new ArrayList<>();
 
-    // get word to replace from. It will be the first word in the returned list
+    // get word to replace from
     int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
     String replaceFrom = inputQuery.substring(index[0], index[1]);
 
-    // generate the new queries
+    // generate the new queries. We need to re-instantiate the StringBuilder each time
     for (String replaceTo: finalList) {
       // replace the token
       StringBuilder sb = new StringBuilder(inputQuery);

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+
 /**
  * This class will take care of the input handling logic, essentially parsing the input document
  * into queries and data-cleaning if needed.

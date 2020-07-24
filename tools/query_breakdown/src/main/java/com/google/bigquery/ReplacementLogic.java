@@ -10,7 +10,7 @@ public class ReplacementLogic {
 
   /**
    * Given a component, provides a recommendation as to which component the input should be
-   * replaced with.
+   * replaced with. Returns a list of components that it recommends.
    *
    * We choose ArrayLists as the data structure because we want to impose a certain ordering
    * with the recommendations: certain recommendations should be "better" than others
