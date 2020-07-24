@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import data.DataType;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -130,7 +131,7 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable set of keywords from the config file
    */
-  public static ImmutableSet<String> makeImmutableSet(Path inputPath) throws IOException {
+  public static ImmutableSet<String> makeImmutableKeywordSet(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
@@ -149,12 +150,12 @@ public class Utils {
   }
 
   /**
-   * Creates an immutable map from the user-defined config file of keyword mappings
+   * Creates an immutable map from the config file of keyword mappings
    *
    * @param inputPath relative path of the config file
    * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
+  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableKeywordMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     Features features = gson.fromJson(reader, Features.class);
@@ -168,6 +169,28 @@ public class Utils {
     }
 
     ImmutableMap<String, ImmutableList<Mapping>> map = builder.build();
+
+    return map;
+  }
+
+  /**
+   * Creates an immutable map from the config file of datatype mappings
+   *
+   * @param inputPath relative path of the config file
+   * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
+   */
+  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
+
+    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+
+    for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
+      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+    }
+
+    ImmutableMap<DataType, DataTypeMap> map = builder.build();
 
     return map;
   }

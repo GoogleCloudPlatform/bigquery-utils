@@ -23,9 +23,9 @@ public class KeywordsMapping {
    */
   public KeywordsMapping() {
     try {
-      mapDDL = Utils.makeImmutableMap(Paths.get(filePathDDL), keywords.getKeywordsDDL());
-      mapDML = Utils.makeImmutableMap(Paths.get(filePathDML), keywords.getKeywordsDML());
-      mapDQL = Utils.makeImmutableMap(Paths.get(filePathDQL), keywords.getKeywordsDQL());
+      mapDDL = Utils.makeImmutableKeywordMap(Paths.get(filePathDDL), keywords.getKeywordsDDL());
+      mapDML = Utils.makeImmutableKeywordMap(Paths.get(filePathDML), keywords.getKeywordsDML());
+      mapDQL = Utils.makeImmutableKeywordMap(Paths.get(filePathDQL), keywords.getKeywordsDQL());
     } catch (IOException e) {
       e.printStackTrace();
     }

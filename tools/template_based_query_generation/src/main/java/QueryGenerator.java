@@ -12,7 +12,7 @@ public class QueryGenerator {
 	 * @throws Exception
 	 */
 	public QueryGenerator(String[] dialectConfigPaths, String[] userConfigPaths, String mainUserConfig) throws Exception {
-		// TODO (Allen):
+		// TODO (Victor):
 		//  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
 		//  2. Generate number of queries given in config
 		//  3. pass to them to Keyword or Skeleton
@@ -23,7 +23,7 @@ public class QueryGenerator {
 	 * @param targetDirectory
 	 */
 	public void generateQueries(String targetDirectory) {
-		// TODO (Allen): generate output text files containing the number of queries specified
+		// TODO (Victor): generate output text files containing the number of queries specified
 		//  by the user in config files. Output is put in targetDirectory
 	}
 
