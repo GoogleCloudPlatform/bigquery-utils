@@ -6,21 +6,10 @@ import java.io.IOException;
 import java.util.Comparator;
 
 /**
- * This file is the main file for the command line tool.
- * Usage: query_breakdown -r <PATH> [-w <PATH>] [-l <INTEGER>]
- * -i, --inputFile, PATH: this command specifies the path to the file containing queries to be
- *                    inputted into the tool. It is therefore mandatory
- * -o, --outputFile, PATH: this command specifies the path to the file that the tool can write
- *                    its results to. If not specified, the tool will simply print results on the
- *                    console. It is therefore optional
- * -l, --limit, PATH: this command specifies the path to an integer that the tool takes as a
- *                    limit for the number of errors to be explored, thereby controlling the
- *                    runtime. It is therefore optional
- *
- * Sample Usage: query_breakdown -r input.txt
- *               query_breakdown -r input2.txt -w output.txt -l 3
- *               query_breakdown -r input3.txt -w output2.txt
- *               query_breakdown -r input4.txt -l 6
+ * this file is the main file for the command line tool. The first argument is a txt file
+ * containing the queries. The second argument, which is optional, is a time limit that we
+ * impose on processing a single query. The third argument, which is optional, is a file
+ * that we want to write the results to.
  */
 public class Main {
   public static void main(String[] args) {
@@ -34,11 +23,11 @@ public class Main {
       System.exit(1);
     }
 
-    if (cl.hasOption("i")) {
-      inputFile = cl.getOptionValue("i");
+    if (cl.hasOption("r")) {
+      inputFile = cl.getOptionValue("r");
     }
-    if (cl.hasOption("o")) {
-      outputFile = cl.getOptionValue("o");
+    if (cl.hasOption("w")) {
+      outputFile = cl.getOptionValue("w");
     }
     if (cl.hasOption("l")) {
       errorLimit = Integer.parseInt( cl.getOptionValue("l"));
@@ -73,11 +62,8 @@ public class Main {
         if (option1.isRequired() != option2.isRequired()) {
           return option1.isRequired() ? -1 : 1;
         }
-        else if (option1.equals(option2)) {
-          return 0;
-        }
         else {
-          return (option1.getLongOpt().equals("outputFile")) ? -1 : 1;
+          return (option1.getLongOpt().equals("write")) ? -1 : 1;
         }
       }
     });
@@ -98,19 +84,13 @@ public class Main {
    */
   public static Options createOptions() {
     Options options = new Options();
-    options.addOption(Option.builder("i").required(true).longOpt("inputFile").hasArg(true)
-        .argName("PATH").desc("this command specifies the path to the file "
-            + "containing queries to be inputted into the tool. It is therefore mandatory")
+    options.addOption(Option.builder("r").required(true).longOpt("read").hasArg(true)
+        .argName("PATH").desc("this is the file containing queries to be inputted into the tool")
         .build());
-    options.addOption(Option.builder("o").longOpt("outputFile").hasArg(true).argName("PATH")
-        .desc("this command specifies the path to the file that the tool can write "
-            + "its results to. If not specified, the tool will simply print results"
-            + "on the console. It is therefore optional").build());
+    options.addOption(Option.builder("w").longOpt("write").hasArg(true).argName("PATH")
+        .desc("this is the file that the tool can write its results to").build());
     options.addOption(Option.builder("l").longOpt("limit").hasArg(true).argName("INTEGER")
-        .desc("this command specifies the path to an integer that the tools takes "
-            + "as a limit for the number of errors to be explored, thereby controlling"
-            + "the runtime. It is therefore optional").build());
+        .desc("this is the limit for how many errors can be recovered").build());
     return options;
   }
 }
-

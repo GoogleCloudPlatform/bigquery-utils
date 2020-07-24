@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
@@ -16,17 +17,19 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 public class QueryBreakdown {
 
   // global fields that keeps track of the minimum unparseable component so far
-  private int minimumUnparseableComp = Integer.MAX_VALUE;
-  private Node solution;
+  private static int minimumUnparseableComp = Integer.MAX_VALUE;
+  private static Node solution;
 
   // the generated tree
-  private Node root;
+  private static Node root = new Node();
   private static Parser parser;
 
   /**
    * This is the method that will run QueryBreakdown given an original query and output
-   * it to the specified output file, or if that is null, generate a new file to put the output in.
-   * The provided timeLimit will stop the tool from running over a certain time.
+   * it to the specified output file or commandline. The provided errorLimit will stop the
+   * tool from running over a certain time.
+   *
+   * TODO: output file feature and runtime limit support
    */
   public static void run(String originalQuery, String outputFile, int errorLimit) {
 
@@ -34,34 +37,70 @@ public class QueryBreakdown {
     parser = new CalciteParser();
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
-    loop(originalQuery, errorLimit);
+    loop(originalQuery, errorLimit, root, 0);
+
+    // case where entire query can be parsed
+    if (solution.equals(root)) {
+      System.out.println("The entire query can be parsed without error");
+    }
 
     // write termination logic for output (tracing the node back, reconstructing path, output)
+    Node current = solution;
+    while (current.getParent() != null) {
+      // print out the result
+      System.out.println("Unparseable portion: Start Line " + current.getStartLine() +
+          ", End Line " + current.getEndLine() + ", Start Column " + current.getStartColumn() +
+          ", End Column " + current.getEndColumn() + ", " + current.getErrorHandlingType());
+
+      // if replacement
+      if (current.getErrorHandlingType().equals("Replacement")) {
+        System.out.println(": replaced " + current.getReplaceFrom() + " with " +
+            current.getReplaceTo() + "\n");
+      }
+    }
   }
 
   /**
-   * This is where the code for the algorithm will go: essentially, there will be a loop that
-   * constantly inputs a new query after adequate error handling
+   * This is where the code for the algorithm resides: essentially, there is a loop that
+   * constantly inputs a new query after adequate error handling. The loop terminates once
+   * the parsing doesn't throw any errors, and in the case that it went through a smaller
+   * number of unparseable components than the global minimum, it sets the solution as
+   * the global solution.
+   *
+   * TODO: implement errorLimit logic
    */
-  private static void loop(String inputQuery, int errorLimit) {
+  private static void loop(String inputQuery, int errorLimit, Node parent, int depth) {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
+
+      //deletion
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
-      List<String> replacementQueries = replacement(inputQuery, pos.getLineNum(),
+      Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
+          pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1);
+      loop(deletionQuery, errorLimit, deletionNode, depth + 1);
+
+      // replacement
+      ArrayList<ReplacedComponent> replacementQueries= replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
 
       // recursively loops through the new queries
-      loop(deletionQuery, errorLimit);
-      for (String s: replacementQueries) {
-        loop(s, errorLimit);
+      for (ReplacedComponent r: replacementQueries) {
+        Node replacementNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
+            pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement(),
+            depth + 1);
+        loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
       }
     }
     // termination condition: if the parsing doesn't throw exceptions, then the leaf is reached
+    if (depth < minimumUnparseableComp) {
+      minimumUnparseableComp = depth;
+      solution = parent;
+    }
   }
 
   /**
@@ -72,43 +111,96 @@ public class QueryBreakdown {
       int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
 
-    // delete the portion of the string from x (inclusive) to y (exclusive)
-    int x;
-    int y;
-
+    int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
     // when the exception occurs in line 1
     if (startLine == 1) {
-      x = startColumn - 1;
-      y = endColumn;
       // deals with extra spacing when deleting
       if (inputQuery.charAt(startColumn - 2) == ' ') {
-        x = startColumn - 2;
+        index[0] = startColumn - 2;
       }
     }
     else {
       int position = findNthIndexOf(inputQuery, '\n', startLine -1);
-      x = position + startColumn;
-      y = position + endColumn + 1;
       // deals with extra spacing when deleting
       if (inputQuery.charAt(position + startColumn - 1) == ' ') {
-        x = position + startColumn - 1;
+        index[0] = position + startColumn - 1;
       }
     }
 
-    sb.delete(x, y);
+    sb.delete(index[0], index[1]);
     return sb.toString();
   }
 
   /**
    * This method implements the replacement mechanism: given the position of the component, and
    * given the help of the ReplacementLogic class, it determines what to replace the component
-   * with and generates a new query with that component replaced.
+   * with and generates the new query based on it. It then returns a ReplacedComponent containing
+   * the new query and the two components that we replace from/to.
+   *
+   * This is a design decision made due to the fact that we need to expose to the loop the word
+   * being replaced and the word we're replacing with.
+   *
+   * TODO: deal with instances where there are no replacement options
    */
-  private static List<String> replacement(String inputQuery, int startLine, int startColumn,
+  static ArrayList<ReplacedComponent> replacement(String inputQuery, int startLine, int startColumn,
       int endColumn, Collection<String> expectedTokens) {
     // call ReplacementLogic
-    ReplacementLogic.replace(inputQuery);
-    return new ArrayList<>();
+    ArrayList<String> finalList = ReplacementLogic.replace(inputQuery,
+        expectedTokensFilter(expectedTokens));
+
+    ArrayList<ReplacedComponent> result = new ArrayList<>();
+
+    // get word to replace from. It will be the first word in the returned list
+    int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
+    String replaceFrom = inputQuery.substring(index[0], index[1]);
+
+    // generate the new queries
+    for (String replaceTo: finalList) {
+      // replace the token
+      StringBuilder sb = new StringBuilder(inputQuery);
+      sb.replace(index[0], index[1], replaceTo);
+      result.add(new ReplacedComponent(sb.toString(), replaceFrom, replaceTo));
+    }
+    return result;
+  }
+
+  /**
+   * This method filters out EOF from the expected tokens as well as the quotations
+   */
+  static ArrayList<String> expectedTokensFilter(Collection<String> expectedTokens) {
+    // remove EOF
+    if (expectedTokens.contains("<EOF>")) {
+      expectedTokens.remove("<EOF>");
+    }
+
+    // filter out the quotations
+    ArrayList<String> filtered = new ArrayList<>();
+    for (String s : expectedTokens) {
+      s = s.replace("\"", "");
+      filtered.add(s);
+    }
+
+    return filtered;
+  }
+
+  /**
+   * This helper method returns the beginning and ending index for the component of the given
+   * query specified by the startLine, startColumn, and endColumn
+   */
+  static int[] returnIndex(String inputQuery, int startLine, int startColumn, int endColumn) {
+    int[] result = new int[2];
+    // when the exception occurs in line 1
+    if (startLine == 1) {
+      result[0] = startColumn - 1;
+      result[1] = endColumn;
+    }
+    else {
+      int position = findNthIndexOf(inputQuery, '\n', startLine -1);
+      result[0] = position + startColumn;
+      result[1] = position + endColumn + 1;
+    }
+
+    return result;
   }
 
   /**
