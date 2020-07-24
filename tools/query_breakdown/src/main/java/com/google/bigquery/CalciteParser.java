@@ -1,3 +1,5 @@
+package com.google.bigquery;
+
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
@@ -12,10 +14,10 @@ import org.apache.calcite.sql.dialect.CalciteSqlDialect;
  * Calcite Parser can be used as a blackbox.
  */
 public class CalciteParser implements Parser {
-  SqlParser.Config config;
+  private final SqlParser.Config config;
 
   public CalciteParser() {
-    // can change the field here to change the type of Calcite Parser
+    // can change the field here to change the type of Calcite com.google.bigquery.Parser
     config = getParserConfig(SqlBabelParserImpl.FACTORY);
   }
 
@@ -32,7 +34,7 @@ public class CalciteParser implements Parser {
   /**
    * Sets the configuration of the parser. Can change settings of the parser by changing code here.
    */
-  static SqlParser.Config getParserConfig(SqlParserImplFactory factory) {
+  public SqlParser.Config getParserConfig(SqlParserImplFactory factory) {
     return SqlParser.configBuilder()
         .setParserFactory(factory)
         .setQuotedCasing(Casing.UNCHANGED)
