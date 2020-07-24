@@ -1,14 +1,22 @@
 package com.google.cloud.sqlecosystem.sqlextraction
 
 import com.google.cloud.sqlecosystem.sqlextraction.output.QueryFragment
-import io.mockk.mockk
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.RelaxedMockK
+import org.junit.Before
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class EnvironmentTest {
+class EnvironmentTest {
+    @RelaxedMockK
+    lateinit var stubQueryFragment: QueryFragment
+
+    @Before
+    fun setUp() = MockKAnnotations.init(this)
+
     @Test
     fun `declareVariable causes hasVariableInScope`() {
         val env = Environment()
@@ -34,9 +42,11 @@ internal class EnvironmentTest {
     @Test
     fun `getVariableOrDefault returns default for undefined variables`() {
         val env = Environment()
-        val default = mockk<QueryFragment>(relaxed = true)
 
-        assertEquals(default, env.getVariableReferenceOrDefault("test", default))
+        assertEquals(
+            stubQueryFragment,
+            env.getVariableReferenceOrDefault("test", stubQueryFragment)
+        )
         assertEquals(null, env.getVariableReferenceOrDefault("test2"))
 
         env.declareVariable("test")
@@ -46,14 +56,13 @@ internal class EnvironmentTest {
 
     @Test
     fun `setVariable updates getVariable`() {
-        val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
         assertEquals(null, env.getVariableReference("test"))
 
-        env.setVariableReference("test", stub)
+        env.setVariableReference("test", stubQueryFragment)
 
-        assertEquals(stub, env.getVariableReference("test"))
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
     }
 
     @Test
@@ -70,44 +79,41 @@ internal class EnvironmentTest {
 
     @Test
     fun `getVariable gets parent's variable`() {
-        val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
-        env.setVariableReference("test", stub)
+        env.setVariableReference("test", stubQueryFragment)
 
         env.pushScope()
-        assertEquals(stub, env.getVariableReference("test"))
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariableReference("test"))
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
     }
 
     @Test
     fun `getVariableOrDefault gets parent's variable`() {
-        val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
-        env.setVariableReference("test", stub)
+        env.setVariableReference("test", stubQueryFragment)
 
         env.pushScope()
-        assertEquals(stub, env.getVariableReferenceOrDefault("test"))
+        assertEquals(stubQueryFragment, env.getVariableReferenceOrDefault("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariableReferenceOrDefault("test"))
+        assertEquals(stubQueryFragment, env.getVariableReferenceOrDefault("test"))
     }
 
     @Test
     fun `setVariable updates parent's getVariable`() {
-        val stub = mockk<QueryFragment>(relaxed = true)
         val env = Environment()
         env.declareVariable("test")
         env.pushScope()
         assertEquals(null, env.getVariableReference("test"))
 
-        env.setVariableReference("test", stub)
-        assertEquals(stub, env.getVariableReference("test"))
+        env.setVariableReference("test", stubQueryFragment)
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
 
         env.popScope()
-        assertEquals(stub, env.getVariableReference("test"))
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
     }
 }
