@@ -55,6 +55,22 @@
       ]
     },
     {
+      "feature": "DML_VALUES",
+      "allMappings": [
+        {
+          "postgres": "VALUES",
+          "bigQuery": "VALUES",
+          "tokenInfos": [
+            {
+              "tokenName": "values_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "feature": "DML_UPDATE",
       "allMappings": [
         {

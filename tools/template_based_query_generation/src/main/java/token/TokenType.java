@@ -6,6 +6,7 @@ public enum TokenType {
   partition_exp,
   cluster_exp,
   insert_exp,
+  values_exp,
   update_item,
   condition,
   select_exp,

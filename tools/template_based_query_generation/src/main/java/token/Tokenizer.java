@@ -8,10 +8,8 @@ import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.Set;
 
 /**
  *
@@ -19,7 +17,6 @@ import java.util.Set;
 public class Tokenizer {
 
   private Random r;
-  private ArrayList<Token> tokens;
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
   private ImmutableMap<DataType, DataTypeMap> dataTypeMappings;
@@ -31,7 +28,7 @@ public class Tokenizer {
       exception.printStackTrace();
     }
     this.r = r;
-    this.tokenPlaceHolderCounter = new HashMap<DataType, Integer>();
+    this.tokenPlaceHolderCounter = new HashMap<TokenType, Integer>();
     this.resetTable();
   }
 
@@ -65,6 +62,9 @@ public class Tokenizer {
         break;
       case insert_exp:
         this.generateInsertExp(token);
+        break;
+      case values_exp:
+        this.generateValuesExp(token);
         break;
       case update_item:
         this.generateUpdateItem(token);
@@ -109,11 +109,34 @@ public class Tokenizer {
   }
 
   /**
+   * TODO: move out constant into a config, improve using Utils string builder
+   * TODO: figure out a nice way to deal with the extra comma
+   * TODO: figure out a way to deal with
    * sets token to be the table schema
    * @param token
    */
   private void generateTableSchema(Token token) {
-
+    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.table_schema)) {
+      this.tokenPlaceHolderCounter.put(TokenType.table_schema,1);
+    } else {
+      this.tokenPlaceHolderCounter.put(TokenType.table_schema,tokenPlaceHolderCounter.get(TokenType.table_schema) + 1);
+    }
+    int numColumns = r.nextInt(20) + 1;
+    String bqToken = "(";
+    String postgresToken = "(";
+    for (int i = 0; i < numColumns; i++) {
+      DataType d = DataType.getRandomDataType();
+      int columnNameLength = 1 + r.nextInt(20);
+      String columnName = Utils.getRandomString(columnNameLength);
+      DataTypeMap mapping = dataTypeMappings.get(d);
+      bqToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
+      postgresToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
+    }
+    bqToken += " )";
+    postgresToken += " )";
+    token.setBigQueryTokenExpression(bqToken);
+    token.setPostgresTokenExpression(postgresToken);
+    token.setTokenPlaceHolder("<table_schema " + tokenPlaceHolderCounter.get(TokenType.table_schema) + ">");
   }
 
   /**
@@ -147,6 +170,10 @@ public class Tokenizer {
     token.setTokenPlaceHolder("<partition_exp " + tokenPlaceHolderCounter.get(TokenType.partition_exp) + ">");
   }
 
+  /**
+   * sets token to be a cluster expression
+   * @param token
+   */
   private void generateClusterExp(Token token) {
     if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.cluster_exp)) {
       this.tokenPlaceHolderCounter.put(TokenType.cluster_exp,1);
@@ -159,10 +186,33 @@ public class Tokenizer {
     token.setTokenPlaceHolder("<cluster_exp " + tokenPlaceHolderCounter.get(TokenType.cluster_exp) + ">");
   }
 
+  /**
+   *
+   * @param token
+   */
   private void generateInsertExp(Token token) {
-    
+    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.insert_exp)) {
+      this.tokenPlaceHolderCounter.put(TokenType.insert_exp,1);
+    } else {
+      this.tokenPlaceHolderCounter.put(TokenType.insert_exp,tokenPlaceHolderCounter.get(TokenType.insert_exp) + 1);
+    }
+    token.setBigQueryTokenExpression(this.table.getName());
+    token.setPostgresTokenExpression(this.table.getName());
+    token.setTokenPlaceHolder("<insert_exp " + tokenPlaceHolderCounter.get(TokenType.insert_exp) + ">");
   }
 
+  /**
+   * TODO: needs a function to generate a few rows of data to insert into table
+   * @param token
+   */
+  private void generateValuesExp(Token token) {
+
+  }
+
+  /**
+   * TODO: case is more complex and will take care of in a later PR
+   * @param token
+   */
   private void generateUpdateItem(Token token) {
 
   }

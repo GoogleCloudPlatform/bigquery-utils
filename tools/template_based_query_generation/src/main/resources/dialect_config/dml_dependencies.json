@@ -4,6 +4,12 @@
     "DML_DELETE",
     "DML_UPDATE"
   ],
+  "DML_INSERT": [
+    "DML_VALUES"
+  ],
+  "DML_VALUES": [
+    "FEATURE_SINK"
+  ],
   "DML_DELETE": [
     "DML_WHERE"
   ],
