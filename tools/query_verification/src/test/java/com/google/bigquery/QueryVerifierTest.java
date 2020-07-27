@@ -4,6 +4,7 @@ import com.google.cloud.bigquery.*;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -100,6 +101,36 @@ public class QueryVerifierTest {
         tableId = tableIds.get(1);
         assertEquals(tableId.getDataset(), "dataset");
         assertEquals(tableId.getTable(), "secondTable");
+    }
+
+    @Test
+    public void testGetJobInfoFromQuery() {
+        String queryContents = "SELECT * FROM table";
+        QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
+        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
+
+        assertEquals(jobInfos.size(), 1);
+
+        QueryJobConfiguration queryJobConfiguration = jobInfos.get(0).getConfiguration();
+        assertEquals(queryJobConfiguration.getQuery(), "SELECT * FROM table");
+    }
+
+    @Test
+    public void testGetMultipleJobInfosFromQuery() {
+        String queryContents = "SELECT * FROM table1;\nSELECT column1 FROM table2; SELECT column2 FROM table2;";
+        QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
+        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
+
+        assertEquals(jobInfos.size(), 3);
+
+        List<String> queries = jobInfos.stream().map(jobInfo -> {
+            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
+            return queryJobConfiguration.getQuery();
+        }).collect(Collectors.toList());
+
+        assertEquals(queries.get(0), "SELECT * FROM table1");
+        assertEquals(queries.get(1), "SELECT column1 FROM table2");
+        assertEquals(queries.get(2), "SELECT column2 FROM table2");
     }
 
 }
