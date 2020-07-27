@@ -11,6 +11,7 @@ export class Highlighter {
 
   /**
    * Highlights all queries in the open document.
+   *
    * @param openEditor currently open editor.
    * @param workspaceRoot root path of the open workspace.
    * @param queries list of found queries.
@@ -20,18 +21,11 @@ export class Highlighter {
     workspaceRoot: string,
     queries: Query[]
   ) {
-    let openPath = openEditor.document.uri.path.toString();
-    if (!path.isAbsolute(openPath)) {
-      openPath = path.join(workspaceRoot, openPath);
-    }
-
-    const currentQueries = queries.filter(query => {
-      let filePath = query.file;
-      if (!path.isAbsolute(filePath)) {
-        filePath = path.join(workspaceRoot!, query.file);
-      }
-      return filePath === openPath;
-    });
+    const currentQueries = this.getAllQueriesInCurrentFile(
+      openEditor,
+      workspaceRoot,
+      queries
+    );
     if (currentQueries.length <= 0) {
       return;
     }
@@ -39,14 +33,15 @@ export class Highlighter {
     currentQueries.forEach((query, index) => {
       const ranges: vscode.Range[] = [];
 
-      const stack = [query.query];
-      while (stack.length > 0) {
-        const fragment = stack.pop()!;
+      const workRemaining = [query.query];
+      while (workRemaining.length > 0) {
+        const fragment = workRemaining.pop()!;
         if (fragment.literal) {
           ranges.push(locationToRange(fragment.location));
         } else {
+          // recurse for child fragments
           fragment.complex!.forEach(child => {
-            stack.push(child);
+            workRemaining.push(child);
           });
         }
       }
@@ -60,11 +55,39 @@ export class Highlighter {
   }
 
   /**
+   * Gets all queries located in the currently open file.
+   *
+   * @param openEditor currently open editor.
+   * @param workspaceRoot root path of the open workspace.
+   * @param queries list of found queries.
+   */
+  private getAllQueriesInCurrentFile(
+    openEditor: vscode.TextEditor,
+    workspaceRoot: string,
+    queries: Query[]
+  ) {
+    let openPath = openEditor.document.uri.path.toString();
+    if (!path.isAbsolute(openPath)) {
+      openPath = path.join(workspaceRoot, openPath);
+    }
+
+    return queries.filter(query => {
+      let filePath = query.file;
+      if (!path.isAbsolute(filePath)) {
+        filePath = path.join(workspaceRoot!, query.file);
+      }
+      return filePath === openPath;
+    });
+  }
+
+  /**
    * Updates the cache if needed, and then returns the relevant decoration.
+   *
    * @param index decoration number to return.
    */
   private getColor(index: number): vscode.TextEditorDecorationType {
     while (this.decorations.length <= index) {
+      // get a random light color with fixed opacity
       const color = randomColor({luminosity: 'light', hue: 'random'}) + '29';
       const decoration = vscode.window.createTextEditorDecorationType({
         backgroundColor: color,
