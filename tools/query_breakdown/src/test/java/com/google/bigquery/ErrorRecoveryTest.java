@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import javax.management.Query;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.junit.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Replace;
 
 public class ErrorRecoveryTest {
   @Test
@@ -46,12 +46,12 @@ public class ErrorRecoveryTest {
       parser.parseQuery(query);
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
-      Collection<String> actual = new HashSet<>();
+      Collection<String> actual = new ArrayList<>();
       for (String s : test) {
         s = s.replace("\"", "");
         actual.add(s);
       }
-      HashSet<String> expected = new HashSet<>();
+      ArrayList<String> expected = new ArrayList<>();
       expected.add("BY");
       assertEquals(expected, actual);
     }
@@ -65,10 +65,10 @@ public class ErrorRecoveryTest {
       parser.parseQuery(query);
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
-      HashSet<String> expected = new HashSet<>();
+      ArrayList<String> expected = new ArrayList<>();
       expected.add("!");
-      expected.add("%");
       expected.add("!=");
+      expected.add("%");
       assertEquals(expected,
           ReplacementLogic.replace("", QueryBreakdown.expectedTokensFilter(test)));
     }
@@ -82,15 +82,16 @@ public class ErrorRecoveryTest {
       parser.parseQuery(query);
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
-      HashSet<String> expected = new HashSet<>();
-      expected.add("SELECT a ! b");
-      expected.add("SELECT a % b");
-      expected.add("SELECT a != b");
-      assertEquals(expected,
-          QueryBreakdown.replacement(query, ((SqlParseException) e).getPos().getLineNum(),
-              ((SqlParseException) e).getPos().getColumnNum(),
-              ((SqlParseException) e).getPos().getEndColumnNum(),
-              test));
+      ArrayList<ReplacedComponent> expected = new ArrayList<>();
+      expected.add(new ReplacedComponent("SELECT a ! b", "WHERE", "!"));
+      expected.add(new ReplacedComponent("SELECT a != b", "WHERE", "!="));
+      expected.add(new ReplacedComponent("SELECT a % b", "WHERE", "%"));
+      ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
+          ((SqlParseException) e).getPos().getLineNum(),
+          ((SqlParseException) e).getPos().getColumnNum(),
+          ((SqlParseException) e).getPos().getEndColumnNum(),
+          test);
+      assertEquals(expected, actual);
     }
   }
 }

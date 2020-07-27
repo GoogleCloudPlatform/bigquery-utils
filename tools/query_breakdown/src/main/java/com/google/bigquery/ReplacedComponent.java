@@ -25,4 +25,22 @@ public class ReplacedComponent {
   public String getReplacement() {
     return replacement;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (!ReplacedComponent.class.isAssignableFrom(obj.getClass())) {
+      return false;
+    }
+    ReplacedComponent rc = (ReplacedComponent) obj;
+    if (rc.getQuery().equals(query) && rc.getOriginal().equals(original)
+        && rc.getReplacement().equals(replacement)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 }

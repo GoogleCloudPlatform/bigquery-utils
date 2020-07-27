@@ -64,6 +64,9 @@ public class QueryBreakdown {
         System.out.println(": replaced " + current.getReplaceFrom() + " with " +
             current.getReplaceTo() + "\n");
       }
+
+      // update for loop
+      current = current.getParent();
     }
   }
 
@@ -87,9 +90,9 @@ public class QueryBreakdown {
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1);
+          pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
       loop(deletionQuery, errorLimit, deletionNode, depth + 1);
-
+      /**
       // replacement: gets the new queries, creates nodes, and calls the loop for each of them
       ArrayList<ReplacedComponent> replacementQueries= replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
@@ -100,8 +103,15 @@ public class QueryBreakdown {
         Node replacementNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
             pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement(),
             depth + 1);
+        System.out.println("REPL" + r.getQuery());
         loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
       }
+       **/
+
+      /* termination to end the loop if the instance was not a full run through the query.
+      In other words, it ensures that the termination condition is not hit on the way back
+      up the tree */
+      return;
     }
     // termination condition: if the parsing doesn't throw exceptions, then the leaf is reached
     if (depth < minimumUnparseableComp) {

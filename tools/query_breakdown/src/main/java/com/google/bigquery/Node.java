@@ -65,6 +65,17 @@ public class Node {
   }
 
   /**
+   * Override toString method for better debugging
+   */
+  @Override
+  public String toString() {
+    return "Parent: " + parent.getStartColumn() + parent.getEndColumn()
+        + "\nstartLine: " + startLine + "\nstartColumn: " + startColumn + "\nendLine: " + endLine
+    + "\nendColumn: " + endColumn + "\ntype: " + type + "\nreplaceFrom: " + replaceFrom +
+        "\nreplaceTo: " + replaceTo + "\nunparseableCount: " + unparseableCount;
+  }
+
+  /**
    * no args constructor for the root node
    */
   public Node () {}
