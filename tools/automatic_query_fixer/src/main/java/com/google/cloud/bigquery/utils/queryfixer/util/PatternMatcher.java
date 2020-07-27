@@ -32,11 +32,12 @@ public class PatternMatcher {
    * Extract substrings from a string based on regular expression. Only the grouped items will be
    * extracted. A group item is enclosed by a pair of parentheses `()`. The sequence of the
    * extracted substrings are determined by the position of their left parenthesis. For more
-   * details, please read {@link Pattern}.
+   * details, please read {@link Pattern}. If a pattern is not matched in the input string, a null
+   * pointer will be returned.
    *
    * @param source the string to match
    * @param regex regular expression
-   * @return a list of extracted substrings.
+   * @return a list of extracted substrings or null pointer.
    */
   public static List<String> extract(@NonNull String source, @NonNull String regex) {
     Pattern pattern = Pattern.compile(regex);

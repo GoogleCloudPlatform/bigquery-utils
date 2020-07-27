@@ -65,6 +65,7 @@ public class SqlErrorFactory {
 
     // Here shows the index of matching places.
     // "^Not found: Table (0) was not found"
+    // There is no need to check size, because the size of extracted substrings has been determined by the pattern.
     String incorrectTable = contents.get(0);
     return new TableNotFoundError(incorrectTable, /*errPos= */ null, exception);
   }
@@ -89,6 +90,7 @@ public class SqlErrorFactory {
 
     // Here shows the index of matching places.
     // "^Unrecognized name: (0)(; Did you mean (2)\\?)? at (3)$"
+    // There is no need to check size, because the size of extracted substrings has been determined by the pattern.
     String unrecognizedName = contents.get(0);
     String suggestion = contents.get(2);
     String errPosStr = contents.get(3);
@@ -116,6 +118,7 @@ public class SqlErrorFactory {
     }
     // Here shows the index of matching places.
     // "^Function not found: (0)(; Did you mean (2)\\?)? at (3)$"
+    // There is no need to check size, because the size of extracted substrings has been determined by the pattern.
     String functionName = contents.get(0);
     String suggestion = contents.get(2);
     String errPosStr = contents.get(3);
