@@ -88,6 +88,7 @@ export class Highlighter {
   private getColor(index: number): vscode.TextEditorDecorationType {
     while (this.decorations.length <= index) {
       // get a random light color with fixed opacity
+      // todo: use highlight color of the current theme
       const color = randomColor({luminosity: 'light', hue: 'random'}) + '29';
       const decoration = vscode.window.createTextEditorDecorationType({
         backgroundColor: color,
