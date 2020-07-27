@@ -93,19 +93,24 @@ public class Tokenizer {
     }
   }
 
+  private int generateNextPlaceHolder(TokenType tokenType) {
+    if (!this.tokenPlaceHolderCounter.keySet().contains(tokenType)) {
+      this.tokenPlaceHolderCounter.put(tokenType,1);
+    } else {
+      this.tokenPlaceHolderCounter.put(tokenType,tokenPlaceHolderCounter.get(tokenType) + 1);
+    }
+    return this.tokenPlaceHolderCounter.get(tokenType);
+  }
+
   /**
    * sets token to be the table name
    * @param token
    */
   private void generateTableName(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.table_name)) {
-      this.tokenPlaceHolderCounter.put(TokenType.table_name,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.table_name,tokenPlaceHolderCounter.get(TokenType.table_name) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     token.setBigQueryTokenExpression(this.table.getName());
     token.setPostgresTokenExpression(this.table.getName());
-    token.setTokenPlaceHolder("<table " + tokenPlaceHolderCounter.get(TokenType.table_name) + ">");
+    token.setTokenPlaceHolder("<table " + placeHolder + ">");
   }
 
   /**
@@ -116,11 +121,7 @@ public class Tokenizer {
    * @param token
    */
   private void generateTableSchema(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.table_schema)) {
-      this.tokenPlaceHolderCounter.put(TokenType.table_schema,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.table_schema,tokenPlaceHolderCounter.get(TokenType.table_schema) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int numColumns = r.nextInt(20) + 1;
     String bqToken = "(";
     String postgresToken = "(";
@@ -136,7 +137,7 @@ public class Tokenizer {
     postgresToken += " )";
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
-    token.setTokenPlaceHolder("<table_schema " + tokenPlaceHolderCounter.get(TokenType.table_schema) + ">");
+    token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
   }
 
   /**
@@ -146,11 +147,7 @@ public class Tokenizer {
    * @param token
    */
   private void generatePartitionExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.partition_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.partition_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.partition_exp,tokenPlaceHolderCounter.get(TokenType.partition_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int option = r.nextInt(3);
     if (option == 0) {
       String column = this.table.getRandomColumn(DataType.INTEGER);
@@ -167,7 +164,7 @@ public class Tokenizer {
     }
     token.setBigQueryTokenExpression(this.table.getName());
     token.setPostgresTokenExpression(this.table.getName());
-    token.setTokenPlaceHolder("<partition_exp " + tokenPlaceHolderCounter.get(TokenType.partition_exp) + ">");
+    token.setTokenPlaceHolder("<partition_exp " + placeHolder + ">");
   }
 
   /**
@@ -175,15 +172,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateClusterExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.cluster_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.cluster_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.cluster_exp,tokenPlaceHolderCounter.get(TokenType.cluster_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     String column = Utils.getRandomElement(this.table.getSchema().keySet());
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
-    token.setTokenPlaceHolder("<cluster_exp " + tokenPlaceHolderCounter.get(TokenType.cluster_exp) + ">");
+    token.setTokenPlaceHolder("<cluster_exp " + placeHolder + ">");
   }
 
   /**
@@ -191,14 +184,10 @@ public class Tokenizer {
    * @param token
    */
   private void generateInsertExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.insert_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.insert_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.insert_exp,tokenPlaceHolderCounter.get(TokenType.insert_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     token.setBigQueryTokenExpression(this.table.getName());
     token.setPostgresTokenExpression(this.table.getName());
-    token.setTokenPlaceHolder("<insert_exp " + tokenPlaceHolderCounter.get(TokenType.insert_exp) + ">");
+    token.setTokenPlaceHolder("<insert_exp " + placeHolder + ">");
   }
 
   /**
@@ -222,15 +211,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateCondition(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.condition)) {
-      this.tokenPlaceHolderCounter.put(TokenType.condition,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.condition,tokenPlaceHolderCounter.get(TokenType.condition) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     boolean bool = r.nextBoolean();
     token.setBigQueryTokenExpression("" + bool);
     token.setPostgresTokenExpression("" + bool);
-    token.setTokenPlaceHolder("<condition " + tokenPlaceHolderCounter.get(TokenType.condition) + ">");
+    token.setTokenPlaceHolder("<condition " + placeHolder + ">");
   }
 
   /**
@@ -238,14 +223,10 @@ public class Tokenizer {
    * @param token
    */
   private void generateSelectExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.select_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.select_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.select_exp,tokenPlaceHolderCounter.get(TokenType.select_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     token.setBigQueryTokenExpression("*");
     token.setPostgresTokenExpression("*");
-    token.setTokenPlaceHolder("<select_exp " + tokenPlaceHolderCounter.get(TokenType.select_exp) + ">");
+    token.setTokenPlaceHolder("<select_exp " + placeHolder + ">");
   }
 
   /**
@@ -253,14 +234,10 @@ public class Tokenizer {
    * @param token
    */
   private void generateFromItem(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.from_item)) {
-      this.tokenPlaceHolderCounter.put(TokenType.from_item,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.from_item,tokenPlaceHolderCounter.get(TokenType.from_item) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     token.setBigQueryTokenExpression(this.table.getName());
     token.setPostgresTokenExpression(this.table.getName());
-    token.setTokenPlaceHolder("<from_item " + tokenPlaceHolderCounter.get(TokenType.from_item) + ">");
+    token.setTokenPlaceHolder("<from_item " + placeHolder + ">");
   }
 
   /**
@@ -268,15 +245,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateGroupExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.group_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.group_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.group_exp,tokenPlaceHolderCounter.get(TokenType.group_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     String column = Utils.getRandomElement(this.table.getSchema().keySet());
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
-    token.setTokenPlaceHolder("<group_exp " + tokenPlaceHolderCounter.get(TokenType.group_exp) + ">");
+    token.setTokenPlaceHolder("<group_exp " + placeHolder + ">");
   }
 
   /**
@@ -284,15 +257,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateOrderExp(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.order_exp)) {
-      this.tokenPlaceHolderCounter.put(TokenType.order_exp,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.order_exp,tokenPlaceHolderCounter.get(TokenType.order_exp) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     String column = Utils.getRandomElement(this.table.getSchema().keySet());
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
-    token.setTokenPlaceHolder("<order_exp " + tokenPlaceHolderCounter.get(TokenType.order_exp) + ">");
+    token.setTokenPlaceHolder("<order_exp " + placeHolder + ">");
   }
 
   /**
@@ -300,15 +269,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateCount(Token token) {
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.count)) {
-      this.tokenPlaceHolderCounter.put(TokenType.count,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.count,tokenPlaceHolderCounter.get(TokenType.count) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int count = r.nextInt(this.table.getNumRows());
     token.setBigQueryTokenExpression("" + count);
     token.setPostgresTokenExpression("" + count);
-    token.setTokenPlaceHolder("<count " + tokenPlaceHolderCounter.get(TokenType.count) + ">");
+    token.setTokenPlaceHolder("<count " + placeHolder + ">");
   }
 
   /**
@@ -316,15 +281,11 @@ public class Tokenizer {
    * @param token
    */
   private void generateSkipRows(Token token){
-    if (!this.tokenPlaceHolderCounter.keySet().contains(TokenType.skip_rows)) {
-      this.tokenPlaceHolderCounter.put(TokenType.skip_rows,1);
-    } else {
-      this.tokenPlaceHolderCounter.put(TokenType.skip_rows,tokenPlaceHolderCounter.get(TokenType.skip_rows) + 1);
-    }
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int count = r.nextInt(this.table.getNumRows());
     token.setBigQueryTokenExpression("" + count);
     token.setPostgresTokenExpression("" + count);
-    token.setTokenPlaceHolder("<skip_rows " + tokenPlaceHolderCounter.get(TokenType.skip_rows) + ">");
+    token.setTokenPlaceHolder("<skip_rows " + placeHolder + ">");
   }
 
 
