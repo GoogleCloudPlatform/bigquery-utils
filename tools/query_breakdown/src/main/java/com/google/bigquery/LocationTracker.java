@@ -10,9 +10,9 @@ import org.apache.calcite.util.mapping.IntPair;
 public class LocationTracker {
   /* we keep a double arraylist to represent the position of each character (line and column).
      We can do this as the line number of the component will not change
-     (each line is a separate query internally)
+     (deletion and replacement won't change the line numbers)
    */
-  private ArrayList<ArrayList<IntPair>> location;
+  private ArrayList<ArrayList<Integer>> location;
 
   /**
    * Constructor for the class
@@ -25,9 +25,17 @@ public class LocationTracker {
    * This method interacts with the InputReader and adds a pair to the location field that
    * represents the position (x, y) in the original query
    */
-  public void add(int line, int x, int y) {
-    location.get(line).add(new IntPair(x, y));
+  public void add(int x, int y) {
+    location.get(x).add(y);
   }
+
+  /**
+   * This method gets the original position of the component in (x,y) of the intermediate query
+   */
+  public int getOriginalPosition(int x, int y) {
+    return location.get(x).get(y);
+  }
+
   public void delete(int line, int startColumn, int endColumn) {
 
   }
