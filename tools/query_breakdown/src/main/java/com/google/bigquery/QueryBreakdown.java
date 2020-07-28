@@ -55,14 +55,15 @@ public class QueryBreakdown {
     Node current = solution;
     while (current.getParent() != null) {
       // print out the result
-      System.out.println("Unparseable portion: Start Line " + current.getStartLine() +
-          ", End Line " + current.getEndLine() + ", Start Column " + current.getStartColumn() +
-          ", End Column " + current.getEndColumn() + ", " + current.getErrorHandlingType());
+      System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+          + "Start Column %3$s, End Column %4$s, %5$s", current.getStartLine(),
+          current.getEndLine(), current.getStartColumn(), current.getEndColumn(),
+          current.getErrorHandlingType()));
 
       // if replacement
       if (current.getErrorHandlingType().equals("Replacement")) {
-        System.out.println(": replaced " + current.getReplaceFrom() + " with " +
-            current.getReplaceTo() + "\n");
+        System.out.print(String.format(": replaced %1$s with %2$s", current.getReplaceFrom(),
+            current.getReplaceTo()));
       }
 
       // update for loop
