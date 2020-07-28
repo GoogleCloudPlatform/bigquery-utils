@@ -24,7 +24,7 @@ export class SqlExtractionRunner {
     }>,
     token: CancellationToken
   ): Promise<Query[]> {
-    return this.execute(['-r', dir], progress, token);
+    return this.execute(['-r', '--progress', dir], progress, token);
   }
 
   private execute(
@@ -41,6 +41,7 @@ export class SqlExtractionRunner {
 
     return new Promise<Query[]>((resolve, reject) => {
       let json = '';
+      let errMsg = '';
       const process = execFile(this.execPath, args)
         .on('close', code => {
           if (!process.killed && code === 0) {
@@ -54,7 +55,26 @@ export class SqlExtractionRunner {
       process.stdout!.on('data', data => {
         json += data;
       });
-      // todo: track progress
+      process.stderr!.on('data', data => {
+        errMsg += data;
+        let index = errMsg.indexOf('\n');
+        while (index >= 0) {
+          // one entire error message was received completely up to newline
+          const statement = errMsg.substring(0, index);
+          errMsg = errMsg.substring(index + 1);
+          index = errMsg.indexOf('\n');
+
+          // if the error message starts with a percentage
+          if (statement.match(/^\d+(\.\d*)?% .*$/)) {
+            const percent = parseFloat(statement);
+            const message = statement.substring(statement.indexOf('%' + 2));
+            progress.report({
+              message: message,
+              increment: isNaN(percent) ? undefined : percent,
+            });
+          }
+        }
+      });
       token.onCancellationRequested(() => process.kill());
     });
   }
