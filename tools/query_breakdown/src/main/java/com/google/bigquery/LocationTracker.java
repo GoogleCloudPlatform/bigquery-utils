@@ -1,6 +1,7 @@
 package com.google.bigquery;
 
 import java.util.ArrayList;
+import javax.xml.stream.Location;
 
 /**
  * This class tracks the original location of components in the query, thereby making sure that
@@ -22,14 +23,11 @@ public class LocationTracker {
 
   /**
    * This method interacts with the InputReader and adds a pair to the location field that
-   * represents the position (x, y) in the original query
+   * represents the position (x, y) in the original query. x and y are 1-indexed, so we
+   * adjust accordingly.
    */
   public void add(int x, int y) {
-    // deals with first line
-    if (x > location.size()) {
-      location.add(new ArrayList<>());
-    }
-    location.get(x - 1).add(y - 1);
+    location.get(x - 1).add(y);
   }
 
   /**
@@ -46,15 +44,34 @@ public class LocationTracker {
     return location.get(x - 1).get(y - 1);
   }
 
-  public void delete(int line, int startColumn, int endColumn) {
-
+  /**
+   * This method ensures that the location field is kept correctly despite the deletion. It
+   * returns a new LocationTracker object
+   */
+  public LocationTracker delete(int line, int startColumn, int endColumn) {
+    for (int i = startColumn; i < endColumn + 1; i++) {
+      location.get(line - 1).remove(i - 1);
+    }
   }
 
-  public void replace() {
-
+  /**
+   * To be implemented
+   */
+  public LocationTracker replace() {
+    return null;
   }
 
+  public LocationTracker cloneTracker() {
+    LocationTracker lt = new LocationTracker();
+    for (int i = 0; i < location.size(); i++) {
+      ArrayList<Integer> line = new ArrayList<>();
+      ArrayList<Integer> lineOriginal = location.get(i);
+      for (int j = 0; j < lineOriginal.size(); j++) {
+        lt.add(i + 1, lineOriginal.get(j));
+      }
 
+    }
+  }
 
 
 }

@@ -34,6 +34,11 @@ public class InputReader {
     int line = 1;
     int column = 1;
 
+    // for the first line
+    if (current != -1) {
+      lt.addLine();
+    }
+
     // loop for input reading
     while (current != -1) {
       sb.append((char) current);

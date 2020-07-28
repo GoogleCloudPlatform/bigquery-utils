@@ -40,11 +40,11 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public void run(String originalQuery, String outputFile, int errorLimit) {
+  public void run(String originalQuery, String outputFile, int errorLimit, LocationTracker lt) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
     // this will set the variable solution
-    loop(originalQuery, errorLimit, root, 0);
+    loop(originalQuery, errorLimit, root, 0, lt);
 
     // case where entire query can be parsed
     if (solution.equals(root)) {
@@ -79,7 +79,8 @@ public class QueryBreakdown {
    *
    * TODO: implement errorLimit logic, deal with exception casting
    */
-  private void loop(String inputQuery, int errorLimit, Node parent, int depth) {
+  private void loop(String inputQuery, int errorLimit, Node parent, int depth,
+      LocationTracker lt) {
     // termination for branch
     if (depth > minimumUnparseableComp) {
       return;
@@ -95,8 +96,9 @@ public class QueryBreakdown {
           pos.getEndColumnNum());
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
-      loop(deletionQuery, errorLimit, deletionNode, depth + 1);
+      loop(deletionQuery, errorLimit, deletionNode, depth + 1, lt);
 
+      /**
       // replacement: gets the new queries, creates nodes, and calls the loop for each of them
       ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
@@ -109,7 +111,7 @@ public class QueryBreakdown {
             depth + 1);
         loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
       }
-
+       **/
       /* termination to end the loop if the instance was not a full run through the query.
       In other words, it ensures that the termination condition is not hit on the way back
       up the tree */
