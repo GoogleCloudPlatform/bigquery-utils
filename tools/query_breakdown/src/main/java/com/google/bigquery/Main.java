@@ -47,7 +47,8 @@ public class Main {
     // this is where we will put the file I/O logic through the input reader.
     String originalQuery = null;
     try {
-      originalQuery = InputReader.readInput(inputFile);
+      InputReader ir = new InputReader();
+      originalQuery = ir.readInput(inputFile);
     } catch (IOException e) {
       System.out.println("there was an I/O error while reading the input");
     }
