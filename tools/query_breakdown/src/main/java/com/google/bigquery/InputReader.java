@@ -1,5 +1,7 @@
 package com.google.bigquery;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,6 +14,15 @@ import java.util.List;
  */
 public class InputReader {
 
+  private LocationTracker lt;
+
+  /**
+   * Constructor for the class
+   */
+  public InputReader() {
+    lt = new LocationTracker();
+  }
+
   /**
    * This method will take in a txt file name, use BufferedReader to parse the input, and return
    * all the queries in a string format
@@ -19,6 +30,9 @@ public class InputReader {
    * TODO: more robust method for input parsing needed (ex: semicolons in strings, comments)
    */
   public static String readInput(String filename) throws IOException {
+    BufferedReader reader = new BufferedReader(new FileReader(filename));
+
+    /**
     List<String> lines = Files.readAllLines(Paths.get(filename));
 
     StringBuilder sb = new StringBuilder();
@@ -38,5 +52,13 @@ public class InputReader {
     }
 
     return parsedInput;
+     **/
+  }
+
+  /**
+   * Getter method for LocationTracker of the input
+   */
+  public LocationTracker getLocationTracker() {
+    return lt;
   }
 }

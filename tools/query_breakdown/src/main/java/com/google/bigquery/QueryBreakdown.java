@@ -60,8 +60,8 @@ public class QueryBreakdown {
           ", End Column " + current.getEndColumn() + ", " + current.getErrorHandlingType());
 
       // if replacement
-      if (current.getErrorHandlingType().equals("Replacement")) {
-        System.out.println(": replaced " + current.getReplaceFrom() + " with " +
+      if (current.getErrorHandlingType().equals("REPLACEMENT")) {
+        System.out.println(":replaced " + current.getReplaceFrom() + " with " +
             current.getReplaceTo() + "\n");
       }
 
@@ -80,6 +80,10 @@ public class QueryBreakdown {
    * TODO: implement errorLimit logic, deal with exception casting
    */
   private void loop(String inputQuery, int errorLimit, Node parent, int depth) {
+    // termination for branch
+    if (depth > minimumUnparseableComp) {
+      return;
+    }
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
@@ -92,9 +96,9 @@ public class QueryBreakdown {
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
       loop(deletionQuery, errorLimit, deletionNode, depth + 1);
-      /**
+
       // replacement: gets the new queries, creates nodes, and calls the loop for each of them
-      ArrayList<ReplacedComponent> replacementQueries= replacement(inputQuery, pos.getLineNum(),
+      ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
 
@@ -103,10 +107,8 @@ public class QueryBreakdown {
         Node replacementNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
             pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement(),
             depth + 1);
-        System.out.println("REPL" + r.getQuery());
         loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
       }
-       **/
 
       /* termination to end the loop if the instance was not a full run through the query.
       In other words, it ensures that the termination condition is not hit on the way back

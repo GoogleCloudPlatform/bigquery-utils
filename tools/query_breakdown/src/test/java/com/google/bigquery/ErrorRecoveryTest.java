@@ -94,4 +94,11 @@ public class ErrorRecoveryTest {
       assertEquals(expected, actual);
     }
   }
+
+  @Test
+  public void replacementSingleLineTwoErrors() {
+    String query = "SELECT a WHERE A GROUP WITH a";
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+
+  }
 }
