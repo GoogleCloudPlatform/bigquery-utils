@@ -23,4 +23,8 @@ public abstract class BigQuerySqlError {
     this.errorPosition = errorPosition;
     this.errorSource = errorSource;
   }
+
+  public String getMessage() {
+    return errorSource.getMessage();
+  }
 }
