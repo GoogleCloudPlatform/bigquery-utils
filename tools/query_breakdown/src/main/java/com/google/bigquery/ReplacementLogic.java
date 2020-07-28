@@ -1,7 +1,6 @@
 package com.google.bigquery;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * This class implements all the replacement logic.

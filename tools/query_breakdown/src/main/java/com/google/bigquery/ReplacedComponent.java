@@ -4,9 +4,9 @@ package com.google.bigquery;
  * This class captures the replaced query, original component, and what it is replaced with
  */
 public class ReplacedComponent {
-  private String query;
-  private String original;
-  private String replacement;
+  private final String query;
+  private final String original;
+  private final String replacement;
 
   public ReplacedComponent(String query, String original, String replacement) {
     this.query = query;
