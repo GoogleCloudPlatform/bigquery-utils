@@ -19,7 +19,7 @@ public class InputReaderTest {
   public void inputReaderTestMultipleQuery() throws IOException {
     InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    assertEquals("SELECT a FROM A;\nSELECT b FROM B;",
+    assertEquals("SELECT a FROM A;\n\nSELECT b FROM B;",
         ir.readInput(absPath +
         "/src/test/java/com/google/bigquery/InputTestFiles/multipleLines.txt"));
   }
@@ -28,7 +28,7 @@ public class InputReaderTest {
   public void inputReaderTestSpaceWithoutSemicolon() throws IOException {
     InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    assertEquals("SELECT a FROM A;\nSELECT b FROM B",
+    assertEquals("SELECT a FROM A;\n\nSELECT b FROM B",
             ir.readInput(absPath +
                     "/src/test/java/com/google/bigquery"
                 + "/InputTestFiles/multipleLinesNoSemicolon.txt"));

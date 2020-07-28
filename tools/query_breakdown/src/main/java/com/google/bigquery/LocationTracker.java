@@ -25,6 +25,7 @@ public class LocationTracker {
    * represents the position (x, y) in the original query
    */
   public void add(int x, int y) {
+    // deals with first line
     if (x > location.size()) {
       location.add(new ArrayList<>());
     }

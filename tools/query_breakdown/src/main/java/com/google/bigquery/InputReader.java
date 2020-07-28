@@ -42,6 +42,7 @@ public class InputReader {
       if ((char) current == '\n') {
         column = 1;
         line++;
+        lt.addLine();
       }
       else {
         lt.add(line, column);
