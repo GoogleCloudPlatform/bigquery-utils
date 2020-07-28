@@ -4,10 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.junit.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Replace;
 
 public class ErrorRecoveryTest {
   @Test

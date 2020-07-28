@@ -28,8 +28,8 @@ public class QueryBreakdown {
    * times and create multiple instances of it.
    */
   public QueryBreakdown(Parser parser) {
-    minimumUnparseableComp = Integer.MAX_VALUE;
-    root = new Node();
+    this.minimumUnparseableComp = Integer.MAX_VALUE;
+    this.root = new Node();
     this.parser = parser;
   }
 
