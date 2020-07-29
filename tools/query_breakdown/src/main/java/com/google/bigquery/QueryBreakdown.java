@@ -91,7 +91,6 @@ public class QueryBreakdown {
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
-
       /* deletion: gets the new query, creates a node, and calls the loop again */
 
       // gets the error location in the original query

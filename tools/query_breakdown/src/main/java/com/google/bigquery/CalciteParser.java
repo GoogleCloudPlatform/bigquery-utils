@@ -8,6 +8,7 @@ import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.sql.parser.babel.SqlBabelParserImpl;
 import org.apache.calcite.sql.dialect.CalciteSqlDialect;
+import org.apache.calcite.sql.parser.impl.SqlParserImpl;
 
 /**
  * This class is where the logic for CalciteParser lives. Through instantiating the object, the
@@ -18,7 +19,7 @@ public class CalciteParser implements Parser {
 
   public CalciteParser() {
     // can change the field here to change the type of Calcite Parser
-    config = getParserConfig(SqlBabelParserImpl.FACTORY);
+    config = getParserConfig(SqlParserImpl.FACTORY);
   }
 
   /**

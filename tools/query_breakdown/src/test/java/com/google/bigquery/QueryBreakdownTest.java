@@ -55,4 +55,24 @@ public class QueryBreakdownTest {
     assertEquals("Unparseable portion: Start Line 1, End Line 1, "
         + "Start Column 1, End Column 4, DELETION\n", outContent.toString());
   }
+
+  @Test
+  public void QueryBreakdownRunMultiDeletion() throws IOException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/multipleDeletion.txt");
+    qb.run(query, "", 0, ir.getLocationTracker());
+    assertEquals(
+        "Unparseable portion: Start Line 2, End Line 2, "
+            + "Start Column 28, End Column 31, DELETION\n"
+            + "Unparseable portion: Start Line 2, End Line 2, "
+            + "Start Column 1, End Column 4, DELETION\n"
+            + "Unparseable portion: Start Line 1, End Line 1, "
+            + "Start Column 1, End Column 4, DELETION\n",
+        outContent.toString());
+  }
 }
