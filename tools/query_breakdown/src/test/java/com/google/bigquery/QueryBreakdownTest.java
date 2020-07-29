@@ -41,6 +41,6 @@ public class QueryBreakdownTest {
   public void QueryBreakdownRunSimple() {
     QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
     String query = "SELECT a WHERE A GROUP WITH a";
-    qb.run(query, "", 0);
+    qb.run(query, "", 0, null);
   }
 }

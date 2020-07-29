@@ -38,6 +38,17 @@ public class LocationTracker {
   }
 
   /**
+   * This method removes an entry from location specified by (x, y) in the original query
+   */
+  public void remove(int x, int y) {
+    if (x > 1 && x <= location.size()) {
+      if (y > 1 && y <= location.get(x).size()) {
+        location.get(x - 1).remove(y - 1);
+      }
+    }
+  }
+
+  /**
    * This method gets the original position of the component in (x,y) of the intermediate query
    */
   public int getOriginalPosition(int x, int y) {
@@ -49,9 +60,11 @@ public class LocationTracker {
    * returns a new LocationTracker object
    */
   public LocationTracker delete(int line, int startColumn, int endColumn) {
+    LocationTracker lt = cloneTracker();
     for (int i = startColumn; i < endColumn + 1; i++) {
-      location.get(line - 1).remove(i - 1);
+      lt.remove(line, i);
     }
+    return lt;
   }
 
   /**
@@ -64,13 +77,13 @@ public class LocationTracker {
   public LocationTracker cloneTracker() {
     LocationTracker lt = new LocationTracker();
     for (int i = 0; i < location.size(); i++) {
-      ArrayList<Integer> line = new ArrayList<>();
+      lt.addLine();
       ArrayList<Integer> lineOriginal = location.get(i);
       for (int j = 0; j < lineOriginal.size(); j++) {
         lt.add(i + 1, lineOriginal.get(j));
       }
-
     }
+    return lt;
   }
 
 

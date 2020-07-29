@@ -18,6 +18,15 @@ public class LocationTrackerTest {
   }
 
   @Test
+  public void locationTrackerTestInitializedCorrectlyClone() throws IOException {
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/multipleLineQuery.txt");
+    assertEquals(4, ir.getLocationTracker().cloneTracker().getOriginalPosition(3, 4));
+  }
+
+  @Test
   public void locationTrackerDeletionTest() throws IOException {
     InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();

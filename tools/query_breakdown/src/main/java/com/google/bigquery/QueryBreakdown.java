@@ -94,9 +94,11 @@ public class QueryBreakdown {
       //deletion: gets the new query, creates a node, and calls the loop again
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
+      LocationTracker deletedLt = lt.delete(pos.getLineNum(), pos.getColumnNum(),
+          pos.getEndColumnNum());
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
-      loop(deletionQuery, errorLimit, deletionNode, depth + 1, lt);
+      loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
 
       /**
       // replacement: gets the new queries, creates nodes, and calls the loop for each of them
