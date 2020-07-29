@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
+import jdk.internal.net.http.common.Pair;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -43,9 +44,9 @@ public class Utils {
 
   /**
    * Returns a random element from given set
-   * @param list a set of objects from which a random element is selected
+   * @param list a list of objects from which a random element is selected
    */
-  public static Object getRandomElement(ArrayList<? extends Object> list) throws IllegalArgumentException  {
+  public static Pair<String, DataType> getRandomElement(ArrayList<Pair<String, DataType>> list) throws IllegalArgumentException  {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }

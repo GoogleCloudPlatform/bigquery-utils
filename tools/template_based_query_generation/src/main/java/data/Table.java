@@ -61,7 +61,7 @@ public class Table {
    * @return name of random column of schema
    */
   public String getRandomColumn() {
-    Pair<String, DataType> p = (Pair<String, DataType>) Utils.getRandomElement(this.schema);
+    Pair<String, DataType> p = Utils.getRandomElement(this.schema);
     return p.first;
   }
 
@@ -75,7 +75,7 @@ public class Table {
     for (Pair<String, DataType> col: this.schema) {
       if (col.second == type) columns.add(col);
     }
-    Pair<String, DataType> p = (Pair<String, DataType>) Utils.getRandomElement(columns);
+    Pair<String, DataType> p = åUtils.getRandomElement(columns);
     return p.first;
   }
 
