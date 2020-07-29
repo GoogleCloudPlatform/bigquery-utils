@@ -92,13 +92,25 @@ public class QueryBreakdown {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
-      //deletion: gets the new query, creates a node, and calls the loop again
+      /* deletion: gets the new query, creates a node, and calls the loop again */
+
+      // gets the error location in the original query
+      int originalStartColumn = lt.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
+      int originalEndColumn = lt.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
+
+      // gets the new query
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
+
+      // updates the location tracker to reflect the deletion
       LocationTracker deletedLt = lt.delete
           (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
-      Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
+
+      // creates a node for this deletion
+      Node deletionNode = new Node(parent, pos.getLineNum(), originalStartColumn,
+          pos.getEndLineNum(), originalEndColumn, depth + 1 );
+
+      // calls the loop again
       loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
 
       /**

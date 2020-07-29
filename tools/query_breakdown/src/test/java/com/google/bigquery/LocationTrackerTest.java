@@ -30,9 +30,9 @@ public class LocationTrackerTest {
   public void locationTrackerDeletionTest() throws IOException {
     InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+    ir.readInput(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleLineQuery.txt");
     LocationTracker lt = ir.getLocationTracker().delete(3, 1, 5);
-    //assertEquals(lt.getOriginalPosition(3, 1));
+    assertEquals(6, lt.getOriginalPosition(3, 1));
   }
 }

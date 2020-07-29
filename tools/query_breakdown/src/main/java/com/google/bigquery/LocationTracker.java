@@ -41,8 +41,8 @@ public class LocationTracker {
    * This method removes an entry from location specified by (x, y) in the original query
    */
   public void remove(int x, int y) {
-    if (x > 1 && x <= location.size()) {
-      if (y > 1 && y <= location.get(x).size()) {
+    if (x > 0 && x <= location.size()) {
+      if (y > 0 && y <= location.get(x - 1).size()) {
         location.get(x - 1).remove(y - 1);
       }
     }
@@ -61,7 +61,7 @@ public class LocationTracker {
   public LocationTracker delete(int line, int startColumn, int endColumn) {
     LocationTracker lt = cloneTracker();
     for (int i = startColumn; i < endColumn + 1; i++) {
-     lt.remove(line, i);
+     lt.remove(line, startColumn);
     }
     return lt;
   }
