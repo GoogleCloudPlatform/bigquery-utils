@@ -14,6 +14,7 @@ public class Table {
 
   private String name;
   private int numRows;
+  // change this to an ordered map
   private HashMap<String, DataType> schema;
 
   /**
@@ -53,6 +54,14 @@ public class Table {
 
   public int getNumRows() {
     return this.numRows;
+  }
+
+  /**
+   *
+   * @return name of random column of schema
+   */
+  public String getRandomColumn() {
+    return Utils.getRandomElement(schema.keySet());
   }
 
   /**
