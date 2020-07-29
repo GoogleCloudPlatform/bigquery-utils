@@ -60,9 +60,8 @@ WITH jobChangeEvent AS (
      */
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.queryStats.totalProcessedBytes') AS queryJobStatsTotalProcessedBytes,
-    CAST(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.queryStats.totalBilledBytes') AS INT64) AS queryJobStatsTotalBilledBytes,
+    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.queryStats.totalBilledBytes') AS INT64) AS queryJobStatsTotalBilledBytes,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.queryStats.billingTier') AS queryJobStatsBillingTier,
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
@@ -82,9 +81,8 @@ WITH jobChangeEvent AS (
      * Load: Load job statistics
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load_1
      */
-    CAST(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64 ) AS loadJobStatsTotalOutputBytes,
+    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64 ) AS loadJobStatsTotalOutputBytes,
     /*
      * JobStats convenience custom fields
      */
