@@ -28,6 +28,12 @@
       ]
     },
     {
+      "feature": "DML_VALUES",
+      "allMappings": [
+
+      ]
+    },
+    {
       "feature": "DML_DELETE",
       "allMappings": [
         {

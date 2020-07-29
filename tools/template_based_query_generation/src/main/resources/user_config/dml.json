@@ -5,6 +5,10 @@
       "isIncluded": true
     },
     {
+      "feature": "DML_VALUES",
+      "isIncluded": true
+    },
+    {
       "feature": "DML_DELETE",
       "isIncluded": true
     },

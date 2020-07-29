@@ -21,11 +21,15 @@
       "isIncluded": true
     },
     {
-      "feature": "DQL_WINDOW",
+      "feature": "DQL_ORDER",
       "isIncluded": true
     },
     {
-      "feature": "DQL_ORDER",
+      "feature": "DQL_ASC",
+      "isIncluded": true
+    },
+    {
+      "feature": "DQL_DESC",
       "isIncluded": true
     },
     {
