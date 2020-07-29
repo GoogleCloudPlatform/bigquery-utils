@@ -69,10 +69,10 @@ public class Node {
    */
   @Override
   public String toString() {
-    return "Parent: " + parent.getStartColumn() + parent.getEndColumn()
-        + "\nstartLine: " + startLine + "\nstartColumn: " + startColumn + "\nendLine: " + endLine
-    + "\nendColumn: " + endColumn + "\ntype: " + type + "\nreplaceFrom: " + replaceFrom +
-        "\nreplaceTo: " + replaceTo + "\nunparseableCount: " + unparseableCount;
+    return String.format("Parent: %1$s, %2$s\nstartline: %3$s\nstartColumn: %4$s"
+        + "\nendLine: %5$s\nendColumn: %6$s\ntype: %7$s\nreplaceFrom: %8$s\nreplaceTo: %9$s\n"
+        + "unparseableCount: %10$s\n", parent.getStartColumn(), parent.getEndColumn(), startLine,
+        startColumn, endLine, endColumn, type, replaceFrom, replaceTo, unparseableCount);
   }
 
   /**

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+
 /**
  * This class will take care of the input handling logic, essentially parsing the input document
  * into queries and data-cleaning if needed.
