@@ -9,6 +9,7 @@ import data.DataType;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -42,21 +43,14 @@ public class Utils {
 
   /**
    * Returns a random element from given set
-   * @param set a set of objects from which a random element is selected
+   * @param list a set of objects from which a random element is selected
    */
-  public static String getRandomElement(Set<String> set) throws IllegalArgumentException  {
-    if (set.size() <= 0) {
-      throw new IllegalArgumentException("Set must contain at least one element");
+  public static Object getRandomElement(ArrayList<? extends Object> list) throws IllegalArgumentException  {
+    if (list.size() <= 0) {
+      throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
-    int index = Utils.getRandomInteger(set.size());
-    int counter = 0;
-    for (String s: set) {
-      if (counter == index) {
-        return s;
-      }
-      counter++;
-    }
-    return "";
+    int index = Utils.getRandomInteger(list.size());
+    return list.get(index);
   }
 
   /**

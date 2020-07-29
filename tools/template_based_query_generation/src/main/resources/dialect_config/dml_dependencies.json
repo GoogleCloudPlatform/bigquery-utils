@@ -1,8 +1,7 @@
 {
   "DML_FEATURE_ROOT": [
     "DML_INSERT",
-    "DML_DELETE",
-    "DML_UPDATE"
+    "DML_DELETE"
   ],
   "DML_INSERT": [
     "DML_VALUES"
@@ -12,13 +11,6 @@
   ],
   "DML_DELETE": [
     "DML_WHERE"
-  ],
-  "DML_UPDATE" : [
-    "DML_SET"
-  ],
-  "DML_SET": [
-    "DML_WHERE",
-    "FEATURE_SINK"
   ],
   "DML_WHERE": [
     "FEATURE_SINK"

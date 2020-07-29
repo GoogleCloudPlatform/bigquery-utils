@@ -1,10 +1,10 @@
 package data;
 
+import jdk.internal.net.http.common.Pair;
 import parser.Utils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.ArrayList;
 
 /**
  * class representing a data table
@@ -14,8 +14,8 @@ public class Table {
 
   private String name;
   private int numRows;
-  // change this to an ordered map
-  private HashMap<String, DataType> schema;
+  private ArrayList<Pair<String, DataType>> schema;
+  private ArrayList<ArrayList> data;
 
   /**
    * constructs empty table from table name
@@ -24,7 +24,7 @@ public class Table {
   public Table(String name) {
     this.name = name;
     this.numRows = 0;
-    this.schema = new HashMap<String, DataType>();
+    this.schema = new ArrayList<Pair<String, DataType>>();
   }
 
   /**
@@ -33,10 +33,10 @@ public class Table {
    * @param type
    */
   public void addColumn(String columnName, DataType type) {
-    this.schema.put(columnName, type);
+    this.schema.add(new Pair(columnName, type));
   }
 
-  public HashMap<String, DataType> getSchema() {
+  public ArrayList<Pair<String, DataType>> getSchema() {
     return this.schema;
   }
 
@@ -61,22 +61,23 @@ public class Table {
    * @return name of random column of schema
    */
   public String getRandomColumn() {
-    return Utils.getRandomElement(schema.keySet());
+    Pair<String, DataType> p = (Pair<String, DataType>) Utils.getRandomElement(this.schema);
+    return p.first;
   }
 
   /**
    *
-   * @param datatype
-   * @return name of random column of given datatype
+   * @param type
+   * @return name of random column of given type
    */
-  public String getRandomColumn(DataType datatype) {
-    Set<String> s = new HashSet<>();
-    for (String col: this.schema.keySet()){
-      if (this.schema.get(col) == datatype) {
-        s.add(col);
-      }
+  public String getRandomColumn(DataType type) {
+    ArrayList<Pair<String, DataType>> columns = new ArrayList<Pair<String, DataType>>();
+    for (Pair<String, DataType> col: this.schema) {
+      if (col.second == type) columns.add(col);
     }
-    return Utils.getRandomElement(s);
+    Pair<String, DataType> p = (Pair<String, DataType>) Utils.getRandomElement(columns);
+    return p.first;
   }
+
 
 }

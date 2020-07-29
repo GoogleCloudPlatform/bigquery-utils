@@ -71,38 +71,6 @@
       ]
     },
     {
-      "feature": "DML_UPDATE",
-      "allMappings": [
-        {
-          "postgres": "UPDATE",
-          "bigQuery": "UPDATE",
-          "tokenInfos": [
-            {
-              "tokenName": "table_name",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DML_SET",
-      "allMappings": [
-        {
-          "postgres": "SET",
-          "bigQuery": "SET",
-          "tokenInfos": [
-            {
-              "tokenName": "update_item",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
       "feature": "DML_WHERE",
       "allMappings": [
         {

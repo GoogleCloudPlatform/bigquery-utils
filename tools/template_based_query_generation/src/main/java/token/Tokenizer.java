@@ -32,8 +32,11 @@ public class Tokenizer {
     this.resetTable();
   }
 
+  /**
+   * TODO (Allen): move out constants into user config
+   * resets the table in Tokenizer
+   */
   public void resetTable() {
-    // TODO (Allen): move out constants into user config
     int tableNameLength = 1 + r.nextInt(20);
     this.table = new Table(Utils.getRandomString(tableNameLength));
     this.table.setNumRows(r.nextInt(1000));
@@ -46,6 +49,10 @@ public class Tokenizer {
     }
   }
 
+  /**
+   * fills in missing information for a token by using its tokenInfo field
+   * @param token
+   */
   public void generateToken(Token token) {
     switch (token.getTokenInfo().getTokenType()) {
       case table_name:
@@ -65,9 +72,6 @@ public class Tokenizer {
         break;
       case values_exp:
         this.generateValuesExp(token);
-        break;
-      case update_item:
-        this.generateUpdateItem(token);
         break;
       case condition:
         this.generateCondition(token);
@@ -93,6 +97,11 @@ public class Tokenizer {
     }
   }
 
+  /**
+   * Generates the next int placeholder given the tokenType for the token
+   * @param tokenType
+   * @return
+   */
   private int generateNextPlaceHolder(TokenType tokenType) {
     if (!this.tokenPlaceHolderCounter.keySet().contains(tokenType)) {
       this.tokenPlaceHolderCounter.put(tokenType,1);
@@ -173,7 +182,7 @@ public class Tokenizer {
    */
   private void generateClusterExp(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
-    String column = Utils.getRandomElement(this.table.getSchema().keySet());
+    String column = this.table.getRandomColumn();
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
     token.setTokenPlaceHolder("<cluster_exp " + placeHolder + ">");
@@ -199,22 +208,14 @@ public class Tokenizer {
   }
 
   /**
-   * TODO: case is more complex and will take care of in a later PR
-   * @param token
-   */
-  private void generateUpdateItem(Token token) {
-
-  }
-
-  /**
    * generates a random condition (currently only generates true or false)
    * @param token
    */
   private void generateCondition(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     boolean bool = r.nextBoolean();
-    token.setBigQueryTokenExpression("" + bool);
-    token.setPostgresTokenExpression("" + bool);
+    token.setBigQueryTokenExpression(("" + bool).toUpperCase());
+    token.setPostgresTokenExpression(("" + bool).toUpperCase());
     token.setTokenPlaceHolder("<condition " + placeHolder + ">");
   }
 
@@ -246,7 +247,7 @@ public class Tokenizer {
    */
   private void generateGroupExp(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
-    String column = Utils.getRandomElement(this.table.getSchema().keySet());
+    String column = this.table.getRandomColumn();
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
     token.setTokenPlaceHolder("<group_exp " + placeHolder + ">");
@@ -258,7 +259,7 @@ public class Tokenizer {
    */
   private void generateOrderExp(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
-    String column = Utils.getRandomElement(this.table.getSchema().keySet());
+    String column = this.table.getRandomColumn();
     token.setBigQueryTokenExpression(column);
     token.setPostgresTokenExpression(column);
     token.setTokenPlaceHolder("<order_exp " + placeHolder + ">");
