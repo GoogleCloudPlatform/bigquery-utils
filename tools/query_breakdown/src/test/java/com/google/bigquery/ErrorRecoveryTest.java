@@ -64,9 +64,9 @@ public class ErrorRecoveryTest {
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
       ArrayList<String> expected = new ArrayList<>();
-      expected.add("!");
       expected.add("!=");
       expected.add("%");
+      expected.add("(");
       assertEquals(expected,
           ReplacementLogic.replace("", QueryBreakdown.expectedTokensFilter(test)));
     }
@@ -81,9 +81,9 @@ public class ErrorRecoveryTest {
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
       ArrayList<ReplacedComponent> expected = new ArrayList<>();
-      expected.add(new ReplacedComponent("SELECT a ! b", "WHERE", "!"));
       expected.add(new ReplacedComponent("SELECT a != b", "WHERE", "!="));
       expected.add(new ReplacedComponent("SELECT a % b", "WHERE", "%"));
+      expected.add(new ReplacedComponent("SELECT a ( b", "WHERE", "("));
       ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
           ((SqlParseException) e).getPos().getLineNum(),
           ((SqlParseException) e).getPos().getColumnNum(),

@@ -61,27 +61,6 @@ public class InputReader {
 
     reader.close();
     return sb.toString();
-    /**
-    List<String> lines = Files.readAllLines(Paths.get(filename));
-
-    StringBuilder sb = new StringBuilder();
-    for (String line : lines) {
-      sb.append(line);
-    }
-
-    String parsedInput = sb.toString();
-
-    parsedInput = parsedInput.replaceAll(";", ";\n");
-
-    int len = parsedInput.length();
-
-    // deals with case where last query ends with a semicolon
-    if (parsedInput.charAt(len - 1) == '\n') {
-      parsedInput = parsedInput.substring(0, len - 1);
-    }
-
-    return parsedInput;
-     **/
   }
 
   /**

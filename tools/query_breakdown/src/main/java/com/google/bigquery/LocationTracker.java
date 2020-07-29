@@ -1,7 +1,6 @@
 package com.google.bigquery;
 
 import java.util.ArrayList;
-import javax.xml.stream.Location;
 
 /**
  * This class tracks the original location of components in the query, thereby making sure that
@@ -73,6 +72,10 @@ public class LocationTracker {
     return null;
   }
 
+  /**
+   * This method produces a deep copy of the LocationTracker instance, thereby allowing a new
+   * instance to be passed during the traversal of the tree
+   */
   public LocationTracker cloneTracker() {
     LocationTracker lt = new LocationTracker();
     for (int i = 0; i < location.size(); i++) {

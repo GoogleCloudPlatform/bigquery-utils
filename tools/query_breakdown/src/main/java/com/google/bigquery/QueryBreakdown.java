@@ -19,8 +19,8 @@ public class QueryBreakdown {
   private Node solution;
 
   // the generated tree
-  private Node root;
-  private Parser parser;
+  private final Node root;
+  private final Parser parser;
 
   /**
    * Constructor for the QueryBreakdown object. We model this class as an object rather than
