@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import static java.lang.System.exit;
 
+import java.io.File;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -50,7 +51,8 @@ public class Main {
     String originalQuery = null;
     InputReader ir = new InputReader();
     try {
-      originalQuery = ir.readInput(inputFile);
+      String absPath = new File("").getAbsolutePath();
+      originalQuery = ir.readInput(absPath + inputFile);
     } catch (IOException e) {
       System.out.println("there was an I/O error while reading the input");
       exit(1);
