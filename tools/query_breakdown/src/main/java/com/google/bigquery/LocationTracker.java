@@ -56,13 +56,12 @@ public class LocationTracker {
   }
 
   /**
-   * This method ensures that the location field is kept correctly despite the deletion. It
-   * returns a new LocationTracker object
+   * This method ensures that the location field is kept correctly despite the deletion.
    */
   public LocationTracker delete(int line, int startColumn, int endColumn) {
     LocationTracker lt = cloneTracker();
     for (int i = startColumn; i < endColumn + 1; i++) {
-      lt.remove(line, i);
+     lt.remove(line, i);
     }
     return lt;
   }

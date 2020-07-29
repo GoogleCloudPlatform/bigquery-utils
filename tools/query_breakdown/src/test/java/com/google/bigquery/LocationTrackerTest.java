@@ -32,6 +32,7 @@ public class LocationTrackerTest {
     String absPath = new File("").getAbsolutePath();
     String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleLineQuery.txt");
-    QueryBreakdown.deletion(query, 3, 1, 5);
+    LocationTracker lt = ir.getLocationTracker().delete(3, 1, 5);
+    //assertEquals(lt.getOriginalPosition(3, 1));
   }
 }

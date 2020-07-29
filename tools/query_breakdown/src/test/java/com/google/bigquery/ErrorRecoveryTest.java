@@ -11,7 +11,7 @@ public class ErrorRecoveryTest {
   @Test
   public void deletionSingleLine() {
     String query = "SELECT GROUP a FROM A";
-    assertEquals("SELECT a FROM A",
+    assertEquals("SELECT  a FROM A",
         QueryBreakdown.deletion(query, 1, 8, 12));
   }
 
@@ -25,7 +25,7 @@ public class ErrorRecoveryTest {
   @Test
   public void deletionMultipleLines() {
     String query = "SELECT a FROM A;" + '\n' + "SELECT GROUP b FROM B";
-    assertEquals("SELECT a FROM A;" + '\n' + "SELECT b FROM B",
+    assertEquals("SELECT a FROM A;" + '\n' + "SELECT  b FROM B",
         QueryBreakdown.deletion(query, 2, 8, 12));
   }
 

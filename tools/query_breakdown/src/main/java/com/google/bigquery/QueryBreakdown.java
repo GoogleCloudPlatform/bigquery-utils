@@ -95,8 +95,8 @@ public class QueryBreakdown {
       //deletion: gets the new query, creates a node, and calls the loop again
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
-      LocationTracker deletedLt = lt.delete(pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndColumnNum());
+      LocationTracker deletedLt = lt.delete
+          (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
       Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
       loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
@@ -135,23 +135,7 @@ public class QueryBreakdown {
   static String deletion(String inputQuery, int startLine, int startColumn,
       int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
-
     int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
-    // when the exception occurs in line 1
-    if (startLine == 1) {
-      // deals with extra spacing when deleting
-      if (inputQuery.charAt(startColumn - 2) == ' ') {
-        index[0] = startColumn - 2;
-      }
-    }
-    else {
-      int position = findNthIndexOf(inputQuery, '\n', startLine -1);
-      // deals with extra spacing when deleting
-      if (inputQuery.charAt(position + startColumn - 1) == ' ') {
-        index[0] = position + startColumn - 1;
-      }
-    }
-
     sb.delete(index[0], index[1]);
     return sb.toString();
   }
