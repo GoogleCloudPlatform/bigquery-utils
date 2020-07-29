@@ -81,22 +81,6 @@
       ]
     },
     {
-      "feature": "DQL_WINDOW",
-      "allMappings": [
-        {
-          "postgres": "WINDOW",
-          "bigQuery": "WINDOW",
-          "tokenInfos": [
-            {
-              "tokenName": "window_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
       "feature": "DQL_ORDER",
       "allMappings": [
         {
@@ -113,6 +97,28 @@
               "required": false,
               "count": 1
             }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_ASC",
+      "allMappings": [
+        {
+          "postgres": "ASC",
+          "bigQuery": "ASC",
+          "tokenInfos": [
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DQL_DESC",
+      "allMappings": [
+        {
+          "postgres": "DESC",
+          "bigQuery": "DESC",
+          "tokenInfos": [
           ]
         }
       ]
