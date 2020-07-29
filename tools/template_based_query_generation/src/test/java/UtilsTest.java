@@ -25,7 +25,7 @@ public class UtilsTest {
   @Test
   public void test_getRandomInteger() {
     int randomInt = Utils.getRandomInteger(10);
-    assertTrue(randomInt > 0);
+    assertTrue(randomInt >= 0);
     assertTrue(randomInt <= 10);
     assertEquals(0, Utils.getRandomInteger(0));
     assertThrows(IllegalArgumentException.class, () -> {
