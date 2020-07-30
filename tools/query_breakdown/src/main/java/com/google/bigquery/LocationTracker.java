@@ -69,7 +69,7 @@ public class LocationTracker {
    * To be implemented
    */
   public LocationTracker replace() {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   /**
