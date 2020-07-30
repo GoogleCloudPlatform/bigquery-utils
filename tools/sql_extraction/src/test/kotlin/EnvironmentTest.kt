@@ -116,4 +116,16 @@ class EnvironmentTest {
         env.popScope()
         assertEquals(stubQueryFragment, env.getVariableReference("test"))
     }
+
+    @Test
+    fun `setVariable creates global variable if variable does not exist`() {
+        val env = Environment()
+        env.pushScope()
+
+        env.setVariableReference("test", stubQueryFragment)
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
+
+        env.popScope()
+        assertEquals(stubQueryFragment, env.getVariableReference("test"))
+    }
 }
