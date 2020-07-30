@@ -44,6 +44,7 @@ export class SqlExtractionRunner {
 
       let json = '';
       let errMsg = '';
+      let totalProgress = 0;
       const process = execFile(this.execPath, args)
         .on('close', code => {
           if (!process.killed && code === 0) {
@@ -68,11 +69,15 @@ export class SqlExtractionRunner {
             // if the error message starts with a percentage
             if (statement.match(/^\d+(\.\d*)?% .*$/)) {
               const percent = parseFloat(statement);
+              const nextTotalProgress = isNaN(percent)
+                ? totalProgress
+                : percent;
               const message = statement.substring(statement.indexOf('%' + 2));
               progress.report({
                 message: message,
-                increment: isNaN(percent) ? undefined : percent,
+                increment: nextTotalProgress - totalProgress,
               });
+              totalProgress = nextTotalProgress;
             }
           }
           // save the remainder for later
