@@ -1,4 +1,4 @@
-name: VS Code Extension for SQL Extraction
+name: VS Code Extension for Automatic Query Fixer
 
 on:
   push:
