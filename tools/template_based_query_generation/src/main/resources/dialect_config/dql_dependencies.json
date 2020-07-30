@@ -7,7 +7,6 @@
     "DQL_WHERE",
     "DQL_GROUP",
     "DQL_HAVING",
-    "DQL_WINDOW",
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
@@ -17,7 +16,6 @@
     "DQL_WHERE",
     "DQL_GROUP",
     "DQL_HAVING",
-    "DQL_WINDOW",
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
@@ -26,7 +24,6 @@
   "DQL_WHERE": [
     "DQL_GROUP",
     "DQL_HAVING",
-    "DQL_WINDOW",
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
@@ -34,26 +31,30 @@
   ],
   "DQL_GROUP": [
     "DQL_HAVING",
-    "DQL_WINDOW",
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
     "FEATURE_SINK"
   ],
   "DQL_HAVING": [
-    "DQL_WINDOW",
-    "DQL_ORDER",
-    "DQL_LIMIT",
-    "DQL_OFFSET",
-    "FEATURE_SINK"
-  ],
-  "DQL_WINDOW": [
     "DQL_ORDER",
     "DQL_LIMIT",
     "DQL_OFFSET",
     "FEATURE_SINK"
   ],
   "DQL_ORDER": [
+    "DQL_ASC",
+    "DQL_DESC",
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "FEATURE_SINK"
+  ],
+  "DQL_ASC": [
+    "DQL_LIMIT",
+    "DQL_OFFSET",
+    "FEATURE_SINK"
+  ],
+  "DQL_DESC": [
     "DQL_LIMIT",
     "DQL_OFFSET",
     "FEATURE_SINK"

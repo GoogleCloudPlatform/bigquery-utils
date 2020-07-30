@@ -5,10 +5,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
+import jdk.internal.net.http.common.Pair;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,6 +40,18 @@ public class Utils {
     }
 
     return random.nextInt(lowerBound, upperBound + 1);
+  }
+
+  /**
+   * Returns a random element from given set
+   * @param list a list of objects from which a random element is selected
+   */
+  public static Pair<String, DataType> getRandomElement(ArrayList<Pair<String, DataType>> list) throws IllegalArgumentException  {
+    if (list.size() <= 0) {
+      throw new IllegalArgumentException("ArrayList must contain at least one element");
+    }
+    int index = Utils.getRandomInteger(list.size());
+    return list.get(index);
   }
 
   /**
