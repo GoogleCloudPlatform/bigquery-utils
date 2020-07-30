@@ -2,7 +2,6 @@ package com.google.bigquery;
 
 import static org.junit.Assert.*;
 
-import com.google.bigquery.InputReader;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
