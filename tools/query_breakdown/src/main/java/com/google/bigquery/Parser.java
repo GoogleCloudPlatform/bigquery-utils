@@ -1,7 +1,9 @@
 package com.google.bigquery;
 
 /**
- * Interface for com.google.bigquery.Parser to abstract out parser logic.
+ * Interface for Parser to abstract out parser logic.
+ *
+ * TODO: make a specific interface class such that the Exception is not too generic
  */
 public interface Parser {
 

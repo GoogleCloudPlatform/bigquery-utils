@@ -55,30 +55,14 @@
       ]
     },
     {
-      "feature": "DML_UPDATE",
+      "feature": "DML_VALUES",
       "allMappings": [
         {
-          "postgres": "UPDATE",
-          "bigQuery": "UPDATE",
+          "postgres": "VALUES",
+          "bigQuery": "VALUES",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DML_SET",
-      "allMappings": [
-        {
-          "postgres": "SET",
-          "bigQuery": "SET",
-          "tokenInfos": [
-            {
-              "tokenName": "update_item",
+              "tokenName": "values_exp",
               "required": true,
               "count": 1
             }

@@ -36,4 +36,11 @@ public class QueryBreakdownTest {
     assertEquals(5, QueryBreakdown.findNthIndexOf(test, '\n', 2));
     assertEquals(-1, QueryBreakdown.findNthIndexOf(test, '\n', 3));
   }
+
+  @Test
+  public void QueryBreakdownRunSimple() {
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    String query = "SELECT a WHERE A GROUP WITH a";
+    qb.run(query, "", 0);
+  }
 }
