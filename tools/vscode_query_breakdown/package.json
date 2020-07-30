@@ -1,8 +1,15 @@
 {
   "name": "vscode-query-breakdown",
   "displayName": "vscode_query_breakdown",
-  "description": "",
+  "description": "This is the VS Code extension for Query Breakdown",
   "version": "0.0.1",
+  "publisher": "google-cloud",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/bigquery-utils.git",
+    "directory": "tools/vscode_query_breakdown"
+  },
+  "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.47.0"
   },

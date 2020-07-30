@@ -1,3 +1,4 @@
 {
+  "ignorePatterns": ["/out/**", "/src/test/**"],
   "extends": "./node_modules/gts/"
 }
