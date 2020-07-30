@@ -17,7 +17,7 @@ public class CalciteParser implements Parser {
   private final SqlParser.Config config;
 
   public CalciteParser() {
-    // can change the field here to change the type of Calcite com.google.bigquery.Parser
+    // can change the field here to change the type of Calcite Parser
     config = getParserConfig(SqlBabelParserImpl.FACTORY);
   }
 

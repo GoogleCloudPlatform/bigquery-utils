@@ -4,6 +4,12 @@
   "description": "VS Code Extension to display results from SQL Extraction.",
   "version": "0.0.1",
   "publisher": "google-cloud",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/bigquery-utils.git",
+    "directory": "tools/vscode_sql_extraction"
+  },
+  "license": "Apache-2.0",
   "engines": {
     "vscode": "^1.45.0"
   },
@@ -66,25 +72,27 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
-    "@types/mkdirp": "^0.5.2",
-    "@types/rimraf": "^2.0.2",
-    "@types/vscode": "^1.46.0",
     "@types/glob": "^7.1.1",
+    "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.11.1",
-    "eslint": "^6.8.0",
-    "@typescript-eslint/parser": "^2.30.0",
+    "@types/randomcolor": "^0.5.5",
+    "@types/rimraf": "^2.0.2",
+    "@types/vscode": "^1.46.0",
     "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "eslint": "^6.8.0",
     "glob": "^7.1.6",
+    "gts": "^2.0.2",
     "mocha": "^7.1.2",
     "typescript": "^3.8.3",
-    "vscode-test": "^1.3.0",
-    "gts": "^2.0.2"
+    "vscode-test": "^1.3.0"
   },
   "dependencies": {
     "ftp": "^0.3.10",
     "jsonc-parser": "^0.4.2",
     "mkdirp": "^0.5.1",
+    "randomcolor": "^0.6.2",
     "rimraf": "^2.6.2",
     "tslint": "^6.1.2"
   }
