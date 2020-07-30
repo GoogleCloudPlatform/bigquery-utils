@@ -40,6 +40,8 @@ export class SqlExtractionRunner {
     }
 
     return new Promise<Query[]>((resolve, reject) => {
+      progress.report({message: 'Launching SQL Extraction...'});
+
       let json = '';
       let errMsg = '';
       const process = execFile(this.execPath, args)
@@ -57,22 +59,25 @@ export class SqlExtractionRunner {
       });
       process.stderr!.on('data', data => {
         errMsg += data;
-        let index = errMsg.indexOf('\n');
-        while (index >= 0) {
-          // one entire error message was received completely up to newline
-          const statement = errMsg.substring(0, index);
-          errMsg = errMsg.substring(index + 1);
-          index = errMsg.indexOf('\n');
+        const lines = errMsg.split('\n');
+        // if at least one entire message was received completely up to newline
+        if (lines.length > 1) {
+          for (let i = 0; i < lines.length - 2; i++) {
+            const statement = lines[i];
 
-          // if the error message starts with a percentage
-          if (statement.match(/^\d+(\.\d*)?% .*$/)) {
-            const percent = parseFloat(statement);
-            const message = statement.substring(statement.indexOf('%' + 2));
-            progress.report({
-              message: message,
-              increment: isNaN(percent) ? undefined : percent,
-            });
+            // if the error message starts with a percentage
+            if (statement.match(/^\d+(\.\d*)?% .*$/)) {
+              const percent = parseFloat(statement);
+              const message = statement.substring(statement.indexOf('%' + 2));
+              progress.report({
+                message: message,
+                increment: isNaN(percent) ? undefined : percent,
+              });
+            }
           }
+          // save the remainder for later
+          // this works even if '\n' appears at the very end
+          errMsg = lines[lines.length - 1];
         }
       });
       token.onCancellationRequested(() => process.kill());
