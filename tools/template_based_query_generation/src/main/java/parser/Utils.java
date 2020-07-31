@@ -82,6 +82,30 @@ public class Utils {
   }
 
   /**
+   * Returns a random string with a specified length consisting of 0s and 1s
+   *
+   * @param length a nonzero integer specifying the desired length of the generated string
+   * @return a random string that matches the regex '[a-zA-Z_]' and has the specified length
+   */
+  public static String getRandomStringBytes(int length) throws IllegalArgumentException {
+    if (length <= 0) {
+      throw new IllegalArgumentException("Random byte string must have positive length");
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < length; i++) {
+      if (random.nextBoolean()) {
+        sb.append("1");
+      } else{
+        sb.append("0");
+      }
+    }
+
+    return sb.toString();
+  }
+
+  /**
    * Writes generated outputs to a specified directory, creating one if it doesn't exist.
    *
    * @param outputs         collection of statements to write
@@ -299,23 +323,24 @@ public class Utils {
 
   /**
    *
+   * // TODO: factor out constants into config, do date generation, time, and timestamp generation
    * @param dataType
    * @return random data of type dataType
    * @throws IllegalArgumentException
    */
   public static String generateRandomStringData(DataType dataType) {
     if (dataType == DataType.STR) {
-      return "random string";
+      return getRandomString(20);
     } else if (dataType == DataType.BYTES) {
-      return "01010101010";
+      return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return "Jul 3 2020";
+      return "1999-01-01";
     } else if (dataType == DataType.TIME) {
-      return "10:23:33.34";
+      return "04:05:06.789";
     } else if (dataType == DataType.TIMESTAMP) {
-      return "100023010300";
+      return "1999-01-08 04:05:06";
     } else {
-      throw new IllegalArgumentException("dataType cannot be represented by a double type");
+      throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }
   }
 
@@ -329,7 +354,7 @@ public class Utils {
     if (dataType == DataType.BOOL) {
       return random.nextBoolean();
     } else {
-      throw new IllegalArgumentException("dataType cannot be represented by a big decimal type");
+      throw new IllegalArgumentException("dataType cannot be represented by a boolean type");
     }
   }
 
