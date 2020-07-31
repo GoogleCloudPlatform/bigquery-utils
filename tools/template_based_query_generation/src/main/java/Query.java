@@ -1,6 +1,8 @@
 import parser.Mapping;
 import token.Token;
 
+import java.util.List;
+
 /**
  * class representing Query
  */
@@ -8,7 +10,7 @@ public class Query {
 
   private FeatureType type;
   private Mapping mapping;
-  private Token token;
+  private List<Token> tokens;
 
   public Query(FeatureType type) {
       this.type = type;
@@ -22,12 +24,12 @@ public class Query {
     this.mapping = mapping;
   }
 
-  public Token getToken() {
-    return this.token;
+  public List<Token> getTokens() {
+    return this.tokens;
   }
 
-  public void setToken(Token token) {
-    this.token = token;
+  public void setTokens(List<Token> tokens) {
+    this.tokens = tokens;
   }
 
   public FeatureType getType() {

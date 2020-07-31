@@ -5,6 +5,7 @@ import parser.Dependencies;
 import parser.Dependency;
 import parser.FeatureIndicator;
 import parser.FeatureIndicators;
+import token.Tokenizer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,13 +61,9 @@ public class QueryGenerator {
 				if (nodeMap.keySet().contains(neighbor)) {
 					nodeNeighbors.add(nodeMap.get(neighbor));
 				}
-				System.out.println(nodeMap.get(nodeKey).getCumulativeProbabilities());
-				System.out.println(nodeNeighbors);
 				nodeMap.get(nodeKey).setNeighbors(nodeNeighbors);
-				System.out.println(nodeMap.get(nodeKey).getCumulativeProbabilities());
 			}
 		}
-
 		markovChain = new MarkovChain(new HashSet<Node<Query>>(nodeMap.values()));
 	}
 
@@ -75,6 +72,9 @@ public class QueryGenerator {
 	 * @param targetDirectory
 	 */
 	public List<Query> generateQueries() {
+		Tokenizer tokenizer = new Tokenizer();
+		List<Query> rawQueries = markovChain.randomWalk(source);
+		Skeleton skeleton = new Skeleton(rawQueries, tokenizer);
 		return markovChain.randomWalk(source);
 	}
 

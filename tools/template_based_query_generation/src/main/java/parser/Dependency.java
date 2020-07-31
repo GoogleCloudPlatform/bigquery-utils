@@ -3,7 +3,7 @@ package parser;
 import java.util.List;
 
 /**
- * Helper class that contains all keyword variants of a feature
+ * Helper class that contains a node and all its neighbors
  */
 public class Dependency {
 
