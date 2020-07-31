@@ -48,7 +48,7 @@ public class Skeleton {
 
       rawQuery.setTokens(tokens);
       for (Token token : tokens) {
-        
+
       }
       for (TokenInfo token : tokens) {
         // if token is required, add it to the skeleton, otherwise add it with a 1/2 probability

@@ -4,8 +4,7 @@
       "node": "DML_FEATURE_ROOT",
       "neighbors": [
         "DML_INSERT",
-        "DML_DELETE",
-        "DML_UPDATE"
+        "DML_DELETE"
       ]
     },
     {
@@ -15,15 +14,15 @@
       ]
     },
     {
-      "node": "DML_DELETE",
+      "node": "DML_VALUES",
       "neighbors": [
-        "DML_WHERE"
+        "FEATURE_SINK"
       ]
     },
     {
-      "node": "DML_UPDATE",
+      "node": "DML_DELETE",
       "neighbors": [
-        "DML_SET"
+        "DML_WHERE"
       ]
     },
     {

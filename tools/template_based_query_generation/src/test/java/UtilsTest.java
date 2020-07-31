@@ -97,7 +97,7 @@ public class UtilsTest {
   // TODO (spoiledhua): add unit tests for makeImmutableMap and makeImmutableSet
 
   @Test
-  public void test_makeImmutableSet(@TempDir Path testDir) throws IOException {
+  public void test_makeImmutableKeywordSet(@TempDir Path testDir) throws IOException {
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
     builder.add("Test 1");
     builder.add("Test 3");
@@ -124,13 +124,13 @@ public class UtilsTest {
       gson.toJson(featureIndicators, writer);
     }
 
-    ImmutableSet<String> actual = Utils.makeImmutableSet(testDir.resolve("test.txt"));
+    ImmutableSet<String> actual = Utils.makeImmutableKeywordSet(testDir.resolve("test.txt"));
 
     assertEquals(expected, actual);
   }
 
   @Test
-  public void test_makeImmutableMap(@TempDir Path testDir) throws IOException {
+  public void test_makeImmutableKeywordMap(@TempDir Path testDir) throws IOException {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
@@ -166,7 +166,7 @@ public class UtilsTest {
     keywordsBuilder.add("Test Feature");
     ImmutableSet<String> keywordsTest = keywordsBuilder.build();
 
-    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableMap(testDir.resolve("test.txt"), keywordsTest);
+    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableKeywordMap(testDir.resolve("test.txt"), keywordsTest);
 
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getCount(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getCount());
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getRequired(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getRequired());

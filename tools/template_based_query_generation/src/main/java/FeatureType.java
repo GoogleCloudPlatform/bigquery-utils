@@ -15,7 +15,6 @@ public enum FeatureType {
 	DML_INSERT,
 	DML_DELETE,
 	DML_WHERE,
-	DML_UPDATE,
 	DML_SET,
 	DQL_SELECT,
 	DQL_FROM,

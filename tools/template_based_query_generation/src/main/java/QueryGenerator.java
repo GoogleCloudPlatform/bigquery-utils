@@ -33,7 +33,11 @@ public class QueryGenerator {
 	private Random r = new Random();
 	private Node<Query> source = new Node<>(new Query(FeatureType.FEATURE_ROOT), r);
 
-	public QueryGenerator() {
+	/**
+	 *
+	 * @throws Exception
+	 */
+	public QueryGenerator() throws Exception {
 		// TODO (Victor):
 		//  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
 		//  2. Generate number of queries given in config
