@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import token.TokenInfo;
+import token.TokenType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public class UtilsTest {
       gson.toJson(featureIndicators, writer);
     }
 
-    ImmutableSet<String> actual = Utils.makeImmutableSet(testDir.resolve("test.txt"));
+    ImmutableSet<String> actual = Utils.makeImmutableKeywordSet(testDir.resolve("test.txt"));
 
     assertEquals(expected, actual);
   }
@@ -132,7 +133,7 @@ public class UtilsTest {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
-    tokenInfo.setTokenName("Test Token");
+    tokenInfo.setTokenType(TokenType.valueOf("table_name"));
     ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
@@ -164,11 +165,11 @@ public class UtilsTest {
     keywordsBuilder.add("Test Feature");
     ImmutableSet<String> keywordsTest = keywordsBuilder.build();
 
-    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableMap(testDir.resolve("test.txt"), keywordsTest);
+    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableKeywordMap(testDir.resolve("test.txt"), keywordsTest);
 
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getCount(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getCount());
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getRequired(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getRequired());
-    assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getTokenName(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getTokenName());
+    assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType());
     assertEquals(expected.get("Test Feature").get(0).getPostgres(), actual.get("Test Feature").get(0).getPostgres());
     assertEquals(expected.get("Test Feature").get(0).getBigQuery(), actual.get("Test Feature").get(0).getBigQuery());
   }
