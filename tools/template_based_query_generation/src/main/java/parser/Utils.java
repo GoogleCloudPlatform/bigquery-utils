@@ -86,7 +86,7 @@ public class Utils {
    * Returns a random string with a specified length consisting of 0s and 1s
    *
    * @param length a nonzero integer specifying the desired length of the generated string
-   * @return a random string that matches the regex consisting of 0s and 1s and has the specified length
+   * @return a random string that matches the regex '[0|1]*' and has the specified length
    */
   public static String getRandomStringBytes(int length) throws IllegalArgumentException {
     if (length <= 0) {
@@ -290,7 +290,7 @@ public class Utils {
       if (num == Integer.MIN_VALUE) {
         return 0;
       } else {
-        return	Math.abs(num);
+        return Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by an int type");
@@ -311,7 +311,7 @@ public class Utils {
       if (num == Long.MIN_VALUE) {
         return 0;
       } else {
-        return	Math.abs(num);
+        return Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a long type");
