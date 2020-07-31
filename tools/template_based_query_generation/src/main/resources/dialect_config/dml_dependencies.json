@@ -15,12 +15,6 @@
       ]
     },
     {
-      "node": "DML_VALUES",
-      "neighbors": [
-        "FEATURE_SINK"
-      ]
-    },
-    {
       "node": "DML_DELETE",
       "neighbors": [
         "DML_WHERE"
@@ -30,13 +24,6 @@
       "node": "DML_UPDATE",
       "neighbors": [
         "DML_SET"
-      ]
-    },
-    {
-      "node": "DML_SET",
-      "neighbors": [
-        "DML_WHERE",
-        "FEATURE_SINK"
       ]
     },
     {

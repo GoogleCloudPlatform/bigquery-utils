@@ -28,12 +28,6 @@
       ]
     },
     {
-      "feature": "DML_VALUES",
-      "allMappings": [
-
-      ]
-    },
-    {
       "feature": "DML_DELETE",
       "allMappings": [
         {
@@ -69,22 +63,6 @@
           "tokenInfos": [
             {
               "tokenName": "table_name",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DML_SET",
-      "allMappings": [
-        {
-          "postgres": "SET",
-          "bigQuery": "SET",
-          "tokenInfos": [
-            {
-              "tokenName": "update_item",
               "required": true,
               "count": 1
             }
