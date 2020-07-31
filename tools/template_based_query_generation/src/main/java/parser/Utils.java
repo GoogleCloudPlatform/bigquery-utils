@@ -6,15 +6,16 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
 import jdk.internal.net.http.common.Pair;
-import org.graalvm.compiler.hotspot.sparc.SPARCHotSpotSafepointOp;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
+import java.text.SimpleDateFormat;
+
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -85,7 +86,7 @@ public class Utils {
    * Returns a random string with a specified length consisting of 0s and 1s
    *
    * @param length a nonzero integer specifying the desired length of the generated string
-   * @return a random string that matches the regex '[a-zA-Z_]' and has the specified length
+   * @return a random string that matches the regex consisting of 0s and 1s and has the specified length
    */
   public static String getRandomStringBytes(int length) throws IllegalArgumentException {
     if (length <= 0) {
@@ -103,6 +104,39 @@ public class Utils {
     }
 
     return sb.toString();
+  }
+
+  /**
+   *
+   * @return a random string representing a random date between 0001-01-01 and 9999-12-31 formatted as YYYY-MM-dd
+   */
+  public static String getRandomStringDate() {
+    Date d1 = new Date(-2177434800000L);
+    Date d2 = new Date(253402232400000L);
+    Date randomDate = new Date(random.nextLong(d1.getTime(), d2.getTime()));
+    SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+    String date = dateFormat.format(randomDate);
+    return date;
+  }
+
+  /**
+   *
+   * @return a random string representing a random time from 00:00:00 to 23:59:59.99999
+   */
+  private static String getRandomStringTime() {
+    int hour = random.nextInt(24);
+    int min = random.nextInt(60);
+    int second = random.nextInt(60);
+    int milli = random.nextInt(100000);
+    return hour + ":" + min + ":" + second + "." + milli;
+  }
+
+  /**
+   *
+   * @return a random string representing a random time from 0001-01-01 00:00:00 to 9999-12-31 23:59:59.99999
+   */
+  private static String getRandomStringTimestamp() {
+    return getRandomStringDate() + " " + getRandomStringTime();
   }
 
   /**
@@ -323,7 +357,7 @@ public class Utils {
 
   /**
    *
-   * // TODO: factor out constants into config, do date generation, time, and timestamp generation
+   * TODO (Allen): factor out constants into config, do date generation, time, and timestamp generation
    * @param dataType
    * @return random data of type dataType
    * @throws IllegalArgumentException
@@ -334,11 +368,11 @@ public class Utils {
     } else if (dataType == DataType.BYTES) {
       return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return "1999-01-01";
+      return getRandomStringDate();
     } else if (dataType == DataType.TIME) {
-      return "04:05:06.789";
+      return getRandomStringTime();
     } else if (dataType == DataType.TIMESTAMP) {
-      return "1999-01-08 04:05:06";
+      return getRandomStringTimestamp();
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }
