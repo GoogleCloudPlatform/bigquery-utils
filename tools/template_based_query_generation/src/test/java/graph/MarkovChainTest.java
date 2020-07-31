@@ -1,5 +1,7 @@
 package graph;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +14,7 @@ public class MarkovChainTest {
 	/**
 	 * test for the randomWalk method when the graph consists of isolated vertices (islands)
 	 */
-	// @Test
+	@Test
 	public void test_randomWalk_islands() {
 		Node<String> node1 = new Node<String>("node 1", 4440);
 		Node<String> node2 = new Node<String>("node 2", 2514);
@@ -36,7 +38,7 @@ public class MarkovChainTest {
 	/**
 	 * test for the randomWalk method when the graph consists of one directed edge
 	 */
-	// @Test
+	@Test
 	public void test_randomWalk_anEdge() {
 		Node<String> node1 = new Node<String>("node 1", 3408);
 		Node<String> node2 = new Node<String>("node 2", 9642);
@@ -60,7 +62,7 @@ public class MarkovChainTest {
 	 * test for the randomWalk method when the graph consists of a bidirectional edge
 	 * an infinite loop happens in the graph.MarkovChain class, so we expect an OutOfMemoryError.class
 	 */
-	// @Test
+	@Test
 	public void test_randomWalk_nonDAG() {
 		Node<String> node1 = new Node<String>("node 1", 3408);
 		Node<String> node2 = new Node<String>("node 2", 9642);
@@ -82,7 +84,7 @@ public class MarkovChainTest {
 	/**
 	 * test for the randomWalk method when the graph is a small DAG
 	 */
-	// @Test
+	@Test
 	public void test_randomWalk_smallDAG() {
 		Random r = new Random();
 		Node<String> node1 = new Node<String>("node 1", 6033);
