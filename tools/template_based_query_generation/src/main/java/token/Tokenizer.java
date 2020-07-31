@@ -323,6 +323,4 @@ public class Tokenizer {
     token.setTokenPlaceHolder("<skip_rows " + placeHolder + ">");
   }
 
-
-
 }

@@ -45,7 +45,7 @@ public enum DataType {
    * @return true if can be represented by a long
    */
   public boolean isLongType() {
-    return this == SMALL_INT || this == INTEGER || this == SMALL_SERIAL || this == SERIAL || this == BIG_SERIAL;
+    return this == BIG_INT || this == BIG_SERIAL;
   }
 
   /**
@@ -53,7 +53,7 @@ public enum DataType {
    * @return true if can be represented by an double
    */
   public boolean isDoubleType() {
-    return this == DECIMAL || this == REAL;
+    return this == BIG_REAL || this == REAL;
   }
 
   /**
@@ -61,7 +61,7 @@ public enum DataType {
    * @return true if can be represented by a big decimal
    */
   public boolean isBigDecimalType() {
-    return this == NUMERIC || this == BIG_REAL;
+    return this == NUMERIC || this == DECIMAL;
   }
 
   /**
