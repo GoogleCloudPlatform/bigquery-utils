@@ -11,13 +11,13 @@ import java.io.IOException;
  */
 public class InputReader {
 
-  private LocationTracker lt;
+  private LocationTracker locationTracker;
 
   /**
    * Constructor for the class
    */
   public InputReader() {
-    lt = new LocationTracker();
+    locationTracker = new LocationTracker();
   }
 
   /**
@@ -37,7 +37,7 @@ public class InputReader {
 
     // for the first line
     if (current != -1) {
-      lt.addLine();
+      locationTracker.addLine();
     }
 
     // loop for input reading
@@ -48,10 +48,10 @@ public class InputReader {
       if ((char) current == '\n') {
         column = 1;
         line++;
-        lt.addLine();
+        locationTracker.addLine();
       }
       else {
-        lt.add(line, column);
+        locationTracker.add(line, column);
         column++;
       }
 
@@ -67,6 +67,6 @@ public class InputReader {
    * Getter method for LocationTracker of the input
    */
   public LocationTracker getLocationTracker() {
-    return lt;
+    return locationTracker;
   }
 }

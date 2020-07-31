@@ -58,11 +58,11 @@ public class LocationTracker {
    * This method ensures that the location field is kept correctly despite the deletion.
    */
   public LocationTracker delete(int line, int startColumn, int endColumn) {
-    LocationTracker lt = cloneTracker();
+    LocationTracker locationTracker = cloneTracker();
     for (int i = startColumn; i < endColumn + 1; i++) {
-     lt.remove(line, startColumn);
+      locationTracker.remove(line, startColumn);
     }
-    return lt;
+    return locationTracker;
   }
 
   /**
@@ -77,15 +77,15 @@ public class LocationTracker {
    * instance to be passed during the traversal of the tree
    */
   public LocationTracker cloneTracker() {
-    LocationTracker lt = new LocationTracker();
+    LocationTracker locationTracker = new LocationTracker();
     for (int i = 0; i < location.size(); i++) {
-      lt.addLine();
+      locationTracker.addLine();
       ArrayList<Integer> lineOriginal = location.get(i);
       for (int j = 0; j < lineOriginal.size(); j++) {
-        lt.add(i + 1, lineOriginal.get(j));
+        locationTracker.add(i + 1, lineOriginal.get(j));
       }
     }
-    return lt;
+    return locationTracker;
   }
 
 
