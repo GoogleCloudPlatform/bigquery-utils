@@ -73,13 +73,14 @@ public class QueryGenerator {
 
 	/**
 	 * generates queries from markov chain starting from root
-	 * @param targetDirectory
 	 */
-	public List<Query> generateQueries() {
-		Tokenizer tokenizer = new Tokenizer();
+	public void generateQueries() {
+		Tokenizer tokenizer = new Tokenizer(r);
 		List<Query> rawQueries = markovChain.randomWalk(source);
 		Skeleton skeleton = new Skeleton(rawQueries, tokenizer);
-		return markovChain.randomWalk(source);
+		System.out.println(skeleton.getPostgreSkeleton());
+		System.out.println(skeleton.getBigQuerySkeleton());
+		return;
 	}
 
 	private Map<String, Node<Query>> addNodeMap(Map<String, Node<Query>> nodeMap, Path input, Random r) {

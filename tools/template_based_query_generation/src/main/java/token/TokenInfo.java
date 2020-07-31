@@ -12,8 +12,8 @@ public class TokenInfo {
     return this.tokenType;
   }
 
-  public void setTokenType(TokenType tokenType) {
-    this.tokenType = tokenType;
+  public void setTokenType(String tokenType) {
+    this.tokenType = TokenType.valueOf(tokenType);
   }
 
   public boolean getRequired() {

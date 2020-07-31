@@ -19,8 +19,8 @@ public class Skeleton {
 
   private final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
-  private ImmutableList<Query> postgreSkeleton = new ImmutableList.Builder<Query>().build();
-  private ImmutableList<Query> bigQuerySkeleton = new ImmutableList.Builder<Query>().build();
+  private final ImmutableList<String> postgreSkeleton;
+  private final ImmutableList<String> bigQuerySkeleton;
 
   /**
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
@@ -48,16 +48,13 @@ public class Skeleton {
 
       rawQuery.setTokens(tokens);
       for (Token token : tokens) {
-
-      }
-      for (TokenInfo token : tokens) {
-        // if token is required, add it to the skeleton, otherwise add it with a 1/2 probability
-        if (token.getRequired()) {
-          postgresBuilder.add(token.getTokenName());
-          bigQueryBuilder.add(token.getTokenName());
+        tokenizer.generateToken(token);
+        if (token.getTokenInfo().getRequired()) {
+          postgresBuilder.add(token.getPostgresTokenExpression());
+          bigQueryBuilder.add(token.getBigQueryTokenExpression());
         } else if (Utils.getRandomInteger(1) == 1) {
-          postgresBuilder.add(token.getTokenName());
-          bigQueryBuilder.add(token.getTokenName());
+          postgresBuilder.add(token.getPostgresTokenExpression());
+          bigQueryBuilder.add(token.getBigQueryTokenExpression());
         }
       }
     }
