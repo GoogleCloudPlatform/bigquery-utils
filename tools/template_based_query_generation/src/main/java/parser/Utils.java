@@ -6,8 +6,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
 import jdk.internal.net.http.common.Pair;
+import org.graalvm.compiler.hotspot.sparc.SPARCHotSpotSafepointOp;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -209,6 +211,126 @@ public class Utils {
 
     return map;
   }
-
   // TODO(spoiledhua): refactor IO exception handling
+
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static int generateRandomIntegerData(DataType dataType) throws IllegalArgumentException {
+    if (dataType == DataType.SMALL_INT) {
+      return 	random.nextInt(-32768,32769);
+    } else if (dataType == DataType.INTEGER) {
+      return 	random.nextInt();
+    } else if (dataType == DataType.SMALL_SERIAL) {
+      return 	random.nextInt(1, 32768);
+    } else if (dataType == DataType.SERIAL) {
+      int num = random.nextInt();
+      if (num == Integer.MIN_VALUE) {
+        return 0;
+      } else {
+        return	Math.abs(num);
+      }
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by an int type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static long generateRandomLongData(DataType dataType) {
+    if (dataType == DataType.BIG_INT) {
+      return 	random.nextLong();
+    } else if (dataType == DataType.BIG_SERIAL) {
+      long num = random.nextLong();
+      if (num == Long.MIN_VALUE) {
+        return 0;
+      } else {
+        return	Math.abs(num);
+      }
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a long type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static double generateRandomDoubleData(DataType dataType) {
+    if (dataType == DataType.REAL) {
+      return random.nextFloat();
+    } else if (dataType == DataType.BIG_REAL) {
+      return random.nextDouble();
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a double type");
+    }
+  }
+
+  /**
+   *
+   * Up to 131072 digits are permitted in postgres, here uses up to 50 digits (slightly over size of double)
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static BigDecimal generateRandomBigDecimalData(DataType dataType) {
+    if (dataType == DataType.DECIMAL) {
+      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal range = low.abs().multiply(new BigDecimal(2));
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+    } else if (dataType == DataType.NUMERIC) {
+      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal range = low.abs().multiply(new BigDecimal(2));
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a big decimal type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static String generateRandomStringData(DataType dataType) {
+    if (dataType == DataType.STR) {
+      return "random string";
+    } else if (dataType == DataType.BYTES) {
+      return "01010101010";
+    } else if (dataType == DataType.DATE) {
+      return "Jul 3 2020";
+    } else if (dataType == DataType.TIME) {
+      return "10:23:33.34";
+    } else if (dataType == DataType.TIMESTAMP) {
+      return "100023010300";
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a double type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static boolean generateRandomBooleanData(DataType dataType) {
+    if (dataType == DataType.BOOL) {
+      return random.nextBoolean();
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a big decimal type");
+    }
+  }
+
 }

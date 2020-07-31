@@ -15,7 +15,6 @@ public class Table {
   private String name;
   private int numRows;
   private ArrayList<Pair<String, DataType>> schema;
-  private ArrayList<ArrayList> data;
 
   /**
    * constructs empty table from table name
@@ -78,6 +77,30 @@ public class Table {
     Pair<String, DataType> p = Utils.getRandomElement(columns);
     return p.first;
   }
+
+  /**
+   *
+   * @return sample data with number of rows being number of rows in table
+   */
+  public ArrayList<Column> generateData() {
+    return generateData(this.numRows);
+  }
+
+  /**
+   *
+   * @param numRows number of rows to generate
+   * @return sample data with number of rows being numRows
+   */
+  public ArrayList<Column> generateData(int numRows) {
+    ArrayList<Column> data = new ArrayList<Column>();
+    for (int i = 0; i < this.schema.size(); i++) {
+      Column col = new Column(this.schema.get(i).second);
+      col.fillRandomData(numRows);
+      data.add(col);
+    }
+    return data;
+  }
+
 
 
 }
