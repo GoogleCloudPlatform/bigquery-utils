@@ -37,6 +37,19 @@ class Environment {
     }
 
     /**
+     * Checks whether a variable of name [varName] was declared in any existing scope.
+     *
+     * @return true if variable was declared in any scope.
+     */
+    fun isVariableDeclaredInAnyScope(varName: String): Boolean {
+        return when {
+            isVariableDeclaredInScope(varName) -> true
+            parentScope != null -> parentScope!!.isVariableDeclaredInAnyScope(varName)
+            else -> false
+        }
+    }
+
+    /**
      * Gets all possible queries for the variable [varName].
      * Variable can be declared in any reachable scope.
      *
