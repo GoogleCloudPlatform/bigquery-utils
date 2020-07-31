@@ -23,8 +23,12 @@ class DataFlowSolver(private val frontends: List<FrontEnd>) {
     fun solveDataFlow(engine: DataFlowEngine, filePath: Path): Sequence<QueryUsages> {
         for (frontEnd in frontends) {
             if (frontEnd.canSolve(filePath)) {
-                LOGGER.debug { "Using ${frontEnd.javaClass.simpleName} for $filePath" }
-                frontEnd.solveDataFlow(engine, frontEnd.openFile(filePath))
+                LOGGER.debug { "Using ${frontEnd.javaClass.simpleName} for $filePath." }
+                try {
+                    frontEnd.solveDataFlow(engine, frontEnd.openFile(filePath))
+                } catch (e: RuntimeException) {
+                    LOGGER.error(e) { "Error occurred while analyzing $filePath." }
+                }
                 return engine.getAllQueries()
             }
         }

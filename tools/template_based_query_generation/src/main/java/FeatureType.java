@@ -24,4 +24,5 @@ public enum FeatureType {
 	DQL_ORDER,
 	DQL_LIMIT,
 	DQL_OFFSET,
+	DQL_WINDOW
 }
