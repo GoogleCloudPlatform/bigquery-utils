@@ -22,7 +22,8 @@ public class InputReader {
 
   /**
    * This method will take in a txt file name, use BufferedReader to parse the input, and return
-   * all the queries in a string format
+   * all the queries in a string format. We also initialize a LocationTracker instance since
+   * this is where we are processing the input.
    *
    * TODO: more robust method for input parsing needed (ex: semicolons in strings, comments)
    */
@@ -61,6 +62,41 @@ public class InputReader {
 
     reader.close();
     return sb.toString();
+  }
+
+  /**
+   * Method created to initialize a LocationTracker instance from an input string for testing
+   */
+  public void readFromString(String input) {
+    // local state for input reading
+    int current = 0;
+    int line = 1;
+    int column = 1;
+
+    // empty string
+    if (input == null || input.length() == 0) {
+      return;
+    }
+
+    // for the first line
+    locationTracker.addLine();
+
+    // loop for input reading
+    while (current < input.length()) {
+      // line changes
+      if (input.charAt(current) == '\n') {
+        column = 1;
+        line++;
+        locationTracker.addLine();
+      }
+      else {
+        locationTracker.add(line, column);
+        column++;
+      }
+
+      // advance current pointer
+      current++;
+    }
   }
 
   /**
