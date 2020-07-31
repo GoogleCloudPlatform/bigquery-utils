@@ -31,5 +31,54 @@ public enum DataType {
     Random random = new Random();
     return values()[random.nextInt(values().length)];
   }
+
+  /**
+   *
+   * @return true if can be represented by an integer
+   */
+  public boolean isIntegerType() {
+    return this == SMALL_INT || this == INTEGER || this == SMALL_SERIAL || this == SERIAL;
+  }
+
+  /**
+   *
+   * @return true if can be represented by a long
+   */
+  public boolean isLongType() {
+    return this == SMALL_INT || this == INTEGER || this == SMALL_SERIAL || this == SERIAL || this == BIG_SERIAL;
+  }
+
+  /**
+   *
+   * @return true if can be represented by an double
+   */
+  public boolean isDoubleType() {
+    return this == DECIMAL || this == REAL;
+  }
+
+  /**
+   *
+   * @return true if can be represented by a big decimal
+   */
+  public boolean isBigDecimalType() {
+    return this == NUMERIC || this == BIG_REAL;
+  }
+
+  /**
+   *
+   * @return true if can be represented by a String
+   */
+  public boolean isStringType() {
+    return this == STR || this == BYTES || this == DATE || this == TIME || this == TIMESTAMP;
+  }
+
+  /**
+   *
+   * @return true if can be represented by a boolean
+   */
+  public boolean isBooleanType() {
+    return this == BOOL;
+  }
+
 }
 

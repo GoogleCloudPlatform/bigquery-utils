@@ -8,6 +8,7 @@ import data.DataType;
 import jdk.internal.net.http.common.Pair;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -209,6 +210,30 @@ public class Utils {
 
     return map;
   }
-
   // TODO(spoiledhua): refactor IO exception handling
+
+  public static int generateRandomIntegerData(DataType dataType) {
+    return 0;
+  }
+
+  public static long generateRandomLongData(DataType dataType) {
+    return 0;
+  }
+
+  public static double generateRandomDoubleData(DataType dataType) {
+    return 0;
+  }
+
+  public static BigDecimal generateRandomBigDecimalData(DataType dataType) {
+    return BigDecimal.valueOf(0);
+  }
+
+  public static String generateRandomStringData(DataType dataType) {
+    return "";
+  }
+
+  public static boolean generateRandomBooleanData(DataType dataType) {
+    return false;
+  }
+
 }
