@@ -65,13 +65,13 @@ WITH jobChangeEvent AS (
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.queryStats.billingTier') AS queryJobStatsBillingTier,
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobStats.queryStats.referencedTables')
+      '$.jobChange.job.jobStats.queryStats.referencedTables'),
       '["'), '"]'), '","') AS queryJobStatsReferencedTables,
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
        '$.jobChange.job.jobStats.queryStats.referencedViews'),
        '["'), '"]'), '","') AS queryJobStatsReferencedViews,
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
-       '$.jobChange.job.jobStats.queryStats.referencedRoutines')
+       '$.jobChange.job.jobStats.queryStats.referencedRoutines'),
        '["'), '"]'), '","') AS queryJobStatsReferencedRoutines,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.queryStats.outputRowCount') AS queryJobStatsOutputRowCount,
