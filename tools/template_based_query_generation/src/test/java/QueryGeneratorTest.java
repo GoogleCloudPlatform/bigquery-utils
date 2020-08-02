@@ -8,9 +8,7 @@ class QueryGeneratorTest {
 		//  graph.MarkovChain. Tests will manually whether all dependencies are satisfied from
 		//  test config files
 		QueryGenerator queryGenerator = new QueryGenerator();
-		for (int i = 0; i < 10; i++) {
-			queryGenerator.generateQueries();
-		}
+		queryGenerator.generateQueries(10);
 	}
 
 }

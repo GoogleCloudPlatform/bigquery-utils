@@ -72,13 +72,21 @@ public class QueryGenerator {
 	/**
 	 * generates queries from markov chain starting from root
 	 */
-	public void generateQueries() {
+	public void generateQueries(int numberQueries) {
 		Tokenizer tokenizer = new Tokenizer(r);
-		List<Query> rawQueries = markovChain.randomWalk(source);
-		Skeleton skeleton = new Skeleton(rawQueries, tokenizer);
-		System.out.println(skeleton.getPostgreSkeleton());
-		System.out.println(skeleton.getBigQuerySkeleton());
-		return;
+
+		int i = 0;
+		while (i < numberQueries) {
+			List<Query> rawQueries = markovChain.randomWalk(source);
+
+			if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
+				List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-2);
+				Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
+				System.out.println("Postgres: " + skeleton.getPostgreSkeleton());
+				System.out.println("BigQuery: " + skeleton.getBigQuerySkeleton());
+				i++;
+			}
+		}
 	}
 
 	private Map<String, Node<Query>> addNodeMap(Map<String, Node<Query>> nodeMap, Path input, Random r) {
