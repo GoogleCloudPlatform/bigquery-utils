@@ -29,6 +29,14 @@
       "isIncluded": true
     },
     {
+      "feature": "DQL_ASC",
+      "isIncluded": true
+    },
+    {
+      "feature": "DQL_DESC",
+      "isIncluded": true
+    },
+    {
       "feature": "DQL_LIMIT",
       "isIncluded": true
     },

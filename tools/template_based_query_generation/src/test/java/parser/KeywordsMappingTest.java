@@ -3,7 +3,6 @@ package parser;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import token.TokenInfo;
-import token.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,16 +6,20 @@ package parser;
 public class FeatureIndicator {
 
   /* name of feature */
-  private String feature;
+  private FeatureType feature;
 
   /* indicates whether the user would like the feature to be included */
   private boolean isIncluded;
 
-  public String getFeature() {
+  public FeatureType getFeature() {
     return this.feature;
   }
 
   public void setFeature(String feature) {
+    this.feature = FeatureType.valueOf(feature);
+  }
+
+  public void setFeature(FeatureType feature) {
     this.feature = feature;
   }
 

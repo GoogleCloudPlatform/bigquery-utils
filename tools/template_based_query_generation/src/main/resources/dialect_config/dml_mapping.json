@@ -8,7 +8,7 @@
           "bigQuery": "INSERT",
           "tokenInfos": [
             {
-              "tokenName": "insert_exp",
+              "tokenType": "insert_exp",
               "required": true,
               "count": 1
             }
@@ -19,7 +19,7 @@
           "bigQuery": "INSERT INTO",
           "tokenInfos": [
             {
-              "tokenName": "insert_exp",
+              "tokenType": "insert_exp",
               "required": true,
               "count": 1
             }
@@ -35,7 +35,7 @@
           "bigQuery": "DELETE",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             }
@@ -46,7 +46,7 @@
           "bigQuery": "DELETE FROM",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             }
@@ -62,7 +62,7 @@
           "bigQuery": "VALUES",
           "tokenInfos": [
             {
-              "tokenName": "values_exp",
+              "tokenType": "values_exp",
               "required": true,
               "count": 1
             }
@@ -78,7 +78,7 @@
           "bigQuery": "WHERE",
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }
