@@ -84,17 +84,6 @@
           ]
         }
       ]
-    },
-    {
-      "feature": "DDL_AS",
-      "allMappings": [
-        {
-          "postgres": "AS",
-          "bigQuery": "AS",
-          "tokenInfos": [
-          ]
-        }
-      ]
     }
   ]
 }

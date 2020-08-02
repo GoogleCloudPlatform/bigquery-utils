@@ -15,10 +15,6 @@
     {
       "feature": "DDL_CLUSTER",
       "isIncluded": true
-    },
-    {
-      "feature": "DDL_AS",
-      "isIncluded": true
     }
   ]
 }
