@@ -133,7 +133,7 @@ public class UtilsTest {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
-    tokenInfo.setTokenType(TokenType.valueOf("table_name"));
+    tokenInfo.setTokenType("table_name");
     ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();

@@ -1,8 +1,7 @@
 package data;
 
-import jdk.internal.net.http.common.Pair;
 import parser.Utils;
-
+import parser.Pair;
 
 import java.util.ArrayList;
 
@@ -100,7 +99,5 @@ public class Table {
     }
     return data;
   }
-
-
 
 }
