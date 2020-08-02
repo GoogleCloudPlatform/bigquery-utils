@@ -1,10 +1,7 @@
 import com.google.gson.Gson;
 import graph.MarkovChain;
 import graph.Node;
-import parser.Dependencies;
-import parser.Dependency;
-import parser.FeatureIndicator;
-import parser.FeatureIndicators;
+import parser.*;
 import token.Tokenizer;
 
 import java.io.BufferedReader;
@@ -68,6 +65,7 @@ public class QueryGenerator {
 				nodeMap.get(nodeKey).setNeighbors(nodeNeighbors);
 			}
 		}
+
 		markovChain = new MarkovChain(new HashSet<Node<Query>>(nodeMap.values()));
 	}
 
@@ -91,7 +89,7 @@ public class QueryGenerator {
 
 			for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
 				if (featureIndicator.getIsIncluded()) {
-					nodeMap.put(featureIndicator.getFeature(), new Node<>(new Query(FeatureType.valueOf(featureIndicator.getFeature())), r));
+					nodeMap.put(featureIndicator.getFeature().name(), new Node<>(new Query(featureIndicator.getFeature()), r));
 				}
 			}
 		} catch (IOException exception) {

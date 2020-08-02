@@ -6,14 +6,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
 import jdk.internal.net.http.common.Pair;
-import org.graalvm.compiler.hotspot.sparc.SPARCHotSpotSafepointOp;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -173,6 +171,7 @@ public class Utils {
    * @return an immutable set of keywords from the config file
    */
   public static ImmutableSet<String> makeImmutableKeywordSet(Path inputPath) throws IOException {
+
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
@@ -181,7 +180,7 @@ public class Utils {
 
     for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
       if (featureIndicator.getIsIncluded()) {
-        builder.add(featureIndicator.getFeature());
+        builder.add(featureIndicator.getFeature().name());
       }
     }
 

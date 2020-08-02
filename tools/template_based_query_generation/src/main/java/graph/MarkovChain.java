@@ -38,11 +38,13 @@ public class MarkovChain<E> {
    * @return list of nodes for a random walk from start node
    */
   public ArrayList<E> randomWalk(Node<E> start) {
+    System.out.println("entered2");
     ArrayList<E> walk = new ArrayList<E>();
     Node<E> current = start;
     while (current.hasNextNode()) {
       walk.add(current.getObj());
       current = current.nextNode();
+      System.out.println(walk);
     }
     walk.add(current.getObj());
     return walk;

@@ -3,7 +3,6 @@ package parser;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 import token.TokenInfo;
-import token.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ public class KeywordsMappingTest {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
-    tokenInfo.setTokenType(TokenType.valueOf("partition_exp"));
+    tokenInfo.setTokenType("partition_exp");
     List<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();

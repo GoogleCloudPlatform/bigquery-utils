@@ -16,6 +16,10 @@ public class TokenInfo {
     this.tokenType = TokenType.valueOf(tokenType);
   }
 
+  public void setTokenType(TokenType tokenType) {
+    this.tokenType = tokenType;
+  }
+
   public boolean getRequired() {
     return this.required;
   }

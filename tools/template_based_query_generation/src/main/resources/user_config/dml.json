@@ -10,25 +10,15 @@
     },
     {
       "feature": "DML_VALUES",
-<<<<<<< HEAD
-      "isIncluded": true
-    },
-    {
-      "feature": "DML_DELETE",
-=======
->>>>>>> b6ec1236e3cd6d9c56e0fe30fe083a100eab34e7
       "isIncluded": true
     },
     {
       "feature": "DML_DELETE",
       "isIncluded": true
     },
-<<<<<<< HEAD
-=======
     {
       "feature": "DML_WHERE",
       "isIncluded": true
     }
->>>>>>> b6ec1236e3cd6d9c56e0fe30fe083a100eab34e7
   ]
 }

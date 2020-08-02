@@ -7,14 +7,16 @@ import com.google.gson.Gson;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import token.TokenInfo;
-import token.TokenType;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,23 +100,14 @@ public class UtilsTest {
   @Test
   public void test_makeImmutableSet(@TempDir Path testDir) throws IOException {
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-    builder.add("Test 1");
-    builder.add("Test 3");
+    builder.add("DDL_CREATE");
     ImmutableSet<String> expected = builder.build();
 
     FeatureIndicator featureIndicator1 = new FeatureIndicator();
-    FeatureIndicator featureIndicator2 = new FeatureIndicator();
-    FeatureIndicator featureIndicator3 = new FeatureIndicator();
-    featureIndicator1.setFeature("Test 1");
-    featureIndicator2.setFeature("Test 2");
-    featureIndicator3.setFeature("Test 3");
+    featureIndicator1.setFeature("DDL_CREATE");
     featureIndicator1.setIsIncluded(true);
-    featureIndicator2.setIsIncluded(false);
-    featureIndicator3.setIsIncluded(true);
     List<FeatureIndicator> featureIndicatorList = new ArrayList<FeatureIndicator>();
     featureIndicatorList.add(featureIndicator1);
-    featureIndicatorList.add(featureIndicator2);
-    featureIndicatorList.add(featureIndicator3);
     FeatureIndicators featureIndicators = new FeatureIndicators();
     featureIndicators.setFeatureIndicators(featureIndicatorList);
 
@@ -133,7 +126,7 @@ public class UtilsTest {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
-    tokenInfo.setTokenType(TokenType.valueOf("table_name"));
+    tokenInfo.setTokenType("table_name");
     ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
