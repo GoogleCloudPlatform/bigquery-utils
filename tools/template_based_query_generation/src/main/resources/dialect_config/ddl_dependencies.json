@@ -19,19 +19,11 @@
       "node": "DDL_PARTITION",
       "neighbors": [
         "DDL_CLUSTER",
-        "DDL_AS",
         "FEATURE_SINK"
       ]
     },
     {
       "node": "DDL_CLUSTER",
-      "neighbors": [
-        "DDL_AS",
-        "FEATURE_SINK"
-      ]
-    },
-    {
-      "node": "DDL_AS",
       "neighbors": [
         "FEATURE_SINK"
       ]

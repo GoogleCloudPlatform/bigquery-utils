@@ -13,7 +13,6 @@ public enum FeatureType {
 	DDL_CREATE,
 	DDL_PARTITION,
 	DDL_CLUSTER,
-	DDL_AS,
 	DML_INSERT,
 	DML_VALUES,
 	DML_DELETE,
