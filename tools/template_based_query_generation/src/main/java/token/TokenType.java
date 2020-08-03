@@ -7,7 +7,6 @@ public enum TokenType {
   cluster_exp,
   insert_exp,
   values_exp,
-  update_item,
   condition,
   select_exp,
   from_item,
