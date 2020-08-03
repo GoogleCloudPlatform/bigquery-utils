@@ -73,15 +73,15 @@ public class QueryPositionConverter {
     return new Position(line, index - startIndices.get(line - 1) + 1);
   }
 
-  // use the binary search on startIndices to find the greatest start index
-  // that is less or equal index.
-  // the return line should be 1-index
+  // Use the binary search on startIndices to find the greatest start index
+  // that is less than or equals to index. The return line should be 1-index.
   private int findStartLine(int index) {
     int left = 0, right = startIndices.size() - 1;
     while (left < right) {
       // in case left + right overflow.
       int mid = left + (right - left + 1) / 2;
       if (startIndices.get(mid) == index) {
+        // +1 is to convert the 0-based index to 1-based.
         return mid + 1;
       } else if (startIndices.get(mid) < index) {
         left = mid;
@@ -89,6 +89,7 @@ public class QueryPositionConverter {
         right = mid - 1;
       }
     }
+    // +1 is to convert the 0-based index to 1-based.
     return left + 1;
   }
 }

@@ -41,8 +41,6 @@ public class StringUtil {
     return new SimilarStrings(words, minDistance);
   }
 
-  // the code was inspired from
-  // https://www.programcreek.com/2013/12/edit-distance-in-java/
   private static int editDistance(String word1, String word2) {
     int len1 = word1.length();
     int len2 = word2.length();

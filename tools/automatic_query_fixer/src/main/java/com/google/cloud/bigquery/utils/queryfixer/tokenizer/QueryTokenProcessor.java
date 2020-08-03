@@ -51,12 +51,11 @@ public class QueryTokenProcessor {
    */
   public String replaceToken(String query, IToken token, String identifier) {
     QueryPositionConverter converter = new QueryPositionConverter(query);
-    // the token's row and column number are 1-index,
-    // but the array and string index start with 0.
+    // The token's row and column number are 1-index, but the array and string index start with 0.
     int startIndex = converter.posToIndex(token.getBeginRow(), token.getBeginColumn());
     int endIndex = converter.posToIndex(token.getEndRow(), token.getEndColumn());
     if (startIndex == -1 || endIndex == -1) {
-      throw new IllegalArgumentException("token position does not fit in the input query");
+      throw new IllegalArgumentException("Token position does not fit in the input query");
     }
     return StringUtil.replaceStringBetweenIndex(query, startIndex, endIndex + 1, identifier);
   }
