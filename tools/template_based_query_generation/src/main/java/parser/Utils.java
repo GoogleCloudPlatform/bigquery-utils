@@ -49,7 +49,7 @@ public class Utils {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
-    int index = Utils.getRandomInteger(list.size());
+    int index = Utils.getRandomInteger(list.size()-1);
     return list.get(index);
   }
 

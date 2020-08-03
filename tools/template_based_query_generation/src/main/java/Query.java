@@ -14,7 +14,7 @@ public class Query {
   private List<Token> tokens;
 
   public Query(FeatureType type) {
-      this.type = type;
+    this.type = type;
   }
 
   public Mapping getMapping() {
@@ -34,7 +34,7 @@ public class Query {
   }
 
   public FeatureType getType() {
-      return this.type;
+    return this.type;
   }
 
   public void setType(FeatureType type) {

@@ -1,8 +1,10 @@
 package data;
 
+import parser.Pair;
 import parser.Utils;
 import parser.Pair;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -82,6 +84,59 @@ public class Table {
    * @return sample data with number of rows being number of rows in table
    */
   public ArrayList<Column> generateData() {
+    
+   * @param numRows number of rows of data to generate
+   * @param dataType type of data to generate
+   * @return column of data with type dataType and numRows rows
+   * @throws IllegalArgumentException
+   */
+  public ArrayList<?> generateColumn(int numRows, DataType dataType) throws IllegalArgumentException {
+    if (dataType.isIntegerType()) {
+      ArrayList<Integer> data = new ArrayList<Integer>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomIntegerData(dataType));
+      }
+      return data;
+    } else if (dataType.isLongType()) {
+      ArrayList<Long> data = new ArrayList<Long>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomLongData(dataType));
+      }
+      return data;
+    } else if (dataType.isDoubleType()) {
+      ArrayList<Double> data = new ArrayList<Double>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomDoubleData(dataType));
+      }
+      return data;
+    } else if (dataType.isBigDecimalType()) {
+      ArrayList<BigDecimal> data = new ArrayList<BigDecimal>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomBigDecimalData(dataType));
+      }
+      return data;
+    } else if (dataType.isStringType()) {
+      ArrayList<String> data = new ArrayList<String>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomStringData(dataType));
+      }
+      return data;
+    } else if (dataType.isBooleanType()) {
+      ArrayList<Boolean> data = new ArrayList<Boolean>();
+      for (int i = 0; i < numRows; i++) {
+        data.add(Utils.generateRandomBooleanData(dataType));
+      }
+      return data;
+    } else {
+      throw new IllegalArgumentException("invalid datatype");
+    }
+  }
+
+  /**
+   *
+   * @return sample data with number of rows being number of rows in table
+   */
+  public ArrayList<ArrayList<?>> generateData() {
     return generateData(this.numRows);
   }
 
@@ -90,14 +145,12 @@ public class Table {
    * @param numRows number of rows to generate
    * @return sample data with number of rows being numRows
    */
-  public ArrayList<Column> generateData(int numRows) {
-    ArrayList<Column> data = new ArrayList<Column>();
+  public ArrayList<ArrayList<?>> generateData(int numRows) {
+    ArrayList<ArrayList<?>> data = new ArrayList<ArrayList<?>>();
     for (int i = 0; i < this.schema.size(); i++) {
-      Column col = new Column(this.schema.get(i).second);
-      col.fillRandomData(numRows);
-      data.add(col);
+      ArrayList<?> column = this.generateColumn(numRows, this.schema.get(i).second);
+      data.add(column);
     }
     return data;
   }
-
 }
