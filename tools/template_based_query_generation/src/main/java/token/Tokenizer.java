@@ -1,7 +1,6 @@
 package token;
 
 import com.google.common.collect.ImmutableMap;
-import data.Column;
 import data.DataType;
 import data.Table;
 import parser.DataTypeMap;
@@ -218,7 +217,7 @@ public class Tokenizer {
   private void generateValuesExp(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int numRows = r.nextInt(this.maxNumColumnsValues) + 1;
-    ArrayList<Column> values = this.table.generateData(numRows);
+    ArrayList<ArrayList<? extends Object>> values = this.table.generateData(numRows);
     // parse the values and hardcode into appropriate token
     String bqToken = "";
     String postgresToken = "";
@@ -226,8 +225,8 @@ public class Tokenizer {
       bqToken += "( ";
       postgresToken += "( ";
       for (int col = 0; col < values.size(); col ++) {
-        bqToken += values.get(col).getData().get(row);
-        postgresToken += values.get(col).getData().get(row);
+        bqToken += values.get(col).get(row);
+        postgresToken += values.get(col).get(row);
         bqToken += ", ";
         postgresToken += ", ";
       }
