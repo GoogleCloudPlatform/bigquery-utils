@@ -1,6 +1,6 @@
 package data;
 
-import jdk.internal.net.http.common.Pair;
+import parser.Pair;
 import parser.Utils;
 
 

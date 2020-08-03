@@ -5,17 +5,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
-import jdk.internal.net.http.common.Pair;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
-import java.text.SimpleDateFormat;
-
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -53,7 +49,7 @@ public class Utils {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
-    int index = Utils.getRandomInteger(list.size());
+    int index = Utils.getRandomInteger(list.size()-1);
     return list.get(index);
   }
 
@@ -86,7 +82,7 @@ public class Utils {
    * Returns a random string with a specified length consisting of 0s and 1s
    *
    * @param length a nonzero integer specifying the desired length of the generated string
-   * @return a random string that matches the regex '[0|1]*' and has the specified length
+   * @return a random string that matches the regex '[a-zA-Z_]' and has the specified length
    */
   public static String getRandomStringBytes(int length) throws IllegalArgumentException {
     if (length <= 0) {
@@ -107,39 +103,6 @@ public class Utils {
   }
 
   /**
-   *
-   * @return a random string representing a random date between 0001-01-01 and 9999-12-31 formatted as YYYY-MM-dd
-   */
-  public static String getRandomStringDate() {
-    Date d1 = new Date(-2177434800000L);
-    Date d2 = new Date(253402232400000L);
-    Date randomDate = new Date(random.nextLong(d1.getTime(), d2.getTime()));
-    SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
-    String date = dateFormat.format(randomDate);
-    return date;
-  }
-
-  /**
-   *
-   * @return a random string representing a random time from 00:00:00 to 23:59:59.99999
-   */
-  private static String getRandomStringTime() {
-    int hour = random.nextInt(24);
-    int min = random.nextInt(60);
-    int second = random.nextInt(60);
-    int milli = random.nextInt(100000);
-    return hour + ":" + min + ":" + second + "." + milli;
-  }
-
-  /**
-   *
-   * @return a random string representing a random time from 0001-01-01 00:00:00 to 9999-12-31 23:59:59.99999
-   */
-  private static String getRandomStringTimestamp() {
-    return getRandomStringDate() + " " + getRandomStringTime();
-  }
-
-  /**
    * Writes generated outputs to a specified directory, creating one if it doesn't exist.
    *
    * @param outputs         collection of statements to write
@@ -147,10 +110,8 @@ public class Utils {
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("BQ_skeletons"), outputDirectory.resolve("bq_skeleton.txt"));
-    writeFile(outputs.get("BQ_tokenized"), outputDirectory.resolve("bq_tokenized.txt"));
-    writeFile(outputs.get("Postgre_skeletons"), outputDirectory.resolve("postgre_skeleton.txt"));
-    writeFile(outputs.get("Postgre_tokenized"), outputDirectory.resolve("postgre_tokenized.txt"));
+    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
+    writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
     // TODO(spoiledhua): write sample data to file
 
     System.out.println("The output is stored at " + outputDirectory);
@@ -207,6 +168,7 @@ public class Utils {
    * @return an immutable set of keywords from the config file
    */
   public static ImmutableSet<String> makeImmutableKeywordSet(Path inputPath) throws IOException {
+
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
@@ -215,7 +177,7 @@ public class Utils {
 
     for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
       if (featureIndicator.getIsIncluded()) {
-        builder.add(featureIndicator.getFeature());
+        builder.add(featureIndicator.getFeature().name());
       }
     }
 
@@ -290,7 +252,7 @@ public class Utils {
       if (num == Integer.MIN_VALUE) {
         return 0;
       } else {
-        return Math.abs(num);
+        return	Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by an int type");
@@ -311,7 +273,7 @@ public class Utils {
       if (num == Long.MIN_VALUE) {
         return 0;
       } else {
-        return Math.abs(num);
+        return	Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a long type");
@@ -357,7 +319,7 @@ public class Utils {
 
   /**
    *
-   * TODO (Allen): factor out constants into config, do date generation, time, and timestamp generation
+   * // TODO: factor out constants into config, do date generation, time, and timestamp generation
    * @param dataType
    * @return random data of type dataType
    * @throws IllegalArgumentException
@@ -368,11 +330,11 @@ public class Utils {
     } else if (dataType == DataType.BYTES) {
       return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return getRandomStringDate();
+      return "1999-01-01";
     } else if (dataType == DataType.TIME) {
-      return getRandomStringTime();
+      return "04:05:06.789";
     } else if (dataType == DataType.TIMESTAMP) {
-      return getRandomStringTimestamp();
+      return "1999-01-08 04:05:06";
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }

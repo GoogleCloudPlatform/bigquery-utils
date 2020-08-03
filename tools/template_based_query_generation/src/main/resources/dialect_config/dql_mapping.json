@@ -8,7 +8,7 @@
           "bigQuery": "SELECT",
           "tokenInfos": [
             {
-              "tokenName": "select_exp",
+              "tokenType": "select_exp",
               "required": true,
               "count": 1
             }
@@ -24,7 +24,7 @@
           "bigQuery": "FROM",
           "tokenInfos": [
             {
-              "tokenName": "from_item",
+              "tokenType": "from_item",
               "required": true,
               "count": 1
             }
@@ -40,7 +40,7 @@
           "bigQuery": "WHERE",
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }
@@ -56,7 +56,7 @@
           "bigQuery": "GROUP BY",
           "tokenInfos": [
             {
-              "tokenName": "group_exp",
+              "tokenType": "group_exp",
               "required": true,
               "count": 1
             }
@@ -72,7 +72,7 @@
           "bigQuery": "HAVING",
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }
@@ -88,7 +88,7 @@
           "bigQuery": "ORDER BY",
           "tokenInfos": [
             {
-              "tokenName": "order_exp",
+              "tokenType": "order_exp",
               "required": true,
               "count": 1
             }
@@ -126,7 +126,7 @@
           "bigQuery": "LIMIT",
           "tokenInfos": [
             {
-              "tokenName": "count",
+              "tokenType": "count",
               "required": true,
               "count": 1
             }
@@ -142,7 +142,7 @@
           "bigQuery": "OFFSET",
           "tokenInfos": [
             {
-              "tokenName": "skip_rows",
+              "tokenType": "skip_rows",
               "required": true,
               "count": 1
             }

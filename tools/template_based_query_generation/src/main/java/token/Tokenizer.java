@@ -17,6 +17,8 @@ import java.util.Random;
  */
 public class Tokenizer {
 
+  private final String filePathConfigData = "./src/main/resources/dialect_config/datatype_mapping.json";
+
   private Random r;
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
@@ -29,12 +31,11 @@ public class Tokenizer {
 
   /**
    *
-   * @param dataConfigFilePath path to data config file
    * @param r random object
    */
-  public Tokenizer(String dataConfigFilePath, Random r) {
+  public Tokenizer(Random r) {
     try {
-      this.dataTypeMappings = Utils.makeImmutableDataTypeMap(Paths.get(dataConfigFilePath));
+      this.dataTypeMappings = Utils.makeImmutableDataTypeMap(Paths.get(filePathConfigData));
     } catch (IOException exception) {
       exception.printStackTrace();
     }

@@ -8,12 +8,12 @@
           "bigQuery": "CREATE TABLE",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             },
             {
-              "tokenName": "table_schema",
+              "tokenType": "table_schema",
               "required": true,
               "count": 1
             }
@@ -24,12 +24,12 @@
           "bigQuery": "CREATE TABLE IF NOT EXISTS",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             },
             {
-              "tokenName": "table_schema",
+              "tokenType": "table_schema",
               "required": true,
               "count": 1
             }
@@ -40,12 +40,12 @@
           "bigQuery": "CREATE OR REPLACE TABLE",
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             },
             {
-              "tokenName": "table_schema",
+              "tokenType": "table_schema",
               "required": true,
               "count": 1
             }
@@ -61,7 +61,7 @@
           "bigQuery": "PARTITION BY",
           "tokenInfos": [
             {
-              "tokenName": "partition_exp",
+              "tokenType": "partition_exp",
               "required": true,
               "count": 1
             }
@@ -77,21 +77,10 @@
           "bigQuery": "CLUSTER BY",
           "tokenInfos": [
             {
-              "tokenName": "cluster_exp",
+              "tokenType": "cluster_exp",
               "required": true,
               "count": 1
             }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DDL_AS",
-      "allMappings": [
-        {
-          "postgres": "AS",
-          "bigQuery": "AS",
-          "tokenInfos": [
           ]
         }
       ]
