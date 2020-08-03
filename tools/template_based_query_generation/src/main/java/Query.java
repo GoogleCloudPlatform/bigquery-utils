@@ -43,7 +43,7 @@ public class Query {
 
   /**
    *
-   * @return whether parser.parser.FeatureType type is kind of query
+   * @return whether parser.FeatureType type is kind of query
    * not one of FEATURE_ROOT, DDL_FEATURE_ROOT, DML_FEATURE_ROOT, DQL_FEATURE_ROOT, FEATURE_SINK
    */
   public boolean isQuery() {

@@ -2,8 +2,6 @@ package data;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TableTest {
@@ -25,7 +23,6 @@ public class TableTest {
 
   @Test
   public void test_addColumn() {
-
   }
 
 }

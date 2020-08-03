@@ -2,7 +2,7 @@ package data;
 
 import parser.Pair;
 import parser.Utils;
-
+import parser.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -81,6 +81,10 @@ public class Table {
 
   /**
    *
+   * @return sample data with number of rows being number of rows in table
+   */
+  public ArrayList<Column> generateData() {
+    
    * @param numRows number of rows of data to generate
    * @param dataType type of data to generate
    * @return column of data with type dataType and numRows rows
@@ -149,7 +153,4 @@ public class Table {
     }
     return data;
   }
-
-
-
 }
