@@ -1,3 +1,5 @@
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import graph.MarkovChain;
 import graph.Node;
@@ -73,6 +75,8 @@ public class QueryGenerator {
 	 * generates queries from markov chain starting from root
 	 */
 	public void generateQueries(int numberQueries) {
+		ImmutableList.Builder<String> postgreBuilder = ImmutableList.builder();
+		ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
 		Tokenizer tokenizer = new Tokenizer(r);
 
 		int i = 0;
@@ -80,12 +84,26 @@ public class QueryGenerator {
 			List<Query> rawQueries = markovChain.randomWalk(source);
 
 			if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
-				List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-2);
+				List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-1);
 				Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
-				System.out.println("Postgres: " + skeleton.getPostgreSkeleton());
-				System.out.println("BigQuery: " + skeleton.getBigQuerySkeleton());
+				postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()));
+				bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()));
 				i++;
 			}
+		}
+
+		ImmutableList<String> postgreSyntax = postgreBuilder.build();
+		ImmutableList<String> bigQuerySyntax = bigQueryBuilder.build();
+
+		ImmutableMap.Builder<String, ImmutableList<String>> builder = ImmutableMap.builder();
+		builder.put("PostgreSQL", postgreSyntax);
+		builder.put("BigQuery", bigQuerySyntax);
+		ImmutableMap<String, ImmutableList<String>> outputs = builder.build();
+
+		try {
+			Utils.writeDirectory(outputs);
+		} catch (IOException exception){
+			exception.printStackTrace();
 		}
 	}
 

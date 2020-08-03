@@ -47,31 +47,21 @@ public class UtilsTest {
 
   @Test
   public void test_writeDirectory(@TempDir Path testDir) throws IOException {
-    List<String> expected_bq_skeletons = new ArrayList<>();
-    List<String> expected_bq_tokenized = new ArrayList<>();
-    List<String> expected_postgre_skeletons = new ArrayList<>();
-    List<String> expected_postgre_tokenized = new ArrayList<>();
-    expected_bq_skeletons.add("BQ Skeletons!");
-    expected_bq_tokenized.add("BQ Tokens!");
-    expected_postgre_skeletons.add("PostgreSQL Skeletons!");
-    expected_postgre_tokenized.add("PostgreSQL Tokens!");
+    List<String> expected_bigQuery = new ArrayList<>();
+    List<String> expected_postgreSQL = new ArrayList<>();
+    expected_bigQuery.add("BigQuery Tokens!");
+    expected_postgreSQL.add("PostgreSQL Tokens!");
     Map<String, ImmutableList<String>> expectedOutputs = new HashMap<>();
-    expectedOutputs.put("BQ_skeletons", ImmutableList.copyOf(expected_bq_skeletons));
-    expectedOutputs.put("BQ_tokenized", ImmutableList.copyOf(expected_bq_tokenized));
-    expectedOutputs.put("Postgre_skeletons", ImmutableList.copyOf(expected_postgre_skeletons));
-    expectedOutputs.put("Postgre_tokenized", ImmutableList.copyOf(expected_postgre_tokenized));
+    expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
+    expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
 
     Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
 
-    List<String> actual_bq_skeletons = Files.readAllLines(Paths.get(testDir.toString() + "/bq_skeleton.txt"));
-    List<String> actual_bq_tokenized = Files.readAllLines(Paths.get(testDir.toString() + "/bq_tokenized.txt"));
-    List<String> actual_postgre_skeletons = Files.readAllLines(Paths.get(testDir.toString() + "/postgre_skeleton.txt"));
-    List<String> actual_postgre_tokenized = Files.readAllLines(Paths.get(testDir.toString() + "/postgre_tokenized.txt"));
+    List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
+    List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
     Map<String, ImmutableList<String>> actualOutputs = new HashMap<>();
-    actualOutputs.put("BQ_skeletons", ImmutableList.copyOf(actual_bq_skeletons));
-    actualOutputs.put("BQ_tokenized", ImmutableList.copyOf(actual_bq_tokenized));
-    actualOutputs.put("Postgre_skeletons", ImmutableList.copyOf(actual_postgre_skeletons));
-    actualOutputs.put("Postgre_tokenized", ImmutableList.copyOf(actual_postgre_tokenized));
+    actualOutputs.put("BigQuery", ImmutableList.copyOf(actual_bigQuery));
+    actualOutputs.put("PostgreSQL", ImmutableList.copyOf(actual_postgreSQL));
 
     assertEquals(ImmutableMap.copyOf(expectedOutputs), ImmutableMap.copyOf(actualOutputs));
   }
@@ -106,7 +96,7 @@ public class UtilsTest {
     FeatureIndicator featureIndicator1 = new FeatureIndicator();
     featureIndicator1.setFeature("DDL_CREATE");
     featureIndicator1.setIsIncluded(true);
-    List<FeatureIndicator> featureIndicatorList = new ArrayList<FeatureIndicator>();
+    List<FeatureIndicator> featureIndicatorList = new ArrayList<>();
     featureIndicatorList.add(featureIndicator1);
     FeatureIndicators featureIndicators = new FeatureIndicators();
     featureIndicators.setFeatureIndicators(featureIndicatorList);

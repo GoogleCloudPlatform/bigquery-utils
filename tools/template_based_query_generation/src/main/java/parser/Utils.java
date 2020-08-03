@@ -110,10 +110,8 @@ public class Utils {
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("BQ_skeletons"), outputDirectory.resolve("bq_skeleton.txt"));
-    writeFile(outputs.get("BQ_tokenized"), outputDirectory.resolve("bq_tokenized.txt"));
-    writeFile(outputs.get("Postgre_skeletons"), outputDirectory.resolve("postgre_skeleton.txt"));
-    writeFile(outputs.get("Postgre_tokenized"), outputDirectory.resolve("postgre_tokenized.txt"));
+    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
+    writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
     // TODO(spoiledhua): write sample data to file
 
     System.out.println("The output is stored at " + outputDirectory);
