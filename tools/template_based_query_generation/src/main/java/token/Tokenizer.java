@@ -155,7 +155,7 @@ public class Tokenizer {
       postgresToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
     }
     bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
-    postgresToken += postgresToken.substring(0, postgresToken.length()-1) + " )";
+    postgresToken = postgresToken.substring(0, postgresToken.length()-1) + " )";
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
