@@ -8,6 +8,7 @@ import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -20,7 +21,17 @@ public class Tokenizer {
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
   private ImmutableMap<DataType, DataTypeMap> dataTypeMappings;
+  private int maxNumColumnsValues = 5;
+  private int maxColumnsPerDataType = 3;
+  private int maxColumnNameLength = 20;
+  private int maxNumRows = 20;
+  private int maxTableNameLength = 20;
 
+  /**
+   *
+   * @param dataConfigFilePath path to data config file
+   * @param r random object
+   */
   public Tokenizer(String dataConfigFilePath, Random r) {
     try {
       this.dataTypeMappings = Utils.makeImmutableDataTypeMap(Paths.get(dataConfigFilePath));
@@ -33,23 +44,24 @@ public class Tokenizer {
   }
 
   /**
-   * TODO (Allen): move out constants into user config
+   *
    * resets the table in Tokenizer
    */
   public void resetTable() {
-    int tableNameLength = 1 + r.nextInt(20);
+    int tableNameLength = 1 + r.nextInt(this.maxTableNameLength);
     this.table = new Table(Utils.getRandomString(tableNameLength));
-    this.table.setNumRows(r.nextInt(1000));
+    this.table.setNumRows(r.nextInt(maxNumRows));
     for (DataType dataType : this.dataTypeMappings.keySet()) {
-      int numColumns = 1 + r.nextInt(5);
+      int numColumns = 1 + r.nextInt(this.maxColumnsPerDataType);
       for (int i = 0; i < numColumns; i++) {
-        int columnNameLength = 1 + r.nextInt(20);
+        int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
         this.table.addColumn(Utils.getRandomString(columnNameLength), dataType);
       }
     }
   }
 
   /**
+   *
    * fills in missing information for a token by using its tokenInfo field
    * @param token
    */
@@ -123,27 +135,25 @@ public class Tokenizer {
   }
 
   /**
-   * TODO: move out constant into a config, improve using Utils string builder
-   * TODO: figure out a nice way to deal with the extra comma
-   * TODO: figure out a way to deal with
+   * TODO: improve using Utils string builder
    * sets token to be the table schema
    * @param token
    */
   private void generateTableSchema(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
-    int numColumns = r.nextInt(20) + 1;
+    int numColumns = r.nextInt(this.maxColumnsPerDataType) + 1;
     String bqToken = "(";
     String postgresToken = "(";
     for (int i = 0; i < numColumns; i++) {
       DataType d = DataType.getRandomDataType();
-      int columnNameLength = 1 + r.nextInt(20);
+      int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
       DataTypeMap mapping = dataTypeMappings.get(d);
       bqToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
       postgresToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
     }
-    bqToken += " )";
-    postgresToken += " )";
+    bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
+    postgresToken += postgresToken.substring(0, postgresToken.length()-1) + " )";
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
@@ -189,7 +199,7 @@ public class Tokenizer {
   }
 
   /**
-   *
+   * sets token to be an insert expression
    * @param token
    */
   private void generateInsertExp(Token token) {
@@ -200,11 +210,34 @@ public class Tokenizer {
   }
 
   /**
-   * TODO: needs a function to generate a few rows of data to insert into table
+   * TODO: fix with Utils string builder to increase efficiency
+   * sets token to be a values expression
    * @param token
    */
   private void generateValuesExp(Token token) {
-
+    int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
+    int numRows = r.nextInt(this.maxNumColumnsValues) + 1;
+    ArrayList<ArrayList<? extends Object>> values = this.table.generateData(numRows);
+    // parse the values and hardcode into appropriate token
+    String bqToken = "";
+    String postgresToken = "";
+    for (int row = 0; row < numRows; row++) {
+      bqToken += "( ";
+      postgresToken += "( ";
+      for (int col = 0; col < values.size(); col ++) {
+        bqToken += values.get(col).get(row);
+        postgresToken += values.get(col).get(row);
+        bqToken += ", ";
+        postgresToken += ", ";
+      }
+      bqToken = bqToken.substring(0, bqToken.length()-2) + " ), ";
+      postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ), ";
+    }
+    bqToken = bqToken.substring(0, bqToken.length()-2) + " ;";
+    postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ;";
+    token.setBigQueryTokenExpression(bqToken);
+    token.setPostgresTokenExpression(postgresToken);
+    token.setTokenPlaceHolder("<values_exp " + placeHolder + ">");
   }
 
   /**
@@ -288,7 +321,5 @@ public class Tokenizer {
     token.setPostgresTokenExpression("" + count);
     token.setTokenPlaceHolder("<skip_rows " + placeHolder + ">");
   }
-
-
 
 }

@@ -5,19 +5,15 @@
       "isIncluded": true
     },
     {
+      "feature": "DML_VALUES",
+      "isIncluded": true
+    },
+    {
       "feature": "DML_DELETE",
       "isIncluded": true
     },
     {
       "feature": "DML_WHERE",
-      "isIncluded": true
-    },
-    {
-      "feature": "DML_UPDATE",
-      "isIncluded": true
-    },
-    {
-      "feature": "DML_SET",
       "isIncluded": true
     }
   ]
