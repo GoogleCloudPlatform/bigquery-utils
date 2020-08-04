@@ -26,7 +26,7 @@
   * Hourly Utilization Report: Returns hourly BigQuery usage
   * by reservation, project, job type, and user
   */
-  
+
 SELECT
   -- usage_time is used for grouping jobs by the hour
   -- usage_date is used to separately store the date this job occurred
