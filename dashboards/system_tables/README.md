@@ -2,11 +2,11 @@
 This view illustrates how users can leverage BigQuery's [`INFORMATION_SCHEMA` metadata tables](https://cloud.google.com/bigquery/docs/information-schema-intro) to understand their organization's slot and reservation utilization, job execution, and job errors. Users can use this dashboard and its underlying queries as-is, or use them as a starting point for more complex queries and/or visualizations.
 
 The dashboard is comprised of the following reports:
-1. [Daily Utilization Report](./pages/daily_utilization.md)
-2. [Hourly Utilization Report](./pages/hourly_utilization.md)
-3. [Reservation Utilization Report](./pages/reservation_utilization.md)
-4. [Job Execution Report](./pages/job_execution.md)
-5. [Job Error Report](./pages/job_error.md)
+1. [Daily Utilization Report](./docs/daily_utilization.md)
+2. [Hourly Utilization Report](./docs/hourly_utilization.md)
+3. [Reservation Utilization Report](./docs/reservation_utilization.md)
+4. [Job Execution Report](./docs/job_execution.md)
+5. [Job Error Report](./docs/job_error.md)
 
 The above links will direct you to documentation for each individual report which will describe its contents in more detail.
 
