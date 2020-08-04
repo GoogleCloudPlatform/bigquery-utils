@@ -31,6 +31,7 @@ BIGQUERY_TEST_DATASET_MAPPINGS = {
     'teradata': 'td_test',
     'vertica': 've_test',
     'community': 'fn_test',
+    'statslib': 'st_test',
 }
 
 UDF_PARENT_DIR = 'udfs/'
@@ -81,10 +82,13 @@ def replace_with_test_datasets(udf_path=None, project_id=None, udf_sql=None):
         with open(udf_path) as udf_file:
             udf_sql = udf_file.read()
     udf_length_before_replacement = len(udf_sql)
+    print("project_id: " + project_id)
+    print("udf_sql: " + udf_sql)
     udf_sql = re.sub(
         r'(\w+\.)?(?P<bq_dataset>\w+)(?P<udf_name>\.\w+)\(',
         f'`{project_id}.\\g<bq_dataset>_test_{os.getenv("SHORT_SHA")}\\g<udf_name>`(',
         udf_sql)
+    print("udf_sql: " + udf_sql)
     if udf_length_before_replacement == len(udf_sql):
         return None
     else:

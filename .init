@@ -1,0 +1,15 @@
+
+# if lsst virutalenv exists, use it.
+
+if [ -f ~/.bigquery/bin/activate ]; then
+   . ~/.bigquery/bin/activate
+fi
+
+if [ -f $(pwd)/key.json ]; then
+   export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json"
+fi
+
+gcloud config set project nih-bq
+gcloud config set compute/zone us-central1-f
+gcloud config set compute/region us-central1
+

@@ -1,5 +1,6 @@
 # Compiled class file
 *.class
+*.pyc
 
 # Log file
 *.log
@@ -27,3 +28,5 @@ hs_err_pid*
 .vscode
 .idea/
 target/
+tools/unsupervised_dataset/sql_crawler/__pycache__/__init__.cpython-38.pyc
+key.json

@@ -1,0 +1,4 @@
+pvalue:
+  - test:
+    input: CAST(0.22222222 AS FLOAT64), CAST(0.88888888 AS FLOAT64)
+    output:0.22222222
