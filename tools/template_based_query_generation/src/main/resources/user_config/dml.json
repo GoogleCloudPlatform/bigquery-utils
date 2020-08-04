@@ -1,23 +1,23 @@
 {
-  "keywordIndicators": [
+  "featureIndicators": [
     {
-      "keyword": "DML_INSERT",
+      "feature": "DML_INSERT",
       "isIncluded": true
     },
     {
-      "keyword": "DML_DELETE",
+      "feature": "DML_DELETE",
       "isIncluded": true
     },
     {
-      "keyword": "DML_WHERE",
+      "feature": "DML_WHERE",
       "isIncluded": true
     },
     {
-      "keyword": "DML_UPDATE",
+      "feature": "DML_UPDATE",
       "isIncluded": true
     },
     {
-      "keyword": "DML_SET",
+      "feature": "DML_SET",
       "isIncluded": true
     }
   ]

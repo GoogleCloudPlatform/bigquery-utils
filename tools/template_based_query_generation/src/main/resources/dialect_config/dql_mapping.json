@@ -6,7 +6,7 @@
         {
           "postgres": "SELECT",
           "bigQuery": "SELECT",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "select_exp",
               "required": true,
@@ -22,7 +22,7 @@
         {
           "postgres": "FROM",
           "bigQuery": "FROM",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "from_item",
               "required": true,
@@ -38,7 +38,7 @@
         {
           "postgres": "WHERE",
           "bigQuery": "WHERE",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "condition",
               "required": true,
@@ -54,7 +54,7 @@
         {
           "postgres": "GROUP BY",
           "bigQuery": "GROUP BY",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "group_exp",
               "required": true,
@@ -70,7 +70,7 @@
         {
           "postgres": "HAVING",
           "bigQuery": "HAVING",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "condition",
               "required": true,
@@ -86,7 +86,7 @@
         {
           "postgres": "WINDOW",
           "bigQuery": "WINDOW",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "window_exp",
               "required": true,
@@ -102,7 +102,7 @@
         {
           "postgres": "ORDER BY",
           "bigQuery": "ORDER BY",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "order_exp",
               "required": true,
@@ -123,7 +123,7 @@
         {
           "postgres": "LIMIT",
           "bigQuery": "LIMIT",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "count",
               "required": true,
@@ -139,7 +139,7 @@
         {
           "postgres": "OFFSET",
           "bigQuery": "OFFSET",
-          "tokens": [
+          "tokenInfos": [
             {
               "tokenName": "skip_rows",
               "required": true,

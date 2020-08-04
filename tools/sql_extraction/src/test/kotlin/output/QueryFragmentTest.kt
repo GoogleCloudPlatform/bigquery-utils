@@ -1,16 +1,30 @@
 package com.google.cloud.sqlecosystem.sqlextraction.output
 
+import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.RelaxedMockK
+import org.junit.Before
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal class QueryFragmentTest {
+class QueryFragmentTest {
+    @RelaxedMockK
+    lateinit var location: Location
+
+    @RelaxedMockK
+    lateinit var literalA: QueryFragment
+
+    @RelaxedMockK
+    lateinit var literalB: QueryFragment
+
+    @Before
+    fun setUp() = MockKAnnotations.init(this)
+
     @Test
     fun `toCombinedString for literal`() {
         val fragment = QueryFragment.createLiteral(
             FragmentCount.SINGLE,
-            mockk(relaxed = true),
+            location,
             "test"
         )
 
@@ -23,7 +37,7 @@ internal class QueryFragmentTest {
     fun `toCombinedString for optional literal`() {
         val fragment = QueryFragment.createLiteral(
             FragmentCount.OPTIONAL,
-            mockk(relaxed = true),
+            location,
             "test"
         )
 
@@ -36,7 +50,7 @@ internal class QueryFragmentTest {
     fun `toCombinedString for multiple literal`() {
         val fragment = QueryFragment.createLiteral(
             FragmentCount.MULTIPLE,
-            mockk(relaxed = true),
+            location,
             "test"
         )
 
@@ -47,9 +61,7 @@ internal class QueryFragmentTest {
 
     @Test
     fun `toCombinedString for complex and`() {
-        val literalA = mockk<QueryFragment>(relaxed = true)
         every { literalA.toCombinedString() } returns "testA"
-        val literalB = mockk<QueryFragment>(relaxed = true)
         every { literalB.toCombinedString() } returns "testB"
 
         val fragment = QueryFragment.createComplex(
@@ -65,9 +77,7 @@ internal class QueryFragmentTest {
 
     @Test
     fun `toCombinedString for complex or`() {
-        val literalA = mockk<QueryFragment>(relaxed = true)
         every { literalA.toCombinedString() } returns "testA"
-        val literalB = mockk<QueryFragment>(relaxed = true)
         every { literalB.toCombinedString() } returns "testB"
 
         val fragment = QueryFragment.createComplex(
@@ -83,9 +93,7 @@ internal class QueryFragmentTest {
 
     @Test
     fun `toCombinedString for complex and optional`() {
-        val literalA = mockk<QueryFragment>(relaxed = true)
         every { literalA.toCombinedString() } returns "testA"
-        val literalB = mockk<QueryFragment>(relaxed = true)
         every { literalB.toCombinedString() } returns "testB"
 
         val fragment = QueryFragment.createComplex(
@@ -101,9 +109,7 @@ internal class QueryFragmentTest {
 
     @Test
     fun `toCombinedString for complex and multiple`() {
-        val literalA = mockk<QueryFragment>(relaxed = true)
         every { literalA.toCombinedString() } returns "testA"
-        val literalB = mockk<QueryFragment>(relaxed = true)
         every { literalB.toCombinedString() } returns "testB"
 
         val fragment = QueryFragment.createComplex(
