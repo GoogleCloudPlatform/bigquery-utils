@@ -19,7 +19,11 @@ class SqlExtractor(
     /**
      * @return Detected SQL queries sorted by confidence
      */
-    fun process(filePaths: Sequence<Path>, showProgress: Boolean = false): Output {
+    fun process(
+        filePaths: Sequence<Path>,
+        confidenceThreshold: Double = 0.0,
+        showProgress: Boolean = false
+    ): Output {
         val queries = ArrayList<Query>()
 
         var numCompleted = 0
@@ -47,7 +51,8 @@ class SqlExtractor(
                             it.query,
                             it.usages
                         )
-                    })
+                    }.filter { it.confidence >= confidenceThreshold }
+            )
             numCompleted++
 
             if (showProgress) {

@@ -67,13 +67,13 @@ class Environment {
     }
 
     /**
-     * Overwrites the possible queries for the variable [varName] existing in the most recent scope.
-     * Variable needs to be defined first to be set.
-     *
-     * @throws[NullPointerException] if variable does not exist.
+     * Overwrites the possible queries for the variable [varName] existing in the most recent scope,
+     * or declares a variable in the global scope if it does not exist.
      */
     fun setVariableReference(varName: String, query: QueryFragment?) {
         if (isVariableDeclaredInScope(varName)) {
+            variableReference[varName] = query
+        } else if (parentScope == null) {
             variableReference[varName] = query
         } else {
             parentScope!!.setVariableReference(varName, query)

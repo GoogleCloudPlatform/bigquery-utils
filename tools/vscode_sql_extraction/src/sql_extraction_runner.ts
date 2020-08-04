@@ -24,7 +24,7 @@ export class SqlExtractionRunner {
     }>,
     token: CancellationToken
   ): Promise<Query[]> {
-    return this.execute(['-r', dir], progress, token);
+    return this.execute(['-r', '--progress', dir], progress, token);
   }
 
   private execute(
@@ -40,7 +40,11 @@ export class SqlExtractionRunner {
     }
 
     return new Promise<Query[]>((resolve, reject) => {
+      progress.report({message: 'Launching SQL Extraction...'});
+
       let json = '';
+      let errMsg = '';
+      let totalProgress = 0;
       const process = execFile(this.execPath, args)
         .on('close', code => {
           if (!process.killed && code === 0) {
@@ -54,7 +58,33 @@ export class SqlExtractionRunner {
       process.stdout!.on('data', data => {
         json += data;
       });
-      // todo: track progress
+      process.stderr!.on('data', data => {
+        errMsg += data;
+        const lines = errMsg.split('\n');
+        // if at least one entire message was received completely up to newline
+        if (lines.length > 1) {
+          for (let i = 0; i < lines.length - 2; i++) {
+            const statement = lines[i];
+
+            // if the error message starts with a percentage
+            if (statement.match(/^\d+(\.\d*)?% .*$/)) {
+              const percent = parseFloat(statement);
+              const nextTotalProgress = isNaN(percent)
+                ? totalProgress
+                : percent;
+              const message = statement.substring(statement.indexOf('%' + 2));
+              progress.report({
+                message: message,
+                increment: nextTotalProgress - totalProgress,
+              });
+              totalProgress = nextTotalProgress;
+            }
+          }
+          // save the remainder for later
+          // this works even if '\n' appears at the very end
+          errMsg = lines[lines.length - 1];
+        }
+      });
       token.onCancellationRequested(() => process.kill());
     });
   }
