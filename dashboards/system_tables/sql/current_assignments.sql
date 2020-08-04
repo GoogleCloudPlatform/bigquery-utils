@@ -27,19 +27,21 @@
  */
 
 -- This table retrieves the latest slot capacity for each reservation
-WITH latest_slot_capacity as (
-  SELECT
-    rcp.reservation_name, rcp.slot_capacity
-  FROM
-    `region-{region_name}`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT AS rcp
-  WHERE
-    -- This subquery returns the latest slot capacity for each reservation
-    -- by extracting the reservation with the maximum timestamp
-    (rcp.reservation_name, rcp.change_timestamp) IN (
-      SELECT AS STRUCT reservation_name, MAX(change_timestamp)
-      FROM
-        `region-{region_name}`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT
-      GROUP BY reservation_name))
+WITH
+  latest_slot_capacity as (
+    SELECT
+      rcp.reservation_name, rcp.slot_capacity
+    FROM
+      `region-{region_name}`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT AS rcp
+    WHERE
+      -- This subquery returns the latest slot capacity for each reservation
+      -- by extracting the reservation with the maximum timestamp
+      (rcp.reservation_name, rcp.change_timestamp) IN (
+        SELECT AS STRUCT reservation_name, MAX(change_timestamp)
+        FROM
+          `region-{region_name}`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT
+        GROUP BY reservation_name)
+  )
 -- Extract information about current assignments
 SELECT
   acp.assignment_id,

@@ -70,19 +70,19 @@ WITH
       state = 'ACTIVE'
       AND commitment_plan != 'FLEX'
     ORDER BY change_timestamp
-    ),
-    results AS (SELECT * FROM commitments WHERE rn = 1),
-    days AS (
-      -- This subquery is used to fill in the missing days between a commitment
-      -- starting and ending so that it can be graphed properly.
-      SELECT day
-      FROM (
-         SELECT
-           start_date,
-           stop_date
-         FROM results
-       ), UNNEST(GENERATE_DATE_ARRAY(start_date, stop_date)) day
- )
+  ),
+  results AS (SELECT * FROM commitments WHERE rn = 1),
+  days AS (
+    -- This subquery is used to fill in the missing days between a commitment
+    -- starting and ending so that it can be graphed properly.
+    SELECT day
+    FROM (
+       SELECT
+         start_date,
+         stop_date
+       FROM results
+     ), UNNEST(GENERATE_DATE_ARRAY(start_date, stop_date)) day
+  )
 SELECT TIMESTAMP(day) as date, LAST_VALUE(slot_cummulative IGNORE NULLS) OVER(ORDER BY day) slots,
 FROM days
 -- Join these results with the cumulative slot count values for each day
