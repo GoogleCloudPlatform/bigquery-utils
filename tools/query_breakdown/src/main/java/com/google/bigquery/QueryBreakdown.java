@@ -40,11 +40,12 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public void run(String originalQuery, String outputFile, int errorLimit, LocationTracker lt) {
+  public void run(String originalQuery, String outputFile, int errorLimit,
+      LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
     // this will set the variable solution
-    loop(originalQuery, errorLimit, root, 0, lt);
+    loop(originalQuery, errorLimit, root, 0, locationTracker);
 
     // case where entire query can be parsed
     if (solution.equals(root)) {
@@ -81,7 +82,7 @@ public class QueryBreakdown {
    * TODO: implement errorLimit logic, deal with exception casting
    */
   private void loop(String inputQuery, int errorLimit, Node parent, int depth,
-      LocationTracker lt) {
+      LocationTracker locationTracker) {
     // termination for branch
     if (depth > minimumUnparseableComp) {
       return;
@@ -94,15 +95,17 @@ public class QueryBreakdown {
       /* deletion: gets the new query, creates a node, and calls the loop again */
 
       // gets the error location in the original query
-      int originalStartColumn = lt.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
-      int originalEndColumn = lt.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
+      int originalStartColumn =
+          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
+      int originalEndColumn =
+          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
 
       // gets the new query
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
 
       // updates the location tracker to reflect the deletion
-      LocationTracker deletedLt = lt.delete
+      LocationTracker deletedLt = locationTracker.delete
           (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
 
       // creates a node for this deletion

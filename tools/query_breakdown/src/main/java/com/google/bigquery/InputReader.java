@@ -10,19 +10,19 @@ import java.io.IOException;
  * into queries and data-cleaning if needed.
  */
 public class InputReader {
-
-  private LocationTracker lt;
+  private LocationTracker locationTracker;
 
   /**
    * Constructor for the class
    */
   public InputReader() {
-    lt = new LocationTracker();
+    locationTracker = new LocationTracker();
   }
 
   /**
    * This method will take in a txt file name, use BufferedReader to parse the input, and return
-   * all the queries in a string format
+   * all the queries in a string format. We also initialize a LocationTracker instance since
+   * this is where we are processing the input.
    *
    * TODO: more robust method for input parsing needed (ex: semicolons in strings, comments)
    */
@@ -37,7 +37,7 @@ public class InputReader {
 
     // for the first line
     if (current != -1) {
-      lt.addLine();
+      locationTracker.addLine();
     }
 
     // loop for input reading
@@ -48,10 +48,10 @@ public class InputReader {
       if ((char) current == '\n') {
         column = 1;
         line++;
-        lt.addLine();
+        locationTracker.addLine();
       }
       else {
-        lt.add(line, column);
+        locationTracker.add(line, column);
         column++;
       }
 
@@ -64,9 +64,44 @@ public class InputReader {
   }
 
   /**
+   * Method created to initialize a LocationTracker instance from an input string for testing
+   */
+  public void readFromString(String input) {
+    // local state for input reading
+    int current = 0;
+    int line = 1;
+    int column = 1;
+
+    // empty string
+    if (input == null || input.length() == 0) {
+      return;
+    }
+
+    // for the first line
+    locationTracker.addLine();
+
+    // loop for input reading
+    while (current < input.length()) {
+      // line changes
+      if (input.charAt(current) == '\n') {
+        column = 1;
+        line++;
+        locationTracker.addLine();
+      }
+      else {
+        locationTracker.add(line, column);
+        column++;
+      }
+
+      // advance current pointer
+      current++;
+    }
+  }
+
+  /**
    * Getter method for LocationTracker of the input
    */
   public LocationTracker getLocationTracker() {
-    return lt;
+    return locationTracker;
   }
 }

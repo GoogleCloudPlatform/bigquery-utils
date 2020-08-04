@@ -4,7 +4,11 @@ import java.util.ArrayList;
 
 /**
  * This class tracks the original location of components in the query, thereby making sure that
- * the error locations are correctly represented.
+ * the error locations are correctly represented. For each pair of (line, column) in the original
+ * query, it is initialized in position at the (line - 1)th arraylist and
+ * (column - 1)th element of the arraylist as the integer column - 1.
+ * Since the line number won't ever change (but the column number will change constantly),
+ * we simply keep track of the original column number as the integer in the double arraylist
  */
 public class LocationTracker {
   /* we keep a double arraylist to represent the position of each character (line and column).
@@ -55,14 +59,17 @@ public class LocationTracker {
   }
 
   /**
-   * This method ensures that the location field is kept correctly despite the deletion.
+   * This method ensures that the location field is kept correctly despite the deletion. We do
+   * this by removing the entry in location that corresponds to the deleted characters from
+   * position. We also make sure that we return a new location tracker instance (by making
+   * a deep copy) such that a new copy is passed to further runs of the tool.
    */
   public LocationTracker delete(int line, int startColumn, int endColumn) {
-    LocationTracker lt = cloneTracker();
+    LocationTracker locationTracker = cloneTracker();
     for (int i = startColumn; i < endColumn + 1; i++) {
-     lt.remove(line, startColumn);
+      locationTracker.remove(line, startColumn);
     }
-    return lt;
+    return locationTracker;
   }
 
   /**
@@ -77,16 +84,15 @@ public class LocationTracker {
    * instance to be passed during the traversal of the tree
    */
   public LocationTracker cloneTracker() {
-    LocationTracker lt = new LocationTracker();
+    LocationTracker locationTracker = new LocationTracker();
     for (int i = 0; i < location.size(); i++) {
-      lt.addLine();
+      locationTracker.addLine();
       ArrayList<Integer> lineOriginal = location.get(i);
       for (int j = 0; j < lineOriginal.size(); j++) {
-        lt.add(i + 1, lineOriginal.get(j));
+        locationTracker.add(i + 1, lineOriginal.get(j));
       }
     }
-    return lt;
+    return locationTracker;
   }
-
 
 }

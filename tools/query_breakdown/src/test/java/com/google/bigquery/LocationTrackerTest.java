@@ -9,30 +9,28 @@ import org.junit.Test;
 public class LocationTrackerTest {
 
   @Test
-  public void locationTrackerTestInitializedCorrectly() throws IOException {
+  public void locationTrackerTestInitializedCorrectly() {
     InputReader ir = new InputReader();
-    String absPath = new File("").getAbsolutePath();
-    ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-            + "/InputTestFiles/multipleLineQuery.txt");
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    ir.readFromString(query);
     assertEquals(4, ir.getLocationTracker().getOriginalPosition(3, 4));
   }
 
   @Test
-  public void locationTrackerTestInitializedCorrectlyClone() throws IOException {
+  public void locationTrackerTestInitializedCorrectlyClone() {
     InputReader ir = new InputReader();
-    String absPath = new File("").getAbsolutePath();
-    ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/multipleLineQuery.txt");
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    ir.readFromString(query);
     assertEquals(4, ir.getLocationTracker().cloneTracker().getOriginalPosition(3, 4));
   }
 
   @Test
-  public void locationTrackerDeletionTest() throws IOException {
+  public void locationTrackerDeletionTest() {
     InputReader ir = new InputReader();
-    String absPath = new File("").getAbsolutePath();
-    ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/multipleLineQuery.txt");
-    LocationTracker lt = ir.getLocationTracker().delete(3, 1, 5);
-    assertEquals(6, lt.getOriginalPosition(3, 1));
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    ir.readFromString(query);
+    LocationTracker locationTracker =
+        ir.getLocationTracker().delete(3, 1, 5);
+    assertEquals(6, locationTracker.getOriginalPosition(3, 1));
   }
 }
