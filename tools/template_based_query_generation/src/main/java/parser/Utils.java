@@ -8,11 +8,14 @@ import data.DataType;
 import jdk.internal.net.http.common.Pair;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
+import java.text.SimpleDateFormat;
+
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -77,6 +80,63 @@ public class Utils {
     }
 
     return sb.toString();
+  }
+
+  /**
+   * Returns a random string with a specified length consisting of 0s and 1s
+   *
+   * @param length a nonzero integer specifying the desired length of the generated string
+   * @return a random string that matches the regex '[0|1]*' and has the specified length
+   */
+  public static String getRandomStringBytes(int length) throws IllegalArgumentException {
+    if (length <= 0) {
+      throw new IllegalArgumentException("Random byte string must have positive length");
+    }
+
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < length; i++) {
+      if (random.nextBoolean()) {
+        sb.append("1");
+      } else{
+        sb.append("0");
+      }
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   *
+   * @return a random string representing a random date between 0001-01-01 and 9999-12-31 formatted as YYYY-MM-dd
+   */
+  public static String getRandomStringDate() {
+    Date d1 = new Date(-2177434800000L);
+    Date d2 = new Date(253402232400000L);
+    Date randomDate = new Date(random.nextLong(d1.getTime(), d2.getTime()));
+    SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd");
+    String date = dateFormat.format(randomDate);
+    return date;
+  }
+
+  /**
+   *
+   * @return a random string representing a random time from 00:00:00 to 23:59:59.99999
+   */
+  private static String getRandomStringTime() {
+    int hour = random.nextInt(24);
+    int min = random.nextInt(60);
+    int second = random.nextInt(60);
+    int milli = random.nextInt(100000);
+    return hour + ":" + min + ":" + second + "." + milli;
+  }
+
+  /**
+   *
+   * @return a random string representing a random time from 0001-01-01 00:00:00 to 9999-12-31 23:59:59.99999
+   */
+  private static String getRandomStringTimestamp() {
+    return getRandomStringDate() + " " + getRandomStringTime();
   }
 
   /**
@@ -209,6 +269,127 @@ public class Utils {
 
     return map;
   }
-
   // TODO(spoiledhua): refactor IO exception handling
+
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static int generateRandomIntegerData(DataType dataType) throws IllegalArgumentException {
+    if (dataType == DataType.SMALL_INT) {
+      return 	random.nextInt(-32768,32769);
+    } else if (dataType == DataType.INTEGER) {
+      return 	random.nextInt();
+    } else if (dataType == DataType.SMALL_SERIAL) {
+      return 	random.nextInt(1, 32768);
+    } else if (dataType == DataType.SERIAL) {
+      int num = random.nextInt();
+      if (num == Integer.MIN_VALUE) {
+        return 0;
+      } else {
+        return Math.abs(num);
+      }
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by an int type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static long generateRandomLongData(DataType dataType) {
+    if (dataType == DataType.BIG_INT) {
+      return 	random.nextLong();
+    } else if (dataType == DataType.BIG_SERIAL) {
+      long num = random.nextLong();
+      if (num == Long.MIN_VALUE) {
+        return 0;
+      } else {
+        return Math.abs(num);
+      }
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a long type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static double generateRandomDoubleData(DataType dataType) {
+    if (dataType == DataType.REAL) {
+      return random.nextFloat();
+    } else if (dataType == DataType.BIG_REAL) {
+      return random.nextDouble();
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a double type");
+    }
+  }
+
+  /**
+   *
+   * Up to 131072 digits are permitted in postgres, here uses up to 50 digits (slightly over size of double)
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static BigDecimal generateRandomBigDecimalData(DataType dataType) {
+    if (dataType == DataType.DECIMAL) {
+      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal range = low.abs().multiply(new BigDecimal(2));
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+    } else if (dataType == DataType.NUMERIC) {
+      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal range = low.abs().multiply(new BigDecimal(2));
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a big decimal type");
+    }
+  }
+
+  /**
+   *
+   * TODO (Allen): factor out constants into config, do date generation, time, and timestamp generation
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static String generateRandomStringData(DataType dataType) {
+    if (dataType == DataType.STR) {
+      return getRandomString(20);
+    } else if (dataType == DataType.BYTES) {
+      return getRandomStringBytes(20);
+    } else if (dataType == DataType.DATE) {
+      return getRandomStringDate();
+    } else if (dataType == DataType.TIME) {
+      return getRandomStringTime();
+    } else if (dataType == DataType.TIMESTAMP) {
+      return getRandomStringTimestamp();
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a string type");
+    }
+  }
+
+  /**
+   *
+   * @param dataType
+   * @return random data of type dataType
+   * @throws IllegalArgumentException
+   */
+  public static boolean generateRandomBooleanData(DataType dataType) {
+    if (dataType == DataType.BOOL) {
+      return random.nextBoolean();
+    } else {
+      throw new IllegalArgumentException("dataType cannot be represented by a boolean type");
+    }
+  }
+
 }
