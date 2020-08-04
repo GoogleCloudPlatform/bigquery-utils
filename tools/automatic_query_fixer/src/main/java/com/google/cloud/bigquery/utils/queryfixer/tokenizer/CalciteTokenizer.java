@@ -17,11 +17,11 @@ public class CalciteTokenizer implements Tokenizer {
   private final BigQueryParserFactory parserFactory;
 
   @Override
-  public List<IToken> tokenize(@NonNull final String sql) {
+  public List<IToken> tokenize(@NonNull final String query) {
     List<IToken> tokens = new ArrayList<>();
 
     // SqlBabelParserImpl has a token manager to tokenize the input query.
-    SqlBabelParserImpl parserImpl = parserFactory.getBabelParserImpl(sql);
+    SqlBabelParserImpl parserImpl = parserFactory.getBabelParserImpl(query);
 
     Token token;
     final int EndKind = 0;
