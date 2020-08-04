@@ -25,18 +25,7 @@ public class TableTest {
 
   @Test
   public void test_addColumn() {
-    Table t = new Table("t");
-    t.addColumn("column 1", DataType.BOOL);
-    t.addColumn("column 2", DataType.REAL);
-    t.addColumn("times", DataType.TIME);
-    t.addColumn("hello world", DataType.STR);
-    HashMap<String, DataType> schema = t.getSchema();
-    assertEquals(4, schema.size());
-    assertEquals(DataType.BOOL, schema.get("column 1"));
-    assertEquals(DataType.REAL, schema.get("column 2"));
-    assertEquals(DataType.TIME, schema.get("times"));
-    assertEquals(DataType.STR, schema.get("hello world"));
-    assertEquals(null, schema.get("hello"));
+
   }
 
 }

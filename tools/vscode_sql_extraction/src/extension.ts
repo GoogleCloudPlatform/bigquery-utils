@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import {SqlExtractionRunner} from './sql_extraction_runner';
 import {Query, QueryFragment, locationToRange, toCombinedString} from './query';
+import {Highlighter} from './highlighter';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -19,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const provider = new SqlExtractionProvider(
     new SqlExtractionRunner(execPath),
+    new Highlighter(),
     vscode.workspace.rootPath
   );
   vscode.window.createTreeView('vscode-sql-extraction.tree-view', {
@@ -39,6 +41,12 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('vscode-sql-extraction.onclick', sqlQuery =>
     sqlQuery.onClick()
   );
+
+  vscode.window.onDidChangeActiveTextEditor(
+    editor => provider.highlight(editor),
+    null,
+    context.subscriptions
+  );
 }
 
 // this method is called when your extension is deactivated
@@ -58,8 +66,9 @@ export class SqlExtractionProvider
     ._onDidChangeTreeData.event;
 
   constructor(
-    private sqlExtractor: SqlExtractionRunner,
-    private workspaceRoot?: string
+    private readonly sqlExtractor: SqlExtractionRunner,
+    private readonly highlighter: Highlighter,
+    private readonly workspaceRoot?: string
   ) {}
 
   /**
@@ -98,9 +107,8 @@ export class SqlExtractionProvider
 
     this._onDidChangeTreeData.fire(undefined);
 
-    // todo: next PR
-    // const openEditor = vscode.window.activeTextEditor;
-    // this.highlight(openEditor);
+    const openEditor = vscode.window.activeTextEditor;
+    this.highlight(openEditor);
   }
 
   getTreeItem(element: SqlQueryItem): vscode.TreeItem {
@@ -150,6 +158,14 @@ export class SqlExtractionProvider
 
     // todo: show usages
     return Promise.resolve([]);
+  }
+
+  highlight(openEditor?: vscode.TextEditor) {
+    if (!openEditor || !this.workspaceRoot || !this.queries) {
+      return;
+    }
+
+    this.highlighter.highlight(openEditor, this.workspaceRoot!, this.queries!);
   }
 }
 
