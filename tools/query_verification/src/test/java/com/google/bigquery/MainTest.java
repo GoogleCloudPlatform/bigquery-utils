@@ -14,7 +14,7 @@ public class MainTest {
     public void testGetContentsOfFile() {
         String contents = Main.getContentsOfFile(queryOne);
         contents = contents.trim();
-        assertEquals(contents, "SELECT 1 + 1;");
+        assertEquals(contents, "SELECT 1 + 1");
     }
 
     @Test
