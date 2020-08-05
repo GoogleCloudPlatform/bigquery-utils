@@ -13,7 +13,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
-* [kruskal_wallis_udf](#kruskal_wallisarrstructfactor-string-val-float64)
+* [kruskal_wallis](#kruskal_wallisarrstructfactor-string-val-float64)
 
 ## Documentation
 
@@ -43,7 +43,7 @@ set data = [
 ];
 
 
-SELECT `lib_stats.kruskal_wallis_udf`(data) as results;
+SELECT `lib_stats.kruskal_wallis`(data) as results;
 ```
 
 results:
