@@ -17,14 +17,14 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:vscode-query-breakdown.helloWorld"
+    "onCommand:vscode-query-breakdown.run"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vscode-query-breakdown.helloWorld",
-        "title": "Hello World"
+        "command": "vscode-query-breakdown.run",
+        "title": "Query_Breakdown"
       }
     ]
   },
