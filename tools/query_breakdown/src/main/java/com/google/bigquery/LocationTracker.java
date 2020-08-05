@@ -41,7 +41,7 @@ public class LocationTracker {
   }
 
   /**
-   * This method removes an entry from location specified by (x, y) in the original query
+   * This method removes an entry from location specified by (x, y) in the original query.
    */
   public void remove(int x, int y) {
     if (x > 0 && x <= location.size()) {
@@ -94,5 +94,6 @@ public class LocationTracker {
     }
     return locationTracker;
   }
+
 
 }

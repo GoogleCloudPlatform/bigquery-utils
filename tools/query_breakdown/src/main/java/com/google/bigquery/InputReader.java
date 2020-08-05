@@ -10,6 +10,7 @@ import java.io.IOException;
  * into queries and data-cleaning if needed.
  */
 public class InputReader {
+
   private LocationTracker locationTracker;
 
   /**
