@@ -16,13 +16,13 @@ const json = [
     replacedTo: null,
   },
   {
-    error_position: {startLine: 2, startColumn: 2, endLine: 1, endColumn: 4},
+    error_position: {startLine: 2, startColumn: 1, endLine: 2, endColumn: 4},
     error_type: 'DELETION',
     replacedFrom: null,
     replacedTo: null,
   },
   {
-    error_position: {startLine: 2, startColumn: 2, endLine: 28, endColumn: 31},
+    error_position: {startLine: 2, startColumn: 28, endLine: 2, endColumn: 31},
     error_type: 'REPLACEMENT',
     replacedFrom: 'BLAH',
     replacedTo: 'BY',
@@ -63,12 +63,12 @@ function decorate(editor: vscode.TextEditor) {
   for (let i = 0; i < json.length; i++) {
     // finds error position
     const errorRange = new vscode.Range(
-      json[i].error_position.startLine,
-      json[i].error_position.startColumn,
-      json[i].error_position.endLine,
-      json[i].error_position.endColumn
-    );
-
+      json[i].error_position.startLine - 1,
+      json[i].error_position.startColumn - 1,
+      json[i].error_position.endLine - 1,
+	  json[i].error_position.endColumn
+	);
+	console.log(json[i].error_position.endColumn)
     // deletion case
     if (json[i].error_type === 'DELETION') {
       const deletionMessage = new vscode.MarkdownString('Deleted');
