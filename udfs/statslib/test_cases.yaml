@@ -4,7 +4,5 @@ pvalue:
     expected_output: CAST(0.8607079764250578 AS FLOAT64)
 kruskal_wallis:
   - test:
-    input: [('a',1.0), ('b',2.0), ('c',2.3), ('a',1.4), ('b',2.2), ('c',5.5), ('a',1.0), ('b',2.3), ('c',2.3), ('a',1.1), ('b',7.2), ('c',2.8)]
-
-
-    expected_output: STRUCT<H FLOAT64, p FLOAT64, DOF INT64>(1, 2, 3)
+    input: (SELECT [('a',1.0), ('b',2.0), ('c',2.3), ('a',1.4), ('b',2.2), ('c',5.5), ('a',1.0), ('b',2.3), ('c',2.3), ('a',1.1), ('b',7.2), ('c',2.8)])
+    expected_output: STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)
