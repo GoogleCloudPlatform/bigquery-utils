@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -78,7 +79,7 @@ public class QueryVerifier {
         List<QueryJobResults> migratedResults = migratedInstance.runQueries();
         List<QueryJobResults> originalResults = originalInstance.runQueries();
 
-        ResultDifferences resultDifferences = compareResults(migratedResults, originalResults);
+        ResultDifferences resultDifferences = QueryVerifier.compareResults(migratedResults, originalResults);
 
         int migratedSyntaxErrors = 0;
         int migratedSemanticErrors = 0;
@@ -123,7 +124,7 @@ public class QueryVerifier {
      * @param originalResults Parsed results returned from original data warehouse service
      * @return Differences classified as either extra or missing from migrated results.
      */
-    public ResultDifferences compareResults(List<QueryJobResults> migratedResults, List<QueryJobResults> originalResults) {
+    public static ResultDifferences compareResults(List<QueryJobResults> migratedResults, List<QueryJobResults> originalResults) throws IllegalArgumentException {
         // Check if same amount of queries were run
         if (migratedResults.size() == originalResults.size()) {
             // Rows present in migrated query results, but not original query results
@@ -133,12 +134,12 @@ public class QueryVerifier {
             List<List<Object>> missingResults = new ArrayList<List<Object>>();
 
             for (int i = 0; i < migratedResults.size(); i++) {
-                QueryJobResults migratedJobResults = migratedResults.get(i);
+                Set<List<Object>> migratedJobResults = migratedResults.get(i).results();
+                Set<List<Object>> originalJobResults = originalResults.get(i).results();
 
-                QueryJobResults originalJobResults = originalResults.get(i);
-                Set<List<Object>> missingResultsSet = originalJobResults.results();
+                Set<List<Object>> missingResultsSet = new HashSet<List<Object>>(originalJobResults);
 
-                for (List<Object> migratedQueryResults : migratedJobResults.results()) {
+                for (List<Object> migratedQueryResults : migratedJobResults) {
                     // Rows that exist in both results are removed from missing results set
                     if (!missingResultsSet.remove(migratedQueryResults)) {
                         // Rows in the migrated results that don't exist in original results are classified as extra in migrated results
@@ -152,7 +153,7 @@ public class QueryVerifier {
 
             return ResultDifferences.create(extraResults, missingResults);
         } else {
-            return null;
+            throw new IllegalArgumentException("Number of statements in migrated query file should be equal to the number of statements in the original query file.");
         }
     }
 

@@ -328,7 +328,7 @@ public class BigQueryManager implements DataWarehouseManager {
                         result = value.getStringValue();
                 }
             } catch (ParseException e) {
-                result = null;
+                result = Optional.empty();
             }
 
             results.add(result);
