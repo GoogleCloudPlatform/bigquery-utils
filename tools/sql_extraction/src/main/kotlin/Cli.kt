@@ -3,16 +3,17 @@ package com.google.cloud.sqlecosystem.sqlextraction
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import mu.KotlinLogging
+import org.slf4j.impl.SimpleLogger
 import java.nio.file.Path
-
-private val LOGGER = KotlinLogging.logger { }
 
 fun main(args: Array<String>) = Cli(
     FilesExpander(),
@@ -21,7 +22,7 @@ fun main(args: Array<String>) = Cli(
             listOf(
                 JavaFrontEnd()
             )
-        )
+        ), ConfidenceRater()
     )
 ).main(args)
 
@@ -74,13 +75,35 @@ private class Cli(
         "--pretty", help = "Pretty-print output JSON"
     ).flag()
 
+    private val showProgress: Boolean by option(
+        "--progress", help = "Print progress to STDERR"
+    ).flag()
+
+    private val confidenceThreshold: Double by option(
+        "--threshold",
+        help = "Minimum confidence value (inclusive between 0 and 1) " +
+                "required for a detected query to be included in final " +
+                "output (default is 0.5)"
+    ).double().default(0.5)
+
+    private val debug: Boolean by option(
+        "--debug", "--verbose", help = "Print debug logs to STDERR"
+    ).flag()
+
     override fun run() {
-        LOGGER.debug("Starting SQL Extraction from command line")
+        if (debug) {
+            System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "Debug")
+        }
+        val logger = KotlinLogging.logger { }
+        logger.debug("Starting SQL Extraction from command line")
 
         val files = filesExpander.expandAndFilter(filePaths, recursive, includes, excludes)
+        if (showProgress) {
+            System.err.println("0.0% Analyzing files...")
+        }
 
-        val output = sqlExtractor.process(files)
-        LOGGER.debug { "output: ${Gson().toJson(output)}" }
+        val output = sqlExtractor.process(files, confidenceThreshold, showProgress)
+        logger.debug { "output: ${Gson().toJson(output)}" }
 
         val builder = GsonBuilder()
         if (prettyPrint) {

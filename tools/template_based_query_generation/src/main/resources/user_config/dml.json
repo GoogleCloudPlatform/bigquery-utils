@@ -1,35 +1,19 @@
 {
-  "keywordIndicators": [
+  "featureIndicators": [
     {
-      "keyword": "DML_INSERT",
+      "feature": "DML_INSERT",
       "isIncluded": true
     },
     {
-      "keyword": "DML_DELETE",
+      "feature": "DML_VALUES",
       "isIncluded": true
     },
     {
-      "keyword": "DML_WHERE",
+      "feature": "DML_DELETE",
       "isIncluded": true
     },
     {
-      "keyword": "DML_UPDATE",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_INTO",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_VALUES",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_SET",
-      "isIncluded": true
-    },
-    {
-      "keyword": "DML_FROM",
+      "feature": "DML_WHERE",
       "isIncluded": true
     }
   ]
