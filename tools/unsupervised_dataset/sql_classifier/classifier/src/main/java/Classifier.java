@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Date;
 
-public class Parserc {
+public class Classifier {
     /*
      * Runs the classification tool. Takes a CSV file of queries, classifies queries based on dialect, and creates
      * several subdirectories to store the queries by dialect.

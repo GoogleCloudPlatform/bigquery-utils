@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.google.bigquery</groupId>
-    <artifactId>parserc</artifactId>
+    <artifactId>classifier</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <dependencyManagement>
@@ -78,7 +78,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Parserc</mainClass>
+                            <mainClass>Classifier</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

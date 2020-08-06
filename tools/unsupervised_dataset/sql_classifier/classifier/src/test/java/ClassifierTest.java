@@ -12,13 +12,13 @@ public class ClassifierTest {
     @Test
     public void testFileNotFound() {
         String invalidFile = "invalidFile.csv";
-        assertNull(Parserc.readCSV(invalidFile));
+        assertNull(Classifier.readCSV(invalidFile));
     }
 
     @Test
     public void testReadCSV() {
         String filepath = "queries_large.csv";
-        List<String[]> data = Parserc.readCSV(resourcesPath + filepath);
+        List<String[]> data = Classifier.readCSV(resourcesPath + filepath);
         assertNotNull(data);
         assertEquals(data.size(), 7637);
     }
@@ -27,7 +27,7 @@ public class ClassifierTest {
     public void testClassificationSmall() {
         String filepath = "queries_small.csv";
         String[] args = {resourcesPath + filepath};
-        Parserc.main(args);
+        Classifier.main(args);
         File directory = new File("queries/");
         assertTrue(directory.exists());
     }
@@ -36,7 +36,7 @@ public class ClassifierTest {
     public void testClassificationLarge() {
         String filepath = "queries_large.csv";
         String[] args = {resourcesPath + filepath};
-        Parserc.main(args);
+        Classifier.main(args);
         File directory = new File("queries/");
         assertTrue(directory.exists());
     }
@@ -44,10 +44,10 @@ public class ClassifierTest {
     @Test
     public void testCleanQueries() {
         String query1 = "SELECT 1 + 1;";
-        assertEquals("SELECT 1 + 1", Parserc.cleanQuery(query1));
+        assertEquals("SELECT 1 + 1", Classifier.cleanQuery(query1));
 
         String query2 = "SELECT 2 +\u00a02;";
-        assertEquals("SELECT 2 + 2", Parserc.cleanQuery(query2));
+        assertEquals("SELECT 2 + 2", Classifier.cleanQuery(query2));
     }
 
 }
