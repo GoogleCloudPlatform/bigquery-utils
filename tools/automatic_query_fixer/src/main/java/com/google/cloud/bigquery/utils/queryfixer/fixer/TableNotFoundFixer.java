@@ -47,9 +47,9 @@ public class TableNotFoundFixer implements IFixer {
     StringUtil.SimilarStrings similarTables =
         StringUtil.findSimilarWords(tableNames, fullTableId.getTable());
 
-    // this is an arbitrary standard. It requires the candidate table should share at least 50%
-    // similarity as
-    // the incorrect table typo.
+    // This is an arbitrary standard. It requires the candidate table should share at least 50%
+    // similarity as the incorrect table typo.
+    // TODO: this could be user configurable in future.
     int editDistanceThreshold = (fullTableId.getTable().length() + 1) / 2;
 
     if (similarTables.getStrings().isEmpty()
@@ -57,7 +57,7 @@ public class TableNotFoundFixer implements IFixer {
       return FixResult.failure(err);
     }
 
-    // this method only finds the first occurrence of the incorrect table. It is possible that this
+    // This method only finds the first occurrence of the incorrect table. It is possible that this
     // table exists in multiple positions of this query. What is worse, it is possible that the
     // table name is also part of a literal, then this auto fixing may have problem. The ultimate
     // solution for this issue is to use Parser to find the correct position of this table.
@@ -100,7 +100,7 @@ public class TableNotFoundFixer implements IFixer {
   }
 
   private int findTheIndexOfIncorrectTable() {
-    // the table in the error message is presented in the legacySQL mode, but this fixer is used to
+    // The table in the error message is presented in the legacySQL mode, but this fixer is used to
     // fix the
     // standardSQL. Thus, the table name needs to be converted to the one consistent with
     // standardSQL.
