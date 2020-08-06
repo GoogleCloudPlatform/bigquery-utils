@@ -11,10 +11,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Classifier {
+
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
     /*
      * Runs the classification tool. Takes a CSV file of queries, classifies queries based on dialect, and creates
      * several subdirectories to store the queries by dialect.
@@ -23,11 +31,11 @@ public class Classifier {
      */
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.out.println("Please provide a CSV file.");
+            LOGGER.log(Level.SEVERE, "Please provide a CSV file.");
             return;
         }
-        List<String[]> allData = readCSV(args[0]);
-        if (allData == null) {
+        Optional<List<String[]>> allData = readCSV(args[0]);
+        if (allData.isEmpty()) {
             return;
         }
         SqlParser.Config[] parserConfigs = new SqlParser.Config[4];
@@ -38,12 +46,12 @@ public class Classifier {
 
         CSVWriter[] writers = setupOutput();
 
-        for (String[] data : allData) {
-            boolean[] results = classifyQuery(cleanQuery(data[0]), parserConfigs);
+        for (String[] data : allData.get()) {
+            Map<SqlParser.Config, Boolean> results = classifyQuery(cleanQuery(data[0]), parserConfigs);
             boolean unclassified = true;
             String[] nextLine = {data[0], data[1]};
-            for (int i = 0; i < results.length; i++) {
-                if (results[i]) {
+            for (int i = 0; i < parserConfigs.length; i++) {
+                if (results.get(parserConfigs[i])) {
                     unclassified = false;
                     writers[i].writeNext(nextLine);
                 }
@@ -57,7 +65,7 @@ public class Classifier {
                 writer.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage());
         }
 
     }
@@ -66,17 +74,17 @@ public class Classifier {
      * Reads a CSV file and returns the data as a list of String arrays.
      *
      * @param filename Path to a CSV file
-     * @return Contents of the CSV file
+     * @return Optional containing contents of the CSV file
      */
-    static List<String[]> readCSV(String filename) {
+    static Optional<List<String[]>> readCSV(String filename) {
         try {
             FileReader filereader = new FileReader(filename);
             CSVReader csvReader = new CSVReaderBuilder(filereader).withSkipLines(1).build();
-            return csvReader.readAll();
+            return Optional.of(csvReader.readAll());
         }
         catch (Exception e) {
-            System.out.println(e);
-            return null;
+            LOGGER.log(Level.SEVERE, e.getMessage());
+            return Optional.empty();
         }
     }
 
@@ -85,17 +93,18 @@ public class Classifier {
      *
      * @param query The query to be classified
      * @param parserConfigs The parsers for each of the different dialects
-     * @return A boolean array, with true values if the query can be classified in a dialect and false otherwise
+     * @return A map where parsers are mapped to booleans, with true values if the query can be classified in a dialect
+     * and false otherwise
      */
-    static boolean[] classifyQuery(String query, SqlParser.Config[] parserConfigs) {
+    static Map<SqlParser.Config, Boolean> classifyQuery(String query, SqlParser.Config[] parserConfigs) {
 
-        boolean[] results = new boolean[parserConfigs.length];
+        Map<SqlParser.Config, Boolean> results = new HashMap<>();
         for (int i = 0; i < parserConfigs.length; i++) {
             try {
                 SqlParser.create(query, parserConfigs[i]).parseStmt();
-                results[i] = true;
+                results.put(parserConfigs[i], true);
             } catch (SqlParseException e) {
-                results[i] = false;
+                results.put(parserConfigs[i], false);
             }
         }
         return results;
@@ -135,7 +144,7 @@ public class Classifier {
                 writers[i].writeNext(header);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.getMessage());
                 writers[i] = null;
             }
         }

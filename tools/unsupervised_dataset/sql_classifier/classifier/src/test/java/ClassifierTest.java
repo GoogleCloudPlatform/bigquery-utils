@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 public class ClassifierTest {
 
@@ -12,15 +13,15 @@ public class ClassifierTest {
     @Test
     public void testFileNotFound() {
         String invalidFile = "invalidFile.csv";
-        assertNull(Classifier.readCSV(invalidFile));
+        assertTrue(Classifier.readCSV(invalidFile).isEmpty());
     }
 
     @Test
     public void testReadCSV() {
         String filepath = "queries_large.csv";
-        List<String[]> data = Classifier.readCSV(resourcesPath + filepath);
-        assertNotNull(data);
-        assertEquals(data.size(), 7637);
+        Optional<List<String[]>> data = Classifier.readCSV(resourcesPath + filepath);
+        assertTrue(data.isPresent());
+        assertEquals(data.get().size(), 7637);
     }
 
     @Test
