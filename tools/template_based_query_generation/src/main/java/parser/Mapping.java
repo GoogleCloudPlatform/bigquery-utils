@@ -9,29 +9,18 @@ import java.util.List;
  */
 public class Mapping {
 
-  /* Equivalent PostgreSQL mapping to a keyword */
-  private String postgres;
-
-  /* Equivalent BigQuery mapping to a keyword */
-  private String bigQuery;
+  /* List of dialect maps to each keyword */
+  private List<DialectMap> dialectMaps;
 
   /* All necessary tokens for a given keyword variant */
   private List<TokenInfo> tokenInfos;
 
-  public String getPostgres() {
-    return this.postgres;
+  public List<DialectMap> getDialectMaps() {
+    return this.dialectMaps;
   }
 
-  public void setPostgres(String postgres) {
-    this.postgres = postgres;
-  }
-
-  public String getBigQuery() {
-    return this.bigQuery;
-  }
-
-  public void setBigQuery(String bigQuery) {
-    this.bigQuery = bigQuery;
+  public void setDialectMaps(List<DialectMap> dialectMaps) {
+    this.dialectMaps = dialectMaps;
   }
 
   public List<TokenInfo> getTokenInfos() {

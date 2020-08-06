@@ -4,8 +4,16 @@
       "feature": "DML_INSERT",
       "allMappings": [
         {
-          "postgres": "INSERT",
-          "bigQuery": "INSERT",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "INSERT"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "INSERT"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "insert_exp",
@@ -15,8 +23,16 @@
           ]
         },
         {
-          "postgres": "INSERT INTO",
-          "bigQuery": "INSERT INTO",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "INSERT INTO"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "INSERT INTO"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "insert_exp",
@@ -31,8 +47,16 @@
       "feature": "DML_DELETE",
       "allMappings": [
         {
-          "postgres": "DELETE",
-          "bigQuery": "DELETE",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "DELETE"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "DELETE"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "table_name",
@@ -42,8 +66,16 @@
           ]
         },
         {
-          "postgres": "DELETE FROM",
-          "bigQuery": "DELETE FROM",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "DELETE FROM"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "DELETE FROM"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "table_name",
@@ -58,8 +90,16 @@
       "feature": "DML_VALUES",
       "allMappings": [
         {
-          "postgres": "VALUES",
-          "bigQuery": "VALUES",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "VALUES"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "VALUES"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "values_exp",
@@ -74,8 +114,16 @@
       "feature": "DML_WHERE",
       "allMappings": [
         {
-          "postgres": "WHERE",
-          "bigQuery": "WHERE",
+          "dialectMaps": [
+            {
+              "dialect": "postgres",
+              "mapping": "WHERE"
+            },
+            {
+              "dialect": "bigQuery",
+              "mapping": "WHERE"
+            }
+          ],
           "tokenInfos": [
             {
               "tokenType": "condition",
