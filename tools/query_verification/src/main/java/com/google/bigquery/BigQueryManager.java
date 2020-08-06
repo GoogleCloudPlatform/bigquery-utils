@@ -5,6 +5,8 @@ import com.google.gson.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -279,8 +281,55 @@ public class BigQueryManager implements DataWarehouseManager {
             StandardSQLTypeName type = fields.get(i).getType().getStandardType();
 
             Object result;
-            // TODO Convert value to appropriate Java type
-            result = value.getStringValue();
+            try {
+                switch (type) {
+                    case BOOL:
+                        // returns boolean
+                        result = value.getBooleanValue();
+                        break;
+                    case FLOAT64:
+                        // returns double
+                        result = value.getDoubleValue();
+                        break;
+                    case INT64:
+                        // returns long
+                        result = value.getLongValue();
+                        break;
+                    case NUMERIC:
+                        // returns BigDecimal
+                        result = value.getNumericValue();
+                        break;
+                    case STRUCT:
+                        FieldList subFields = fields.get(i).getSubFields();
+                        FieldValueList subValues = value.getRecordValue();
+                        List<Object> subResults = parseResults(subValues, subFields);
+
+                        // returns List<Object>
+                        result = subResults;
+                        break;
+                    case DATE:
+                        // returns Date
+                        result = new SimpleDateFormat("yyyy-MM-dd").parse(value.getStringValue());
+                        break;
+                    case DATETIME:
+                        // returns Date
+                        result = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSS").parse(value.getStringValue());
+                        break;
+                    case TIME:
+                        // returns Date
+                        result = new SimpleDateFormat("hh:mm:ss.SSSSSS").parse(value.getStringValue());
+                        break;
+                    case TIMESTAMP:
+                        // returns Date
+                        result = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS zzz").parse(value.getStringValue());
+                        break;
+                    case STRING: default:
+                        // returns String
+                        result = value.getStringValue();
+                }
+            } catch (ParseException e) {
+                result = null;
+            }
 
             results.add(result);
         }
