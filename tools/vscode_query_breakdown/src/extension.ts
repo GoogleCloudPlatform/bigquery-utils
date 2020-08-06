@@ -10,9 +10,21 @@ const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
 
 const json = [
   {
-    error_position: {startLine: 1, startColumn: 5, endLine: 1, endColumn: 9},
+    error_position: {startLine: 1, startColumn: 1, endLine: 1, endColumn: 4	},
+    error_type: 'DELETION',
+    replacedFrom: null,
+    replacedTo: null,
+  },
+  {
+    error_position: {startLine: 2, startColumn: 2, endLine: 1, endColumn: 4},
+    error_type: 'DELETION',
+    replacedFrom: null,
+    replacedTo: null,
+  },
+  {
+    error_position: {startLine: 2, startColumn: 2, endLine: 28, endColumn: 31},
     error_type: 'REPLACEMENT',
-    replacedFrom: 'WITH',
+    replacedFrom: 'BLAH',
     replacedTo: 'BY',
   },
 ];
