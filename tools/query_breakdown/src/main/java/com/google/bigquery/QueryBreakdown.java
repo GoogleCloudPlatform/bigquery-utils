@@ -63,7 +63,7 @@ public class QueryBreakdown {
       current = current.getParent();
     }
 
-    // we then pop
+    // we then pop the stack and output results one by one
     while (!stack.empty()) {
       current = stack.pop();
       if (current.getErrorHandlingType().equals("DELETION")) {
