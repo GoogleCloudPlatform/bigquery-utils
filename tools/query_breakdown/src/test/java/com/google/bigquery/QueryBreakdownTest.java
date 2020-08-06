@@ -75,4 +75,14 @@ public class QueryBreakdownTest {
             + "Start Column 1, End Column 4, DELETION\n",
         outContent.toString());
   }
+
+  @Test
+  public void QueryBreakdownRunSingleDeletionReplacement() throws IOException {
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/singleDeletionReplacement.txt");
+    qb.run(query, "", 0, ir.getLocationTracker());
+  }
 }
