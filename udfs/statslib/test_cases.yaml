@@ -1,4 +1,8 @@
 pvalue:
   - test:
-    input: CAST(0.22222222 AS FLOAT64), CAST(0.88888888 AS FLOAT64)
-    output:0.22222222
+    input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
+    expected_output: CAST(0.8607079764250578 AS FLOAT64)
+kruskal_wallis:
+  - test:
+    input: (SELECT [('a',1.0), ('b',2.0), ('c',2.3), ('a',1.4), ('b',2.2), ('c',5.5), ('a',1.0), ('b',2.3), ('c',2.3), ('a',1.1), ('b',7.2), ('c',2.8)])
+    expected_output: STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)

@@ -30,3 +30,4 @@ hs_err_pid*
 target/
 tools/unsupervised_dataset/sql_crawler/__pycache__/__init__.cpython-38.pyc
 key.json
+BigQueryUtils.code-workspace
