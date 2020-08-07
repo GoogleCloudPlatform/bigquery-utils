@@ -150,11 +150,11 @@ public class Tokenizer {
       int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
       DataTypeMap mapping = dataTypeMappings.get(d);
-      bqToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
-      postgresToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
+      bqToken += " " + columnName + " " + mapping.getBigQuery() + ",";
+      postgresToken += " " + columnName + " " + mapping.getPostgres() + ",";
     }
     bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
-    postgresToken += postgresToken.substring(0, postgresToken.length()-1) + " )";
+    postgresToken = postgresToken.substring(0, postgresToken.length()-1) + " )";
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
@@ -234,8 +234,8 @@ public class Tokenizer {
       bqToken = bqToken.substring(0, bqToken.length()-2) + " ), ";
       postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ), ";
     }
-    bqToken = bqToken.substring(0, bqToken.length()-2) + " ;";
-    postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ;";
+    bqToken = bqToken.substring(0, bqToken.length()-2);
+    postgresToken += postgresToken.substring(0, postgresToken.length()-2);
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<values_exp " + placeHolder + ">");

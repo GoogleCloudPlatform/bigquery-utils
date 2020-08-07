@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-import jdk.internal.net.http.common.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -47,7 +47,7 @@ public class Utils {
    * Returns a random element from given set
    * @param list a list of objects from which a random element is selected
    */
-  public static Pair<String, DataType> getRandomElement(ArrayList<Pair<String, DataType>> list) throws IllegalArgumentException  {
+  public static MutablePair<String, DataType> getRandomElement(ArrayList<MutablePair<String, DataType>> list) throws IllegalArgumentException  {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
@@ -332,11 +332,11 @@ public class Utils {
     } else if (dataType == DataType.BYTES) {
       return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return "1999-01-01";
+      return "\'1999-01-01\'";
     } else if (dataType == DataType.TIME) {
-      return "04:05:06.789";
+      return "\'04:05:06.789\'";
     } else if (dataType == DataType.TIMESTAMP) {
-      return "1999-01-08 04:05:06";
+      return "\'1999-01-08 04:05:06\'";
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }

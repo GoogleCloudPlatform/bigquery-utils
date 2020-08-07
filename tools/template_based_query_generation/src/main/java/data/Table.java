@@ -5,7 +5,8 @@ import parser.Utils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import jdk.internal.net.http.common.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
+
 
 /**
  * class representing a data table
@@ -15,7 +16,7 @@ public class Table {
 
   private String name;
   private int numRows;
-  private ArrayList<Pair<String, DataType>> schema;
+  private ArrayList<MutablePair<String, DataType>> schema;
 
   /**
    * constructs empty table from table name
@@ -24,7 +25,7 @@ public class Table {
   public Table(String name) {
     this.name = name;
     this.numRows = 0;
-    this.schema = new ArrayList<Pair<String, DataType>>();
+    this.schema = new ArrayList<MutablePair<String, DataType>>();
   }
 
   /**
@@ -33,10 +34,10 @@ public class Table {
    * @param type
    */
   public void addColumn(String columnName, DataType type) {
-    this.schema.add(new Pair(columnName, type));
+    this.schema.add(new MutablePair(columnName, type));
   }
 
-  public ArrayList<Pair<String, DataType>> getSchema() {
+  public ArrayList<MutablePair<String, DataType>> getSchema() {
     return this.schema;
   }
 
@@ -61,8 +62,8 @@ public class Table {
    * @return name of random column of schema
    */
   public String getRandomColumn() {
-    Pair<String, DataType> p = Utils.getRandomElement(this.schema);
-    return p.first;
+    MutablePair<String, DataType> p = Utils.getRandomElement(this.schema);
+    return p.getLeft();
   }
 
   /**
@@ -71,12 +72,12 @@ public class Table {
    * @return name of random column of given type
    */
   public String getRandomColumn(DataType type) {
-    ArrayList<Pair<String, DataType>> columns = new ArrayList<Pair<String, DataType>>();
-    for (Pair<String, DataType> col: this.schema) {
-      if (col.second == type) columns.add(col);
+    ArrayList<MutablePair<String, DataType>> columns = new ArrayList<MutablePair<String, DataType>>();
+    for (MutablePair<String, DataType> col: this.schema) {
+      if (col.getRight() == type) columns.add(col);
     }
-    Pair<String, DataType> p = Utils.getRandomElement(columns);
-    return p.first;
+    MutablePair<String, DataType> p = Utils.getRandomElement(columns);
+    return p.getLeft();
   }
 
   /**
@@ -145,7 +146,7 @@ public class Table {
   public ArrayList<ArrayList<?>> generateData(int numRows) {
     ArrayList<ArrayList<?>> data = new ArrayList<ArrayList<?>>();
     for (int i = 0; i < this.schema.size(); i++) {
-      ArrayList<?> column = this.generateColumn(numRows, this.schema.get(i).second);
+      ArrayList<?> column = this.generateColumn(numRows, this.schema.get(i).getRight());
       data.add(column);
     }
     return data;
