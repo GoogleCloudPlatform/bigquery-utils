@@ -15,7 +15,7 @@ public class SkeletonTest {
     expectedBuilder.add("cluster_exp");
     ImmutableList<String> expected = expectedBuilder.build();
 
-    Skeleton skeleton = new Skeleton(rawKeywordsList);
+    query.Skeleton skeleton = new query.Skeleton(rawKeywordsList);
     ImmutableList<String> actual = skeleton.getPostgreSkeleton();
 
     assertEquals(expected, actual);
@@ -35,7 +35,7 @@ public class SkeletonTest {
     expectedBuilder.add("cluster_exp");
     ImmutableList<String> expected = expectedBuilder.build();
 
-    Skeleton skeleton = new Skeleton(rawKeywordsList);
+    query.Skeleton skeleton = new query.Skeleton(rawKeywordsList);
     ImmutableList<String> actual = skeleton.getBigQuerySkeleton();
 
     assertEquals(expected, actual);

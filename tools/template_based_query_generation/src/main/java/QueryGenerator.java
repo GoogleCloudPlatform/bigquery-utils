@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import graph.MarkovChain;
 import graph.Node;
 import parser.*;
+import query.Query;
+import query.Skeleton;
 import token.Tokenizer;
 
 import java.io.BufferedReader;
@@ -40,7 +42,7 @@ public class QueryGenerator {
     // TODO (Victor):
     //  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
     //  2. Generate number of queries given in config
-    //  3. pass to them to Keyword or Skeleton
+    //  3. pass to them to Keyword or query.Skeleton
 
     // create nodes
     Map<String, Node<Query>> nodeMap = new HashMap<>();
