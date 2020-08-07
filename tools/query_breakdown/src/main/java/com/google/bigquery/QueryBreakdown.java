@@ -41,7 +41,7 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public void run(String originalQuery, String outputFile, int errorLimit,
+  public void run(String originalQuery, boolean jsonOutput, int errorLimit,
       LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
