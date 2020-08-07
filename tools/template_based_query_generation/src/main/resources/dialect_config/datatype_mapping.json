@@ -2,83 +2,211 @@
   "dataTypeMaps": [
     {
       "dataType": "SMALL_INT",
-      "postgres": "SMALLINT",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "SMALLINT"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "INTEGER",
-      "postgres": "INTEGER",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "INTEGER"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "BIG_INT",
-      "postgres": "BIGINT",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "BIGINT"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "DECIMAL",
-      "postgres": "DECIMAL",
-      "bigQuery": "NUMERIC"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "DECIMAL"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "NUMERIC"
+        }
+      ]
     },
     {
       "dataType": "NUMERIC",
-      "postgres": "NUMERIC",
-      "bigQuery": "NUMERIC"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "NUMERIC"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "NUMERIC"
+        }
+      ]
     },
     {
       "dataType": "REAL",
-      "postgres": "REAL",
-      "bigQuery": "FLOAT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "REAL"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "FLOAT64"
+        }
+      ]
     },
     {
       "dataType": "BIG_REAL",
-      "postgres": "DOUBLE PRECISION",
-      "bigQuery": "FLOAT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "DOUBLE PRECISION"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "FLOAT64"
+        }
+      ]
     },
     {
       "dataType": "SMALL_SERIAL",
-      "postgres": "SMALLSERIAL",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "SMALLSERIAL"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "SERIAL",
-      "postgres": "SERIAL",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "SERIAL"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "BIG_SERIAL",
-      "postgres": "BIGSERIAL",
-      "bigQuery": "INT64"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "BIGSERIAL"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "INT64"
+        }
+      ]
     },
     {
       "dataType": "BOOL",
-      "postgres": "BOOLEAN",
-      "bigQuery": "BOOL"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "BOOLEAN"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "BOOL"
+        }
+      ]
     },
     {
       "dataType": "STR",
-      "postgres": "VARCHAR",
-      "bigQuery": "STRING"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "VARCHAR"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "STRING"
+        }
+      ]
     },
     {
       "dataType": "BYTES",
-      "postgres": "BIT VARYING",
-      "bigQuery": "BYTES"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "BIT VARYING"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "BYTES"
+        }
+      ]
     },
     {
       "dataType": "DATE",
-      "postgres": "DATE",
-      "bigQuery": "DATE"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "DATE"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "DATE"
+        }
+      ]
     },
     {
       "dataType": "TIME",
-      "postgres": "TIME",
-      "bigQuery": "TIME"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "TIME"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "TIME"
+        }
+      ]
     },
     {
       "dataType": "TIMESTAMP",
-      "postgres": "TIMESTAMP",
-      "bigQuery": "TIMESTAMP"
+      "dialectMaps": [
+        {
+          "dialect": "postgres",
+          "mapping": "TIMESTAMP"
+        },
+        {
+          "dialect": "bigQuery",
+          "mapping": "TIMESTAMP"
+        }
+      ]
     }
   ]
 }
