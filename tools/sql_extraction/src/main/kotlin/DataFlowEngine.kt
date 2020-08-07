@@ -31,6 +31,25 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
+     * Visits an annotation located at [location].
+     * Strings passed as arguments can be considered a usage.
+     *
+     * @param[visitArguments] Potential visit for all annotation arguments.
+     */
+    fun visitAnnotation(location: Location, visitArguments: () -> Unit) {
+        val prevQuery = currentQuery
+
+        currentQuery = null
+        visitArguments()
+
+        if (currentQuery != null) {
+            addUsage(currentQuery!!, location)
+        }
+
+        currentQuery = prevQuery
+    }
+
+    /**
      * Visits method scope from an Antlr Visitor.
      *
      * @param[visitChildren] function to visit the rest of the method.
