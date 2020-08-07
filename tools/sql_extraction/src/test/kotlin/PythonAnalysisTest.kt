@@ -19,6 +19,69 @@ def test():
     }
 
     @Test
+    fun `triple quote multiline string return`() {
+        val program = """
+def test():
+    return '''test
+a
+b
+c'''
+"""
+
+        val result = analyze(program)
+
+        assertCorrect(result, "test\na\nb\nc")
+    }
+
+    @Test
+    fun `parenthesized multiline string return`() {
+        val program = """
+def test():
+    return ("test"
+        "a"
+        "b"
+        "c")
+"""
+
+        val result = analyze(program)
+
+        assertCorrect(result, "(testabc)")
+    }
+
+    @Test
+    fun `backslash multiline string return`() {
+        val program = """
+def test():
+    return "test"\
+        "a"\
+        "b"\
+        "c"
+"""
+
+        val result = analyze(program)
+
+        assertCorrect(result, "(testabc)")
+    }
+
+    @Test
+    fun `escaped multiline string return`() {
+        val program = """
+def test():
+    return "test\
+a\
+b\
+c"
+"""
+
+        val result = analyze(program).toList()
+
+        assertEquals(result.count(), 1)
+        assertEquals(result[0].query.type, null)
+        // the grammar does not remove the backslash
+        assertEquals(result[0].query.literal!!.replace("\\", ""), "test\na\nb\nc")
+    }
+
+    @Test
     fun `simple method argument`() {
         val program = """
 import something
