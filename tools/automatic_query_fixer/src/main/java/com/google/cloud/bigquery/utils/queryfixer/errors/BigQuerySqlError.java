@@ -2,7 +2,6 @@ package com.google.cloud.bigquery.utils.queryfixer.errors;
 
 import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.utils.queryfixer.entity.Position;
-
 import lombok.Getter;
 
 /**
@@ -13,11 +12,14 @@ import lombok.Getter;
 public abstract class BigQuerySqlError {
 
   private final BigQueryException errorSource;
+
   /**
    * The occurrence of the error at a query. It may be null if the error does not belong to any
-   * specific locations.
+   * specific locations. This field is not final, because the original error message may not contain
+   * position information, but later the query fixer may locate the error and specify the error
+   * position.
    */
-  private final Position errorPosition;
+  private Position errorPosition;
 
   public BigQuerySqlError(Position errorPosition, BigQueryException errorSource) {
     this.errorPosition = errorPosition;
@@ -26,5 +28,9 @@ public abstract class BigQuerySqlError {
 
   public String getMessage() {
     return errorSource.getMessage();
+  }
+
+  public void setErrorPosition(Position errorPosition) {
+    this.errorPosition = errorPosition;
   }
 }
