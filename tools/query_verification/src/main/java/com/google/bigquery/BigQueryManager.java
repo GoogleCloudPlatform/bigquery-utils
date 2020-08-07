@@ -314,6 +314,7 @@ public class BigQueryManager implements DataWarehouseManager {
                         break;
                     case STRING:
                         result = value.getStringValue();
+                        break;
                     default:
                         // Handle unknown/unsupported types as String
                         result = value.getStringValue();
