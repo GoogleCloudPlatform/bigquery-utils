@@ -1,4 +1,4 @@
-import {SqlQueryItem} from './extension';
+import {SqlQueryItem} from './tree_view';
 import {Range} from 'vscode';
 
 export interface Query {
