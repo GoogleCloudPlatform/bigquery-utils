@@ -12,6 +12,34 @@ import org.antlr.v4.runtime.Token
  * @param dataFlowEngine engine running data-flow analysis
  */
 class JavaAnalyzer(private val dataFlowEngine: DataFlowEngine) : Java9BaseVisitor<Unit>() {
+    // region annotations
+
+    override fun visitNormalAnnotation(ctx: Java9Parser.NormalAnnotationContext?) {
+        ctx!!.typeName().accept(this)
+
+        if (ctx.elementValuePairList() != null) {
+            dataFlowEngine.visitAnnotation(
+                Location.combine(
+                    ctx.LPAREN().symbol.getLocation(),
+                    ctx.RPAREN().symbol.getLocation()
+                )
+            ) { ctx.elementValuePairList().accept(this) }
+        }
+    }
+
+    override fun visitSingleElementAnnotation(ctx: Java9Parser.SingleElementAnnotationContext?) {
+        ctx!!.typeName().accept(this)
+
+        dataFlowEngine.visitAnnotation(
+            Location.combine(
+                ctx.LPAREN().symbol.getLocation(),
+                ctx.RPAREN().symbol.getLocation()
+            )
+        ) { ctx.elementValue().accept(this) }
+    }
+
+    // endregion
+
     // region methods
 
     override fun visitMethodDeclaration(ctx: Java9Parser.MethodDeclarationContext?) =

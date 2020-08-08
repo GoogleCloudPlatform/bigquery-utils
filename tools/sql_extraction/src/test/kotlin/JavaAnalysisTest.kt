@@ -132,6 +132,17 @@ External.sink(a);
         assertCorrect(result, "test")
     }
 
+    @Test
+    fun `literal in annotation`() {
+        val program = classHeaders(
+            "@Annotation(\"test\")\n" + voidMethodHeaders("")
+        )
+
+        val result = analyze(program)
+
+        assertCorrect(result, "test")
+    }
+
     private fun analyze(program: String): Sequence<QueryUsages> {
         val engine = DataFlowEngine()
         JavaFrontEnd().solveDataFlow(engine, CharStreams.fromString(program))
