@@ -51,6 +51,7 @@ public class Main {
       originalQuery = ir.readInput(inputFile);
     } catch (IOException e) {
       System.out.println("there was an I/O error while reading the input");
+      e.printStackTrace();
       exit(1);
     }
 
