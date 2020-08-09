@@ -1,0 +1,84 @@
+{
+  "datatypes": [
+    {
+      "datatype": "SMALL_INT",
+      "postgres": "SMALLINT",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "INTEGER",
+      "postgres": "INTEGER",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "BIG_INT",
+      "postgres": "BIGINT",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "DECIMAL",
+      "postgres": "DECIMAL",
+      "bigQuery": "NUMERIC"
+    },
+    {
+      "datatype": "NUMERIC",
+      "postgres": "NUMERIC",
+      "bigQuery": "NUMERIC"
+    },
+    {
+      "datatype": "REAL",
+      "postgres": "REAL",
+      "bigQuery": "FLOAT64"
+    },
+    {
+      "datatype": "BIG_REAL",
+      "postgres": "DOUBLE PRECISION",
+      "bigQuery": "FLOAT64"
+    },
+    {
+      "datatype": "SMALL_SERIAL",
+      "postgres": "SMALLSERIAL",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "SERIAL",
+      "postgres": "SERIAL",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "BIG_SERIAL",
+      "postgres": "BIGSERIAL",
+      "bigQuery": "INT64"
+    },
+    {
+      "datatype": "BOOL",
+      "postgres": "BOOLEAN",
+      "bigQuery": "BOOL"
+    },
+    {
+      "datatype": "STR",
+      "postgres": "VARCHAR",
+      "bigQuery": "STRING"
+    },
+    {
+      "datatype": "BYTES",
+      "postgres": "BIT VARYING",
+      "bigQuery": "BYTES"
+    },
+    {
+      "datatype": "DATE",
+      "postgres": "DATE",
+      "bigQuery": "DATE"
+    },
+    {
+      "datatype": "TIME",
+      "postgres": "TIME",
+      "bigQuery": "TIME"
+    },
+    {
+      "datatype": "TIMESTAMP",
+      "postgres": "TIMESTAMP",
+      "bigQuery": "TIMESTAMP"
+    }
+  ]
+}

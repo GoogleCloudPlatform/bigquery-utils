@@ -1,0 +1,18 @@
+{
+  "DML_FEATURE_ROOT": [
+    "DML_INSERT",
+    "DML_DELETE"
+  ],
+  "DML_INSERT": [
+    "DML_VALUES"
+  ],
+  "DML_VALUES": [
+    "FEATURE_SINK"
+  ],
+  "DML_DELETE": [
+    "DML_WHERE"
+  ],
+  "DML_WHERE": [
+    "FEATURE_SINK"
+  ]
+}

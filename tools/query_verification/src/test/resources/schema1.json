@@ -1,0 +1,15 @@
+[
+  {
+    "fields": [
+      {
+        "name": "field",
+        "type": "STRING",
+        "mode": "REQUIRED"
+      }
+    ],
+    "tableReference": {
+      "datasetId": "dataset",
+      "tableId": "table"
+    }
+  }
+]

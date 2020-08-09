@@ -20,9 +20,12 @@ SELECT bqutil.fn.int(1.684)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
+* [last_day](#lastdaydt-date)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
+* [percentage_change](#percentage_changeval1-float64-val2-float64)
+* [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
@@ -209,6 +212,24 @@ object, array, string, number, boolean, boolean, null
 ```
 
 
+### [last_day(dt DATE)](last_day.sql)
+
+Get the date representing the last day of the month.
+
+```sql
+SELECT bqutil.fn.last_day(DATE("1987-12-25"))
+  , bqutil.fn.last_day(DATE("1998-09-04"))
+  , bqutil.fn.last_day(DATE("2020-02-21")) -- leap year
+  , bqutil.fn.last_day(DATE("2019-02-21")) -- non-leap year
+```
+
+results:
+
+|     f0_    |     f1_    |     f2_    |     f3_    |
+|------------|------------|------------|------------|
+| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
+
+
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
 
@@ -245,6 +266,40 @@ SELECT bqutil.fn.nlp_compromise_people(
 
 ["felipe hoffa", "elliott brossard", "jordan tigani"]
 ```
+
+
+### [percentage_change(val1 FLOAT64, val2 FLOAT64)](percentage_change.sql)
+Calculate the percentage change (increase/decrease) between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_change(0.2, 0.4)
+  , bqutil.fn.percentage_change(5, 15)
+  , bqutil.fn.percentage_change(100, 50)
+  , bqutil.fn.percentage_change(-20, -45)
+```
+
+results:
+
+| f0_ | f1_ |  f2_  |   f3_   |
+|-----|-----|-------|---------|
+| 1.0 | 2.0 |  -0.5 |  -1.125 |
+
+
+### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sql)
+Calculate the percentage difference between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_difference(0.2, 0.8)
+  , bqutil.fn.percentage_difference(4.0, 12.0)
+  , bqutil.fn.percentage_difference(100, 200)
+  , bqutil.fn.percentage_difference(1.0, 1000000000)
+```
+
+results:
+
+| f0_ | f1_ |   f2_   | f3_ |
+|-----|-----|---------|-----|
+| 1.2 | 1.0 |  0.6667 | 2.0 |
 
 
 ### [radians(x ANY TYPE)](radians.sql)

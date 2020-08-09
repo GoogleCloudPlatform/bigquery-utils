@@ -15,14 +15,5 @@
  */
 
 CREATE OR REPLACE FUNCTION td.last_day(date_expr DATE) AS (
-  DATE_SUB(
-    DATE_TRUNC(
-      DATE_ADD(
-        date_expr,
-        INTERVAL 1 MONTH
-      ),
-      MONTH
-    ),
-    INTERVAL 1 DAY
-  )
+  fn.last_day(date_expr)
 );
