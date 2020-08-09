@@ -19,7 +19,7 @@ public class ReplacementLogic {
     int n = 3;
 
     if (options.size() <= n) {
-      return new ArrayList<String>(options);
+      return new ArrayList<>(options);
     }
 
     ArrayList<String> result = new ArrayList<>();

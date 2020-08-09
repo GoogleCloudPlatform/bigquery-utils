@@ -3,12 +3,13 @@ package com.google.bigquery;
 import com.google.cloud.bigquery.*;
 import org.junit.Test;
 
-import java.util.List;
+import java.awt.geom.Line2D;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-public class QueryVerifierTest {
+public class BigQueryManagerTest {
 
     final String resourcesPath = "src/test/resources/";
 
@@ -16,7 +17,7 @@ public class QueryVerifierTest {
     public void testGetTableIdFromJsonSchema() {
         String schemaContents = Main.getContentsOfFile(resourcesPath + "schema1.json");
         QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+        List<TableInfo> tableInfos = new BigQueryManager(null, schema, null, null).getTableInfoFromJsonSchema();
 
         assertEquals(tableInfos.size(), 1);
         TableId tableId = tableInfos.get(0).getTableId();
@@ -29,7 +30,7 @@ public class QueryVerifierTest {
     public void testGetMultipleTableIdFromJsonSchema() {
         String schemaContents = Main.getContentsOfFile(resourcesPath + "schema3.json");
         QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+        List<TableInfo> tableInfos = new BigQueryManager(null, schema, null, null).getTableInfoFromJsonSchema();
 
         assertEquals(tableInfos.size(), 2);
         TableId tableId;
@@ -47,7 +48,7 @@ public class QueryVerifierTest {
     public void testGetFieldsFromJsonSchema() {
         String schemaContents = Main.getContentsOfFile(resourcesPath + "schema2.json");
         QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+        List<TableInfo> tableInfos = new BigQueryManager(null, schema, null, null).getTableInfoFromJsonSchema();
 
         assertEquals(tableInfos.size(), 1);
         FieldList fieldList = tableInfos.get(0).getDefinition().getSchema().getFields();
@@ -75,7 +76,7 @@ public class QueryVerifierTest {
     public void testGetTableIdFromDdlSchema() {
         String schemaContents = "CREATE TABLE dataset.table (stringField STRING, integerField INT64);";
         QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(schema);
+        List<TableId> tableIds = new BigQueryManager(null, schema, null, null).getTableIdsFromDdlSchema();
 
         assertEquals(tableIds.size(), 1);
         TableId tableId = tableIds.get(0);
@@ -89,7 +90,7 @@ public class QueryVerifierTest {
         String schemaContents = "CREATE TABLE dataset.firstTable (stringField STRING, integerField INT64);\n" +
                 "CREATE TABLE dataset.secondTable (stringField STRING, integerField INT64);";
         QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(schema);
+        List<TableId> tableIds = new BigQueryManager(null, schema, null, null).getTableIdsFromDdlSchema();
 
         assertEquals(tableIds.size(), 2);
         TableId tableId;
@@ -107,7 +108,7 @@ public class QueryVerifierTest {
     public void testGetJobInfoFromQuery() {
         String queryContents = "SELECT * FROM table";
         QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
-        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
+        List<JobInfo> jobInfos = new BigQueryManager(query, null, null, null).getJobInfosFromQuery(true);
 
         assertEquals(jobInfos.size(), 1);
 
@@ -119,7 +120,7 @@ public class QueryVerifierTest {
     public void testGetMultipleJobInfosFromQuery() {
         String queryContents = "SELECT * FROM table1;\nSELECT column1 FROM table2; SELECT column2 FROM table2;";
         QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
-        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
+        List<JobInfo> jobInfos = new BigQueryManager(query, null, null, null).getJobInfosFromQuery(true);
 
         assertEquals(jobInfos.size(), 3);
 
@@ -131,6 +132,20 @@ public class QueryVerifierTest {
         assertEquals(queries.get(0), "SELECT * FROM table1");
         assertEquals(queries.get(1), "SELECT column1 FROM table2");
         assertEquals(queries.get(2), "SELECT column2 FROM table2");
+    }
+
+    @Test
+    public void testParseResults() {
+        Map<StandardSQLTypeName, String> types = new LinkedHashMap<StandardSQLTypeName, String>();
+        types.put(StandardSQLTypeName.STRING, "value");
+        // TODO Test other data types
+
+        FieldValueList values = FieldValueList.of(types.values().stream().map(value -> FieldValue.of(FieldValue.Attribute.PRIMITIVE, value)).collect(Collectors.toList()));
+        FieldList fields = FieldList.of(types.keySet().stream().map(type -> Field.newBuilder(type.name(), type).build()).collect(Collectors.toList()));
+
+        List<Object> results = new BigQueryManager(null, null, null, null).parseResults(values, fields);
+
+        assertEquals(results.get(0), "value");
     }
 
 }
