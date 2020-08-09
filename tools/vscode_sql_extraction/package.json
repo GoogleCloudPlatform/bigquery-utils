@@ -35,7 +35,7 @@
     "commands": [
       {
         "command": "vscode-sql-extraction.run",
-        "title": "Find All",
+        "title": "Find All Embedded SQL Queries",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"

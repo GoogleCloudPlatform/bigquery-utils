@@ -19,8 +19,8 @@ public class QueryBreakdown {
   private Node solution;
 
   // the generated tree
-  private Node root;
-  private Parser parser;
+  private final Node root;
+  private final Parser parser;
 
   /**
    * Constructor for the QueryBreakdown object. We model this class as an object rather than
@@ -40,11 +40,12 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public void run(String originalQuery, String outputFile, int errorLimit) {
+  public void run(String originalQuery, String outputFile, int errorLimit,
+      LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
     // this will set the variable solution
-    loop(originalQuery, errorLimit, root, 0);
+    loop(originalQuery, errorLimit, root, 0, locationTracker);
 
     // case where entire query can be parsed
     if (solution.equals(root)) {
@@ -80,22 +81,43 @@ public class QueryBreakdown {
    *
    * TODO: implement errorLimit logic, deal with exception casting
    */
-  private void loop(String inputQuery, int errorLimit, Node parent, int depth) {
+  private void loop(String inputQuery, int errorLimit, Node parent, int depth,
+      LocationTracker locationTracker) {
+    // termination for branch
+    if (depth > minimumUnparseableComp) {
+      return;
+    }
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
+      /* deletion: gets the new query, creates a node, and calls the loop again */
 
-      //deletion: gets the new query, creates a node, and calls the loop again
+      // gets the error location in the original query
+      int originalStartColumn =
+          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
+      int originalEndColumn =
+          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
+
+      // gets the new query
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
-      Node deletionNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndLineNum(), pos.getEndColumnNum(), depth + 1 );
-      loop(deletionQuery, errorLimit, deletionNode, depth + 1);
+
+      // updates the location tracker to reflect the deletion
+      LocationTracker deletedLt = locationTracker.delete
+          (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
+
+      // creates a node for this deletion
+      Node deletionNode = new Node(parent, pos.getLineNum(), originalStartColumn,
+          pos.getEndLineNum(), originalEndColumn, depth + 1 );
+
+      // calls the loop again
+      loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
+
       /**
       // replacement: gets the new queries, creates nodes, and calls the loop for each of them
-      ArrayList<ReplacedComponent> replacementQueries= replacement(inputQuery, pos.getLineNum(),
+      ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
 
@@ -104,7 +126,6 @@ public class QueryBreakdown {
         Node replacementNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
             pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement(),
             depth + 1);
-        System.out.println("REPL" + r.getQuery());
         loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
       }
        **/
@@ -128,23 +149,7 @@ public class QueryBreakdown {
   static String deletion(String inputQuery, int startLine, int startColumn,
       int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
-
     int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
-    // when the exception occurs in line 1
-    if (startLine == 1) {
-      // deals with extra spacing when deleting
-      if (inputQuery.charAt(startColumn - 2) == ' ') {
-        index[0] = startColumn - 2;
-      }
-    }
-    else {
-      int position = findNthIndexOf(inputQuery, '\n', startLine -1);
-      // deals with extra spacing when deleting
-      if (inputQuery.charAt(position + startColumn - 1) == ' ') {
-        index[0] = position + startColumn - 1;
-      }
-    }
-
     sb.delete(index[0], index[1]);
     return sb.toString();
   }

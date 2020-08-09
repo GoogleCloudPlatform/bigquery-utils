@@ -11,7 +11,7 @@ public class ErrorRecoveryTest {
   @Test
   public void deletionSingleLine() {
     String query = "SELECT GROUP a FROM A";
-    assertEquals("SELECT a FROM A",
+    assertEquals("SELECT  a FROM A",
         QueryBreakdown.deletion(query, 1, 8, 12));
   }
 
@@ -25,7 +25,7 @@ public class ErrorRecoveryTest {
   @Test
   public void deletionMultipleLines() {
     String query = "SELECT a FROM A;" + '\n' + "SELECT GROUP b FROM B";
-    assertEquals("SELECT a FROM A;" + '\n' + "SELECT b FROM B",
+    assertEquals("SELECT a FROM A;" + '\n' + "SELECT  b FROM B",
         QueryBreakdown.deletion(query, 2, 8, 12));
   }
 
@@ -64,9 +64,9 @@ public class ErrorRecoveryTest {
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
       ArrayList<String> expected = new ArrayList<>();
-      expected.add("!");
       expected.add("!=");
       expected.add("%");
+      expected.add("(");
       assertEquals(expected,
           ReplacementLogic.replace("", QueryBreakdown.expectedTokensFilter(test)));
     }
@@ -81,9 +81,9 @@ public class ErrorRecoveryTest {
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
       ArrayList<ReplacedComponent> expected = new ArrayList<>();
-      expected.add(new ReplacedComponent("SELECT a ! b", "WHERE", "!"));
       expected.add(new ReplacedComponent("SELECT a != b", "WHERE", "!="));
       expected.add(new ReplacedComponent("SELECT a % b", "WHERE", "%"));
+      expected.add(new ReplacedComponent("SELECT a ( b", "WHERE", "("));
       ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
           ((SqlParseException) e).getPos().getLineNum(),
           ((SqlParseException) e).getPos().getColumnNum(),
@@ -91,5 +91,12 @@ public class ErrorRecoveryTest {
           test);
       assertEquals(expected, actual);
     }
+  }
+
+  // incomplete test
+  @Test
+  public void replacementSingleLineTwoErrors() {
+    String query = "SELECT a WHERE A GROUP WITH a";
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
   }
 }
