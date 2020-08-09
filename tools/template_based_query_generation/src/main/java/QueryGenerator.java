@@ -88,9 +88,8 @@ public class QueryGenerator {
       if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
         List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-1);
         Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
-        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()));
-        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()));
-        bigQueryBuilder.add(";");
+        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()) + ";");
+        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()) + ";");
         i++;
       }
     }
