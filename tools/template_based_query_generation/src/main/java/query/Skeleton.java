@@ -1,10 +1,15 @@
+package query;
+
 import com.google.common.collect.ImmutableList;
 import parser.Keywords;
 import parser.KeywordsMapping;
 import parser.Mapping;
 import parser.Utils;
+import token.Token;
 import token.TokenInfo;
+import token.Tokenizer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,35 +21,42 @@ public class Skeleton {
 
   private final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
-  private ImmutableList<String> postgreSkeleton = new ImmutableList.Builder<String>().build();
-  private ImmutableList<String> bigQuerySkeleton = new ImmutableList.Builder<String>().build();
+  private final ImmutableList<String> postgreSkeleton;
+  private final ImmutableList<String> bigQuerySkeleton;
 
   /**
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
    */
-  // TODO (spoiledhua): change input and output to Query Objects
-  public Skeleton(ImmutableList<String> rawKeywordsList) {
+  // TODO (spoiledhua): change input and output to query.Query Objects
+  public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) {
     ImmutableList.Builder<String> postgresBuilder = ImmutableList.builder();
     ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
 
-    for (String rawKeyword : rawKeywordsList) {
-      ImmutableList<Mapping> mappingList = getLanguageMap(rawKeyword);
+    for (Query rawQuery : rawQueries) {
+      ImmutableList<Mapping> mappingList = getLanguageMap(rawQuery.getType().name());
 
       // choose a random variant from the list of possible keyword variants
       int randomIndex = Utils.getRandomInteger(mappingList.size() - 1);
       Mapping keywordVariant = mappingList.get(randomIndex);
-      postgresBuilder.add(keywordVariant.getPostgres());
-      bigQueryBuilder.add(keywordVariant.getBigQuery());
-      List<TokenInfo> tokens = keywordVariant.getTokenInfos();
+      postgresBuilder.add(keywordVariant.getDialectMap().get("postgres"));
+      bigQueryBuilder.add(keywordVariant.getDialectMap().get("bigQuery"));
+      List<TokenInfo> tokenInfos = keywordVariant.getTokenInfos();
 
-      for (TokenInfo token : tokens) {
-        // if token is required, add it to the skeleton, otherwise add it with a 1/2 probability
-        if (token.getRequired()) {
-          postgresBuilder.add(token.getTokenName());
-          bigQueryBuilder.add(token.getTokenName());
+      List<Token> tokens = new ArrayList<>();
+      for (TokenInfo tokenInfo : tokenInfos) {
+        Token token = new Token(tokenInfo);
+        tokens.add(token);
+      }
+
+      rawQuery.setTokens(tokens);
+      for (Token token : tokens) {
+        tokenizer.generateToken(token);
+        if (token.getTokenInfo().getRequired()) {
+          postgresBuilder.add(token.getPostgresTokenExpression());
+          bigQueryBuilder.add(token.getBigQueryTokenExpression());
         } else if (Utils.getRandomInteger(1) == 1) {
-          postgresBuilder.add(token.getTokenName());
-          bigQueryBuilder.add(token.getTokenName());
+          postgresBuilder.add(token.getPostgresTokenExpression());
+          bigQueryBuilder.add(token.getBigQueryTokenExpression());
         }
       }
     }
