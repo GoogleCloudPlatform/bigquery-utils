@@ -2,7 +2,7 @@ package parser;
 
 import data.DataType;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class that contains the PostgreSQL and BigQuery mappings for a datatype
@@ -13,7 +13,7 @@ public class DataTypeMap {
   DataType dataType;
 
   /* List of dialect maps to each keyword */
-  private List<DialectMap> dialectMaps;
+  private Map<String, String> dialectMap;
 
   public DataType getDataType() {
     return dataType;
@@ -23,11 +23,11 @@ public class DataTypeMap {
     this.dataType = dataType;
   }
 
-  public List<DialectMap> getDialectMaps() {
-    return this.dialectMaps;
+  public Map<String, String> getDialectMap() {
+    return this.dialectMap;
   }
 
-  public void setDialectMaps(List<DialectMap> dialectMaps) {
-    this.dialectMaps = dialectMaps;
+  public void setDialectMap(Map<String, String> dialectMap) {
+    this.dialectMap = dialectMap;
   }
 }

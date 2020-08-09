@@ -90,6 +90,7 @@ public class QueryGenerator {
         Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
         postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()));
         bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()));
+        bigQueryBuilder.add(";");
         i++;
       }
     }

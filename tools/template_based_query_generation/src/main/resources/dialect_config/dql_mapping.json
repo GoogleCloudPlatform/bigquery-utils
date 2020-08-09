@@ -4,16 +4,10 @@
       "feature": "DQL_SELECT",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "SELECT"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "SELECT"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "SELECT",
+            "bigQuery": "SELECT"
+          },
           "tokenInfos": [
             {
               "tokenType": "select_exp",
@@ -28,16 +22,10 @@
       "feature": "DQL_FROM",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "FROM"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "FROM"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "FROM",
+            "bigQuery": "FROM"
+          },
           "tokenInfos": [
             {
               "tokenType": "from_item",
@@ -52,16 +40,10 @@
       "feature": "DQL_WHERE",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "WHERE"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "WHERE"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "WHERE",
+            "bigQuery": "WHERE"
+          },
           "tokenInfos": [
             {
               "tokenType": "condition",
@@ -76,16 +58,10 @@
       "feature": "DQL_GROUP",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "GROUP BY"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "GROUP BY"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "GROUP BY",
+            "bigQuery": "GROUP BY"
+          },
           "tokenInfos": [
             {
               "tokenType": "group_exp",
@@ -100,16 +76,10 @@
       "feature": "DQL_HAVING",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "HAVING"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "HAVING"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "HAVING",
+            "bigQuery": "HAVING"
+          },
           "tokenInfos": [
             {
               "tokenType": "condition",
@@ -124,16 +94,10 @@
       "feature": "DQL_ORDER",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "ORDER BY"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "ORDER BY"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "ORDER BY",
+            "bigQuery": "ORDER BY"
+          },
           "tokenInfos": [
             {
               "tokenType": "order_exp",
@@ -148,16 +112,10 @@
       "feature": "DQL_ASC",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "ASC"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "ASC"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "ASC",
+            "bigQuery": "ASC"
+          },
           "tokenInfos": [
           ]
         }
@@ -167,16 +125,10 @@
       "feature": "DQL_DESC",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "DESC"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "DESC"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "DESC",
+            "bigQuery": "DESC"
+          },
           "tokenInfos": [
           ]
         }
@@ -186,16 +138,10 @@
       "feature": "DQL_LIMIT",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "LIMIT"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "LIMIT"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "LIMIT",
+            "bigQuery": "LIMIT"
+          },
           "tokenInfos": [
             {
               "tokenType": "count",
@@ -210,16 +156,10 @@
       "feature": "DQL_OFFSET",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "OFFSET"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "OFFSET"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "OFFSET",
+            "bigQuery": "OFFSET"
+          },
           "tokenInfos": [
             {
               "tokenType": "skip_rows",

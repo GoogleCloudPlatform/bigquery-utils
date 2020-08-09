@@ -120,9 +120,11 @@ public class UtilsTest {
     ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
-    mapping.setPostgres("Test Postgre");
-    mapping.setBigQuery("Test BigQuery");
+    Map<String, String> dialectMap = new HashMap<>();
+    dialectMap.put("postgres", "Test Postgre");
+    dialectMap.put("bigQuery", "Test BigQuery");
     mapping.setTokenInfos(tokenInfos);
+    mapping.setDialectMap(dialectMap);
     ArrayList<Mapping> mappings = new ArrayList<>();
     mappings.add(mapping);
 
@@ -153,7 +155,7 @@ public class UtilsTest {
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getCount(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getCount());
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getRequired(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getRequired());
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType());
-    assertEquals(expected.get("Test Feature").get(0).getPostgres(), actual.get("Test Feature").get(0).getPostgres());
-    assertEquals(expected.get("Test Feature").get(0).getBigQuery(), actual.get("Test Feature").get(0).getBigQuery());
+    assertEquals(expected.get("Test Feature").get(0).getDialectMap().get("postgres"), actual.get("Test Feature").get(0).getDialectMap().get("postgres"));
+    assertEquals(expected.get("Test Feature").get(0).getDialectMap().get("bigQuery"), actual.get("Test Feature").get(0).getDialectMap().get("bigQuery"));
   }
 }

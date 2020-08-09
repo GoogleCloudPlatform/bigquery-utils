@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -252,18 +253,18 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, Map> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, Map> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
-      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+      builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
     }
 
-    ImmutableMap<DataType, DataTypeMap> map = builder.build();
+    ImmutableMap<DataType, Map> map = builder.build();
 
     return map;
   }

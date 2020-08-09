@@ -4,16 +4,10 @@
       "feature": "DDL_CREATE",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "CREATE TABLE"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "CREATE TABLE"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "CREATE TABLE",
+            "bigQuery": "CREATE TABLE"
+          },
           "tokenInfos": [
             {
               "tokenType": "table_name",
@@ -28,16 +22,10 @@
           ]
         },
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "CREATE TABLE IF NOT EXISTS"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "CREATE TABLE IF NOT EXISTS"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "CREATE TABLE IF NOT EXISTS",
+            "bigQuery": "CREATE TABLE IF NOT EXISTS"
+          },
           "tokenInfos": [
             {
               "tokenType": "table_name",
@@ -52,16 +40,10 @@
           ]
         },
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "CREATE TABLE"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "CREATE OR REPLACE TABLE"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "CREATE TABLE",
+            "bigQuery": "CREATE OR REPLACE TABLE"
+          },
           "tokenInfos": [
             {
               "tokenType": "table_name",
@@ -81,16 +63,10 @@
       "feature": "DDL_PARTITION",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "PARTITION BY"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "PARTITION BY"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "PARTITION BY",
+            "bigQuery": "PARTITION BY"
+          },
           "tokenInfos": [
             {
               "tokenType": "partition_exp",
@@ -105,16 +81,10 @@
       "feature": "DDL_CLUSTER",
       "allMappings": [
         {
-          "dialectMaps": [
-            {
-              "dialect": "postgres",
-              "mapping": "COLLATE"
-            },
-            {
-              "dialect": "bigQuery",
-              "mapping": "CLUSTER BY"
-            }
-          ],
+          "dialectMap": {
+            "postgres": "COLLATE",
+            "bigQuery": "CLUSTER BY"
+          },
           "tokenInfos": [
             {
               "tokenType": "cluster_exp",

@@ -38,8 +38,8 @@ public class Skeleton {
       // choose a random variant from the list of possible keyword variants
       int randomIndex = Utils.getRandomInteger(mappingList.size() - 1);
       Mapping keywordVariant = mappingList.get(randomIndex);
-      postgresBuilder.add(keywordVariant.getPostgres());
-      bigQueryBuilder.add(keywordVariant.getBigQuery());
+      postgresBuilder.add(keywordVariant.getDialectMap().get("postgres"));
+      bigQueryBuilder.add(keywordVariant.getDialectMap().get("bigQuery"));
       List<TokenInfo> tokenInfos = keywordVariant.getTokenInfos();
 
       List<Token> tokens = new ArrayList<>();
