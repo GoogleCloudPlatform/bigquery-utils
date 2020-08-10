@@ -1,6 +1,10 @@
 {
   "featureIndicators": [
     {
+      "feature": "DQL_FEATURE_ROOT",
+      "isIncluded": true
+    },
+    {
       "feature": "DQL_SELECT",
       "isIncluded": true
     },
@@ -21,11 +25,15 @@
       "isIncluded": true
     },
     {
-      "feature": "DQL_WINDOW",
+      "feature": "DQL_ORDER",
       "isIncluded": true
     },
     {
-      "feature": "DQL_ORDER",
+      "feature": "DQL_ASC",
+      "isIncluded": true
+    },
+    {
+      "feature": "DQL_DESC",
       "isIncluded": true
     },
     {

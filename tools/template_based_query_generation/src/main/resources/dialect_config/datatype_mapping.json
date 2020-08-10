@@ -1,84 +1,116 @@
 {
-  "datatypes": [
+  "dataTypeMaps": [
     {
-      "datatype": "SMALL_INT",
-      "postgres": "SMALLINT",
-      "bigQuery": "INT64"
+      "dataType": "SMALL_INT",
+      "dialectMap": {
+        "postgres": "SMALLINT",
+        "bigQuery": "INT64"
+      }
     },
     {
-      "datatype": "INTEGER",
-      "postgres": "INTEGER",
-      "bigQuery": "INT64"
+      "dataType": "INTEGER",
+      "dialectMap": {
+        "postgres": "INTEGER",
+        "bigQuery": "INT64"
+        }
     },
     {
-      "datatype": "BIG_INT",
-      "postgres": "BIGINT",
-      "bigQuery": "INT64"
+      "dataType": "BIG_INT",
+      "dialectMap": {
+        "postgres": "BIGINT",
+        "bigQuery": "INT64"
+      }
     },
     {
-      "datatype": "DECIMAL",
-      "postgres": "DECIMAL",
-      "bigQuery": "NUMERIC"
+      "dataType": "DECIMAL",
+      "dialectMap": {
+        "postgres": "DECIMAL",
+        "bigQuery": "NUMERIC"
+      }
     },
     {
-      "datatype": "NUMERIC",
-      "postgres": "NUMERIC",
-      "bigQuery": "NUMERIC"
+      "dataType": "NUMERIC",
+      "dialectMap": {
+        "postgres": "NUMERIC",
+        "bigQuery": "NUMERIC"
+      }
     },
     {
-      "datatype": "REAL",
-      "postgres": "REAL",
-      "bigQuery": "FLOAT64"
+      "dataType": "REAL",
+      "dialectMap": {
+        "postgres": "REAL",
+        "bigQuery": "FLOAT64"
+      }
     },
     {
-      "datatype": "BIG_REAL",
-      "postgres": "DOUBLE PRECISION",
-      "bigQuery": "FLOAT64"
+      "dataType": "BIG_REAL",
+      "dialectMap": {
+        "postgres": "DOUBLE PRECISION",
+        "bigQuery": "FLOAT64"
+      }
     },
     {
-      "datatype": "SMALL_SERIAL",
-      "postgres": "SMALLSERIAL",
-      "bigQuery": "INT64"
+      "dataType": "SMALL_SERIAL",
+      "dialectMap": {
+        "postgres": "SMALLSERIAL",
+        "bigQuery": "INT64"
+      }
     },
     {
-      "datatype": "SERIAL",
-      "postgres": "SERIAL",
-      "bigQuery": "INT64"
+      "dataType": "SERIAL",
+      "dialectMap": {
+        "postgres": "SERIAL",
+        "bigQuery": "INT64"
+      }
     },
     {
-      "datatype": "BIG_SERIAL",
-      "postgres": "BIGSERIAL",
-      "bigQuery": "INT64"
+      "dataType": "BIG_SERIAL",
+      "dialectMap": {
+        "postgres": "BIGSERIAL",
+        "bigQuery": "INT64"
+      }
     },
     {
-      "datatype": "BOOL",
-      "postgres": "BOOLEAN",
-      "bigQuery": "BOOL"
+      "dataType": "BOOL",
+      "dialectMap": {
+        "postgres": "BOOLEAN",
+        "bigQuery": "BOOL"
+      }
     },
     {
-      "datatype": "STR",
-      "postgres": "VARCHAR",
-      "bigQuery": "STRING"
+      "dataType": "STR",
+      "dialectMap": {
+        "postgres": "VARCHAR",
+        "bigQuery": "STRING"
+      }
     },
     {
-      "datatype": "BYTES",
-      "postgres": "BIT VARYING",
-      "bigQuery": "BYTES"
+      "dataType": "BYTES",
+      "dialectMap": {
+        "postgres": "BIT VARYING",
+        "bigQuery": "BYTES"
+      }
     },
     {
-      "datatype": "DATE",
-      "postgres": "DATE",
-      "bigQuery": "DATE"
+      "dataType": "DATE",
+      "dialectMap": {
+        "postgres": "DATE",
+        "bigQuery": "DATE"
+      }
     },
     {
-      "datatype": "TIME",
-      "postgres": "TIME",
-      "bigQuery": "TIME"
+      "dataType": "TIME",
+      "dialectMap": {
+        "postgres": "TIME",
+        "bigQuery": "TIME"
+      }
     },
     {
-      "datatype": "TIMESTAMP",
-      "postgres": "TIMESTAMP",
-      "bigQuery": "TIMESTAMP"
+      "dataType": "TIMESTAMP",
+      "dialectMap": {
+        "postgres": "TIMESTAMP",
+        "bigQuery": "TIMESTAMP"
+      }
     }
   ]
 }

@@ -1,17 +1,22 @@
+package query;
+
+import parser.FeatureType;
 import parser.Mapping;
 import token.Token;
 
+import java.util.List;
+
 /**
- * class representing Query
+ * class representing query.Query
  */
 public class Query {
 
   private FeatureType type;
   private Mapping mapping;
-  private Token token;
+  private List<Token> tokens;
 
   public Query(FeatureType type) {
-      this.type = type;
+    this.type = type;
   }
 
   public Mapping getMapping() {
@@ -22,16 +27,16 @@ public class Query {
     this.mapping = mapping;
   }
 
-  public Token getToken() {
-    return this.token;
+  public List<Token> getTokens() {
+    return this.tokens;
   }
 
-  public void setToken(Token token) {
-    this.token = token;
+  public void setTokens(List<Token> tokens) {
+    this.tokens = tokens;
   }
 
   public FeatureType getType() {
-      return this.type;
+    return this.type;
   }
 
   public void setType(FeatureType type) {
@@ -40,7 +45,7 @@ public class Query {
 
   /**
    *
-   * @return whether FeatureType type is kind of query
+   * @return whether parser.parser.FeatureType type is kind of query
    * not one of FEATURE_ROOT, DDL_FEATURE_ROOT, DML_FEATURE_ROOT, DQL_FEATURE_ROOT, FEATURE_SINK
    */
   public boolean isQuery() {
