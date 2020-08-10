@@ -1,23 +1,28 @@
 package com.google.bigquery;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import org.apache.commons.cli.*;
 
 public class Main {
 
     /**
-     * usage: query_verification -q <PATH> <PATH> [-d <PATH>] [-s <PATH> <PATH>]
+     * usage: query_verification -q <PATH> <PATH> [-d <PATHS>] [-s <PATH> <PATH>]
      *        [-h]
      *  -q,--query <PATH> <PATH>    First argument is the path to the migrated
      *                              query file. Second argument is the path to
      *                              the original query file and only required
      *                              when data is provided.
-     *  -d,--data <PATH>            Path for table data in CSV format.
+     *  -d,--data <PATHS>           Paths for table data in CSV format. File
+     *                              names should be formatted as
+     *                              "[dataset].[table].csv".
      *  -s,--schema <PATH> <PATH>   First argument is the path to the migrated
      *                              schema path. Second argument is the path to
      *                              the original schema query and is optional.
@@ -37,6 +42,8 @@ public class Main {
 
         QueryVerificationQuery originalQuery = null;
         QueryVerificationSchema originalSchema = null;
+
+        List<QueryVerificationData> data = new ArrayList<QueryVerificationData>();
 
         // Query input handling
         if (command.hasOption("q")) {
@@ -82,9 +89,18 @@ public class Main {
 
         // Data input handling
         if (command.hasOption("d")) {
-            // TODO Data input for data aware verification
+            String[] dataOptionValues = command.getOptionValues("d");
+
+            for (String dataFilePath : dataOptionValues) {
+                String dataFileName = new File(dataFilePath).getName();
+                String dataContents = getContentsOfFile(dataFilePath);
+                String[] dataTableId = dataFileName.split("\\.");
+
+                data.add(QueryVerificationData.create(dataTableId[0], dataTableId[1], dataFilePath, dataContents));
+            }
         }
-        QueryVerifier queryVerifier = new QueryVerifier(migratedQuery, migratedSchema, originalQuery, originalSchema);
+
+        QueryVerifier queryVerifier = new QueryVerifier(migratedQuery, migratedSchema, originalQuery, originalSchema, data);
         queryVerifier.verify();
 
         System.exit(0);
@@ -150,9 +166,10 @@ public class Main {
                 .build());
         options.addOption(Option.builder("d")
                 .longOpt("data")
-                .hasArg(true)
-                .argName("PATH")
-                .desc("Path for table data in CSV format.")
+                .numberOfArgs(Option.UNLIMITED_VALUES)
+                .valueSeparator(' ')
+                .argName("PATHS")
+                .desc("Paths for table data in CSV format. File names should be formatted as \"[dataset].[table].csv\".")
                 .build());
         options.addOption(Option.builder("h")
                 .longOpt("help")

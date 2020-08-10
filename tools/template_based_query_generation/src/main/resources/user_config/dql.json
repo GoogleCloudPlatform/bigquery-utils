@@ -1,39 +1,47 @@
 {
-  "keywordIndicators": [
+  "featureIndicators": [
     {
-      "keyword": "DQL_SELECT",
+      "feature": "DQL_FEATURE_ROOT",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_FROM",
+      "feature": "DQL_SELECT",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_WHERE",
+      "feature": "DQL_FROM",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_GROUP",
+      "feature": "DQL_WHERE",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_HAVING",
+      "feature": "DQL_GROUP",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_WINDOW",
+      "feature": "DQL_HAVING",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_ORDER",
+      "feature": "DQL_ORDER",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_LIMIT",
+      "feature": "DQL_ASC",
       "isIncluded": true
     },
     {
-      "keyword": "DQL_OFFSET",
+      "feature": "DQL_DESC",
+      "isIncluded": true
+    },
+    {
+      "feature": "DQL_LIMIT",
+      "isIncluded": true
+    },
+    {
+      "feature": "DQL_OFFSET",
       "isIncluded": true
     }
   ]
