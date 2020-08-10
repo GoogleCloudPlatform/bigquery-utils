@@ -44,7 +44,7 @@ public class LocationTracker {
    * This method inserts an element in the middle of the location ArrayList to replicate
    * replacement
    */
-  public void add(int x, int y, int numberToAdd) {
+  private void add(int x, int y, int numberToAdd) {
     location.get(x - 1).add(y, numberToAdd);
   }
 
