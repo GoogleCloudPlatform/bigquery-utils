@@ -232,7 +232,7 @@ tableDeletionEvent AS (
       ) AS jobId,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName') AS tableDeletionJobName,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.tableDeletion.table.reason') AS tableDeletionReason,
+      '$.tableDeletion.reason') AS tableDeletionReason,
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_system_event`
 ),
 /*
@@ -253,12 +253,9 @@ tableDataReadEvent AS (
             "/")[SAFE_OFFSET(3)]
     ) AS jobId,
     SPLIT(TRIM(TRIM(
-      COALESCE(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.fields'),
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.fields')),
-        '["'),'"]'),'","') AS tableDataReadFields,
+      JSON_EXTRACT(protopayload_auditlog.metadataJson,
+        '$.tableDataRead.fields'),
+      '["'),'"]'),'","') AS tableDataReadFields,
      CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson,
           '$.tableDataRead.fieldsTruncated') AS BOOL) AS tableDataReadFieldsTruncated,
      SPLIT(TRIM(TRIM(
