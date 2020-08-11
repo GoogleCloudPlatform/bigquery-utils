@@ -82,11 +82,10 @@ class SqlExtractor(
         LOGGER.debug { "Scanning $filePath" }
         if (showProgress) {
             System.err.printf(
-                "%.1f%% Analyzing %s...",
+                "%.1f%% Analyzing %s...%n",
                 numCompleted.get() * 100.0 / numTotal,
                 filePath
             )
-            System.err.println()
         }
 
         queries.addAll(
@@ -104,11 +103,10 @@ class SqlExtractor(
 
         if (showProgress) {
             System.err.printf(
-                "%.1f%% Analyzed %s.",
+                "%.1f%% Analyzed %s.%n",
                 incremented * 100.0 / numTotal,
                 filePath
             )
-            System.err.println()
         }
     }
 }
