@@ -317,6 +317,7 @@ public class BigQueryManager implements DataWarehouseManager {
                         break;
                     default:
                         // Handle unknown/unsupported types as String
+                        System.err.println("Warning: Unsupported type: " + type.name());
                         result = value.getStringValue();
                 }
             } catch (ParseException e) {
