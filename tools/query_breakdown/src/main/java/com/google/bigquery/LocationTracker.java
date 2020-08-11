@@ -60,17 +60,6 @@ public class LocationTracker {
   }
 
   /**
-   * This method changes an entry from location specified by (x, y) in the original query.
-   */
-  public void change(int x, int y, int changeTo) {
-    if (x > 0 && x <= location.size()) {
-      if (y > 0 && y <= location.get(x - 1).size()) {
-        location.get(x - 1).set(y - 1, changeTo);
-      }
-    }
-  }
-
-  /**
    * This method gets the original position of the component in (x,y) of the intermediate query
    */
   public int getOriginalPosition(int x, int y) {
