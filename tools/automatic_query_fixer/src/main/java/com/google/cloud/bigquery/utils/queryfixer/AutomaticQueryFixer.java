@@ -57,7 +57,7 @@ public class AutomaticQueryFixer {
   private FixResult fixNotSupport(BigQueryException exception) {
     return FixResult.builder()
         .status(FixResult.Status.FAILURE)
-        .approach("The fix of this error is not supported")
+        .approach("The error cannot be fixed automatically.")
         .error(exception.getMessage())
         .build();
   }
@@ -65,7 +65,7 @@ public class AutomaticQueryFixer {
   private FixResult fixNotSupport(BigQuerySqlError error) {
     return FixResult.builder()
         .status(FixResult.Status.FAILURE)
-        .approach("The fix of this error is not supported")
+        .approach("The error cannot be fixed automatically.")
         .error(error.getMessage())
         .errorPosition(error.getErrorPosition())
         .build();

@@ -12,34 +12,52 @@ import java.util.List;
 
 public class QueryFixerMain {
 
+  private static final String CREDENTIAL_SHORTCUT = "c";
+  private static final String CREDENTIAL = "credential";
+
+  private static final String PROJECT_ID_SHORTCUT = "p";
+  private static final String PROJECT_ID = "project-id";
+
+  private static final String OUTPUT_SHORTCUT = "o";
+  private static final String OUTPUT = "output";
+  private static final String OUTPUT_MODE_JSON = "json";
+  private static final String OUTPUT_MODE_NATURAL = "natural";
+
+  private static final String INTERACT_SHORTCUT = "i";
+  private static final String INTERACT = "interact";
+  private static final String INTERACT_MODE_NONE = "none";
+  private static final String INTERACT_MODE_GUIDE = "guide";
+  private static final String INTERACT_MODE_ALL = "all";
+  private static final String INTERACT_MODE_FULL = "full";
+
   private static CommandLine readFlags(String[] args) {
     Options options = new Options();
 
     Option option =
         new Option(
-            /*opt=*/ "c",
-            /*long-opt=*/ "credential",
+            /*opt=*/ CREDENTIAL_SHORTCUT,
+            /*long-opt=*/ CREDENTIAL,
             /*hasArg=*/ true,
-            /*description=*/ "The credential file (in JSON) of service account connecting to BigQuery. Otherwise, the default application-login credential will be used.");
+            /*description=*/ "The path to the credential file of the service account connecting to BigQuery. Otherwise, the default application-login credential will be used.");
     options.addOption(option);
     option =
         new Option(
-            /*opt=*/ "p",
-            /*long-opt=*/ "project-id",
+            /*opt=*/ PROJECT_ID_SHORTCUT,
+            /*long-opt=*/ PROJECT_ID,
             /*hasArg=*/ true,
             /*description=*/ "The ID of project where queries will be performed. This field is required if the project is not specified in credential");
     options.addOption(option);
     option =
         new Option(
-            /*opt=*/ "o",
-            /*long-opt=*/ "output",
+            /*opt=*/ OUTPUT_SHORTCUT,
+            /*long-opt=*/ OUTPUT,
             /*hasArg=*/ true,
             /*description=*/ "The format to output fix results. The available formats are \"natural\" (default) and \"json\"");
     options.addOption(option);
     option =
         new Option(
-            /*opt=*/ "i",
-            /*long-opt=*/ "interact",
+            /*opt=*/ INTERACT_SHORTCUT,
+            /*long-opt=*/ INTERACT,
             /*hasArg=*/ true,
             /*description=*/ "Interactive Mode. The available mode are \"none\" (default), \"guide\" and \"all/full\"");
     options.addOption(option);
@@ -68,8 +86,8 @@ public class QueryFixerMain {
   public static void main(String[] args) {
     CommandLine cmd = readFlags(args);
 
-    String credentialPath = cmd.getOptionValue("credential");
-    String projectId = cmd.getOptionValue("project-id");
+    String credentialPath = cmd.getOptionValue(CREDENTIAL);
+    String projectId = cmd.getOptionValue(PROJECT_ID);
     BigQueryOptions bigQueryOptions = buildBigQueryOptions(credentialPath, projectId);
 
     if (cmd.getArgList().isEmpty()) {
@@ -84,25 +102,34 @@ public class QueryFixerMain {
 
     AutomaticQueryFixer queryFixer = new AutomaticQueryFixer(bigQueryOptions);
 
-    String interactMode = cmd.getOptionValue("interact");
-    if (interactMode == null || interactMode.equalsIgnoreCase("none")) {
-      // todo: Implement Non-interactive mode
-      FixResult fixResult = queryFixer.fix(query);
-      if (fixResult.getOptions().isEmpty()) {
-        return;
-      }
-      String newQuery = fixResult.getOptions().get(0).getFixedQuery();
-      printQueryResult(newQuery, bigQueryOptions);
+    String interactMode = cmd.getOptionValue(INTERACT);
+    if (interactMode == null) {
+      interactMode = INTERACT_MODE_NONE;
+    }
+    switch (interactMode) {
+      case INTERACT_MODE_NONE:
+        // todo: Implement Non-interactive mode
+        FixResult fixResult = queryFixer.fix(query);
+        if (fixResult.getOptions().isEmpty()) {
+          return;
+        }
+        String newQuery = fixResult.getOptions().get(0).getFixedQuery();
+        printQueryResult(newQuery, bigQueryOptions);
+        break;
 
-    } else if (interactMode.equalsIgnoreCase("guide")) {
-      // todo: Implement guide mode
-      return;
-    } else if (interactMode.equalsIgnoreCase("all") || interactMode.equalsIgnoreCase("full")) {
-      FixResult fixResult = fullInteractMode(queryFixer, query);
-      printFixResult(fixResult, cmd.getOptionValue("output"));
-    } else {
-      System.out.println("Interact Mode (-i) is incorrect. Use --help for usage.");
-      System.exit(1);
+      case INTERACT_MODE_GUIDE:
+        // todo: Implement guide mode
+        return;
+
+      case INTERACT_MODE_ALL:
+      case INTERACT_MODE_FULL:
+        fixResult = fixQueryInFullInteractMode(queryFixer, query);
+        printFixResult(fixResult, cmd.getOptionValue(OUTPUT));
+        break;
+
+      default:
+        System.out.println("Interact Mode (-i) is incorrect. Use --help for usage.");
+        System.exit(1);
     }
   }
 
@@ -111,20 +138,21 @@ public class QueryFixerMain {
       return BigQueryOptions.newBuilder().setProjectId(projectId).build();
     } else {
       // TODO: should support this in near future.
-      System.out.println("customized credential is not supported");
+      System.out.println("customized credential path is not supported");
       System.exit(1);
       return null;
     }
   }
 
-  private static FixResult fullInteractMode(AutomaticQueryFixer queryFixer, String query) {
+  private static FixResult fixQueryInFullInteractMode(
+      AutomaticQueryFixer queryFixer, String query) {
     return queryFixer.fix(query);
   }
 
   private static void printFixResult(FixResult fixResult, String outputFormat) {
-    if (outputFormat == null || outputFormat.equalsIgnoreCase("natural")) {
+    if (outputFormat == null || outputFormat.equalsIgnoreCase(OUTPUT_MODE_NATURAL)) {
       printFixResultInCommandLine(fixResult);
-    } else if (outputFormat.equalsIgnoreCase("json")) {
+    } else if (outputFormat.equalsIgnoreCase(OUTPUT_MODE_JSON)) {
       printFixResultAsJson(fixResult);
     } else {
       System.out.println("Output Mode (-o) is incorrect. Use --help for usage.");
@@ -139,14 +167,14 @@ public class QueryFixerMain {
 
   private static void printFixResultInCommandLine(FixResult fixResult) {
     if (fixResult.getStatus() == FixResult.Status.NO_ERROR) {
-      System.out.println("The input query is correct");
+      System.out.println("The input query is valid. No errors to fix.");
       return;
     }
 
     System.out.println("The query has an error: " + fixResult.getError());
 
     if (fixResult.getStatus() == FixResult.Status.FAILURE) {
-      System.out.println("The input query is unable to fix");
+      System.out.println("Failed to fix the input query.");
       return;
     }
 
