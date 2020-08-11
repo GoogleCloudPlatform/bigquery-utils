@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import {QueryBreakdownRunner} from './query_breakdown_runner'
 
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
   backgroundColor: '#21bf2b',
@@ -31,14 +33,33 @@ const json = [
 
 // this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
+  const execPath = path.join(__filename, '..', '..', 'resources', 'query_breakdown', 'bin')
   // The command has been defined in the package.json file
   const disposable = vscode.commands.registerCommand(
     'vscode-query-breakdown.run',
-    () => {
+    async () => {
       // Display a message box to the user
       vscode.window.showInformationMessage(
         'vscode_query_breakdown is running!'
       );
+
+      // Display that progress is being made (the tool is running)
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Finding Unparsable Components',
+          cancellable: true
+        },
+        async (progress, token) => {
+          const runner = new QueryBreakdownRunner(execPath)
+          if (vscode.workspace.rootPath) {
+            return await runner.execute(['-i', vscode.workspace.rootPath, '-j'], progress, token);
+          }
+          else {
+            return;
+          }
+        }
+      )
       const currentEditor = vscode.window.activeTextEditor;
       if (!currentEditor) {
         vscode.window.showInformationMessage(
@@ -66,7 +87,7 @@ function decorate(editor: vscode.TextEditor) {
       json[i].error_position.startLine - 1,
       json[i].error_position.startColumn - 1,
       json[i].error_position.endLine - 1,
-	  json[i].error_position.endColumn
+      json[i].error_position.endColumn
 	);
 	console.log(json[i].error_position.endColumn)
     // deletion case
