@@ -17,8 +17,11 @@ export class QueryBreakdownRunner {
 
                 let jsonString = '';
                 let errorMessage = '';
+                console.log(this.execPath)
                 const process = execFile(this.execPath, args).on('close', exitCode => {
                     if (!process.killed && exitCode === 0) {
+                        console.log("this is jsonstring" + jsonString)
+                        console.log("this is parsed" + JSON.parse(jsonString))
                         resolve(JSON.parse(jsonString));
                     }
                     else {

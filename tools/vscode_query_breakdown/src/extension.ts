@@ -55,24 +55,24 @@ export function activate(context: vscode.ExtensionContext) {
         },
         async (progress, token) => {
           const runner = new QueryBreakdownRunner(execPath)
-          if (vscode.workspace.rootPath) {
-            json = await runner.execute(['-i', vscode.workspace.rootPath, '-j'], progress, token);
+          const currentEditor = vscode.window.activeTextEditor;
+          if (currentEditor) {
+            console.log(currentEditor.document.uri.fsPath)
+            json = await runner.execute(['-i ' + currentEditor.document.uri.fsPath, '-j'], progress, token);
+            console.log(json + "this is the json")
+            
+            if (json) {
+              // highlights and creates hovers for queries
+              decorate(currentEditor);
+            }
           }
           else {
-            return;
+            vscode.window.showInformationMessage(
+              'there is no editor open currently'
+            );
           }
         }
       )
-      const currentEditor = vscode.window.activeTextEditor;
-      if (!currentEditor) {
-        vscode.window.showInformationMessage(
-          'there is no editor open currently'
-        );
-        return;
-      }
-
-      // highlights and creates hovers for queries
-      decorate(currentEditor);
     }
   );
 
