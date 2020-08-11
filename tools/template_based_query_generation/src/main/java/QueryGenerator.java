@@ -1,6 +1,7 @@
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import data.Table;
 import graph.MarkovChain;
 import graph.Node;
 import parser.*;
@@ -102,8 +103,10 @@ public class QueryGenerator {
     builder.put("BigQuery", bigQuerySyntax);
     ImmutableMap<String, ImmutableList<String>> outputs = builder.build();
 
+    Table dataTable = tokenizer.getTable();
+
     try {
-      Utils.writeDirectory(outputs);
+      Utils.writeDirectory(outputs, dataTable);
     } catch (IOException exception){
       exception.printStackTrace();
     }

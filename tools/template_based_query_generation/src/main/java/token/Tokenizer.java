@@ -7,10 +7,7 @@ import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  *
@@ -42,6 +39,13 @@ public class Tokenizer {
     this.r = r;
     this.tokenPlaceHolderCounter = new HashMap<TokenType, Integer>();
     this.resetTable();
+  }
+
+  /**
+   * returns the Table object
+   */
+  public Table getTable() {
+    return this.table;
   }
 
   /**
@@ -218,7 +222,7 @@ public class Tokenizer {
   private void generateValuesExp(Token token) {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     int numRows = r.nextInt(this.maxNumColumnsValues) + 1;
-    ArrayList<ArrayList<? extends Object>> values = this.table.generateData(numRows);
+    List<List<? extends Object>> values = this.table.generateData(numRows);
     // parse the values and hardcode into appropriate token
     String bqToken = "";
     String postgresToken = "";

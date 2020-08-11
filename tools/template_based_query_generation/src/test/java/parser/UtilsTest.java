@@ -4,19 +4,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import data.Table;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import token.Token;
 import token.TokenInfo;
+import token.TokenType;
+import token.Tokenizer;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,11 +55,19 @@ public class UtilsTest {
     Map<String, ImmutableList<String>> expectedOutputs = new HashMap<>();
     expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
     expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
+    Tokenizer tokenizer = new Tokenizer(new Random());
+    TokenInfo tokenInfo = new TokenInfo();
+    tokenInfo.setTokenType(TokenType.select_exp);
+    Token token = new Token(tokenInfo);
+    tokenizer.generateToken(token);
+    Table testTable = tokenizer.getTable();
 
-    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
+    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testTable, testDir);
+    // TODO (spoiledhua): add actual test for table
 
     List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
     List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
+
     Map<String, ImmutableList<String>> actualOutputs = new HashMap<>();
     actualOutputs.put("BigQuery", ImmutableList.copyOf(actual_bigQuery));
     actualOutputs.put("PostgreSQL", ImmutableList.copyOf(actual_postgreSQL));
