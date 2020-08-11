@@ -87,6 +87,10 @@ private class Cli(
                 "output (default is 0.5)"
     ).double().default(0.5)
 
+    private val parallelize: Boolean by option(
+        "--parallel", help = "Analyze multiple files in parallel"
+    ).flag()
+
     private val debug: Boolean by option(
         "--debug", "--verbose", help = "Print debug logs to STDERR"
     ).flag()
@@ -103,7 +107,7 @@ private class Cli(
             System.err.println("0.0% Analyzing files...")
         }
 
-        val output = sqlExtractor.process(files, confidenceThreshold, showProgress)
+        val output = sqlExtractor.process(files, confidenceThreshold, showProgress, parallelize)
         logger.debug { "output: ${Gson().toJson(output)}" }
 
         val builder = GsonBuilder()
