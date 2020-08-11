@@ -1,26 +1,107 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
+  backgroundColor: '#21bf2b',
+});
+
+const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
+  backgroundColor: '#8f1713',
+});
+
+const json = [
+  {
+    error_position: {startLine: 1, startColumn: 1, endLine: 1, endColumn: 4	},
+    error_type: 'DELETION',
+    replacedFrom: null,
+    replacedTo: null,
+  },
+  {
+    error_position: {startLine: 2, startColumn: 1, endLine: 2, endColumn: 4},
+    error_type: 'DELETION',
+    replacedFrom: null,
+    replacedTo: null,
+  },
+  {
+    error_position: {startLine: 2, startColumn: 28, endLine: 2, endColumn: 31},
+    error_type: 'REPLACEMENT',
+    replacedFrom: 'BLAH',
+    replacedTo: 'BY',
+  },
+];
+
+// this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
+  // The command has been defined in the package.json file
+  const disposable = vscode.commands.registerCommand(
+    'vscode-query-breakdown.run',
+    () => {
+      // Display a message box to the user
+      vscode.window.showInformationMessage(
+        'vscode_query_breakdown is running!'
+      );
+      const currentEditor = vscode.window.activeTextEditor;
+      if (!currentEditor) {
+        vscode.window.showInformationMessage(
+          'there is no editor open currently'
+        );
+        return;
+      }
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-query-breakdown" is now active!');
+      // highlights and creates hovers for queries
+      decorate(currentEditor);
+    }
+  );
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('vscode-query-breakdown.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+  context.subscriptions.push(disposable);
+}
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from vscode_query_breakdown!');
-	});
+function decorate(editor: vscode.TextEditor) {
+  const decorationUnparseableArray: vscode.DecorationOptions[] = [];
+  const decorationParseableArray: vscode.DecorationOptions[] = [];
 
-	context.subscriptions.push(disposable);
+  // parses through the json objects
+  for (let i = 0; i < json.length; i++) {
+    // finds error position
+    const errorRange = new vscode.Range(
+      json[i].error_position.startLine - 1,
+      json[i].error_position.startColumn - 1,
+      json[i].error_position.endLine - 1,
+	  json[i].error_position.endColumn
+	);
+	console.log(json[i].error_position.endColumn)
+    // deletion case
+    if (json[i].error_type === 'DELETION') {
+      const deletionMessage = new vscode.MarkdownString('Deleted');
+      decorationUnparseableArray.push({
+        range: errorRange,
+        hoverMessage: deletionMessage,
+      });
+    }
+    // replacement case
+    else if (json[i].error_type === 'REPLACEMENT') {
+      const replacementMessage = new vscode.MarkdownString(
+        'Replaced ' + json[i].replacedFrom + ' with ' + json[i].replacedTo
+      );
+      decorationUnparseableArray.push({
+        range: errorRange,
+        hoverMessage: replacementMessage,
+      });
+    } else {
+      // error handling
+      continue;
+    }
+  }
+
+  // constructs decoration option for entire document
+  const entireDocument = new vscode.Range(
+    editor.document.lineAt(0).range.start,
+    editor.document.lineAt(editor.document.lineCount - 1).range.end
+  );
+  decorationParseableArray.push({range: entireDocument});
+
+  // sets the decorations
+  editor.setDecorations(decorationTypeParseable, decorationParseableArray);
+  editor.setDecorations(decorationTypeUnparseable, decorationUnparseableArray);
 }
 
 // this method is called when your extension is deactivated
