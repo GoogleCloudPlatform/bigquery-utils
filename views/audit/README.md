@@ -2,9 +2,9 @@ This directory contains helper SELECT statements to query BigQuery audit logs \
 More information regarding each is detailed below:
 
 
-### [big_query_elt_audit_log_v2.sql](/views/audit/big_query_elt_audit_log_v2.sql)
+### [big_query_elt_script_logging.sql](/views/audit/big_query_elt_script_logging.sql)
 
-Customers who run scripts in legacy data warehouses such as Teradata, understandably want to track statement results and metrics. For example, tracking the number of rows affected after a set of DML queries are executed. In order to collect this information for analysis, users would have to set system variables and make logging calls after each DML statement. Essentially, users are in charge of managing monitoring. This can become very tedious for users who run thousands, if not more, scripts in a day.  With BigQuery, you no longer have to log your SQL statement results because Cloud Logging allows you to store, search, analyze, monitor, and set alerts on all your BigQuery scripting activity. The new version of Cloud Logging logs for BigQuery, BigQueryAuditMetadata, provides rich insights into the execution of your scripts. This data can give you insight into your script performance, modifications of your data, and more. This is a BigQuery SELECT statement that has extracted and formatted BigQueryMetaData events, allowing you to write simple queries to monitor your BigQuery jobs.
+A common pattern in data warehousing for tracking results of DML statements is to collect system variable values after each DML statement and write them to a separate logging table. With BigQuery, you no longer have to log your SQL statement results because Cloud Logging allows you to store, search, analyze, monitor, and set alerts on all your BigQuery scripting activity. The new version of Cloud Logging logs for BigQuery, BigQueryAuditMetadata, provides rich insights into the execution of your scripts. This data can give you insight into your script performance, modifications of your data, and more. This is a BigQuery SELECT statement that has extracted and formatted BigQueryMetaData events, allowing you to write simple queries to monitor your BigQuery jobs.
 
 #### Prerequisites
 
