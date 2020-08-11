@@ -42,10 +42,11 @@ class SqlExtractor(
             Pair(1, filePaths)
         }
 
+        val coroutineDispatcher = Executors.newWorkStealingPool().asCoroutineDispatcher()
         runBlocking {
             for (filePath in processedFilePaths) {
                 if (parallelize) {
-                    launch(Executors.newWorkStealingPool().asCoroutineDispatcher()) {
+                    launch(coroutineDispatcher) {
                         analyzeFile(
                             filePath,
                             showProgress,
