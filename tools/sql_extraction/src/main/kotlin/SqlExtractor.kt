@@ -2,11 +2,13 @@ package com.google.cloud.sqlecosystem.sqlextraction
 
 import com.google.cloud.sqlecosystem.sqlextraction.output.Output
 import com.google.cloud.sqlecosystem.sqlextraction.output.Query
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicInteger
 
 private val LOGGER = KotlinLogging.logger { }
@@ -43,7 +45,7 @@ class SqlExtractor(
         runBlocking {
             for (filePath in processedFilePaths) {
                 if (parallelize) {
-                    launch {
+                    launch(Executors.newWorkStealingPool().asCoroutineDispatcher()) {
                         analyzeFile(
                             filePath,
                             showProgress,
