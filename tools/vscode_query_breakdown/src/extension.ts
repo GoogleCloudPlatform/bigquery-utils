@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import {ResultJson} from './resultJson';
 import {QueryBreakdownRunner} from './query_breakdown_runner'
 
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
@@ -10,6 +11,8 @@ const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
   backgroundColor: '#8f1713',
 });
 
+let json: ResultJson[]; 
+/*
 const json = [
   {
     error_position: {startLine: 1, startColumn: 1, endLine: 1, endColumn: 4	},
@@ -29,7 +32,7 @@ const json = [
     replacedFrom: 'BLAH',
     replacedTo: 'BY',
   },
-];
+]; */
 
 // this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
@@ -53,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
         async (progress, token) => {
           const runner = new QueryBreakdownRunner(execPath)
           if (vscode.workspace.rootPath) {
-            return await runner.execute(['-i', vscode.workspace.rootPath, '-j'], progress, token);
+            json = await runner.execute(['-i', vscode.workspace.rootPath, '-j'], progress, token);
           }
           else {
             return;

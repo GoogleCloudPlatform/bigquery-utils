@@ -1,5 +1,6 @@
 import {Progress, CancellationToken} from 'vscode';
 import {execFile} from 'child_process';
+import {ResultJson} from './resultJson';
 
 export class QueryBreakdownRunner {
     constructor(private execPath: string) {}
@@ -7,11 +8,11 @@ export class QueryBreakdownRunner {
     execute(
         args: string[], 
         progress: Progress<{message?: string | undefined;}>,
-        token: CancellationToken): Promise<Object[]> {
+        token: CancellationToken): Promise<ResultJson[]> {
             if (token.isCancellationRequested) {
                 return Promise.reject();
             }
-            return new Promise<Object[]>((resolve, reject) => {
+            return new Promise<ResultJson[]>((resolve, reject) => {
                 progress.report({message: 'Launching Query Breakdown...'});
 
                 let jsonString = '';
