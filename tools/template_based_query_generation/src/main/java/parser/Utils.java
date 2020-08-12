@@ -148,7 +148,7 @@ public class Utils {
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
+    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSql.txt"));
     writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
     writeData(dataTable, outputDirectory.resolve("data.csv"));
 
@@ -195,7 +195,6 @@ public class Utils {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       List<List<?>> data = dataTable.generateData();
       // traverse data column-first
-      System.out.println(dataTable.getSchema());
       for (int row = 0; row < data.get(0).size(); row++) {
         StringBuilder sb = new StringBuilder();
         for (int column = 0; column < data.size(); column++) {

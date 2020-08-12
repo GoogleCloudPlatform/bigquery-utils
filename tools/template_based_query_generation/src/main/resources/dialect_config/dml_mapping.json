@@ -6,7 +6,8 @@
         {
           "dialectMap": {
             "postgres": "INSERT",
-            "bigQuery": "INSERT"
+            "bigQuery": "INSERT",
+            "mySql": "INSERT"
           },
           "tokenInfos": [
             {
@@ -19,7 +20,8 @@
         {
           "dialectMap": {
             "postgres": "INSERT INTO",
-            "bigQuery": "INSERT INTO"
+            "bigQuery": "INSERT INTO",
+            "mySql": "INSERT INTO"
           },
           "tokenInfos": [
             {
@@ -37,7 +39,8 @@
         {
           "dialectMap": {
             "postgres": "DELETE",
-            "bigQuery": "DELETE"
+            "bigQuery": "DELETE",
+            "mySql": "DELETE FROM"
           },
           "tokenInfos": [
             {
@@ -50,7 +53,8 @@
         {
           "dialectMap": {
             "postgres": "DELETE FROM",
-            "bigQuery": "DELETE FROM"
+            "bigQuery": "DELETE FROM",
+            "mySql": "DELETE FROM"
           },
           "tokenInfos": [
             {
@@ -68,7 +72,8 @@
         {
           "dialectMap": {
             "postgres": "VALUES",
-            "bigQuery": "VALUES"
+            "bigQuery": "VALUES",
+            "mySql": "VALUES"
           },
           "tokenInfos": [
             {
@@ -86,7 +91,8 @@
         {
           "dialectMap": {
             "postgres": "WHERE",
-            "bigQuery": "WHERE"
+            "bigQuery": "WHERE",
+            "mySql": "WHERE"
           },
           "tokenInfos": [
             {
