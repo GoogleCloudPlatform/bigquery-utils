@@ -2,14 +2,22 @@ package token;
 
 import com.google.common.collect.ImmutableMap;
 import data.DataType;
+<<<<<<< HEAD
+=======
 import parser.DataTypeMap;
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import data.Table;
 import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+<<<<<<< HEAD
+import java.util.HashMap;
+import java.util.List;
+=======
 import java.util.List;
 import java.util.HashMap;
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import java.util.Map;
 import java.util.Random;
 
@@ -23,7 +31,7 @@ public class Tokenizer {
   private Random r;
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
-  private ImmutableMap<DataType, DataTypeMap> dataTypeMappings;
+  private ImmutableMap<DataType, Map<String, String>> dataTypeMappings;
   private int maxNumColumnsValues = 5;
   private int maxColumnsPerDataType = 3;
   private int maxColumnNameLength = 20;
@@ -158,9 +166,15 @@ public class Tokenizer {
       DataType d = DataType.getRandomDataType();
       int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
+<<<<<<< HEAD
+      Map<String, String> mapping = dataTypeMappings.get(d);
+      bqToken += " " + columnName + " " + mapping.get("bigQuery") + ",";
+      postgresToken += " " + columnName + " " + mapping.get("postgres") + ",";
+=======
       DataTypeMap mapping = dataTypeMappings.get(d);
       bqToken += " " + columnName + " " + mapping.getDialectMap().get("bigQuery") + ",";
       postgresToken += " " + columnName + " " + mapping.getDialectMap().get("postgres") + ",";
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
     }
     bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
     postgresToken = postgresToken.substring(0, postgresToken.length()-1) + " )";

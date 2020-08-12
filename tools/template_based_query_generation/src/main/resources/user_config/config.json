@@ -1,5 +1,16 @@
 {
   "start": "FEATURE_ROOT",
+<<<<<<< HEAD
+  "end": "FEATURE_SINK",
+  "numColumns": 10,
+  "numQueries": 100,
+  "dialectIndicators": {
+    "postgres": true,
+    "bigQuery": true,
+    "mySql": true
+  }
+=======
   "end": "FEATURE_SINK"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 }
 

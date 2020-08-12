@@ -13,8 +13,13 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+<<<<<<< HEAD
+import java.util.Date;
+import java.util.List;
+=======
 import java.util.List;
 import java.util.Date;
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -278,20 +283,34 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, Map<String, String>> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, Map<String, String>> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
-      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+      builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
     }
 
-    ImmutableMap<DataType, DataTypeMap> map = builder.build();
+    ImmutableMap<DataType, Map<String, String>> map = builder.build();
 
     return map;
+  }
+
+  /**
+   * Creates an User object from the main user config file
+   *
+   * @param inputPath relative path of the config file
+   * @return a User object describing user preferences
+   */
+  public static User getUser(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    User user = gson.fromJson(reader, User.class);
+
+    return user;
   }
   // TODO(spoiledhua): refactor IO exception handling
 

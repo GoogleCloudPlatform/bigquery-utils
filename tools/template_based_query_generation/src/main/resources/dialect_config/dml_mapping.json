@@ -6,7 +6,12 @@
         {
           "dialectMap": {
             "postgres": "INSERT",
+<<<<<<< HEAD
+            "bigQuery": "INSERT",
+            "mySql": "INSERT"
+=======
             "bigQuery": "INSERT"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -19,7 +24,12 @@
         {
           "dialectMap": {
             "postgres": "INSERT INTO",
+<<<<<<< HEAD
+            "bigQuery": "INSERT INTO",
+            "mySql": "INSERT INTO"
+=======
             "bigQuery": "INSERT INTO"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -37,7 +47,12 @@
         {
           "dialectMap": {
             "postgres": "DELETE",
+<<<<<<< HEAD
+            "bigQuery": "DELETE",
+            "mySql": "DELETE FROM"
+=======
             "bigQuery": "DELETE"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -50,7 +65,12 @@
         {
           "dialectMap": {
             "postgres": "DELETE FROM",
+<<<<<<< HEAD
+            "bigQuery": "DELETE FROM",
+            "mySql": "DELETE FROM"
+=======
             "bigQuery": "DELETE FROM"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -68,7 +88,12 @@
         {
           "dialectMap": {
             "postgres": "VALUES",
+<<<<<<< HEAD
+            "bigQuery": "VALUES",
+            "mySql": "VALUES"
+=======
             "bigQuery": "VALUES"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -86,7 +111,12 @@
         {
           "dialectMap": {
             "postgres": "WHERE",
+<<<<<<< HEAD
+            "bigQuery": "WHERE",
+            "mySql": "WHERE"
+=======
             "bigQuery": "WHERE"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
