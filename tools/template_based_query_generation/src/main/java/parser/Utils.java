@@ -13,13 +13,8 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-<<<<<<< HEAD
 import java.util.Date;
 import java.util.List;
-=======
-import java.util.List;
-import java.util.Date;
->>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -152,9 +147,10 @@ public class Utils {
    * @param outputDirectory relative path of a specified directory
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
-    writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
+  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
+    for (String dialect : outputs.keySet()) {
+      writeFile(outputs.get(dialect), outputDirectory.resolve(dialect + ".txt"));
+    }
     writeData(dataTable, outputDirectory.resolve("data.csv"));
 
     System.out.println("The output is stored at " + outputDirectory);
@@ -166,7 +162,7 @@ public class Utils {
    * @param outputs collection of statements to write
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable) throws IOException {
+  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable) throws IOException {
     String outputDirectory = getOutputDirectory("outputs");
     File file = new File(outputDirectory);
 
@@ -184,7 +180,7 @@ public class Utils {
    * @param outputPath absolute path of a specified file
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeFile(ImmutableList<String> statements, Path outputPath) throws IOException {
+  public static void writeFile(List<String> statements, Path outputPath) throws IOException {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       for (String statement : statements) {
         writer.write(statement);
@@ -200,7 +196,6 @@ public class Utils {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       List<List<?>> data = dataTable.generateData();
       // traverse data column-first
-      System.out.println(dataTable.getSchema());
       for (int row = 0; row < data.get(0).size(); row++) {
         StringBuilder sb = new StringBuilder();
         for (int column = 0; column < data.size(); column++) {

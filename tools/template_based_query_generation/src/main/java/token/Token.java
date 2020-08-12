@@ -1,22 +1,22 @@
 package token;
 
+import java.util.Map;
+
 /**
  * class that represents a token or expression
  */
 public class Token {
   private String tokenPlaceHolder;
-  private String postgresTokenExpression;
-  private String bigQueryTokenExpression;
+  private Map<String, String> dialectExpressions;
   private TokenInfo tokenInfo;
 
   public Token(TokenInfo tokenInfo) {
     this.tokenInfo = tokenInfo;
   }
 
-  public Token(String tokenPlaceHolder, String postgresTokenExpression, String bigQueryTokenExpression, TokenInfo tokenInfo) {
+  public Token(String tokenPlaceHolder, Map<String, String> dialectExpressions, TokenInfo tokenInfo) {
     this.tokenPlaceHolder = tokenPlaceHolder;
-    this.postgresTokenExpression = postgresTokenExpression;
-    this.bigQueryTokenExpression = bigQueryTokenExpression;
+    this.dialectExpressions = dialectExpressions;
     this.tokenInfo = tokenInfo;
   }
 
@@ -28,20 +28,12 @@ public class Token {
     return tokenPlaceHolder;
   }
 
-  public void setPostgresTokenExpression(String postgresTokenExpression) {
-    this.postgresTokenExpression = postgresTokenExpression;
+  public void setDialectExpressions(Map<String, String> dialectExpressions) {
+    this.dialectExpressions = dialectExpressions;
   }
 
-  public String getPostgresTokenExpression() {
-    return postgresTokenExpression;
-  }
-
-  public void setBigQueryTokenExpression(String bigQueryTokenExpression) {
-    this.bigQueryTokenExpression = bigQueryTokenExpression;
-  }
-
-  public String getBigQueryTokenExpression() {
-    return bigQueryTokenExpression;
+  public Map<String, String> getDialectExpressions() {
+    return dialectExpressions;
   }
 
   public void setTokenInfo(TokenInfo tokenInfo) {

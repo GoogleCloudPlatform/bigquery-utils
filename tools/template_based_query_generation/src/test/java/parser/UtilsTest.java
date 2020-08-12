@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,10 +54,9 @@ public class UtilsTest {
     List<String> expected_postgreSQL = new ArrayList<>();
     expected_bigQuery.add("BigQuery Tokens!");
     expected_postgreSQL.add("PostgreSQL Tokens!");
-    Map<String, ImmutableList<String>> expectedOutputs = new HashMap<>();
-    expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
-    expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
-<<<<<<< HEAD
+    Map<String, List<String>> expectedOutputs = new HashMap<>();
+    expectedOutputs.put("BigQuery", expected_bigQuery);
+    expectedOutputs.put("PostgreSQL", expected_postgreSQL);
     Tokenizer tokenizer = new Tokenizer(new Random());
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setTokenType(TokenType.select_exp);
@@ -68,43 +64,36 @@ public class UtilsTest {
     tokenizer.generateToken(token);
     Table testTable = tokenizer.getTable();
 
-    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testTable, testDir);
+    Utils.writeDirectory(expectedOutputs, testTable, testDir);
     // TODO (spoiledhua): add actual test for table
 
     List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
     List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
 
-=======
+    Map<String, List<String>> actualOutputs = new HashMap<>();
+    actualOutputs.put("BigQuery", actual_bigQuery);
+    actualOutputs.put("PostgreSQL", actual_postgreSQL);
 
-//    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
-
-    List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
-    List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
->>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
-    Map<String, ImmutableList<String>> actualOutputs = new HashMap<>();
-    actualOutputs.put("BigQuery", ImmutableList.copyOf(actual_bigQuery));
-    actualOutputs.put("PostgreSQL", ImmutableList.copyOf(actual_postgreSQL));
-
-    assertEquals(ImmutableMap.copyOf(expectedOutputs), ImmutableMap.copyOf(actualOutputs));
+    assertEquals(expectedOutputs, actualOutputs);
   }
 
   @Test
   public void test_writeFile(@TempDir Path testDir) throws IOException {
     List<String> expected = new ArrayList<>();
 
-    Utils.writeFile(ImmutableList.copyOf(expected), testDir.resolve("test.txt"));
+    Utils.writeFile(expected, testDir.resolve("test.txt"));
     List<String> actual = Files.readAllLines(testDir.resolve("test.txt"));
 
-    assertEquals(ImmutableList.copyOf(expected), ImmutableList.copyOf(actual));
+    assertEquals(expected, actual);
 
     expected.add("Test 1");
     expected.add("Test 2");
     expected.add("Test 3");
 
-    Utils.writeFile(ImmutableList.copyOf(expected), testDir.resolve("test.txt"));
+    Utils.writeFile(expected, testDir.resolve("test.txt"));
     actual = Files.readAllLines(testDir.resolve("test.txt"));
 
-    assertEquals(ImmutableList.copyOf(expected), ImmutableList.copyOf(actual));
+    assertEquals(expected, actual);
   }
 
   // TODO (spoiledhua): add unit tests for makeImmutableMap and makeImmutableSet
