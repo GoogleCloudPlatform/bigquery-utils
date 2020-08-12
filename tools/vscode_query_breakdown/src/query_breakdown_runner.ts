@@ -1,12 +1,12 @@
 import {Progress, CancellationToken} from 'vscode';
-import {execFile} from 'child_process';
+import {exec} from 'child_process';
 import {ResultJson} from './resultJson';
 
 export class QueryBreakdownRunner {
     constructor(private execPath: string) {}
 
     execute(
-        args: string[], 
+        filepath: string, 
         progress: Progress<{message?: string | undefined;}>,
         token: CancellationToken): Promise<ResultJson[]> {
             if (token.isCancellationRequested) {
@@ -17,11 +17,8 @@ export class QueryBreakdownRunner {
 
                 let jsonString = '';
                 let errorMessage = '';
-                console.log(this.execPath)
-                const process = execFile(this.execPath, args).on('close', exitCode => {
+                const process = exec("java -jar " + this.execPath + " -i " + filepath + " -j").on('close', exitCode => {
                     if (!process.killed && exitCode === 0) {
-                        console.log("this is jsonstring" + jsonString)
-                        console.log("this is parsed" + JSON.parse(jsonString))
                         resolve(JSON.parse(jsonString));
                     }
                     else {

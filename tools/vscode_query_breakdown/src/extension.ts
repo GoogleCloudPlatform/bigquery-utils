@@ -36,7 +36,7 @@ const json = [
 
 // this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
-  const execPath = path.join(__filename, '..', '..', 'resources', 'query_breakdown', 'bin')
+  const execPath = path.join(__filename, '..', '..', 'resources', 'query_breakdown', 'bin', 'query_breakdown.jar')
   // The command has been defined in the package.json file
   const disposable = vscode.commands.registerCommand(
     'vscode-query-breakdown.run',
@@ -57,9 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
           const runner = new QueryBreakdownRunner(execPath)
           const currentEditor = vscode.window.activeTextEditor;
           if (currentEditor) {
-            console.log(currentEditor.document.uri.fsPath)
-            json = await runner.execute(['-i ' + currentEditor.document.uri.fsPath, '-j'], progress, token);
-            console.log(json + "this is the json")
+            // get results from the backend
+            json = await runner.execute(currentEditor.document.uri.fsPath, progress, token);
             
             if (json) {
               // highlights and creates hovers for queries
@@ -92,7 +91,6 @@ function decorate(editor: vscode.TextEditor) {
       json[i].error_position.endLine - 1,
       json[i].error_position.endColumn
 	);
-	console.log(json[i].error_position.endColumn)
     // deletion case
     if (json[i].error_type === 'DELETION') {
       const deletionMessage = new vscode.MarkdownString('Deleted');
