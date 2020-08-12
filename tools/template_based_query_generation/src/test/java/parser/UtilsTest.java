@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilsTest {
 
+  public final String testDir = "./src/test/resources/";
+
   @Test
   public void test_getRandomInteger() {
     int randomInt = Utils.getRandomInteger(10);
@@ -55,7 +57,7 @@ public class UtilsTest {
     expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
     expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
 
-    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
+//    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
 
     List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
     List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));

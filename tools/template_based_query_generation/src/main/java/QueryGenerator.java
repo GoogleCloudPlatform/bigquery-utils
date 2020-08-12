@@ -1,11 +1,11 @@
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import data.Table;
 import graph.MarkovChain;
 import graph.Node;
 import parser.*;
-import query.Query;
-import query.Skeleton;
+import query.*;
 import token.Tokenizer;
 
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ public class QueryGenerator {
     // TODO (Victor):
     //  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
     //  2. Generate number of queries given in config
-    //  3. pass to them to Keyword or query.Skeleton
+    //  3. pass to them to Keyword or Skeleton
 
     // create nodes
     Map<String, Node<Query>> nodeMap = new HashMap<>();
@@ -88,9 +88,8 @@ public class QueryGenerator {
       if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
         List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-1);
         Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
-        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()));
-        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()));
-        bigQueryBuilder.add(";");
+        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()) + ";");
+        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()) + ";");
         i++;
       }
     }
@@ -103,8 +102,10 @@ public class QueryGenerator {
     builder.put("BigQuery", bigQuerySyntax);
     ImmutableMap<String, ImmutableList<String>> outputs = builder.build();
 
+    Table dataTable = tokenizer.getTable();
+
     try {
-      Utils.writeDirectory(outputs);
+      Utils.writeDirectory(outputs, dataTable);
     } catch (IOException exception){
       exception.printStackTrace();
     }

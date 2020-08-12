@@ -27,7 +27,7 @@ public class Skeleton {
   /**
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
    */
-  // TODO (spoiledhua): change input and output to query.Query Objects
+  // TODO (spoiledhua): change input and output to Query Objects
   public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) {
     ImmutableList.Builder<String> postgresBuilder = ImmutableList.builder();
     ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();

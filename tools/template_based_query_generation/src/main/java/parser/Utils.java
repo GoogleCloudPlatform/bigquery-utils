@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
+import data.Table;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.io.*;
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,7 +50,7 @@ public class Utils {
    * Returns a random element from given set
    * @param list a list of objects from which a random element is selected
    */
-  public static MutablePair<String, DataType> getRandomElement(ArrayList<MutablePair<String, DataType>> list) throws IllegalArgumentException  {
+  public static MutablePair<String, DataType> getRandomElement(List<MutablePair<String, DataType>> list) throws IllegalArgumentException  {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
@@ -146,10 +147,10 @@ public class Utils {
    * @param outputDirectory relative path of a specified directory
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Path outputDirectory) throws IOException {
+  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
     writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
     writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
-    // TODO(spoiledhua): write sample data to file
+    writeData(dataTable, outputDirectory.resolve("data.csv"));
 
     System.out.println("The output is stored at " + outputDirectory);
   }
@@ -160,7 +161,7 @@ public class Utils {
    * @param outputs collection of statements to write
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs) throws IOException {
+  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable) throws IOException {
     String outputDirectory = getOutputDirectory("outputs");
     File file = new File(outputDirectory);
 
@@ -168,7 +169,7 @@ public class Utils {
       throw new FileNotFoundException("The default \"output\" directory could not be created");
     }
 
-    writeDirectory(outputs, file.toPath());
+    writeDirectory(outputs, dataTable, file.toPath());
   }
 
   /**
@@ -183,6 +184,30 @@ public class Utils {
       for (String statement : statements) {
         writer.write(statement);
         writer.write("\n");
+      }
+    }
+  }
+
+  /**
+   * Write data
+   */
+  public static void writeData(Table dataTable, Path outputPath) throws IOException {
+    try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
+      List<List<?>> data = dataTable.generateData();
+      // traverse data column-first
+      System.out.println(dataTable.getSchema());
+      for (int row = 0; row < data.get(0).size(); row++) {
+        StringBuilder sb = new StringBuilder();
+        for (int column = 0; column < data.size(); column++) {
+          if (column == 0) {
+            sb.append(data.get(column).get(row));
+          } else {
+            sb.append(',');
+            sb.append(data.get(column).get(row));
+          }
+        }
+        sb.append('\n');
+        writer.write(sb.toString());
       }
     }
   }
@@ -253,18 +278,18 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, Map> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, Map> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
-      builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
+      builder.put(dataTypeMap.getDataType(), dataTypeMap);
     }
 
-    ImmutableMap<DataType, Map> map = builder.build();
+    ImmutableMap<DataType, DataTypeMap> map = builder.build();
 
     return map;
   }

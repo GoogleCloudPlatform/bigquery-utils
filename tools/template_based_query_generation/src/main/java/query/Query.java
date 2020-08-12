@@ -7,7 +7,7 @@ import token.Token;
 import java.util.List;
 
 /**
- * class representing query.Query
+ * class representing Query
  */
 public class Query {
 
