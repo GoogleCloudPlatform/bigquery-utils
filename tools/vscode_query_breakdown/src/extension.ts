@@ -1,8 +1,14 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import {ResultJson} from './resultJson';
-import {QueryBreakdownRunner} from './query_breakdown_runner'
+import {QueryBreakdownRunner} from './query_breakdown_runner';
 
+/**
+ * extension.ts contains the main code for the extension. It deals with the logic of
+ * what happens when the extension is activated
+ */
+
+// colors for the highlight
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
   backgroundColor: '#21bf2b',
 });
@@ -11,32 +17,20 @@ const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
   backgroundColor: '#8f1713',
 });
 
-let json: ResultJson[]; 
-/*
-const json = [
-  {
-    error_position: {startLine: 1, startColumn: 1, endLine: 1, endColumn: 4	},
-    error_type: 'DELETION',
-    replacedFrom: null,
-    replacedTo: null,
-  },
-  {
-    error_position: {startLine: 2, startColumn: 1, endLine: 2, endColumn: 4},
-    error_type: 'DELETION',
-    replacedFrom: null,
-    replacedTo: null,
-  },
-  {
-    error_position: {startLine: 2, startColumn: 28, endLine: 2, endColumn: 31},
-    error_type: 'REPLACEMENT',
-    replacedFrom: 'BLAH',
-    replacedTo: 'BY',
-  },
-]; */
+// variable to keep track of results of backend
+let json: ResultJson[];
 
 // this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
-  const execPath = path.join(__filename, '..', '..', 'resources', 'query_breakdown', 'bin', 'query_breakdown.jar')
+  const execPath = path.join(
+    __filename,
+    '..',
+    '..',
+    'resources',
+    'query_breakdown',
+    'bin',
+    'query_breakdown.jar'
+  );
   // The command has been defined in the package.json file
   const disposable = vscode.commands.registerCommand(
     'vscode-query-breakdown.run',
@@ -51,27 +45,30 @@ export function activate(context: vscode.ExtensionContext) {
         {
           location: vscode.ProgressLocation.Notification,
           title: 'Finding Unparsable Components',
-          cancellable: true
+          cancellable: true,
         },
         async (progress, token) => {
-          const runner = new QueryBreakdownRunner(execPath)
+          const runner = new QueryBreakdownRunner(execPath);
           const currentEditor = vscode.window.activeTextEditor;
           if (currentEditor) {
             // get results from the backend
-            json = await runner.execute(currentEditor.document.uri.fsPath, progress, token);
-            
+            json = await runner.execute(
+              currentEditor.document.uri.fsPath,
+              progress,
+              token
+            );
+
             if (json) {
               // highlights and creates hovers for queries
               decorate(currentEditor);
             }
-          }
-          else {
+          } else {
             vscode.window.showInformationMessage(
               'there is no editor open currently'
             );
           }
         }
-      )
+      );
     }
   );
 
@@ -90,7 +87,7 @@ function decorate(editor: vscode.TextEditor) {
       json[i].error_position.startColumn - 1,
       json[i].error_position.endLine - 1,
       json[i].error_position.endColumn
-	);
+    );
     // deletion case
     if (json[i].error_type === 'DELETION') {
       const deletionMessage = new vscode.MarkdownString('Deleted');
