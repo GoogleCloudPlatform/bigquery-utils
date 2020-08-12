@@ -1,0 +1,135 @@
+Query,URL
+"SELECT * FROM (SELECT ""apple"" AS fruit, ""carrot"" AS vegetable);",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH groceries AS (SELECT ""milk"" AS dairy, ""eggs"" AS protein, ""bread"" AS grain) SELECT g.* FROM groceries AS g;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH locations AS (SELECT STRUCT(""Seattle"" AS city, ""Washington"" AS state) AS location UNION ALL SELECT STRUCT(""Phoenix"" AS city, ""Arizona"" AS state) AS location) SELECT l.location.* FROM locations l;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH locations AS (SELECT ARRAY<STRUCT<city STRING, state STRING>>[(""Seattle"", ""Washington""), (""Phoenix"", ""Arizona"")] AS location) SELECT l.LOCATION[offset(0)].* FROM locations l;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH orders AS (SELECT 5 as order_id, ""sprocket"" as item_name, 200 as quantity) SELECT * EXCEPT (order_id) FROM orders;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH orders AS (SELECT 5 as order_id, ""sprocket"" as item_name, 200 as quantity) SELECT * REPLACE (""widget"" AS item_name) FROM orders;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH orders AS (SELECT 5 as order_id, ""sprocket"" as item_name, 200 as quantity) SELECT * REPLACE (quantity/2 AS quantity) FROM orders;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT AS VALUE STRUCT(1 a, 2 b) xyz FROM Table;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT * FROM t FOR SYSTEM_TIME AS OF TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR);",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM t FOR SYSTEM_TIME AS OF '2017-01-01 10:00:00-07:00';,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM t1 WHERE t1.a IN (SELECT t2.a FROM t2 FOR SYSTEM_TIME AS OF t1.timestamp_column);,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"CREATE TABLE books AS SELECT 'Hamlet' title, 'William Shakespeare' author;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"CREATE OR REPLACE TABLE books AS SELECT 'Hamlet' title, DATE '1603-01-01' release_date;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM books;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM books FOR SYSTEM_TIME AS OF before_replace_timestamp;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"CREATE OR REPLACE TABLE books AS SELECT 'Hamlet' title, 'William Shakespeare' author;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM books;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT start_time FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_USER WHERE job_type=""QUERY"" AND statement_type=""INSERT"" ORDER BY start_time DESC LIMIT 1 );",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM books FOR SYSTEM_TIME AS OF JOB_START_TIMESTAMP;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT * FROM UNNEST(ARRAY<STRUCT<x INT64, y STRING>>[(1, 'foo'), (3, 'bar')]);",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT *, struct_value FROM UNNEST(ARRAY<STRUCT<x INT64, y STRING>>[(1, 'foo'), (3, 'bar')]) AS struct_value;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster CROSS JOIN TeamMascot;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster, TeamMascot;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster FULL JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster LEFT JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster RIGHT JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM Roster INNER JOIN TeamMascot USING (SchoolID);,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT x FROM A JOIN B USING (x);,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT A.x FROM A JOIN B ON A.x = B.x;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM Roster WHERE SchoolID = 52;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT * FROM Roster WHERE STARTS_WITH(LastName, ""Mc"") OR STARTS_WITH(LastName, ""Mac"");",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster INNER JOIN TeamMascot ON Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Roster.LastName, TeamMascot.Mascot FROM Roster CROSS JOIN TeamMascot WHERE Roster.SchoolID = TeamMascot.SchoolID;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName FROM PlayerStats GROUP BY LastName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName, FirstName FROM PlayerStats GROUP BY LastName, FirstName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName, FirstName FROM PlayerStats GROUP BY 2, FirstName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName as last_name FROM PlayerStats GROUP BY last_name;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT a, b, SUM(c) FROM Input GROUP BY ROLLUP(a, b);",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT NULL, NULL, SUM(c) FROM Input UNION ALL SELECT a, NULL, SUM(c) FROM Input GROUP BY a UNION ALL SELECT a, b, SUM(c) FROM Input GROUP BY a, b;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH Sales AS ( SELECT 123 AS sku, 1 AS day, 9.99 AS price UNION ALL SELECT 123, 1, 8.99 UNION ALL SELECT 456, 1, 4.56 UNION ALL SELECT 123, 2, 9.99 UNION ALL SELECT 789, 3, 1.00 UNION ALL SELECT 456, 3, 4.25 UNION ALL SELECT 789, 3, 0.99 ) SELECT day, SUM(price) AS total FROM Sales GROUP BY ROLLUP(day);",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH Sales AS ( SELECT 123 AS sku, 1 AS day, 9.99 AS price UNION ALL SELECT 123, 1, 8.99 UNION ALL SELECT 456, 1, 4.56 UNION ALL SELECT 123, 2, 9.99 UNION ALL SELECT 789, 3, 1.00 UNION ALL SELECT 456, 3, 4.25 UNION ALL SELECT 789, 3, 0.99 ) SELECT sku, day, SUM(price) AS total FROM Sales GROUP BY ROLLUP(sku, day) ORDER BY sku, day;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT LastName FROM Roster GROUP BY LastName HAVING SUM(PointsScored) > 15;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, SUM(PointsScored) AS ps FROM Roster GROUP BY LastName HAVING ps > 0;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, SUM(PointsScored) AS total FROM PlayerStats GROUP BY LastName HAVING total > 15;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT LastName FROM PlayerStats GROUP BY LastName HAVING SUM(PointsScored) > 15;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, COUNT(*) FROM PlayerStats GROUP BY LastName HAVING SUM(PointsScored) > 15;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT x, y FROM (SELECT 1 AS x, true AS y UNION ALL SELECT 9, true UNION ALL SELECT NULL, false) ORDER BY x;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT x, y FROM (SELECT 1 AS x, true AS y UNION ALL SELECT 9, true UNION ALL SELECT NULL, false) ORDER BY x NULLS LAST;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT x, y FROM (SELECT 1 AS x, true AS y UNION ALL SELECT 9, true UNION ALL SELECT NULL, false) ORDER BY x DESC;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT x, y FROM (SELECT 1 AS x, true AS y UNION ALL SELECT 9, true UNION ALL SELECT NULL, false) ORDER BY x DESC NULLS FIRST;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, PointsScored, OpponentID FROM PlayerStats ORDER BY SchoolID, LastName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM Roster UNION ALL SELECT * FROM TeamMascot ORDER BY SchoolID;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM Roster UNION ALL SELECT * FROM TeamMascot ) ORDER BY SchoolID;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT * FROM Roster UNION ALL ( SELECT * FROM TeamMascot ORDER BY SchoolID );,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName FROM PlayerStats ORDER BY LastName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SUM(PointsScored), LastName FROM PlayerStats ORDER BY 2;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT * FROM UNNEST(ARRAY<int64>[1, 2, 3]) AS number EXCEPT DISTINCT SELECT 1;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"WITH subQ1 AS (SELECT SchoolID FROM Roster), subQ2 AS (SELECT OpponentID FROM PlayerStats) SELECT * FROM subQ1 UNION ALL SELECT * FROM subQ2;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT s.FirstName, s2.SongName FROM Singers AS s, (SELECT * FROM Songs) AS s2;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT s.FirstName AS name, LOWER(s.FirstName) AS lname FROM Singers s;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT FirstName FROM Singers AS s, s.Concerts;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT FirstName FROM s.Concerts, Singers AS s;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT FirstName, s.ReleaseDate FROM Singers s WHERE ReleaseDate = 1975;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT * FROM Singers as s, Songs as s2 ORDER BY Singers.LastName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName AS last, SingerID FROM Singers ORDER BY last;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SingerID AS sid, COUNT(Songid) AS s2id FROM Songs GROUP BY 1 ORDER BY 2 DESC;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SingerID AS sid, COUNT(Songid) AS s2id FROM Songs GROUP BY sid ORDER BY s2id DESC;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT SingerID FROM Singers, Songs;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT FirstName AS name, LastName AS name, FROM Singers GROUP BY name;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT x, z AS T FROM table AS T GROUP BY T.x;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, BirthYear AS BirthYear FROM Singers GROUP BY BirthYear;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT LastName, SUM(PointsScored) FROM PlayerStats GROUP BY LastName;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT Mascot AS X, SchoolID AS Y FROM TeamMascot UNION ALL SELECT LastName, PointsScored FROM PlayerStats;",https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT LastName FROM Roster INTERSECT DISTINCT SELECT LastName FROM PlayerStats;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT LastName FROM Roster EXCEPT DISTINCT SELECT LastName FROM PlayerStats;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+SELECT LastName FROM PlayerStats EXCEPT DISTINCT SELECT LastName FROM Roster;,https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
+"SELECT COUNT(*) FROM UNNEST([1, 2, 3, 4, 5, 6])) > 5 AS 'Table must contain more than 5 rows.';",https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements
+"SELECT X FROM UNNEST([7877, 7879, 7883, 7901, 7907]) X WHERE X = 7919 ) AS 'Column X must contain the value 7919';",https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements
+SELECT CURRENT_TIME() as now;,https://cloud.google.com/bigquery/docs/reference/standard-sql/time_functions
+"SELECT EXTRACT(HOUR FROM TIME ""15:30:00"") as hour;",https://cloud.google.com/bigquery/docs/reference/standard-sql/time_functions
+"SELECT FORMAT_TIME(""%R"", TIME ""15:30:00"") as formatted_time;",https://cloud.google.com/bigquery/docs/reference/standard-sql/time_functions
+"SELECT PARSE_TIME(""%H"", ""15"") as parsed_time;",https://cloud.google.com/bigquery/docs/reference/standard-sql/time_functions
+CREATE VIEW myProject.myDataset.myView AS SELECT * FROM anotherDataset.myTable;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE VIEW "" + ""`"" + projectId + ""."" + datasetId + ""."" + tableId + ""`"" + "" OPTIONS("" + "" expiration_timestamp=TIMESTAMP_ADD("" + "" CURRENT_TIMESTAMP(), INTERVAL 48 HOUR),"" + "" friendly_name=\""new_view\"","" + "" description=\""a view that expires in 2 days\"","" + "" labels=[(\""org_unit\"", \""development\"")]"" + "" )"" + "" AS SELECT name, state, year, number"" + "" FROM `bigquery-public-data.usa_names.usa_1910_current`"" + "" WHERE state LIKE 'W%'`"";",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE VIEW \`${projectId}.${datasetId}.${tableId}\` OPTIONS( expiration_timestamp=TIMESTAMP_ADD( CURRENT_TIMESTAMP(), INTERVAL 48 HOUR), friendly_name=""new_view"", description=""a view that expires in 2 days"", labels=[(""org_unit"", ""development"")] ) AS SELECT name, state, year, number FROM \`bigquery-public-data.usa_names.usa_1910_current\` WHERE state LIKE 'W%'`;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+CREATE MATERIALIZED VIEW myProject.myDataset.myView AS SELECT * FROM anotherDataset.myTable;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+CREATE FUNCTION myProject.myDataset.myFunction() AS (anotherDataset.anotherFunction());,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.multiplyInputs(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x * y);",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"WITH numbers AS (SELECT 1 AS x, 5 as y UNION ALL SELECT 2 AS x, 10 as y UNION ALL SELECT 3 as x, 15 as y) SELECT x, y, mydataset.multiplyInputs(x, y) as product FROM numbers;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.addFourAndDivideAny(x ANY TYPE, y ANY TYPE) AS ( (x + 4) / y );",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT addFourAndDivideAny(3, 4) AS integer_output, addFourAndDivideAny(1.59, 3.14) AS floating_point_output;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+CREATE FUNCTION mydataset.lastArrayElement(arr ANY TYPE) AS ( arr[ORDINAL(ARRAY_LENGTH(arr))] );,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT ['Fred', 'McFeely', 'Rogers'] AS names UNION ALL SELECT ['Marie', 'Skłodowska', 'Curie'] );",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE TEMP FUNCTION mydataset.multiplyInputs(x FLOAT64, y FLOAT64) RETURNS FLOAT64 LANGUAGE js AS """""" return x*y;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"WITH numbers AS (SELECT 1 AS x, 5 as y UNION ALL SELECT 2 AS x, 10 as y UNION ALL SELECT 3 as x, 15 as y) SELECT x, y, multiplyInputs(x, y) as product FROM numbers;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.multiplyInputs(x FLOAT64, y FLOAT64) RETURNS FLOAT64 LANGUAGE js AS """""" return x*y;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.divideByTwo(x FLOAT64) RETURNS FLOAT64 LANGUAGE js AS """""" return x/2;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"WITH numbers AS (SELECT 1 AS x, 5 as y UNION ALL SELECT 2 AS x, 10 as y UNION ALL SELECT 3 as x, 15 as y) SELECT x, y, mydataset.multiplyInputs( mydataset.divideByTwo(x), mydataset.divideByTwo(y)) as half_product FROM numbers;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.SumFieldsNamedFoo(json_row STRING) RETURNS FLOAT64 LANGUAGE js AS """""" function SumFoo(obj) { var sum = 0;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"WITH Input AS ( SELECT STRUCT(1 AS foo, 2 AS bar, STRUCT('foo' AS x, 3.14 AS foo) AS baz) AS s, 10 AS foo UNION ALL SELECT NULL, 4 AS foo UNION ALL SELECT STRUCT(NULL, 2 AS bar, STRUCT('fizz' AS x, 1.59 AS foo) AS baz) AS s, NULL AS foo ) SELECT TO_JSON_STRING(t) AS json_row, mydataset.SumFieldsNamedFoo(TO_JSON_STRING(t)) AS foo_sum FROM Input AS t;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.plusOne(x FLOAT64) RETURNS FLOAT64 LANGUAGE js AS ""return x+1;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.customGreeting(a STRING) RETURNS STRING LANGUAGE js AS """""" var d = new Date();",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT mydataset.myFunc(3.14, 'foo');",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE FUNCTION mydataset.timesTwo(x FLOAT64) RETURNS FLOAT64 LANGUAGE js AS """""" return x*2;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT mydataset.timesTwo(numbers) AS doubles FROM UNNEST([1, 2, 3, 4, 5]) AS numbers;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+CREATE FUNCTION mydataset.AddTwo(x INT64) AS (x + 2);,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+CREATE PROCEDURE myProject.myDataset.QueryTable() BEGIN SELECT * FROM anotherDataset.myTable;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE PROCEDURE mydataset.AddDelta(INOUT x INT64, delta INT64) BEGIN SET x = x + delta;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CALL mydataset.AddDelta(accumulator, 5);",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CALL mydataset.AddDelta(accumulator, 3);",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+SELECT accumulator;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CREATE PROCEDURE mydataset.SelectFromTablesAndAppend( target_date DATE, OUT rows_added INT64) BEGIN CREATE TEMP TABLE DataForTargetDate AS SELECT t1.id, t1.x, t2.y FROM dataset.partitioned_table1 AS t1 JOIN dataset.partitioned_table2 AS t2 ON t1.id = t2.id WHERE t1.date = target_date AND t2.date = target_date;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+SELECT COUNT(*) FROM DataForTargetDate);,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT id, x, y, target_date -- note that target_date is a parameter FROM DataForTargetDate;",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+DROP TABLE DataForTargetDate;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"CALL mydataset.SelectFromTablesAndAppend(CURRENT_DATE(), rows_added);",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT FORMAT('Added %d rows', rows_added);",https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+DROP FUNCTION mydataset.parseJsonAsStruct;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+DROP FUNCTION `other_project`.sample_dataset.parseJsonAsStruct;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+DROP PROCEDURE mydataset.myProcedure;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+DROP PROCEDURE `other-project`.sample_dataset.myprocedure;,https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language
+"SELECT customer_id, MIN(order_date) AS first_order_date FROM orders GROUP BY customer_id''' ) AS rq ON rq.customer_id = c.customer_id GROUP BY c.customer_id, c.name, rq.first_order_date;",https://cloud.google.com/bigquery/docs/reference/standard-sql/federated_query_functions
+"SELECT * FROM EXTERNAL_QUERY( 'connection_id', '''SELECT * FROM information_schema.tables''' );",https://cloud.google.com/bigquery/docs/reference/standard-sql/federated_query_functions
+"SELECT * FROM EXTERNAL_QUERY( 'connection_id', '''SELECT * FROM information_schema.columns WHERE table_name='x';",https://cloud.google.com/bigquery/docs/reference/standard-sql/federated_query_functions
+"SELECT * FROM EXTERNAL_QUERY( 'connection_id', '''SELECT * FROM customers AS c ORDER BY c.customer_id''' );",https://cloud.google.com/bigquery/docs/reference/standard-sql/federated_query_functions
+"SELECT a, BIT_COUNT(a) AS a_bits, FORMAT(""%T"", b) as b, BIT_COUNT(b) AS b_bits FROM UNNEST([ STRUCT(0 AS a, b'' AS b), (0, b'\x00'), (5, b'\x05'), (8, b'\x00\x08'), (0xFFFF, b'\xFF\xFF'), (-2, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFE'), (-1, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF'), (NULL, b'\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF') ]) AS x;",https://cloud.google.com/bigquery/docs/reference/standard-sql/bit_functions
+SELECT GENERATE_UUID() AS uuid;,https://cloud.google.com/bigquery/docs/reference/standard-sql/uuid_functions
+"WITH example AS ( SELECT 1 AS x, ""foo"" AS y, true AS z UNION ALL SELECT 2 AS x, ""apple"" AS y, false AS z UNION ALL SELECT 3 AS x, """" AS y, true AS z ) SELECT *, FARM_FINGERPRINT(CONCAT(CAST(x AS STRING), y, CAST(z AS STRING))) AS row_fingerprint FROM example;",https://cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions
+"SELECT MD5(""Hello World"") as md5;",https://cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions
+"SELECT SHA1(""Hello World"") as sha1;",https://cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions
+"SELECT SHA256(""Hello World"") as sha256;",https://cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions
+"SELECT SHA512(""Hello World"") as sha512;",https://cloud.google.com/bigquery/docs/reference/standard-sql/hash_functions

@@ -1,6 +1,10 @@
 {
   "featureIndicators": [
     {
+      "feature": "DML_FEATURE_ROOT",
+      "isIncluded": true
+    },
+    {
       "feature": "DML_INSERT",
       "isIncluded": true
     },

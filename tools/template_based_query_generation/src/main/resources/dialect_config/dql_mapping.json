@@ -4,11 +4,13 @@
       "feature": "DQL_SELECT",
       "allMappings": [
         {
-          "postgres": "SELECT",
-          "bigQuery": "SELECT",
+          "dialectMap": {
+            "postgres": "SELECT",
+            "bigQuery": "SELECT"
+          },
           "tokenInfos": [
             {
-              "tokenName": "select_exp",
+              "tokenType": "select_exp",
               "required": true,
               "count": 1
             }
@@ -20,11 +22,13 @@
       "feature": "DQL_FROM",
       "allMappings": [
         {
-          "postgres": "FROM",
-          "bigQuery": "FROM",
+          "dialectMap": {
+            "postgres": "FROM",
+            "bigQuery": "FROM"
+          },
           "tokenInfos": [
             {
-              "tokenName": "from_item",
+              "tokenType": "from_item",
               "required": true,
               "count": 1
             }
@@ -36,11 +40,13 @@
       "feature": "DQL_WHERE",
       "allMappings": [
         {
-          "postgres": "WHERE",
-          "bigQuery": "WHERE",
+          "dialectMap": {
+            "postgres": "WHERE",
+            "bigQuery": "WHERE"
+          },
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }
@@ -52,11 +58,13 @@
       "feature": "DQL_GROUP",
       "allMappings": [
         {
-          "postgres": "GROUP BY",
-          "bigQuery": "GROUP BY",
+          "dialectMap": {
+            "postgres": "GROUP BY",
+            "bigQuery": "GROUP BY"
+          },
           "tokenInfos": [
             {
-              "tokenName": "group_exp",
+              "tokenType": "group_exp",
               "required": true,
               "count": 1
             }
@@ -68,11 +76,13 @@
       "feature": "DQL_HAVING",
       "allMappings": [
         {
-          "postgres": "HAVING",
-          "bigQuery": "HAVING",
+          "dialectMap": {
+            "postgres": "HAVING",
+            "bigQuery": "HAVING"
+          },
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }
@@ -84,11 +94,13 @@
       "feature": "DQL_ORDER",
       "allMappings": [
         {
-          "postgres": "ORDER BY",
-          "bigQuery": "ORDER BY",
+          "dialectMap": {
+            "postgres": "ORDER BY",
+            "bigQuery": "ORDER BY"
+          },
           "tokenInfos": [
             {
-              "tokenName": "order_exp",
+              "tokenType": "order_exp",
               "required": true,
               "count": 1
             }
@@ -100,8 +112,10 @@
       "feature": "DQL_ASC",
       "allMappings": [
         {
-          "postgres": "ASC",
-          "bigQuery": "ASC",
+          "dialectMap": {
+            "postgres": "ASC",
+            "bigQuery": "ASC"
+          },
           "tokenInfos": [
           ]
         }
@@ -111,8 +125,10 @@
       "feature": "DQL_DESC",
       "allMappings": [
         {
-          "postgres": "DESC",
-          "bigQuery": "DESC",
+          "dialectMap": {
+            "postgres": "DESC",
+            "bigQuery": "DESC"
+          },
           "tokenInfos": [
           ]
         }
@@ -122,11 +138,13 @@
       "feature": "DQL_LIMIT",
       "allMappings": [
         {
-          "postgres": "LIMIT",
-          "bigQuery": "LIMIT",
+          "dialectMap": {
+            "postgres": "LIMIT",
+            "bigQuery": "LIMIT"
+          },
           "tokenInfos": [
             {
-              "tokenName": "count",
+              "tokenType": "count",
               "required": true,
               "count": 1
             }
@@ -138,11 +156,13 @@
       "feature": "DQL_OFFSET",
       "allMappings": [
         {
-          "postgres": "OFFSET",
-          "bigQuery": "OFFSET",
+          "dialectMap": {
+            "postgres": "OFFSET",
+            "bigQuery": "OFFSET"
+          },
           "tokenInfos": [
             {
-              "tokenName": "skip_rows",
+              "tokenType": "skip_rows",
               "required": true,
               "count": 1
             }

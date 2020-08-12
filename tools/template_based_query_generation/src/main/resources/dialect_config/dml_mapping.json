@@ -4,22 +4,26 @@
       "feature": "DML_INSERT",
       "allMappings": [
         {
-          "postgres": "INSERT",
-          "bigQuery": "INSERT",
+          "dialectMap": {
+            "postgres": "INSERT",
+            "bigQuery": "INSERT"
+          },
           "tokenInfos": [
             {
-              "tokenName": "insert_exp",
+              "tokenType": "insert_exp",
               "required": true,
               "count": 1
             }
           ]
         },
         {
-          "postgres": "INSERT INTO",
-          "bigQuery": "INSERT INTO",
+          "dialectMap": {
+            "postgres": "INSERT INTO",
+            "bigQuery": "INSERT INTO"
+          },
           "tokenInfos": [
             {
-              "tokenName": "insert_exp",
+              "tokenType": "insert_exp",
               "required": true,
               "count": 1
             }
@@ -31,22 +35,26 @@
       "feature": "DML_DELETE",
       "allMappings": [
         {
-          "postgres": "DELETE",
-          "bigQuery": "DELETE",
+          "dialectMap": {
+            "postgres": "DELETE",
+            "bigQuery": "DELETE"
+          },
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             }
           ]
         },
         {
-          "postgres": "DELETE FROM",
-          "bigQuery": "DELETE FROM",
+          "dialectMap": {
+            "postgres": "DELETE FROM",
+            "bigQuery": "DELETE FROM"
+          },
           "tokenInfos": [
             {
-              "tokenName": "table_name",
+              "tokenType": "table_name",
               "required": true,
               "count": 1
             }
@@ -58,11 +66,13 @@
       "feature": "DML_VALUES",
       "allMappings": [
         {
-          "postgres": "VALUES",
-          "bigQuery": "VALUES",
+          "dialectMap": {
+            "postgres": "VALUES",
+            "bigQuery": "VALUES"
+          },
           "tokenInfos": [
             {
-              "tokenName": "values_exp",
+              "tokenType": "values_exp",
               "required": true,
               "count": 1
             }
@@ -74,11 +84,13 @@
       "feature": "DML_WHERE",
       "allMappings": [
         {
-          "postgres": "WHERE",
-          "bigQuery": "WHERE",
+          "dialectMap": {
+            "postgres": "WHERE",
+            "bigQuery": "WHERE"
+          },
           "tokenInfos": [
             {
-              "tokenName": "condition",
+              "tokenType": "condition",
               "required": true,
               "count": 1
             }

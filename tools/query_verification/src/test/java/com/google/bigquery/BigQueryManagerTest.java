@@ -3,7 +3,8 @@ package com.google.bigquery;
 import com.google.cloud.bigquery.*;
 import org.junit.Test;
 
-import java.awt.geom.Line2D;
+import java.math.BigDecimal;
+import java.text.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -135,17 +136,50 @@ public class BigQueryManagerTest {
     }
 
     @Test
-    public void testParseResults() {
+    public void testParseResults() throws ParseException {
+        BigQueryManager bigQueryManager = new BigQueryManager(null, null, null, null);
+
         Map<StandardSQLTypeName, String> types = new LinkedHashMap<StandardSQLTypeName, String>();
+        types.put(StandardSQLTypeName.BOOL, "true");
+        types.put(StandardSQLTypeName.FLOAT64, "2.25");
+        types.put(StandardSQLTypeName.INT64, "10");
+        types.put(StandardSQLTypeName.NUMERIC, "3.333333333");
+        types.put(StandardSQLTypeName.DATE, "2020-01-01");
+        types.put(StandardSQLTypeName.DATETIME, "2020-01-01T12:00:00.000000");
+        types.put(StandardSQLTypeName.TIME, "12:00:00.000000");
+        types.put(StandardSQLTypeName.TIMESTAMP, "2020-01-01 12:00:00.000000 UTC");
         types.put(StandardSQLTypeName.STRING, "value");
-        // TODO Test other data types
+
+        Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS zzz").parse("2020-01-01 12:00:00.000000 UTC");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss.SSSSSS");
+
+        // Test individual data types
 
         FieldValueList values = FieldValueList.of(types.values().stream().map(value -> FieldValue.of(FieldValue.Attribute.PRIMITIVE, value)).collect(Collectors.toList()));
         FieldList fields = FieldList.of(types.keySet().stream().map(type -> Field.newBuilder(type.name(), type).build()).collect(Collectors.toList()));
 
-        List<Object> results = new BigQueryManager(null, null, null, null).parseResults(values, fields);
+        List<Object> results = bigQueryManager.parseResults(values, fields);
 
-        assertEquals(results.get(0), "value");
+        assertEquals(results.size(), 9);
+        assertEquals(results.get(0), true);
+        assertEquals(results.get(1), 2.25);
+        assertEquals(results.get(2), 10L);
+        assertEquals(results.get(3), new BigDecimal("3.333333333"));
+        assertEquals(dateFormat.format(results.get(4)), dateFormat.format(date));
+        assertEquals(results.get(5), date);
+        assertEquals(timeFormat.format(results.get(6)), timeFormat.format(date));
+        assertEquals(results.get(7), date);
+        assertEquals(results.get(8), "value");
+
+        // Test struct data type
+
+        FieldValueList structValues = FieldValueList.of(Arrays.asList(FieldValue.of(FieldValue.Attribute.REPEATED, values)));
+        FieldList structFields = FieldList.of(Arrays.asList(Field.newBuilder("STRUCT", StandardSQLTypeName.STRUCT, fields).build()));
+
+        List<Object> structResults = bigQueryManager.parseResults(structValues, structFields);
+        assertEquals(structResults.size(), 1);
+        assertEquals(structResults.get(0), results);
     }
 
 }

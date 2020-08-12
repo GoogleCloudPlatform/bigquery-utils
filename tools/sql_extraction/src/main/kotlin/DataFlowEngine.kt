@@ -115,12 +115,27 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
     }
 
     /**
+     * Visits an assignment operator (=) to an optionally undeclared variable.
+     *
+     * @param[variableName] Left-hand-side variable that is getting mutated.
+     *     This will be declared in current scope if it does not exist.
+     * @param[visitRhs] Expression to set [variableName].
+     */
+    fun visitAssignmentWithOptionalDeclaration(variableName: String, visitRhs: () -> Unit) {
+        if (!environment.isVariableDeclaredInAnyScope(variableName)) {
+            environment.declareVariable(variableName)
+        }
+
+        visitAssignment(variableName, visitRhs)
+    }
+
+    /**
      * Visits an assignment operator (=) or an concatenation assignment operator (+=).
      *
      * @param[variableName] Left-hand-side variable that is getting mutated.
-     * @param[visitRhs] Expression to set [variableName]
+     * @param[visitRhs] Expression to set [variableName].
      * @param[concatenate] Whether to replace the variable (if false)
-     *     or to append to the variable (if true)
+     *     or to append to the variable (if true).
      */
     fun visitAssignment(variableName: String, visitRhs: () -> Unit, concatenate: Boolean = false) {
         visitRhs()
@@ -139,7 +154,7 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
         }
 
         LOGGER.debug {
-            "variableName ${if (concatenate) "+=" else "="} " +
+            "$variableName ${if (concatenate) "+=" else "="} " +
                     environment.getVariableReference(variableName)?.toCombinedString()
         }
     }
@@ -164,6 +179,26 @@ class DataFlowEngine(private val environment: Environment = Environment()) {
             rightFragment,
             ComplexType.AND
         )
+    }
+
+    /**
+     * Visits a mass concatenation/summation operator, which operates on the current expression.
+     *
+     * @param[visitChildren] Sequence of expressions that evaluate to a String Literal
+     *     such that all literals are appended together.
+     */
+    fun visitConcatenation(visitChildren: Sequence<() -> Unit>) {
+        currentQuery =
+            QueryFragment.createComplex(
+                FragmentCount.SINGLE,// todo: count as defined by current control flow
+                visitChildren.mapNotNull {
+                    it()
+                    val literal = currentQuery
+                    currentQuery = null
+                    literal
+                }.asIterable(),
+                ComplexType.AND
+            )
     }
 
     /**
