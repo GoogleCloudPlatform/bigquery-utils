@@ -6,7 +6,8 @@
         {
           "dialectMap": {
             "postgres": "SELECT",
-            "bigQuery": "SELECT"
+            "bigQuery": "SELECT",
+            "mySql": "SELECT"
           },
           "tokenInfos": [
             {
@@ -24,7 +25,8 @@
         {
           "dialectMap": {
             "postgres": "FROM",
-            "bigQuery": "FROM"
+            "bigQuery": "FROM",
+            "mySql": "FROM"
           },
           "tokenInfos": [
             {
@@ -42,7 +44,8 @@
         {
           "dialectMap": {
             "postgres": "WHERE",
-            "bigQuery": "WHERE"
+            "bigQuery": "WHERE",
+            "mySql": "WHERE"
           },
           "tokenInfos": [
             {
@@ -60,7 +63,8 @@
         {
           "dialectMap": {
             "postgres": "GROUP BY",
-            "bigQuery": "GROUP BY"
+            "bigQuery": "GROUP BY",
+            "mySql": "GROUP BY"
           },
           "tokenInfos": [
             {
@@ -78,7 +82,8 @@
         {
           "dialectMap": {
             "postgres": "HAVING",
-            "bigQuery": "HAVING"
+            "bigQuery": "HAVING",
+            "mySql": "HAVING"
           },
           "tokenInfos": [
             {
@@ -96,7 +101,8 @@
         {
           "dialectMap": {
             "postgres": "ORDER BY",
-            "bigQuery": "ORDER BY"
+            "bigQuery": "ORDER BY",
+            "mySql": "ORDER BY"
           },
           "tokenInfos": [
             {
@@ -114,7 +120,8 @@
         {
           "dialectMap": {
             "postgres": "ASC",
-            "bigQuery": "ASC"
+            "bigQuery": "ASC",
+            "mySql": "ASC"
           },
           "tokenInfos": [
           ]
@@ -127,7 +134,8 @@
         {
           "dialectMap": {
             "postgres": "DESC",
-            "bigQuery": "DESC"
+            "bigQuery": "DESC",
+            "mySql": "DESC"
           },
           "tokenInfos": [
           ]
@@ -140,7 +148,8 @@
         {
           "dialectMap": {
             "postgres": "LIMIT",
-            "bigQuery": "LIMIT"
+            "bigQuery": "LIMIT",
+            "mySql": "LIMIT"
           },
           "tokenInfos": [
             {
@@ -158,7 +167,8 @@
         {
           "dialectMap": {
             "postgres": "OFFSET",
-            "bigQuery": "OFFSET"
+            "bigQuery": "OFFSET",
+            "mySql": "OFFSET"
           },
           "tokenInfos": [
             {

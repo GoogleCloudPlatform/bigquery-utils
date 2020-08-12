@@ -1,11 +1,10 @@
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import data.Table;
 import graph.MarkovChain;
 import graph.Node;
 import parser.*;
-import query.*;
+import query.Query;
+import query.Skeleton;
 import token.Tokenizer;
 
 import java.io.BufferedReader;
@@ -29,20 +28,22 @@ public class QueryGenerator {
   private final String filePathDependenciesDDL = "./src/main/resources/dialect_config/ddl_dependencies.json";
   private final String filePathDependenciesDML = "./src/main/resources/dialect_config/dml_dependencies.json";
   private final String filePathDependenciesDQL = "./src/main/resources/dialect_config/dql_dependencies.json";
+  private final String filePathUser = "./src/main/resources/user_config/config.json";
 
   private final MarkovChain<Query> markovChain;
   private Random r = new Random();
   private Node<Query> source = new Node<>(new Query(FeatureType.FEATURE_ROOT), r);
+  private final User user = Utils.getUser(Paths.get(filePathUser));
 
   /**
    *
-   * @throws Exception
+   * @throws IOException
    */
-  public QueryGenerator() throws Exception {
+  public QueryGenerator() throws IOException {
     // TODO (Victor):
     //  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
     //  2. Generate number of queries given in config
-    //  3. pass to them to Keyword or Skeleton
+    //  3. pass to them to Keyword or query.Skeleton
 
     // create nodes
     Map<String, Node<Query>> nodeMap = new HashMap<>();
@@ -51,8 +52,8 @@ public class QueryGenerator {
     addNodeMap(nodeMap, Paths.get(filePathConfigDQL), r);
 
     // TODO (Victor): Parse these two helper nodes from user config
-    nodeMap.put("FEATURE_ROOT", source);
-    nodeMap.put("FEATURE_SINK", new Node<>(new Query(FeatureType.FEATURE_SINK), r));
+    nodeMap.put(user.getStart(), source);
+    nodeMap.put(user.getEnd(), new Node<>(new Query(FeatureType.FEATURE_SINK), r));
 
     Map<String, List<String>> neighborMap = new HashMap<>();
     addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDDL));
@@ -76,36 +77,36 @@ public class QueryGenerator {
   /**
    * generates queries from markov chain starting from root
    */
-  public void generateQueries(int numberQueries) {
-    ImmutableList.Builder<String> postgreBuilder = ImmutableList.builder();
-    ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
-    Tokenizer tokenizer = new Tokenizer(r);
+  public void generateQueries() throws IOException {
+    Map<String, List<String>> dialectQueries = new HashMap<>();
 
-    int i = 0;
-    while (i < numberQueries) {
-      List<Query> rawQueries = markovChain.randomWalk(source);
-
-      if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
-        List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-1);
-        Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
-        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()) + ";");
-        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()) + ";");
-        i++;
+    for (String dialect : user.getDialectIndicators().keySet()) {
+      if (user.getDialectIndicators().get(dialect)) {
+        dialectQueries.put(dialect, new ArrayList<>());
       }
     }
 
-    ImmutableList<String> postgreSyntax = postgreBuilder.build();
-    ImmutableList<String> bigQuerySyntax = bigQueryBuilder.build();
+    Tokenizer tokenizer = new Tokenizer(r);
 
-    ImmutableMap.Builder<String, ImmutableList<String>> builder = ImmutableMap.builder();
-    builder.put("PostgreSQL", postgreSyntax);
-    builder.put("BigQuery", bigQuerySyntax);
-    ImmutableMap<String, ImmutableList<String>> outputs = builder.build();
+    int i = 0;
+    while (i < user.getNumQueries()) {
+      List<Query> rawQueries = markovChain.randomWalk(source);
+      if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
+        List<Query> actualQueries = rawQueries.subList(2, rawQueries.size() - 1);
+        Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
+        for (String dialect : user.getDialectIndicators().keySet()) {
+          if (user.getDialectIndicators().get(dialect)) {
+            dialectQueries.get(dialect).add(String.join(" ", skeleton.getDialectSkeletons().get(dialect)) + ";");
+          }
+        }
+      }
+      i++;
+    }
 
     Table dataTable = tokenizer.getTable();
 
     try {
-      Utils.writeDirectory(outputs, dataTable);
+      Utils.writeDirectory(dialectQueries, dataTable);
     } catch (IOException exception){
       exception.printStackTrace();
     }

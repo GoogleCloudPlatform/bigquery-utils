@@ -16,8 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Date;
+
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -147,9 +149,10 @@ public class Utils {
    * @param outputDirectory relative path of a specified directory
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
-    writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
+  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
+    for (String dialect : outputs.keySet()) {
+      writeFile(outputs.get(dialect), outputDirectory.resolve(dialect + ".txt"));
+    }
     writeData(dataTable, outputDirectory.resolve("data.csv"));
 
     System.out.println("The output is stored at " + outputDirectory);
@@ -161,7 +164,7 @@ public class Utils {
    * @param outputs collection of statements to write
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable) throws IOException {
+  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable) throws IOException {
     String outputDirectory = getOutputDirectory("outputs");
     File file = new File(outputDirectory);
 
@@ -179,7 +182,7 @@ public class Utils {
    * @param outputPath absolute path of a specified file
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeFile(ImmutableList<String> statements, Path outputPath) throws IOException {
+  public static void writeFile(List<String> statements, Path outputPath) throws IOException {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       for (String statement : statements) {
         writer.write(statement);
@@ -282,20 +285,34 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, Map<String, String>> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, Map<String, String>> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
-      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+      builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
     }
 
-    ImmutableMap<DataType, DataTypeMap> map = builder.build();
+    ImmutableMap<DataType, Map<String, String>> map = builder.build();
 
     return map;
+  }
+
+  /**
+   * Creates an User object from the main user config file
+   *
+   * @param inputPath relative path of the config file
+   * @return a User object describing user preferences
+   */
+  public static User getUser(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    User user = gson.fromJson(reader, User.class);
+
+    return user;
   }
   // TODO(spoiledhua): refactor IO exception handling
 
