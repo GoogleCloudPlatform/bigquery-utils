@@ -20,15 +20,18 @@ public class QueryFixerMain {
 
   private static final String OUTPUT_SHORTCUT = "o";
   private static final String OUTPUT = "output";
-  private static final String OUTPUT_MODE_JSON = "json";
-  private static final String OUTPUT_MODE_NATURAL = "natural";
+  private static final String JSON_OUTPUT = "json";
+  private static final String NATURAL_OUTPUT = "natural";
 
-  private static final String INTERACT_SHORTCUT = "i";
-  private static final String INTERACT = "interact";
-  private static final String INTERACT_MODE_NONE = "none";
-  private static final String INTERACT_MODE_GUIDE = "guide";
-  private static final String INTERACT_MODE_ALL = "all";
-  private static final String INTERACT_MODE_FULL = "full";
+  private static final String MODE_SHORTCUT = "m";
+  private static final String MODE = "mode";
+  private static final String AUTO_MODE = "auto";
+  private static final String USER_ASSISTANCE_MODE = "user-assistance";
+  // The abbreviation of USER_ASSISTANCE_MODE
+  private static final String UA_MODE = "ua";
+  private static final String FIX_ONCE_MODE = "fix-once";
+  // The abbreviation of FIX_ONCE_MODE
+  private static final String FO_MODE = "fo";
 
   private static CommandLine readFlags(String[] args) {
     Options options = new Options();
@@ -56,10 +59,10 @@ public class QueryFixerMain {
     options.addOption(option);
     option =
         new Option(
-            /*opt=*/ INTERACT_SHORTCUT,
-            /*long-opt=*/ INTERACT,
+            /*opt=*/ MODE_SHORTCUT,
+            /*long-opt=*/ MODE,
             /*hasArg=*/ true,
-            /*description=*/ "Interactive Mode. The available mode are \"none\" (default), \"guide\" and \"all/full\"");
+            /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"fo/fix-once\". Please see the README file for their meanings");
     options.addOption(option);
 
     if (args.length == 0) {
@@ -102,12 +105,12 @@ public class QueryFixerMain {
 
     AutomaticQueryFixer queryFixer = new AutomaticQueryFixer(bigQueryOptions);
 
-    String interactMode = cmd.getOptionValue(INTERACT);
-    if (interactMode == null) {
-      interactMode = INTERACT_MODE_NONE;
+    String mode = cmd.getOptionValue(MODE);
+    if (mode == null) {
+      mode = AUTO_MODE;
     }
-    switch (interactMode) {
-      case INTERACT_MODE_NONE:
+    switch (mode) {
+      case AUTO_MODE:
         // todo: Implement Non-interactive mode
         FixResult fixResult = queryFixer.fix(query);
         if (fixResult.getOptions().isEmpty()) {
@@ -117,12 +120,13 @@ public class QueryFixerMain {
         printQueryResult(newQuery, bigQueryOptions);
         break;
 
-      case INTERACT_MODE_GUIDE:
+      case USER_ASSISTANCE_MODE:
+      case UA_MODE:
         // todo: Implement guide mode
         return;
 
-      case INTERACT_MODE_ALL:
-      case INTERACT_MODE_FULL:
+      case FIX_ONCE_MODE:
+      case FO_MODE:
         fixResult = fixQueryInFullInteractMode(queryFixer, query);
         printFixResult(fixResult, cmd.getOptionValue(OUTPUT));
         break;
@@ -150,9 +154,9 @@ public class QueryFixerMain {
   }
 
   private static void printFixResult(FixResult fixResult, String outputFormat) {
-    if (outputFormat == null || outputFormat.equalsIgnoreCase(OUTPUT_MODE_NATURAL)) {
+    if (outputFormat == null || outputFormat.equalsIgnoreCase(NATURAL_OUTPUT)) {
       printFixResultInCommandLine(fixResult);
-    } else if (outputFormat.equalsIgnoreCase(OUTPUT_MODE_JSON)) {
+    } else if (outputFormat.equalsIgnoreCase(JSON_OUTPUT)) {
       printFixResultAsJson(fixResult);
     } else {
       System.out.println("Output Mode (-o) is incorrect. Use --help for usage.");
