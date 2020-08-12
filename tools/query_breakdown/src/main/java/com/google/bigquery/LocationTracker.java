@@ -44,7 +44,7 @@ public class LocationTracker {
    * This method inserts an element in the middle of the location ArrayList to replicate
    * replacement
    */
-  public void add(int x, int y, int numberToAdd) {
+  private void add(int x, int y, int numberToAdd) {
     location.get(x - 1).add(y, numberToAdd);
   }
 
@@ -55,17 +55,6 @@ public class LocationTracker {
     if (x > 0 && x <= location.size()) {
       if (y > 0 && y <= location.get(x - 1).size()) {
         location.get(x - 1).remove(y - 1);
-      }
-    }
-  }
-
-  /**
-   * This method changes an entry from location specified by (x, y) in the original query.
-   */
-  public void change(int x, int y, int changeTo) {
-    if (x > 0 && x <= location.size()) {
-      if (y > 0 && y <= location.get(x - 1).size()) {
-        location.get(x - 1).set(y - 1, changeTo);
       }
     }
   }

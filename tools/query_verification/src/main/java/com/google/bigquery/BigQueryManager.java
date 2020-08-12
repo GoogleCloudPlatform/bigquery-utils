@@ -5,6 +5,8 @@ import com.google.gson.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -279,8 +281,48 @@ public class BigQueryManager implements DataWarehouseManager {
             StandardSQLTypeName type = fields.get(i).getType().getStandardType();
 
             Object result;
-            // TODO Convert value to appropriate Java type
-            result = value.getStringValue();
+            try {
+                switch (type) {
+                    case BOOL:
+                        result = value.getBooleanValue();
+                        break;
+                    case FLOAT64:
+                        result = value.getDoubleValue();
+                        break;
+                    case INT64:
+                        result = value.getLongValue();
+                        break;
+                    case NUMERIC:
+                        result = value.getNumericValue();
+                        break;
+                    case STRUCT:
+                        FieldList subFields = fields.get(i).getSubFields();
+                        FieldValueList subValues = value.getRecordValue();
+                        result = parseResults(subValues, subFields);
+                        break;
+                    case DATE:
+                        result = new SimpleDateFormat("yyyy-MM-dd").parse(value.getStringValue());
+                        break;
+                    case DATETIME:
+                        result = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSSSS").parse(value.getStringValue());
+                        break;
+                    case TIME:
+                        result = new SimpleDateFormat("hh:mm:ss.SSSSSS").parse(value.getStringValue());
+                        break;
+                    case TIMESTAMP:
+                        result = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS zzz").parse(value.getStringValue());
+                        break;
+                    case STRING:
+                        result = value.getStringValue();
+                        break;
+                    default:
+                        // Handle unknown/unsupported types as String
+                        System.err.println("Warning: Unsupported type: " + type.name());
+                        result = value.getStringValue();
+                }
+            } catch (ParseException e) {
+                result = Optional.empty();
+            }
 
             results.add(result);
         }
