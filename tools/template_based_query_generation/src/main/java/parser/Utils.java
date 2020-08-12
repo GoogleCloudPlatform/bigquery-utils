@@ -148,7 +148,7 @@ public class Utils {
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSql.txt"));
+    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
     writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
     writeData(dataTable, outputDirectory.resolve("data.csv"));
 
@@ -195,6 +195,7 @@ public class Utils {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       List<List<?>> data = dataTable.generateData();
       // traverse data column-first
+      System.out.println(dataTable.getSchema());
       for (int row = 0; row < data.get(0).size(); row++) {
         StringBuilder sb = new StringBuilder();
         for (int column = 0; column < data.size(); column++) {
@@ -277,20 +278,34 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, Map> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, Map<String, String>> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, Map> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, Map<String, String>> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
       builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
     }
 
-    ImmutableMap<DataType, Map> map = builder.build();
+    ImmutableMap<DataType, Map<String, String>> map = builder.build();
 
     return map;
+  }
+
+  /**
+   * Creates an User object from the main user config file
+   *
+   * @param inputPath relative path of the config file
+   * @return a User object describing user preferences
+   */
+  public static User getUser(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    User user = gson.fromJson(reader, User.class);
+
+    return user;
   }
   // TODO(spoiledhua): refactor IO exception handling
 

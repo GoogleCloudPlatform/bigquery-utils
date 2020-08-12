@@ -30,16 +30,18 @@ public class QueryGenerator {
   private final String filePathDependenciesDDL = "./src/main/resources/dialect_config/ddl_dependencies.json";
   private final String filePathDependenciesDML = "./src/main/resources/dialect_config/dml_dependencies.json";
   private final String filePathDependenciesDQL = "./src/main/resources/dialect_config/dql_dependencies.json";
+  private final String filePathUser = "./src/main/resources/user_config/config.json";
 
   private final MarkovChain<Query> markovChain;
   private Random r = new Random();
   private Node<Query> source = new Node<>(new Query(FeatureType.FEATURE_ROOT), r);
+  private final User user = Utils.getUser(Paths.get(filePathUser));
 
   /**
    *
-   * @throws Exception
+   * @throws IOException
    */
-  public QueryGenerator() throws Exception {
+  public QueryGenerator() throws IOException {
     // TODO (Victor):
     //  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
     //  2. Generate number of queries given in config
@@ -52,8 +54,8 @@ public class QueryGenerator {
     addNodeMap(nodeMap, Paths.get(filePathConfigDQL), r);
 
     // TODO (Victor): Parse these two helper nodes from user config
-    nodeMap.put("FEATURE_ROOT", source);
-    nodeMap.put("FEATURE_SINK", new Node<>(new Query(FeatureType.FEATURE_SINK), r));
+    nodeMap.put(user.getStart(), source);
+    nodeMap.put(user.getEnd(), new Node<>(new Query(FeatureType.FEATURE_SINK), r));
 
     Map<String, List<String>> neighborMap = new HashMap<>();
     addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDDL));

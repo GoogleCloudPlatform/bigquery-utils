@@ -1,14 +1,14 @@
 package query;
 
 import com.google.common.collect.ImmutableList;
-import parser.Keywords;
-import parser.KeywordsMapping;
-import parser.Mapping;
-import parser.Utils;
+import com.google.common.collect.ImmutableMap;
+import parser.*;
 import token.Token;
 import token.TokenInfo;
 import token.Tokenizer;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +21,10 @@ public class Skeleton {
 
   private final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
+  private final String filePathUser = "./src/main/resources/user_config/config.json";
+  private final User user = Utils.getUser(Paths.get(filePathUser));
+
+  private final ImmutableMap<String, ImmutableList<String>> dialectSkeletons;
   private final ImmutableList<String> postgreSkeleton;
   private final ImmutableList<String> bigQuerySkeleton;
 
@@ -28,9 +32,46 @@ public class Skeleton {
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
    */
   // TODO (spoiledhua): change input and output to query.Query Objects
-  public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) {
-    ImmutableList.Builder<String> postgresBuilder = ImmutableList.builder();
-    ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
+  public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) throws IOException {
+    ImmutableMap.Builder<String, ImmutableList<String>> mapBuilder = ImmutableMap.builder();
+
+    for (String dialect : user.getDialectIndicators().keySet()) {
+      if (user.getDialectIndicators().get(dialect)) {
+        ImmutableList.Builder<String> builder = ImmutableList.builder();
+
+        for (Query rawQuery : rawQueries) {
+          ImmutableList<Mapping> mappingList = getLanguageMap(rawQuery.getType().name());
+
+          // choose a random variant from the list of possible keyword variants
+          int randomIndex = Utils.getRandomInteger(mappingList.size() - 1);
+          Mapping keywordVariant = mappingList.get(randomIndex);
+          builder.add(keywordVariant.getDialectMap().get(dialect));
+          List<TokenInfo> tokenInfos = keywordVariant.getTokenInfos();
+
+          List<Token> tokens = new ArrayList<>();
+          for (TokenInfo tokenInfo : tokenInfos) {
+            Token token = new Token(tokenInfo);
+            tokens.add(token);
+          }
+
+          rawQuery.setTokens(tokens);
+          for (Token token : tokens) {
+            tokenizer.generateToken(token);
+            if (token.getTokenInfo().getRequired()) {
+              // refactor to be generalized
+              postgresBuilder.add(token.getPostgresTokenExpression());
+              bigQueryBuilder.add(token.getBigQueryTokenExpression());
+            } else if (Utils.getRandomInteger(1) == 1) {
+              postgresBuilder.add(token.getPostgresTokenExpression());
+              bigQueryBuilder.add(token.getBigQueryTokenExpression());
+            }
+          }
+        }
+
+        postgreSkeleton = postgresBuilder.build();
+        bigQuerySkeleton = bigQueryBuilder.build();
+      }
+    }
 
     for (Query rawQuery : rawQueries) {
       ImmutableList<Mapping> mappingList = getLanguageMap(rawQuery.getType().name());

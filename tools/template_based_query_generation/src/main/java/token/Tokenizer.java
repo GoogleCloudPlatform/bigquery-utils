@@ -7,7 +7,10 @@ import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 /**
  *
@@ -19,7 +22,7 @@ public class Tokenizer {
   private Random r;
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
-  private ImmutableMap<DataType, Map> dataTypeMappings;
+  private ImmutableMap<DataType, Map<String, String>> dataTypeMappings;
   private int maxNumColumnsValues = 5;
   private int maxColumnsPerDataType = 3;
   private int maxColumnNameLength = 20;
@@ -153,7 +156,7 @@ public class Tokenizer {
       DataType d = DataType.getRandomDataType();
       int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
-      Map mapping = dataTypeMappings.get(d);
+      Map<String, String> mapping = dataTypeMappings.get(d);
       bqToken += " " + columnName + " " + mapping.get("bigQuery") + ",";
       postgresToken += " " + columnName + " " + mapping.get("postgres") + ",";
     }
