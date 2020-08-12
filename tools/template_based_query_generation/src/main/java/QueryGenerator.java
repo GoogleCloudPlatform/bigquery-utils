@@ -1,5 +1,3 @@
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import data.Table;
 import graph.MarkovChain;
@@ -79,36 +77,36 @@ public class QueryGenerator {
   /**
    * generates queries from markov chain starting from root
    */
-  public void generateQueries(int numberQueries) {
-    ImmutableList.Builder<String> postgreBuilder = ImmutableList.builder();
-    ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
-    Tokenizer tokenizer = new Tokenizer(r);
+  public void generateQueries() throws IOException {
+    Map<String, List<String>> dialectQueries = new HashMap<>();
 
-    int i = 0;
-    while (i < numberQueries) {
-      List<Query> rawQueries = markovChain.randomWalk(source);
-
-      if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
-        List<Query> actualQueries = rawQueries.subList(2, rawQueries.size()-1);
-        Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
-        postgreBuilder.add(String.join(" ", skeleton.getPostgreSkeleton()) + ";");
-        bigQueryBuilder.add(String.join(" ", skeleton.getBigQuerySkeleton()) + ";");
-        i++;
+    for (String dialect : user.getDialectIndicators().keySet()) {
+      if (user.getDialectIndicators().get(dialect)) {
+        dialectQueries.put(dialect, new ArrayList<>());
       }
     }
 
-    ImmutableList<String> postgreSyntax = postgreBuilder.build();
-    ImmutableList<String> bigQuerySyntax = bigQueryBuilder.build();
+    Tokenizer tokenizer = new Tokenizer(r);
 
-    ImmutableMap.Builder<String, ImmutableList<String>> builder = ImmutableMap.builder();
-    builder.put("PostgreSQL", postgreSyntax);
-    builder.put("BigQuery", bigQuerySyntax);
-    ImmutableMap<String, ImmutableList<String>> outputs = builder.build();
+    int i = 0;
+    while (i < user.getNumQueries()) {
+      List<Query> rawQueries = markovChain.randomWalk(source);
+      if (rawQueries.get(rawQueries.size()-1).getType() == FeatureType.FEATURE_SINK) {
+        List<Query> actualQueries = rawQueries.subList(2, rawQueries.size() - 1);
+        Skeleton skeleton = new Skeleton(actualQueries, tokenizer);
+        for (String dialect : user.getDialectIndicators().keySet()) {
+          if (user.getDialectIndicators().get(dialect)) {
+            dialectQueries.get(dialect).add(String.join(" ", skeleton.getDialectSkeletons().get(dialect)) + ";");
+          }
+        }
+      }
+      i++;
+    }
 
     Table dataTable = tokenizer.getTable();
 
     try {
-      Utils.writeDirectory(outputs, dataTable);
+      Utils.writeDirectory(dialectQueries, dataTable);
     } catch (IOException exception){
       exception.printStackTrace();
     }
