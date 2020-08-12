@@ -118,6 +118,20 @@ something.some_method(a)
         assertCorrect(result, "test")
     }
 
+    @Test
+    fun `literal in decorator`() {
+        val program = """
+import something
+@something("test")
+def test(i):
+    return i
+"""
+
+        val result = analyze(program)
+
+        assertCorrect(result, "test")
+    }
+
     private fun analyze(program: String): Sequence<QueryUsages> {
         val engine = DataFlowEngine()
         PythonFrontEnd().solveDataFlow(engine, CharStreams.fromString(program))

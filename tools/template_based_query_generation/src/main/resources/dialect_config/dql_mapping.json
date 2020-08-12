@@ -6,8 +6,12 @@
         {
           "dialectMap": {
             "postgres": "SELECT",
+<<<<<<< HEAD
             "bigQuery": "SELECT",
             "mySql": "SELECT"
+=======
+            "bigQuery": "SELECT"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -25,8 +29,12 @@
         {
           "dialectMap": {
             "postgres": "FROM",
+<<<<<<< HEAD
             "bigQuery": "FROM",
             "mySql": "SELECT"
+=======
+            "bigQuery": "FROM"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -44,8 +52,12 @@
         {
           "dialectMap": {
             "postgres": "WHERE",
+<<<<<<< HEAD
             "bigQuery": "WHERE",
             "mySql": "WHERE"
+=======
+            "bigQuery": "WHERE"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -63,8 +75,12 @@
         {
           "dialectMap": {
             "postgres": "GROUP BY",
+<<<<<<< HEAD
             "bigQuery": "GROUP BY",
             "mySql": "GROUP BY"
+=======
+            "bigQuery": "GROUP BY"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -82,8 +98,12 @@
         {
           "dialectMap": {
             "postgres": "HAVING",
+<<<<<<< HEAD
             "bigQuery": "HAVING",
             "mySql": "HAVING"
+=======
+            "bigQuery": "HAVING"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -101,8 +121,12 @@
         {
           "dialectMap": {
             "postgres": "ORDER BY",
+<<<<<<< HEAD
             "bigQuery": "ORDER BY",
             "mySql": "ORDER BY"
+=======
+            "bigQuery": "ORDER BY"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -120,8 +144,12 @@
         {
           "dialectMap": {
             "postgres": "ASC",
+<<<<<<< HEAD
             "bigQuery": "ASC",
             "mySql": "ASC"
+=======
+            "bigQuery": "ASC"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
           ]
@@ -134,8 +162,12 @@
         {
           "dialectMap": {
             "postgres": "DESC",
+<<<<<<< HEAD
             "bigQuery": "DESC",
             "mySql": "DESC"
+=======
+            "bigQuery": "DESC"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
           ]
@@ -148,8 +180,12 @@
         {
           "dialectMap": {
             "postgres": "LIMIT",
+<<<<<<< HEAD
             "bigQuery": "LIMIT",
             "mySql": "LIMIT"
+=======
+            "bigQuery": "LIMIT"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -167,8 +203,12 @@
         {
           "dialectMap": {
             "postgres": "OFFSET",
+<<<<<<< HEAD
             "bigQuery": "OFFSET",
             "mySql": "OFFSET"
+=======
+            "bigQuery": "OFFSET"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {

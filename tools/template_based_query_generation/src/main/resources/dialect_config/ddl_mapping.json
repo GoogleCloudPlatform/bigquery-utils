@@ -6,8 +6,12 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE",
+<<<<<<< HEAD
             "bigQuery": "CREATE TABLE",
             "mySql": "CREATE TABLE"
+=======
+            "bigQuery": "CREATE TABLE"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -25,8 +29,12 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE IF NOT EXISTS",
+<<<<<<< HEAD
             "bigQuery": "CREATE TABLE IF NOT EXISTS",
             "mySql": "CREATE TABLE IF NOT EXISTS"
+=======
+            "bigQuery": "CREATE TABLE IF NOT EXISTS"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -44,8 +52,12 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE",
+<<<<<<< HEAD
             "bigQuery": "CREATE OR REPLACE TABLE",
             "mySql": "CREATE TABLE"
+=======
+            "bigQuery": "CREATE OR REPLACE TABLE"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -68,8 +80,12 @@
         {
           "dialectMap": {
             "postgres": "PARTITION BY",
+<<<<<<< HEAD
             "bigQuery": "PARTITION BY",
             "mySql": "PARTITION BY"
+=======
+            "bigQuery": "PARTITION BY"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {
@@ -87,8 +103,12 @@
         {
           "dialectMap": {
             "postgres": "COLLATE",
+<<<<<<< HEAD
             "bigQuery": "CLUSTER BY",
             "mySql": "COLLATE"
+=======
+            "bigQuery": "CLUSTER BY"
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
           },
           "tokenInfos": [
             {

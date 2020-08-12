@@ -17,12 +17,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilsTest {
+
+  public final String testDir = "./src/test/resources/";
 
   @Test
   public void test_getRandomInteger() {
@@ -55,6 +60,7 @@ public class UtilsTest {
     Map<String, ImmutableList<String>> expectedOutputs = new HashMap<>();
     expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
     expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
+<<<<<<< HEAD
     Tokenizer tokenizer = new Tokenizer(new Random());
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setTokenType(TokenType.select_exp);
@@ -68,6 +74,13 @@ public class UtilsTest {
     List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
     List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
 
+=======
+
+//    Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
+
+    List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
+    List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
     Map<String, ImmutableList<String>> actualOutputs = new HashMap<>();
     actualOutputs.put("BigQuery", ImmutableList.copyOf(actual_bigQuery));
     actualOutputs.put("PostgreSQL", ImmutableList.copyOf(actual_postgreSQL));

@@ -6,6 +6,19 @@ import com.google.cloud.sqlecosystem.sqlextraction.output.Location
 import org.antlr.v4.runtime.Token
 
 class PythonAnalyzer(private val dataFlowEngine: DataFlowEngine) : Python3BaseVisitor<Unit>() {
+    override fun visitDecorator(ctx: Python3Parser.DecoratorContext?) {
+        ctx!!.dotted_name().accept(this)
+
+        if (ctx.arglist() != null) {
+            dataFlowEngine.visitAnnotation(
+                Location.combine(
+                    ctx.OPEN_PAREN().symbol.getLocation(),
+                    ctx.CLOSE_PAREN().symbol.getLocation()
+                )
+            ) { ctx.arglist().accept(this) }
+        }
+    }
+
     override fun visitFuncdef(ctx: Python3Parser.FuncdefContext?) =
         dataFlowEngine.visitMethod { visitChildren(ctx) }
 

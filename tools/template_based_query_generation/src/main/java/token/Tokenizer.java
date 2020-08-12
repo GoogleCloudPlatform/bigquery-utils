@@ -2,13 +2,22 @@ package token;
 
 import com.google.common.collect.ImmutableMap;
 import data.DataType;
+<<<<<<< HEAD
+=======
+import parser.DataTypeMap;
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import data.Table;
 import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.List;
+=======
+import java.util.List;
+import java.util.HashMap;
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
 import java.util.Map;
 import java.util.Random;
 
@@ -26,7 +35,8 @@ public class Tokenizer {
   private int maxNumColumnsValues = 5;
   private int maxColumnsPerDataType = 3;
   private int maxColumnNameLength = 20;
-  private int maxNumRows = 20;
+  private int minNumRows = 20;
+  private int maxNumRows = 100;
   private int maxTableNameLength = 20;
 
   /**
@@ -58,7 +68,7 @@ public class Tokenizer {
   public void resetTable() {
     int tableNameLength = 1 + r.nextInt(this.maxTableNameLength);
     this.table = new Table(Utils.getRandomString(tableNameLength));
-    this.table.setNumRows(r.nextInt(maxNumRows));
+    this.table.setNumRows(minNumRows + r.nextInt(maxNumRows-minNumRows));
     for (DataType dataType : this.dataTypeMappings.keySet()) {
       int numColumns = 1 + r.nextInt(this.maxColumnsPerDataType);
       for (int i = 0; i < numColumns; i++) {
@@ -156,9 +166,15 @@ public class Tokenizer {
       DataType d = DataType.getRandomDataType();
       int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
+<<<<<<< HEAD
       Map<String, String> mapping = dataTypeMappings.get(d);
       bqToken += " " + columnName + " " + mapping.get("bigQuery") + ",";
       postgresToken += " " + columnName + " " + mapping.get("postgres") + ",";
+=======
+      DataTypeMap mapping = dataTypeMappings.get(d);
+      bqToken += " " + columnName + " " + mapping.getDialectMap().get("bigQuery") + ",";
+      postgresToken += " " + columnName + " " + mapping.getDialectMap().get("postgres") + ",";
+>>>>>>> f626435179763ea786b9bf46ff616b2e9eceea33
     }
     bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
     postgresToken = postgresToken.substring(0, postgresToken.length()-1) + " )";
