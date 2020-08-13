@@ -10,10 +10,14 @@ import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -125,11 +129,9 @@ public class Utils {
    * @return a random string representing a random time from 00:00:00 to 23:59:59.99999
    */
   private static String getRandomStringTime() {
-    int hour = random.nextInt(24);
-    int min = random.nextInt(60);
-    int second = random.nextInt(60);
-    int milli = random.nextInt(100000);
-    return hour + ":" + min + ":" + second + "." + milli;
+    final int millisInDay = 24*60*60*1000;
+    Time time = new Time((long)random.nextInt(millisInDay));
+    return time.toString();
   }
 
   /**
@@ -196,6 +198,11 @@ public class Utils {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       List<List<?>> data = dataTable.generateData();
       // traverse data column-first
+      String schema = "";
+      for (MutablePair<String, DataType> p : dataTable.getSchema()){
+        schema += (p.getLeft() + ":" + p.getRight() + ",");
+      }
+      System.out.println(schema.substring(0,schema.length()-1));
       for (int row = 0; row < data.get(0).size(); row++) {
         StringBuilder sb = new StringBuilder();
         for (int column = 0; column < data.size(); column++) {
@@ -381,13 +388,14 @@ public class Utils {
    */
   public static BigDecimal generateRandomBigDecimalData(DataType dataType) {
     if (dataType == DataType.DECIMAL) {
-      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal low = new BigDecimal("-5000000000000000000000000000");
       BigDecimal range = low.abs().multiply(new BigDecimal(2));
-      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1)))).setScale(8, RoundingMode.CEILING); // 8 digits of precision
     } else if (dataType == DataType.NUMERIC) {
-      BigDecimal low = new BigDecimal("-500000000000000000000000000000000000000000000000000");
+      BigDecimal low = new BigDecimal("-5000000000000000000000000000");
       BigDecimal range = low.abs().multiply(new BigDecimal(2));
-      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1))));
+      MathContext m = new MathContext(8); // 8 precision
+      return low.add(range.multiply(new BigDecimal(random.nextDouble(0,1)))).setScale(8, RoundingMode.CEILING); // 8 digits of precision
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a big decimal type");
     }
@@ -406,11 +414,11 @@ public class Utils {
     } else if (dataType == DataType.BYTES) {
       return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return "\'" + getRandomStringDate() + "\'";
+      return "" + getRandomStringDate() + "";
     } else if (dataType == DataType.TIME) {
-      return "\'" + getRandomStringTime() + "\'";
+      return "" + getRandomStringTime() + "";
     } else if (dataType == DataType.TIMESTAMP) {
-      return "\'" + getRandomStringTimestamp() + "\'";
+      return "" + getRandomStringTimestamp() + "";
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }

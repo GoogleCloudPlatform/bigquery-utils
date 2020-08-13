@@ -210,7 +210,7 @@ public class Tokenizer {
       token.setDialectExpressions(dialectExpressions);
     }
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.table.getName());
+    dialectExpressions.put("bigQuery", this.datasetName + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<partition_exp " + placeHolder + ">");

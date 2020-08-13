@@ -1,8 +1,9 @@
 {
   "start": "FEATURE_ROOT",
   "end": "FEATURE_SINK",
-  "numColumns": 10,
-  "numQueries": 100,
+  "datasetName": "hello",
+  "numColumns": 5,
+  "numQueries": 1000,
   "dialectIndicators": {
     "postgres": false,
     "bigQuery": true,
