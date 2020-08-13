@@ -252,25 +252,34 @@ tableDataReadEvent AS (
           '$.tableDataRead.jobName'),
             "/")[SAFE_OFFSET(3)]
     ) AS jobId,
-    SPLIT(TRIM(TRIM(
-      JSON_EXTRACT(protopayload_auditlog.metadataJson,
-        '$.tableDataRead.fields'),
-      '["'),'"]'),'","') AS tableDataReadFields,
-     CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.fieldsTruncated') AS BOOL) AS tableDataReadFieldsTruncated,
-     SPLIT(TRIM(TRIM(
-        JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.categories'),
-        '["'),'"]'),'","') AS tableDataReadCategories,
-     CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.categoriesTruncated') AS BOOL) AS tableDataReadCategoriesTruncated,
-     JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.reason') AS tableDataReadReason,
-     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.jobName') AS tableDataReadJobName,
-     JSON_EXTRACT(protopayload_auditlog.metadataJson,
-          '$.tableDataRead.sessionName') AS tableDataReadSessionName,
+    ARRAY_AGG(
+      protopayload_auditlog.resourceName
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadTableName,
+    ARRAY_AGG(STRUCT(
+      SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataRead.fields'),
+      '["'),'"]'),'","')
+      AS fields) IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadFields,
+    ARRAY_AGG(
+      CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataRead.fieldsTruncated') AS BOOL)
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadFieldsTruncated,
+    ARRAY_AGG(STRUCT(
+      SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,'$.tableDataRead.categories'),
+      '["'),'"]'),'","')
+      AS categories) IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadCategories,
+    ARRAY_AGG(
+      CAST(JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataRead.categoriesTruncated') AS BOOL)
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadCategoriesTruncated,
+    ARRAY_AGG(
+      JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataRead.reason')
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadReason,
+    ARRAY_AGG(
+      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDataRead.jobName')
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadJobName,
+    ARRAY_AGG(
+      JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.tableDataRead.sessionName')
+      IGNORE NULLS ORDER BY protopayload_auditlog.resourceName) AS tableDataReadSessionName,
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_data_access`
+  GROUP BY jobId
 ),
 /*
  * TableDataChange: Table data change event.
