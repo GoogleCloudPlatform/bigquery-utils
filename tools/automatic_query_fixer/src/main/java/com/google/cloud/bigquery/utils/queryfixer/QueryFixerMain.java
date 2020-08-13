@@ -62,7 +62,7 @@ public class QueryFixerMain {
             /*opt=*/ MODE_SHORTCUT,
             /*long-opt=*/ MODE,
             /*hasArg=*/ true,
-            /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"fo/fix-once\". Please see the README file for their meanings");
+            /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"fo/fix-once\". Please see the README file for the detailed description.");
     options.addOption(option);
 
     if (args.length == 0) {
@@ -111,7 +111,7 @@ public class QueryFixerMain {
     }
     switch (mode) {
       case AUTO_MODE:
-        // todo: Implement Non-interactive mode
+        // TODO: Implement Non-interactive mode
         FixResult fixResult = queryFixer.fix(query);
         if (fixResult.getOptions().isEmpty()) {
           return;
@@ -122,7 +122,7 @@ public class QueryFixerMain {
 
       case USER_ASSISTANCE_MODE:
       case UA_MODE:
-        // todo: Implement guide mode
+        // TODO: Implement guide mode
         return;
 
       case FIX_ONCE_MODE:
@@ -132,7 +132,7 @@ public class QueryFixerMain {
         break;
 
       default:
-        System.out.println("Interact Mode (-i) is incorrect. Use --help for usage.");
+        System.out.println("Mode (-m) is incorrect. Use --help for usage.");
         System.exit(1);
     }
   }
@@ -142,7 +142,7 @@ public class QueryFixerMain {
       return BigQueryOptions.newBuilder().setProjectId(projectId).build();
     } else {
       // TODO: should support this in near future.
-      System.out.println("customized credential path is not supported");
+      System.out.println("Customized credential path is not supported");
       System.exit(1);
       return null;
     }
@@ -159,7 +159,7 @@ public class QueryFixerMain {
     } else if (outputFormat.equalsIgnoreCase(JSON_OUTPUT)) {
       printFixResultAsJson(fixResult);
     } else {
-      System.out.println("Output Mode (-o) is incorrect. Use --help for usage.");
+      System.out.println("Output format (-o) is incorrect. Use --help for usage.");
       System.exit(1);
     }
   }
