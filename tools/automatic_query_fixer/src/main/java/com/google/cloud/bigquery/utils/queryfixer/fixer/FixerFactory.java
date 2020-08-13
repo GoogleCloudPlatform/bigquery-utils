@@ -1,7 +1,9 @@
 package com.google.cloud.bigquery.utils.queryfixer.fixer;
 
 import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySqlError;
+import com.google.cloud.bigquery.utils.queryfixer.errors.FunctionNotFoundError;
 import com.google.cloud.bigquery.utils.queryfixer.errors.TableNotFoundError;
+import com.google.cloud.bigquery.utils.queryfixer.errors.UnrecognizedColumnError;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
 import lombok.AllArgsConstructor;
@@ -25,6 +27,16 @@ public class FixerFactory {
 
     if (error instanceof TableNotFoundError) {
       return new TableNotFoundFixer(query, (TableNotFoundError) error, bigQueryService);
+    }
+
+    if (error instanceof UnrecognizedColumnError) {
+      return new UnrecognizedColumnFixer(
+          query, (UnrecognizedColumnError) error, queryTokenProcessor);
+    }
+
+    if (error instanceof FunctionNotFoundError) {
+      FunctionNotFoundError functionError = (FunctionNotFoundError) error;
+      return new FunctionNotFoundFixer(query, functionError, queryTokenProcessor);
     }
 
     return null;
