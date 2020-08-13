@@ -22,6 +22,8 @@ public class User {
   /* an indicator describing which dialects to output */
   Map<String, Boolean> dialectIndicators = new HashMap<>();
 
+  String bigQueryTable;
+
   public String getStart() {
     return start;
   }
@@ -60,5 +62,13 @@ public class User {
 
   public void setDialectIndicators(Map<String, Boolean> dialectIndicators) {
     this.dialectIndicators = dialectIndicators;
+  }
+
+  public String getBigQueryTable() {
+    return bigQueryTable;
+  }
+
+  public void setBigQueryTable(String bigQueryTable) {
+    this.bigQueryTable = bigQueryTable;
   }
 }

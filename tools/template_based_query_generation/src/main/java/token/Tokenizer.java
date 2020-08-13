@@ -143,7 +143,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<table " + placeHolder + ">");
@@ -239,7 +239,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<insert_exp " + placeHolder + ">");
@@ -322,7 +322,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<from_item " + placeHolder + ">");
