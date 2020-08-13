@@ -133,7 +133,6 @@ public class QueryBreakdown {
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
-
       // gets the error location in the original query
       int originalStartColumn =
           locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());

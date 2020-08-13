@@ -25,7 +25,7 @@ public class InputReader {
    * all the queries in a string format. We also initialize a LocationTracker instance since
    * this is where we are processing the input.
    *
-   * TODO: more robust method for input parsing needed (ex: semicolons in strings, comments)
+   * TODO: more robust method for input parsing needed (ex: comments)
    */
   public String readInput(String filename) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filename));
@@ -47,6 +47,7 @@ public class InputReader {
 
       // line changes
       if ((char) current == '\n') {
+        locationTracker.add(line, column);
         column = 1;
         line++;
         locationTracker.addLine();
@@ -85,6 +86,7 @@ public class InputReader {
     while (current < input.length()) {
       // line changes
       if (input.charAt(current) == '\n') {
+        locationTracker.add(line, column);
         column = 1;
         line++;
         locationTracker.addLine();
