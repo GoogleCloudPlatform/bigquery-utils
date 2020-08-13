@@ -26,7 +26,6 @@ public class Tokenizer {
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
   private ImmutableMap<DataType, Map<String, String>> dataTypeMappings;
-  private String datasetName = "";
   private int maxNumColumnsValues = 5;
   private int maxColumnsPerDataType = 3;
   private int maxColumnNameLength = 20;
@@ -144,7 +143,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.datasetName + "." + this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<table " + placeHolder + ">");
@@ -240,7 +239,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.datasetName + "." + this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<insert_exp " + placeHolder + ">");
@@ -323,7 +322,7 @@ public class Tokenizer {
     int placeHolder = generateNextPlaceHolder(token.getTokenInfo().getTokenType());
     Map<String, String> dialectExpressions = new HashMap<String, String>();
     dialectExpressions.put("postgres", this.table.getName());
-    dialectExpressions.put("bigQuery", this.datasetName + "." + this.table.getName());
+    dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
     token.setTokenPlaceHolder("<from_item " + placeHolder + ">");

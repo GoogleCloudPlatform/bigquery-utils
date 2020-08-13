@@ -8,6 +8,7 @@
     "postgres": false,
     "bigQuery": true,
     "mySql": true
-  }
+  },
+  "bigQueryTable": "bigQueryTable"
 }
 
