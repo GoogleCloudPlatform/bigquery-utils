@@ -2,6 +2,8 @@ package parser;
 
 import data.DataType;
 
+import java.util.Map;
+
 /**
  * Helper class that contains the PostgreSQL and BigQuery mappings for a datatype
  */
@@ -10,11 +12,8 @@ public class DataTypeMap {
   /* DataType in hidden language */
   DataType dataType;
 
-  /* Equivalent PostgreSQL mapping to a datatype */
-  String postgres;
-
-  /* Equivalent BigQuery mapping to a datatype */
-  String bigQuery;
+  /* List of dialect maps to each keyword */
+  private Map<String, String> dialectMap;
 
   public DataType getDataType() {
     return dataType;
@@ -24,19 +23,11 @@ public class DataTypeMap {
     this.dataType = dataType;
   }
 
-  public String getPostgres() {
-    return postgres;
+  public Map<String, String> getDialectMap() {
+    return this.dialectMap;
   }
 
-  public void setPostgres(String postgres) {
-    this.postgres = postgres;
-  }
-
-  public String getBigQuery() {
-    return bigQuery;
-  }
-
-  public void setBigQuery(String bigQuery) {
-    this.bigQuery = bigQuery;
+  public void setDialectMap(Map<String, String> dialectMap) {
+    this.dialectMap = dialectMap;
   }
 }

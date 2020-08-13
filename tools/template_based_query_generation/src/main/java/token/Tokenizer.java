@@ -3,13 +3,13 @@ package token;
 import com.google.common.collect.ImmutableMap;
 import data.DataType;
 import data.Table;
-import parser.DataTypeMap;
 import parser.Utils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -17,10 +17,12 @@ import java.util.Random;
  */
 public class Tokenizer {
 
+  private final String filePathConfigData = "./src/main/resources/dialect_config/datatype_mapping.json";
+
   private Random r;
   private Table table;
   private HashMap<TokenType, Integer> tokenPlaceHolderCounter;
-  private ImmutableMap<DataType, DataTypeMap> dataTypeMappings;
+  private ImmutableMap<DataType, Map> dataTypeMappings;
   private int maxNumColumnsValues = 5;
   private int maxColumnsPerDataType = 3;
   private int maxColumnNameLength = 20;
@@ -29,12 +31,11 @@ public class Tokenizer {
 
   /**
    *
-   * @param dataConfigFilePath path to data config file
    * @param r random object
    */
-  public Tokenizer(String dataConfigFilePath, Random r) {
+  public Tokenizer(Random r) {
     try {
-      this.dataTypeMappings = Utils.makeImmutableDataTypeMap(Paths.get(dataConfigFilePath));
+      this.dataTypeMappings = Utils.makeImmutableDataTypeMap(Paths.get(filePathConfigData));
     } catch (IOException exception) {
       exception.printStackTrace();
     }
@@ -148,12 +149,12 @@ public class Tokenizer {
       DataType d = DataType.getRandomDataType();
       int columnNameLength = 1 + r.nextInt(this.maxColumnNameLength);
       String columnName = Utils.getRandomString(columnNameLength);
-      DataTypeMap mapping = dataTypeMappings.get(d);
-      bqToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
-      postgresToken += " \'" + columnName + "\' " + mapping.getBigQuery() + ",";
+      Map mapping = dataTypeMappings.get(d);
+      bqToken += " " + columnName + " " + mapping.get("bigQuery") + ",";
+      postgresToken += " " + columnName + " " + mapping.get("postgres") + ",";
     }
     bqToken = bqToken.substring(0, bqToken.length()-1) + " )";
-    postgresToken += postgresToken.substring(0, postgresToken.length()-1) + " )";
+    postgresToken = postgresToken.substring(0, postgresToken.length()-1) + " )";
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
@@ -233,8 +234,8 @@ public class Tokenizer {
       bqToken = bqToken.substring(0, bqToken.length()-2) + " ), ";
       postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ), ";
     }
-    bqToken = bqToken.substring(0, bqToken.length()-2) + " ;";
-    postgresToken += postgresToken.substring(0, postgresToken.length()-2) + " ;";
+    bqToken = bqToken.substring(0, bqToken.length()-2);
+    postgresToken += postgresToken.substring(0, postgresToken.length()-2);
     token.setBigQueryTokenExpression(bqToken);
     token.setPostgresTokenExpression(postgresToken);
     token.setTokenPlaceHolder("<values_exp " + placeHolder + ">");

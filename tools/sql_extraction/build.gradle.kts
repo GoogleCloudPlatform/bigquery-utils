@@ -41,7 +41,12 @@ task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
         mkdir("gen/main/antlr")
         mkdir("src/main/antlr")
     }
-    src(listOf("https://raw.githubusercontent.com/antlr/grammars-v4/master/java/java9/Java9.g4"))
+    src(
+        listOf(
+            "https://raw.githubusercontent.com/antlr/grammars-v4/master/java/java9/Java9.g4",
+            "https://raw.githubusercontent.com/antlr/grammars-v4/master/python/python3/Python3.g4"
+        )
+    )
     dest("gen/main/antlr/")
     overwrite(false) // no need to download a copy every time
     println(System.getProperty("user.dir"))

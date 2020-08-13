@@ -14,3 +14,12 @@ Multiple URLs should be separated by a space. There is also the option to set th
 python3 run_crawler.py <starting URLs> --max_depth 5 --max_size 500
 ```
 If these are not specified, the default is a depth of 3 and size of 100. After the crawler runs to completion, a log containing the websites will be saved in a subdirectory named "SQLCrawler/Logs". The queries themselves will be in a subdirectory titled "SQLCrawler/Queries".
+
+# SQL Classifier
+
+This directory contains the code for the SQL dialect classifier built on top of Calcite. To build, navigate to the directory and run:
+```
+mvn package
+```
+
+This should build a jar with dependencies. Run this jar and provide a CSV file with queries as the first command line argument, which will classify the queries in the file.

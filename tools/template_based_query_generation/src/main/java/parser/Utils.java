@@ -5,17 +5,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
-import jdk.internal.net.http.common.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.text.SimpleDateFormat;
-
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -49,11 +49,11 @@ public class Utils {
    * Returns a random element from given set
    * @param list a list of objects from which a random element is selected
    */
-  public static Pair<String, DataType> getRandomElement(ArrayList<Pair<String, DataType>> list) throws IllegalArgumentException  {
+  public static MutablePair<String, DataType> getRandomElement(ArrayList<MutablePair<String, DataType>> list) throws IllegalArgumentException  {
     if (list.size() <= 0) {
       throw new IllegalArgumentException("ArrayList must contain at least one element");
     }
-    int index = Utils.getRandomInteger(list.size());
+    int index = Utils.getRandomInteger(list.size()-1);
     return list.get(index);
   }
 
@@ -147,10 +147,8 @@ public class Utils {
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeDirectory(ImmutableMap<String, ImmutableList<String>> outputs, Path outputDirectory) throws IOException {
-    writeFile(outputs.get("BQ_skeletons"), outputDirectory.resolve("bq_skeleton.txt"));
-    writeFile(outputs.get("BQ_tokenized"), outputDirectory.resolve("bq_tokenized.txt"));
-    writeFile(outputs.get("Postgre_skeletons"), outputDirectory.resolve("postgre_skeleton.txt"));
-    writeFile(outputs.get("Postgre_tokenized"), outputDirectory.resolve("postgre_tokenized.txt"));
+    writeFile(outputs.get("PostgreSQL"), outputDirectory.resolve("postgreSQL.txt"));
+    writeFile(outputs.get("BigQuery"), outputDirectory.resolve("bigQuery.txt"));
     // TODO(spoiledhua): write sample data to file
 
     System.out.println("The output is stored at " + outputDirectory);
@@ -207,6 +205,7 @@ public class Utils {
    * @return an immutable set of keywords from the config file
    */
   public static ImmutableSet<String> makeImmutableKeywordSet(Path inputPath) throws IOException {
+
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
@@ -215,7 +214,7 @@ public class Utils {
 
     for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
       if (featureIndicator.getIsIncluded()) {
-        builder.add(featureIndicator.getFeature());
+        builder.add(featureIndicator.getFeature().name());
       }
     }
 
@@ -254,18 +253,18 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between datatypes and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<DataType, DataTypeMap> makeImmutableDataTypeMap(Path inputPath) throws IOException {
+  public static ImmutableMap<DataType, Map> makeImmutableDataTypeMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     DataTypeMaps dataTypeMaps = gson.fromJson(reader, DataTypeMaps.class);
 
-    ImmutableMap.Builder<DataType, DataTypeMap> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<DataType, Map> builder = ImmutableMap.builder();
 
     for (DataTypeMap dataTypeMap : dataTypeMaps.getDataTypeMaps()) {
-      builder.put(dataTypeMap.getDataType(), dataTypeMap);
+      builder.put(dataTypeMap.getDataType(), dataTypeMap.getDialectMap());
     }
 
-    ImmutableMap<DataType, DataTypeMap> map = builder.build();
+    ImmutableMap<DataType, Map> map = builder.build();
 
     return map;
   }
@@ -290,7 +289,7 @@ public class Utils {
       if (num == Integer.MIN_VALUE) {
         return 0;
       } else {
-        return Math.abs(num);
+        return	Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by an int type");
@@ -311,7 +310,7 @@ public class Utils {
       if (num == Long.MIN_VALUE) {
         return 0;
       } else {
-        return Math.abs(num);
+        return	Math.abs(num);
       }
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a long type");
@@ -357,7 +356,7 @@ public class Utils {
 
   /**
    *
-   * TODO (Allen): factor out constants into config, do date generation, time, and timestamp generation
+   * // TODO: factor out constants into config, do date generation, time, and timestamp generation
    * @param dataType
    * @return random data of type dataType
    * @throws IllegalArgumentException
@@ -368,11 +367,11 @@ public class Utils {
     } else if (dataType == DataType.BYTES) {
       return getRandomStringBytes(20);
     } else if (dataType == DataType.DATE) {
-      return getRandomStringDate();
+      return "\'" + getRandomStringDate() + "\'";
     } else if (dataType == DataType.TIME) {
-      return getRandomStringTime();
+      return "\'" + getRandomStringTime() + "\'";
     } else if (dataType == DataType.TIMESTAMP) {
-      return getRandomStringTimestamp();
+      return "\'" + getRandomStringTimestamp() + "\'";
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a string type");
     }

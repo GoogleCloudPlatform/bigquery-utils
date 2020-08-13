@@ -20,7 +20,8 @@ fun main(args: Array<String>) = Cli(
     SqlExtractor(
         DataFlowSolver(
             listOf(
-                JavaFrontEnd()
+                JavaFrontEnd(),
+                PythonFrontEnd()
             )
         ), ConfidenceRater()
     )
