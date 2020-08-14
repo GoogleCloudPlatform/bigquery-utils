@@ -19,6 +19,8 @@ public class QueryVerifier {
     private final BigQueryManager migratedInstance;
     private final DataWarehouseManager originalInstance;
 
+    public static final int DECIMAL_PRECISION = 10;
+
     public QueryVerifier(QueryVerificationQuery migratedQuery, @Nullable QueryVerificationSchema migratedSchema, @Nullable QueryVerificationQuery originalQuery, @Nullable QueryVerificationSchema originalSchema, @Nullable List<QueryVerificationData> data) {
         migratedInstance = new BigQueryManager(migratedQuery, migratedSchema, data);
         originalInstance = null;

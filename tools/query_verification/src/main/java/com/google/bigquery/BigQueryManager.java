@@ -4,6 +4,8 @@ import com.google.cloud.bigquery.*;
 import com.google.gson.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -295,13 +297,13 @@ public class BigQueryManager implements DataWarehouseManager {
                         result = value.getBooleanValue();
                         break;
                     case FLOAT64:
-                        result = value.getDoubleValue();
+                        result = BigDecimal.valueOf(value.getDoubleValue()).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
                         break;
                     case INT64:
                         result = value.getLongValue();
                         break;
                     case NUMERIC:
-                        result = value.getNumericValue();
+                        result = value.getNumericValue().setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
                         break;
                     case STRUCT:
                         FieldList subFields = fields.get(i).getSubFields();
