@@ -22,7 +22,7 @@ def test_extract_queries():
     reader = open("resources/googleCloudSite.html", "r")
     url = "https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax"
     mock_request = MockRequest(url, 200, reader.read())
-    assert len(extractor.extract_queries(mock_request)) == 103
+    assert len(extractor.extract_queries(mock_request)) == 85
     
 def test_generic_extraction():
     reader = open("resources/sample_a.html", "r")

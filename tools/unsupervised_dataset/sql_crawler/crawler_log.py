@@ -15,7 +15,7 @@ class CrawlerLog(object):
         subdirectory.
     """
 
-    def __init__(self):
+    def __init__(self, stream):
         """ Initializes crawler log to keep track of crawler progress and
             instantiates instance variables.
         """
@@ -36,24 +36,48 @@ class CrawlerLog(object):
         if not os.path.exists(query_folder_path):
             os.mkdir(query_folder_path)
 
+        self.stream = stream
         self.query_name = "{0}/queries_{1}.csv".format(query_folder_path, self.start_time)
-        self.csv_file = open(self.query_name, "a")
-        self.queries = csv.writer(self.csv_file)
-        self.queries.writerow(["Query", "URL"])
+
+        if not self.stream:
+            self.csv_file = open(self.query_name, "a")
+            self.queries = csv.writer(self.csv_file)
+            self.queries.writerow(["Query", "URL"])
         
         self.save_to_gcs = False
         self.save_to_bq = False
+        self.batch_data = []
         self.error_log_count = 0
 
-    def log_query(self, query, url):
-        """ Logs query into CSV file.
+    def log_queries(self, queries, url):
+        """ Caches queries to be logged into CSV file or BigQuery. Periodically
+            flushes cache and writes queries once reaching maximum size.
 
         Args:
-            query: Query to be logged
-            url: URL for page containing query
+            queries: Queries to be logged
+            url: URL for page containing queries
         """
-        
-        self.queries.writerow([query, url])
+
+        self.batch_data += [[query, url] for query in queries]
+
+        while (len(self.batch_data) > 1000):
+            self.flush_data(self.batch_data[:1000])
+            self.batch_data = self.batch_data[1000:]
+
+    def flush_data(self, data):
+        """ Flushes data directly to CSV file or BigQuery.
+
+        Args:
+            data: Rows to be flushed to CSV file or BigQuery table
+        """
+
+        if self.save_to_bq:
+            err = cloud_integration.insert_rows(self.bq_project, self.bq_dataset, self.bq_table, data)
+            if err:
+                self.log_error(err)
+
+        if not self.stream:
+            self.queries.writerows(data)
 
     def log_page(self, url, count):
         """ Logs results of crawling one page using provided arguments.
@@ -112,29 +136,32 @@ class CrawlerLog(object):
         """
 
         self.bq_project, self.bq_dataset = self.parse_location_arg(location)
+        self.bq_table = "queries_{0}".format(self.start_time)
+
         if self.bq_project and self.bq_dataset:
-            self.save_to_bq = True
+            self.save_to_bq = cloud_integration.create_bigquery_table(self.bq_project, self.bq_dataset, self.bq_table)
+
+        if not self.save_to_bq:
+            self.log_error("Unable to create bigquery table.")
 
     def close(self):
-        """ Closes the crawler log. Uploads file to Google Cloud. Prints
-            message if there are handled errors logged during crawling process.
+        """ Flushes remaining querise and closes the crawler log. Uploads file
+            to Google Cloud. Prints message if there are handled errors logged
+            during crawling process.
         """
 
         logging.info("Finished crawling.")
-        self.csv_file.close()
         
+        # Flush remaining queries and close file
+        self.flush_data(self.batch_data)
+        if not self.stream:
+            self.csv_file.close()
+
+        # Save file to GCS, if applicable
         file_name = "queries_{0}".format(self.start_time)
         if self.save_to_gcs:
             status, message = cloud_integration.upload_gcs_file(self.gcs_project,
                 self.gcs_bucket, file_name, self.query_name)
-            if status:
-                logging.info(message)
-            else:
-                self.log_error(message)
-
-        if self.save_to_bq:
-            status, message = cloud_integration.load_bigquery_table(self.bq_project,
-                self.bq_dataset, file_name, self.query_name)
             if status:
                 logging.info(message)
             else:

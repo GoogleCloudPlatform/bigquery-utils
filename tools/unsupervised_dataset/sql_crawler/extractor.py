@@ -22,7 +22,10 @@ def extract_links(html):
         A list of URLs (strings).
     """
 
-    content = bs4.BeautifulSoup(html.text, "html.parser")
+    try:
+        content = bs4.BeautifulSoup(html.text, "html.parser")
+    except Exception as e:
+        print(html.url)
     link_tags = content.find_all("a")
     links = set([])
 
@@ -30,6 +33,8 @@ def extract_links(html):
         if link.has_attr('href'):
             # Fix relative paths and anchor links
             absolute_path = urllib.parse.urljoin(html.url, link['href'])
+            if "github.com" in absolute_path:
+                continue
             if "#" in absolute_path:
                 trimmed = absolute_path.split("#", 1)[0]
                 links.add(trimmed)

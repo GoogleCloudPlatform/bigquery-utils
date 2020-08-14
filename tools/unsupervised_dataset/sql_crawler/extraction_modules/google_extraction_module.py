@@ -1,4 +1,7 @@
 from bs4 import BeautifulSoup
+import re
+
+REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP|INSERT|UPDATE|EXEC|CALL|USING) (?:(?!;|[.:]\s).)*;"
 
 class GoogleExtractionModule(object):
 
@@ -19,6 +22,6 @@ class GoogleExtractionModule(object):
         queries = []
         code_blocks = soup.find_all("code")
         for block in code_blocks:
-            if block.parent.name == "pre":
-                queries += [block.contents[0]]
+            if block.parent.name == "pre" and len(block.contents) > 0:
+                queries += re.findall(REGEX_SEARCH, block.contents[0], re.DOTALL)
         return queries
