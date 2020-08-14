@@ -1,0 +1,99 @@
+{
+  "features": [
+    {
+      "feature": "DDL_CREATE",
+      "allMappings": [
+        {
+          "dialectMap": {
+            "postgres": "CREATE TABLE",
+            "bigQuery": "CREATE TABLE"
+          },
+          "tokenInfos": [
+            {
+              "tokenType": "table_name",
+              "required": true,
+              "count": 1
+            },
+            {
+              "tokenType": "table_schema",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "dialectMap": {
+            "postgres": "CREATE TABLE IF NOT EXISTS",
+            "bigQuery": "CREATE TABLE IF NOT EXISTS"
+          },
+          "tokenInfos": [
+            {
+              "tokenType": "table_name",
+              "required": true,
+              "count": 1
+            },
+            {
+              "tokenType": "table_schema",
+              "required": true,
+              "count": 1
+            }
+          ]
+        },
+        {
+          "dialectMap": {
+            "postgres": "CREATE TABLE",
+            "bigQuery": "CREATE OR REPLACE TABLE"
+          },
+          "tokenInfos": [
+            {
+              "tokenType": "table_name",
+              "required": true,
+              "count": 1
+            },
+            {
+              "tokenType": "table_schema",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DDL_PARTITION",
+      "allMappings": [
+        {
+          "dialectMap": {
+            "postgres": "PARTITION BY",
+            "bigQuery": "PARTITION BY"
+          },
+          "tokenInfos": [
+            {
+              "tokenType": "partition_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "feature": "DDL_CLUSTER",
+      "allMappings": [
+        {
+          "dialectMap": {
+            "postgres": "COLLATE",
+            "bigQuery": "CLUSTER BY"
+          },
+          "tokenInfos": [
+            {
+              "tokenType": "cluster_exp",
+              "required": true,
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # SQL Extraction
 
+![SQL Extraction](https://github.com/GoogleCloudPlatform/bigquery-utils/workflows/SQL%20Extraction/badge.svg)
+
 This directory contains a command-line application that can
 - Locate raw SQL query strings and their usage within code
 - Extract and return the SQL query strings from the code
@@ -27,6 +29,12 @@ Options:
   --include GLOB       Search only files whose base name matches GLOB
   --exclude GLOB       Skip files whose base name matches GLOB
   --pretty             Pretty-print output JSON
+  --progress           Print progress to STDERR
+  --threshold FLOAT    Minimum confidence value (inclusive between 0 and 1)
+                       required for a detected query to be included in final
+                       output (default is 0.5)
+  --parallel           Analyze multiple files in parallel
+  --debug, --verbose   Print debug logs to STDERR
   -h, --help           Show this message and exit
 
 Arguments:
