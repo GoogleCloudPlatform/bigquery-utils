@@ -4,10 +4,13 @@ import com.google.cloud.bigquery.*;
 import com.google.gson.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class to communicate with BQ to create tables and run queries
@@ -71,15 +74,20 @@ public class BigQueryManager implements DataWarehouseManager {
                 queryJob.waitFor();
 
                 // Parse and store query results
+                List<List<String>> rawResults = new ArrayList<List<String>>();
                 Set<List<Object>> results = new HashSet<List<Object>>();
                 TableResult queryResults = queryJob.getQueryResults();
                 FieldList fields = queryResults.getSchema().getFields();
-                queryResults.iterateAll().forEach(values -> results.add(parseResults(values, fields)));
 
-                jobResult = QueryJobResults.create(statement, query, null, results);
+                queryResults.iterateAll().forEach(values -> {
+                    rawResults.add(values.stream().map(value -> value.getStringValue()).collect(Collectors.toList()));
+                    results.add(parseResults(values, fields));
+                });
+
+                jobResult = QueryJobResults.create(statement, query, null, results, rawResults);
             } catch (BigQueryException e) {
                 // Print out syntax/semantic errors returned from BQ
-                jobResult = QueryJobResults.create(statement, query, e.getMessage(), null);
+                jobResult = QueryJobResults.create(statement, query, e.getMessage(), null, null);
             }
 
             // Store results
@@ -119,10 +127,10 @@ public class BigQueryManager implements DataWarehouseManager {
                 bigQuery.create(jobInfo);
 
                 // Store results from dry-run
-                jobResult = QueryJobResults.create(statement, query, null, null);
+                jobResult = QueryJobResults.create(statement, query, null, null, null);
             } catch (BigQueryException e) {
                 // Print out syntax/semantic errors returned from BQ
-                jobResult = QueryJobResults.create(statement, query, e.getMessage(), null);
+                jobResult = QueryJobResults.create(statement, query, e.getMessage(), null, null);
             }
 
             jobResults.add(jobResult);
@@ -147,6 +155,8 @@ public class BigQueryManager implements DataWarehouseManager {
 
         for (String statement : statements) {
             statement = statement.trim();
+            if (statement.isEmpty())
+                continue;
 
             JobInfo jobInfo = configureJob(statement, dryRun);
             jobInfos.add(jobInfo);
@@ -287,13 +297,13 @@ public class BigQueryManager implements DataWarehouseManager {
                         result = value.getBooleanValue();
                         break;
                     case FLOAT64:
-                        result = value.getDoubleValue();
+                        result = BigDecimal.valueOf(value.getDoubleValue()).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
                         break;
                     case INT64:
                         result = value.getLongValue();
                         break;
                     case NUMERIC:
-                        result = value.getNumericValue();
+                        result = value.getNumericValue().setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
                         break;
                     case STRUCT:
                         FieldList subFields = fields.get(i).getSubFields();

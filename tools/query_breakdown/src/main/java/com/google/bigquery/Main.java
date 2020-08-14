@@ -10,7 +10,7 @@ import java.util.Comparator;
 
 /**
  * This file is the main file for the command line tool.
- * Usage: query_breakdown -r <PATH> [-w <PATH>] [-l <INTEGER>]
+ * Usage: query_breakdown -i <PATH> [-o <PATH>] [-l <INTEGER>]
  * -i, --inputFile, PATH: this command specifies the path to the file containing queries to be
  *                    inputted into the tool. It is therefore mandatory
  * -o, --outputFile, PATH: this command specifies the path to the file that the tool can write
@@ -20,10 +20,10 @@ import java.util.Comparator;
  *                    limit for the number of errors to be explored, thereby controlling the
  *                    runtime. It is therefore optional
  *
- * Sample Usage: query_breakdown -r input.txt
- *               query_breakdown -r input2.txt -w output.txt -l 3
- *               query_breakdown -r input3.txt -w output2.txt
- *               query_breakdown -r input4.txt -l 6
+ * Sample Usage: query_breakdown -i input.txt
+ *               query_breakdown -i input2.txt -o output.txt -l 3
+ *               query_breakdown -i input3.txt -o output2.txt
+ *               query_breakdown -i input4.txt -l 6
  */
 public class Main {
   public static void main(String[] args) {
