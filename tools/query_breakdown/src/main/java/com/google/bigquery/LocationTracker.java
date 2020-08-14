@@ -41,6 +41,14 @@ public class LocationTracker {
   }
 
   /**
+   * This method inserts an element in the middle of the location ArrayList to replicate
+   * replacement
+   */
+  private void add(int x, int y, int numberToAdd) {
+    location.get(x - 1).add(y, numberToAdd);
+  }
+
+  /**
    * This method removes an entry from location specified by (x, y) in the original query.
    */
   public void remove(int x, int y) {
@@ -73,10 +81,31 @@ public class LocationTracker {
   }
 
   /**
-   * To be implemented
+   * This method ensures that the location field is kept correctly despite the replacement. We
+   * case by the length of the string we replaceFrom to the string that we replaceTo. Depending
+   * on the length, we either leave location as is, add to it, or delete from it.
    */
-  public LocationTracker replace() {
-    throw new UnsupportedOperationException();
+  public LocationTracker replace(int line, int startColumn, int endColumn, String replaceFrom,
+      String replaceTo) {
+    if (replaceFrom.length() == replaceTo.length()) {
+      return this;
+    }
+    // if we replace the token with a longer token and need to add to the locationTracker
+    else if (replaceFrom.length() < replaceTo.length()) {
+      LocationTracker locationTracker = cloneTracker();
+      for (int i = endColumn; i < endColumn + replaceTo.length() - replaceFrom.length(); i++) {
+        locationTracker.add(line, i, -1);
+      }
+      return locationTracker;
+    }
+    // if we replace the token with a shorter token and need to subtract from the locationTracker
+    else {
+      LocationTracker locationTracker = cloneTracker();
+      for (int j = endColumn - replaceFrom.length() + replaceTo.length(); j < endColumn; j++) {
+        locationTracker.remove(line, startColumn + replaceTo.length());
+      }
+      return locationTracker;
+    }
   }
 
   /**

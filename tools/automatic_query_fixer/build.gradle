@@ -31,6 +31,8 @@ dependencies {
     // google flogger dependencies
     compile group: 'com.google.flogger', name: 'flogger', version: '0.1'
     compile 'com.google.flogger:flogger-system-backend:0.4'
+    // CLI flag library
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
     // local jar
     implementation name: 'calcite-babel-1.23.0-SNAPSHOT'
