@@ -24,7 +24,11 @@ export class SqlExtractionRunner {
     }>,
     token: CancellationToken
   ): Promise<Query[]> {
-    return this.execute(['-r', '--progress', dir], progress, token);
+    return this.execute(
+      ['-r', '--progress', '--parallel', dir],
+      progress,
+      token
+    );
   }
 
   private execute(

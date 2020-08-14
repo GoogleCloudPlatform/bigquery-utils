@@ -17,11 +17,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @RunWith(Parameterized::class)
-class SqlExtractorTest(private val showProgress: Boolean) {
+class SqlExtractorTest(private val showProgress: Boolean, private val parallelize: Boolean) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters
-        fun data() = listOf(arrayOf(false), arrayOf(true))
+        fun data() = listOf(
+            arrayOf(false, false),
+            arrayOf(false, true),
+            arrayOf(true, false),
+            arrayOf(true, true)
+        )
     }
 
     @MockK
@@ -40,7 +45,11 @@ class SqlExtractorTest(private val showProgress: Boolean) {
     fun `given data-flow solver is used`() {
         every { solver.solveDataFlow(any(), any()) } returns emptySequence()
 
-        sqlExtractor.process(sequenceOf(mockk(relaxed = true)), showProgress = showProgress)
+        sqlExtractor.process(
+            sequenceOf(mockk(relaxed = true)),
+            showProgress = showProgress,
+            parallelize = parallelize
+        )
         verify { solver.solveDataFlow(any(), any()) }
 
         confirmVerified()
@@ -56,7 +65,11 @@ class SqlExtractorTest(private val showProgress: Boolean) {
             mockk(relaxed = true)
         )
 
-        sqlExtractor.process(filePaths.asSequence(), showProgress = showProgress)
+        sqlExtractor.process(
+            filePaths.asSequence(),
+            showProgress = showProgress,
+            parallelize = parallelize
+        )
         verifyAll { filePaths.map { solver.solveDataFlow(any(), it) } }
 
         confirmVerified()
@@ -68,7 +81,11 @@ class SqlExtractorTest(private val showProgress: Boolean) {
 
         every { rater.rate(any()) } returns 1.0
 
-        sqlExtractor.process(sequenceOf(mockk(relaxed = true)), showProgress = showProgress)
+        sqlExtractor.process(
+            sequenceOf(mockk(relaxed = true)),
+            showProgress = showProgress,
+            parallelize = parallelize
+        )
         verifyAll { rater.rate(any()) }
 
         confirmVerified()
@@ -91,7 +108,12 @@ class SqlExtractorTest(private val showProgress: Boolean) {
         every { rater.rate(queries[3].query) } returns 0.75
         every { rater.rate(queries[4].query) } returns 1.0
 
-        val output = sqlExtractor.process(sequenceOf(mockk(relaxed = true)), 0.5, showProgress)
+        val output = sqlExtractor.process(
+            sequenceOf(mockk(relaxed = true)),
+            0.5,
+            showProgress,
+            parallelize
+        )
 
         assertEquals(3, output.queries.size)
     }
