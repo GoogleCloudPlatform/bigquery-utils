@@ -95,4 +95,47 @@ public class QueryBreakdownTest {
             + "Start Column 28, End Column 31, REPLACEMENT: replaced BLAH with BY\n",
         outContent.toString());
   }
+
+  @Test
+  public void QueryBreakdownRunEmpty() throws IOException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/empty.txt");
+    qb.run(query, false, 0, ir.getLocationTracker());
+    assertEquals(
+        "The entire query can be parsed without error\n",
+        outContent.toString());
+  }
+
+  @Test
+  public void QueryBreakdownRunSingleton() throws IOException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/singleton.txt");
+    qb.run(query, false, 0, ir.getLocationTracker());
+    assertEquals(
+        "Unparseable portion: Start Line 1, End Line 1, "
+            + "Start Column 4, End Column 4, DELETION\n"
+            + "Unparseable portion: Start Line 1, End Line 1, "
+            + "Start Column 1, End Column 3, DELETION\n",
+        outContent.toString());
+  }
+
+  @Test
+  public void QueryBreakdownRunTestA() throws IOException {
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/singleton.txt");
+    qb.run(query, false, 0, ir.getLocationTracker());
+  }
 }

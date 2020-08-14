@@ -131,50 +131,55 @@ public class QueryBreakdown {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
-      // generates new queries through deletion and replacement
+      /* generates new queries through deletion and replacement */
+
       SqlParserPos pos = ((SqlParseException) e).getPos();
-      // gets the error location in the original query
-      int originalStartColumn =
-          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
-      int originalEndColumn =
-          locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
 
-      /* deletion: gets the new query, creates a node, and calls the loop again */
-      // gets the new query
-      String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
-          pos.getEndColumnNum());
+      // if statement checks for EOF
+      if (pos.getLineNum() != 0 && pos.getColumnNum() != 0) {
+        // gets the error location in the original query
+        int originalStartColumn =
+            locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
+        int originalEndColumn =
+            locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
 
-      // updates the location tracker to reflect the deletion
-      LocationTracker deletedLt = locationTracker.delete
-          (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
+        /* deletion: gets the new query, creates a node, and calls the loop again */
+        // gets the new query
+        String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
+            pos.getEndColumnNum());
 
-      // creates a node for this deletion
-      Node deletionNode = new Node(parent, pos.getLineNum(), originalStartColumn,
-          pos.getEndLineNum(), originalEndColumn, depth + 1 );
+        // updates the location tracker to reflect the deletion
+        LocationTracker deletedLt = locationTracker.delete
+            (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
 
-      // calls the loop again
-      loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
+        // creates a node for this deletion
+        Node deletionNode = new Node(parent, pos.getLineNum(), originalStartColumn,
+            pos.getEndLineNum(), originalEndColumn, depth + 1 );
 
-      /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
-      ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
-          pos.getColumnNum(), pos.getEndColumnNum(),
-          ((SqlParseException) e).getExpectedTokenNames());
+        // calls the loop again
+        loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
 
-      // recursively loops through the new queries
-      for (ReplacedComponent r: replacementQueries) {
-        // updates the location tracker to reflect the replacement
-        LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
-            pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
-        Node replacementNode = new Node(parent, pos.getLineNum(), originalStartColumn,
-            pos.getEndLineNum(), originalEndColumn, r.getOriginal(), r.getReplacement(),
-            depth + 1);
-        loop(r.getQuery(), errorLimit, replacementNode, depth + 1, replacedLt);
+        /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
+        ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
+            pos.getColumnNum(), pos.getEndColumnNum(),
+            ((SqlParseException) e).getExpectedTokenNames());
+
+        // recursively loops through the new queries
+        for (ReplacedComponent r: replacementQueries) {
+          // updates the location tracker to reflect the replacement
+          LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
+              pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
+          Node replacementNode = new Node(parent, pos.getLineNum(), originalStartColumn,
+              pos.getEndLineNum(), originalEndColumn, r.getOriginal(), r.getReplacement(),
+              depth + 1);
+          loop(r.getQuery(), errorLimit, replacementNode, depth + 1, replacedLt);
+        }
+
+        /* termination to end the loop if the instance was not a full run through the query.
+        In other words, it ensures that the termination condition is not hit on the way back
+        up the tree */
+        return;
       }
-
-      /* termination to end the loop if the instance was not a full run through the query.
-      In other words, it ensures that the termination condition is not hit on the way back
-      up the tree */
-      return;
     }
     // termination condition: if the parsing doesn't throw exceptions, then the leaf is reached
     if (depth < minimumUnparseableComp) {
