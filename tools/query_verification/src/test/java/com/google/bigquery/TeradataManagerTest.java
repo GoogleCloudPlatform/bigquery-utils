@@ -25,7 +25,7 @@ public class TeradataManagerTest {
     @Test
     public void testGetTablesFromDdlSchema() {
         QueryVerificationSchema schema = QueryVerificationSchema.create(sampleDdl, "");
-        List<String> ddlStatements = new TeradataManager(null, schema, null).getTablesFromDdlSchema();
+        List<String> ddlStatements = new TeradataManager(null, schema, null).getTablesFromDdlSchema(schema.schema());
 
         assertEquals(ddlStatements.size(), 1);
         assertEquals(ddlStatements.get(0), "dataset.table");

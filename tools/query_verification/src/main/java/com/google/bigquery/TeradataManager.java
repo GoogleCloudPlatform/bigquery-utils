@@ -4,10 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
@@ -70,6 +67,8 @@ public class TeradataManager implements DataWarehouseManager {
 
                 while (resultSet.next()) {
                     List<String> rowRawResults = new ArrayList<String>();
+
+                    // Result set columns start at 1 instead of 0
                     for (int j = 1; j <= resultSetMetaData.getColumnCount(); j++) {
                         rowRawResults.add(resultSet.getString(j));
                     }
@@ -99,9 +98,10 @@ public class TeradataManager implements DataWarehouseManager {
      * Reads connection properties to TD database from config file
      * @return databaseServerName, username, password
      */
-    private String[] getConnectionPropertiesFromConfigFile() {
+    private String[] getConnectionPropertiesFromConfigFile() throws IOException {
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("config.json");
         String configContents = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining("\n"));
+        inputStream.close();
 
         JsonObject configJson = JsonParser.parseString(configContents).getAsJsonObject();
         JsonObject tdJsonObject = configJson.getAsJsonObject(getName().toLowerCase());
@@ -121,10 +121,10 @@ public class TeradataManager implements DataWarehouseManager {
     /**
      * Establishes a connection to the TD database
      */
-    private void setupConnection() {
+    private void setupConnection() throws IOException {
         try {
             String[] connectionProperties = getConnectionPropertiesFromConfigFile();
-            String url = "jdbc:teradata://" + connectionProperties[0] + "/TMODE=ANSI,CHARSET=UTF8";
+            String url = String.format("jdbc:teradata://%s/TMODE=ANSI,CHARSET=UTF8", connectionProperties[0]);
             String user = connectionProperties[1];
             String password = connectionProperties[2];
 
@@ -151,6 +151,7 @@ public class TeradataManager implements DataWarehouseManager {
     }
 
     public List<String> getStatementsFromQuery() {
+        // TODO Account for edge case where semicolon could be inside statement
         return Arrays.stream(query.query().split(";")).map(String::trim).filter(statement -> !statement.isEmpty()).collect(Collectors.toList());
     }
 
@@ -176,7 +177,7 @@ public class TeradataManager implements DataWarehouseManager {
                 throw new IllegalArgumentException(schema.path() + " is not correctly formatted. " + e.getMessage());
             }
 
-            tables = getTablesFromDdlSchema();
+            tables = getTablesFromDdlSchema(ddlSchema);
 
             if (tables.isEmpty()) {
                 throw new IllegalArgumentException(schema.path() + " is not correctly formatted.");
@@ -202,26 +203,34 @@ public class TeradataManager implements DataWarehouseManager {
                 JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
 
                 if (tableReference.has("datasetId") && tableReference.has("tableId")) {
-                    String statement = "CREATE TABLE ";
+                    StringBuilder statement = new StringBuilder("CREATE TABLE ");
 
-                    statement += tableReference.get("datasetId").getAsString() + "." + tableReference.get("tableId").getAsString() + " (";
+                    statement.append(tableReference.get("datasetId").getAsString());
+                    statement.append(".");
+                    statement.append(tableReference.get("tableId").getAsString());
+                    statement.append(" (");
 
                     // Generate column syntax for each field provided in JSON
-                    ArrayList<String> columns = new ArrayList<String>();
+                    List<String> columns = new ArrayList<>();
                     for (JsonElement fieldElement : schemaObject.getAsJsonArray("fields")) {
                         JsonObject field = fieldElement.getAsJsonObject();
 
                         // Assemble column syntax
-                        String column = field.get("name").getAsString() + " " + field.get("type").getAsString();
+                        StringBuilder column = new StringBuilder();
+                        column.append(field.get("name").getAsString());
+                        column.append(" ");
+                        column.append(field.get("type").getAsString());
                         if (field.has("mode")) {
-                            column += " " + field.get("mode").getAsString();
+                            column.append(" ");
+                            column.append(field.get("mode").getAsString());
                         }
 
-                        columns.add(column);
+                        columns.add(column.toString());
                     }
-                    statement += String.join(", ", columns) + ")";
+                    statement.append(String.join(", ", columns));
+                    statement.append(")");
 
-                    ddlStatements.add(statement);
+                    ddlStatements.add(statement.toString());
                 }
             }
         }
@@ -232,12 +241,12 @@ public class TeradataManager implements DataWarehouseManager {
      * Read DDL schema to identify tables being created
      * @return List of new table ids
      */
-    public List<String> getTablesFromDdlSchema() {
+    public List<String> getTablesFromDdlSchema(String schemaContents) {
         List<String> tables = new ArrayList<String>();
 
         // Separate DDL schema into statements
         // TODO Account for edge case where semicolon could be inside statement
-        String[] statements = schema.schema().split(";");
+        String[] statements = schemaContents.split(";");
 
         for (String statement : statements) {
             statement = statement.trim().replaceAll("\\s+", " ");
@@ -262,6 +271,8 @@ public class TeradataManager implements DataWarehouseManager {
      */
     private List<Object> parseResults(ResultSet values, ResultSetMetaData metadata) throws SQLException {
         List<Object> results = new ArrayList<Object>();
+
+        // Result set columns start at 1 instead of 0
         for (int i = 1; i <= metadata.getColumnCount(); i++) {
             Object result;
             int type = metadata.getColumnType(i);
