@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Stack;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
 
@@ -54,21 +55,31 @@ public class QueryBreakdown {
 
     // write termination logic for output (tracing the node back, reconstructing path, output)
     Node current = solution;
-    while (current.getParent() != null) {
-      // print out the result
-      System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
-          + "Start Column %3$s, End Column %4$s, %5$s", current.getStartLine(),
-          current.getEndLine(), current.getStartColumn(), current.getEndColumn(),
-          current.getErrorHandlingType()));
 
-      // if replacement
-      if (current.getErrorHandlingType().equals("Replacement")) {
-        System.out.print(String.format(": replaced %1$s with %2$s", current.getReplaceFrom(),
+    // we use a stack to display the results in order
+    Stack<Node> stack = new Stack<>();
+    while (current.getParent() != null) {
+      stack.push(current);
+      current = current.getParent();
+    }
+
+    // we then pop the stack and output results one by one
+    while (!stack.empty()) {
+      current = stack.pop();
+      if (current.getErrorHandlingType().equals("DELETION")) {
+        // print out the result
+        System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+                + "Start Column %3$s, End Column %4$s, %5$s", current.getStartLine(),
+            current.getEndLine(), current.getStartColumn(), current.getEndColumn(),
+            current.getErrorHandlingType()));
+      }
+      else {
+        System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+                + "Start Column %3$s, End Column %4$s, %5$s: replaced %6$s with %7$s",
+            current.getStartLine(), current.getEndLine(), current.getStartColumn(),
+            current.getEndColumn(), current.getErrorHandlingType(), current.getReplaceFrom(),
             current.getReplaceTo()));
       }
-
-      // update for loop
-      current = current.getParent();
     }
   }
 
@@ -92,7 +103,6 @@ public class QueryBreakdown {
     } catch (Exception e) {
       // generates new queries through deletion and replacement
       SqlParserPos pos = ((SqlParseException) e).getPos();
-      /* deletion: gets the new query, creates a node, and calls the loop again */
 
       // gets the error location in the original query
       int originalStartColumn =
@@ -100,6 +110,7 @@ public class QueryBreakdown {
       int originalEndColumn =
           locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
 
+      /* deletion: gets the new query, creates a node, and calls the loop again */
       // gets the new query
       String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
           pos.getEndColumnNum());
@@ -115,20 +126,21 @@ public class QueryBreakdown {
       // calls the loop again
       loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
 
-      /**
-      // replacement: gets the new queries, creates nodes, and calls the loop for each of them
+      /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
       ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
           pos.getColumnNum(), pos.getEndColumnNum(),
           ((SqlParseException) e).getExpectedTokenNames());
 
       // recursively loops through the new queries
       for (ReplacedComponent r: replacementQueries) {
-        Node replacementNode = new Node(parent, pos.getLineNum(), pos.getColumnNum(),
-            pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement(),
+        // updates the location tracker to reflect the replacement
+        LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
+            pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
+        Node replacementNode = new Node(parent, pos.getLineNum(), originalStartColumn,
+            pos.getEndLineNum(), originalEndColumn, r.getOriginal(), r.getReplacement(),
             depth + 1);
-        loop(r.getQuery(), errorLimit, replacementNode, depth + 1);
+        loop(r.getQuery(), errorLimit, replacementNode, depth + 1, replacedLt);
       }
-       **/
 
       /* termination to end the loop if the instance was not a full run through the query.
       In other words, it ensures that the termination condition is not hit on the way back
