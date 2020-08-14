@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -268,17 +270,20 @@ public class TeradataManager implements DataWarehouseManager {
                 case Types.BOOLEAN:
                     result = values.getBoolean(i);
                     break;
+                case Types.DECIMAL:
+                case Types.NUMERIC:
+                    result = values.getBigDecimal(i).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
+                    break;
                 case Types.FLOAT:
+                    result = BigDecimal.valueOf(values.getFloat(i)).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
+                    break;
                 case Types.DOUBLE:
-                    result = values.getDouble(i);
+                    result = BigDecimal.valueOf(values.getDouble(i)).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR);
                     break;
                 case Types.SMALLINT:
                 case Types.BIGINT:
                 case Types.INTEGER:
                     result = values.getLong(i);
-                    break;
-                case Types.NUMERIC:
-                    result = values.getBigDecimal(i);
                     break;
                 // TODO Add support for Types.STRUCT
                 case Types.DATE:
