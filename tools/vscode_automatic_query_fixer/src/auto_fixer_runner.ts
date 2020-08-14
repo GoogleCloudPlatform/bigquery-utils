@@ -1,31 +1,26 @@
 import {Progress, CancellationToken} from 'vscode';
 import {execFile} from 'child_process';
-import {Query} from './query';
+import {QueryFix} from './auto_fixer_result';
 
 /**
- * Runs an executable file provided by the SQL Extraction distribution.
+ * Runs an executable file provided by the Auto Fixer distribution.
  */
-export class SqlExtractionRunner {
+export class AutoFixerRunner {
   constructor(private execPath: string) {}
 
   /**
-   * Runs the executable and returns the results.
-   *
-   * @param dir Directory (recursive) to run SQL extraction at.
-   * @param progress Progress bar.
-   * @param token CancellationToken.
-   * @returns List of Json objects (each representing a complete query).
+   * execute Auto Fixer to analyze [query].
    */
-  extractFromDirectory(
-    dir: string,
+  public analyze(
+    query: string,
     progress: Progress<{
       message?: string | undefined;
       increment?: number | undefined;
     }>,
     token: CancellationToken
-  ): Promise<Query[]> {
+  ): Promise<QueryFix[]> {
     return this.execute(
-      ['-r', '--progress', '--parallel', dir],
+      ['-m', 'fo', '-o', 'json', '-p', 'sql-gravity-internship', query],
       progress,
       token
     );
@@ -38,13 +33,13 @@ export class SqlExtractionRunner {
       increment?: number | undefined;
     }>,
     token: CancellationToken
-  ): Promise<Query[]> {
+  ): Promise<QueryFix[]> {
     if (token.isCancellationRequested) {
       return Promise.reject();
     }
 
-    return new Promise<Query[]>((resolve, reject) => {
-      progress.report({message: 'Launching SQL Extraction...'});
+    return new Promise<QueryFix[]>((resolve, reject) => {
+      progress.report({message: 'Launching Automatic Query Fixer...'});
 
       let json = '';
       let errMsg = '';
@@ -52,7 +47,12 @@ export class SqlExtractionRunner {
       const process = execFile(this.execPath, args)
         .on('close', code => {
           if (!process.killed && code === 0) {
-            resolve(JSON.parse(json).queries);
+            let fixes = JSON.parse(json);
+            if (!Array.isArray(fixes)) {
+              // treat all output payload as an array
+              fixes = [fixes];
+            }
+            resolve(fixes);
           } else {
             reject();
           }

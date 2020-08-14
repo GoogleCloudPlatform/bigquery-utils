@@ -101,8 +101,6 @@ public class QueryFixerMain {
     }
 
     String query = cmd.getArgList().get(0);
-    System.out.println("Input query: " + query);
-
     AutomaticQueryFixer queryFixer = new AutomaticQueryFixer(bigQueryOptions);
 
     String mode = cmd.getOptionValue(MODE);
@@ -128,7 +126,7 @@ public class QueryFixerMain {
       case FIX_ONCE_MODE:
       case FO_MODE:
         fixResult = fixQueryInFullInteractMode(queryFixer, query);
-        printFixResult(fixResult, cmd.getOptionValue(OUTPUT));
+        printFixResult(query, fixResult, cmd.getOptionValue(OUTPUT));
         break;
 
       default:
@@ -153,8 +151,9 @@ public class QueryFixerMain {
     return queryFixer.fix(query);
   }
 
-  private static void printFixResult(FixResult fixResult, String outputFormat) {
+  private static void printFixResult(String query, FixResult fixResult, String outputFormat) {
     if (outputFormat == null || outputFormat.equalsIgnoreCase(NATURAL_OUTPUT)) {
+      System.out.println("Input query: " + query);
       printFixResultInCommandLine(fixResult);
     } else if (outputFormat.equalsIgnoreCase(JSON_OUTPUT)) {
       printFixResultAsJson(fixResult);
