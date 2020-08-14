@@ -22,8 +22,4 @@ public abstract class QueryJobResults {
         return new AutoValue_QueryJobResults(statement, query, error, results, rawResults);
     }
 
-    public static QueryJobResults create(String statement, QueryVerificationQuery query, String error, Set<List<Object>> results, List<List<String>> rawResults) {
-        return new AutoValue_QueryJobResults(statement, query, error, results);
-    }
-
 }
