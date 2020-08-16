@@ -5,16 +5,18 @@ package token;
  */
 public class Token {
   private String tokenPlaceHolder;
-  private String tokenExpression;
+  private String postgresTokenExpression;
+  private String bigQueryTokenExpression;
   private TokenInfo tokenInfo;
 
   public Token(TokenInfo tokenInfo) {
     this.tokenInfo = tokenInfo;
   }
 
-  public Token(String tokenPlaceHolder, String tokenExpression, TokenInfo tokenInfo) {
+  public Token(String tokenPlaceHolder, String postgresTokenExpression, String bigQueryTokenExpression, TokenInfo tokenInfo) {
     this.tokenPlaceHolder = tokenPlaceHolder;
-    this.tokenExpression = tokenExpression;
+    this.postgresTokenExpression = postgresTokenExpression;
+    this.bigQueryTokenExpression = bigQueryTokenExpression;
     this.tokenInfo = tokenInfo;
   }
 
@@ -26,12 +28,20 @@ public class Token {
     return tokenPlaceHolder;
   }
 
-  public void setTokenExpression(String tokenExpression) {
-    this.tokenExpression = tokenExpression;
+  public void setPostgresTokenExpression(String postgresTokenExpression) {
+    this.postgresTokenExpression = postgresTokenExpression;
   }
 
-  public String getTokenExpression() {
-    return tokenExpression;
+  public String getPostgresTokenExpression() {
+    return postgresTokenExpression;
+  }
+
+  public void setBigQueryTokenExpression(String bigQueryTokenExpression) {
+    this.bigQueryTokenExpression = bigQueryTokenExpression;
+  }
+
+  public String getBigQueryTokenExpression() {
+    return bigQueryTokenExpression;
   }
 
   public void setTokenInfo(TokenInfo tokenInfo) {

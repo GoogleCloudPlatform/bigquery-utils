@@ -9,8 +9,8 @@
   <version>1.0-SNAPSHOT</version>
 
   <properties>
-    <maven.compiler.target>1.10</maven.compiler.target>
-    <maven.compiler.source>1.10</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
 
   <build>
@@ -23,7 +23,25 @@
           <mainClass>com.google.bigquery.Main</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.google.bigquery.Main</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
   </build>
 
   <dependencyManagement>

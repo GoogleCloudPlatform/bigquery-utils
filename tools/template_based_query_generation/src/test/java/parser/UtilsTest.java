@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,31 +47,21 @@ public class UtilsTest {
 
   @Test
   public void test_writeDirectory(@TempDir Path testDir) throws IOException {
-    List<String> expected_bq_skeletons = new ArrayList<>();
-    List<String> expected_bq_tokenized = new ArrayList<>();
-    List<String> expected_postgre_skeletons = new ArrayList<>();
-    List<String> expected_postgre_tokenized = new ArrayList<>();
-    expected_bq_skeletons.add("BQ Skeletons!");
-    expected_bq_tokenized.add("BQ Tokens!");
-    expected_postgre_skeletons.add("PostgreSQL Skeletons!");
-    expected_postgre_tokenized.add("PostgreSQL Tokens!");
+    List<String> expected_bigQuery = new ArrayList<>();
+    List<String> expected_postgreSQL = new ArrayList<>();
+    expected_bigQuery.add("BigQuery Tokens!");
+    expected_postgreSQL.add("PostgreSQL Tokens!");
     Map<String, ImmutableList<String>> expectedOutputs = new HashMap<>();
-    expectedOutputs.put("BQ_skeletons", ImmutableList.copyOf(expected_bq_skeletons));
-    expectedOutputs.put("BQ_tokenized", ImmutableList.copyOf(expected_bq_tokenized));
-    expectedOutputs.put("Postgre_skeletons", ImmutableList.copyOf(expected_postgre_skeletons));
-    expectedOutputs.put("Postgre_tokenized", ImmutableList.copyOf(expected_postgre_tokenized));
+    expectedOutputs.put("BigQuery", ImmutableList.copyOf(expected_bigQuery));
+    expectedOutputs.put("PostgreSQL", ImmutableList.copyOf(expected_postgreSQL));
 
     Utils.writeDirectory(ImmutableMap.copyOf(expectedOutputs), testDir);
 
-    List<String> actual_bq_skeletons = Files.readAllLines(Paths.get(testDir.toString() + "/bq_skeleton.txt"));
-    List<String> actual_bq_tokenized = Files.readAllLines(Paths.get(testDir.toString() + "/bq_tokenized.txt"));
-    List<String> actual_postgre_skeletons = Files.readAllLines(Paths.get(testDir.toString() + "/postgre_skeleton.txt"));
-    List<String> actual_postgre_tokenized = Files.readAllLines(Paths.get(testDir.toString() + "/postgre_tokenized.txt"));
+    List<String> actual_bigQuery = Files.readAllLines(Paths.get(testDir.toString() + "/bigQuery.txt"));
+    List<String> actual_postgreSQL = Files.readAllLines(Paths.get(testDir.toString() + "/postgreSQL.txt"));
     Map<String, ImmutableList<String>> actualOutputs = new HashMap<>();
-    actualOutputs.put("BQ_skeletons", ImmutableList.copyOf(actual_bq_skeletons));
-    actualOutputs.put("BQ_tokenized", ImmutableList.copyOf(actual_bq_tokenized));
-    actualOutputs.put("Postgre_skeletons", ImmutableList.copyOf(actual_postgre_skeletons));
-    actualOutputs.put("Postgre_tokenized", ImmutableList.copyOf(actual_postgre_tokenized));
+    actualOutputs.put("BigQuery", ImmutableList.copyOf(actual_bigQuery));
+    actualOutputs.put("PostgreSQL", ImmutableList.copyOf(actual_postgreSQL));
 
     assertEquals(ImmutableMap.copyOf(expectedOutputs), ImmutableMap.copyOf(actualOutputs));
   }
@@ -97,23 +90,14 @@ public class UtilsTest {
   @Test
   public void test_makeImmutableSet(@TempDir Path testDir) throws IOException {
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-    builder.add("Test 1");
-    builder.add("Test 3");
+    builder.add("DDL_CREATE");
     ImmutableSet<String> expected = builder.build();
 
     FeatureIndicator featureIndicator1 = new FeatureIndicator();
-    FeatureIndicator featureIndicator2 = new FeatureIndicator();
-    FeatureIndicator featureIndicator3 = new FeatureIndicator();
-    featureIndicator1.setFeature("Test 1");
-    featureIndicator2.setFeature("Test 2");
-    featureIndicator3.setFeature("Test 3");
+    featureIndicator1.setFeature("DDL_CREATE");
     featureIndicator1.setIsIncluded(true);
-    featureIndicator2.setIsIncluded(false);
-    featureIndicator3.setIsIncluded(true);
-    List<FeatureIndicator> featureIndicatorList = new ArrayList<FeatureIndicator>();
+    List<FeatureIndicator> featureIndicatorList = new ArrayList<>();
     featureIndicatorList.add(featureIndicator1);
-    featureIndicatorList.add(featureIndicator2);
-    featureIndicatorList.add(featureIndicator3);
     FeatureIndicators featureIndicators = new FeatureIndicators();
     featureIndicators.setFeatureIndicators(featureIndicatorList);
 
@@ -122,7 +106,7 @@ public class UtilsTest {
       gson.toJson(featureIndicators, writer);
     }
 
-    ImmutableSet<String> actual = Utils.makeImmutableSet(testDir.resolve("test.txt"));
+    ImmutableSet<String> actual = Utils.makeImmutableKeywordSet(testDir.resolve("test.txt"));
 
     assertEquals(expected, actual);
   }
@@ -132,13 +116,15 @@ public class UtilsTest {
     TokenInfo tokenInfo = new TokenInfo();
     tokenInfo.setCount(1);
     tokenInfo.setRequired(true);
-    tokenInfo.setTokenName("Test Token");
+    tokenInfo.setTokenType("table_name");
     ArrayList<TokenInfo> tokenInfos = new ArrayList<>();
     tokenInfos.add(tokenInfo);
     Mapping mapping = new Mapping();
-    mapping.setPostgres("Test Postgre");
-    mapping.setBigQuery("Test BigQuery");
+    Map<String, String> dialectMap = new HashMap<>();
+    dialectMap.put("postgres", "Test Postgre");
+    dialectMap.put("bigQuery", "Test BigQuery");
     mapping.setTokenInfos(tokenInfos);
+    mapping.setDialectMap(dialectMap);
     ArrayList<Mapping> mappings = new ArrayList<>();
     mappings.add(mapping);
 
@@ -164,12 +150,12 @@ public class UtilsTest {
     keywordsBuilder.add("Test Feature");
     ImmutableSet<String> keywordsTest = keywordsBuilder.build();
 
-    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableMap(testDir.resolve("test.txt"), keywordsTest);
+    ImmutableMap<String, ImmutableList<Mapping>> actual = Utils.makeImmutableKeywordMap(testDir.resolve("test.txt"), keywordsTest);
 
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getCount(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getCount());
     assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getRequired(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getRequired());
-    assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getTokenName(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getTokenName());
-    assertEquals(expected.get("Test Feature").get(0).getPostgres(), actual.get("Test Feature").get(0).getPostgres());
-    assertEquals(expected.get("Test Feature").get(0).getBigQuery(), actual.get("Test Feature").get(0).getBigQuery());
+    assertEquals(expected.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType(), actual.get("Test Feature").get(0).getTokenInfos().get(0).getTokenType());
+    assertEquals(expected.get("Test Feature").get(0).getDialectMap().get("postgres"), actual.get("Test Feature").get(0).getDialectMap().get("postgres"));
+    assertEquals(expected.get("Test Feature").get(0).getDialectMap().get("bigQuery"), actual.get("Test Feature").get(0).getDialectMap().get("bigQuery"));
   }
 }

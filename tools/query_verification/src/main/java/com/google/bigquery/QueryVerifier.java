@@ -1,342 +1,255 @@
 package com.google.bigquery;
 
-import com.google.cloud.bigquery.*;
-import com.google.gson.*;
-
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Contains the logic to run query verification.
  */
 public class QueryVerifier {
 
-    private final QueryVerificationQuery migratedQuery;
-    private final QueryVerificationSchema migratedSchema;
+    private final BigQueryManager migratedInstance;
+    private final DataWarehouseManager originalInstance;
 
-    private final QueryVerificationQuery originalQuery;
-    private final QueryVerificationSchema originalSchema;
-
-    private final List<QueryVerificationData> data;
-
-    private final BigQuery bigQuery;
+    public static final int DECIMAL_PRECISION = 10;
 
     public QueryVerifier(QueryVerificationQuery migratedQuery, @Nullable QueryVerificationSchema migratedSchema, @Nullable QueryVerificationQuery originalQuery, @Nullable QueryVerificationSchema originalSchema, @Nullable List<QueryVerificationData> data) {
-        this.migratedQuery = migratedQuery;
-        this.migratedSchema = migratedSchema;
-
-        this.originalQuery = originalQuery;
-        this.originalSchema = originalSchema;
-
-        this.data = data;
-
-        bigQuery = BigQueryOptions.getDefaultInstance().getService();
+        migratedInstance = new BigQueryManager(migratedQuery, migratedSchema, data);
+        if (originalQuery == null) {
+            originalInstance = null;
+        } else {
+            originalInstance = new TeradataManager(originalQuery, originalSchema, data);
+        }
     }
 
     /**
      * Determines which verification method to use based on provided inputs and runs the verification.
      */
     public void verify() {
-        if (originalQuery != null && originalSchema != null) {
-            verifyDataAware();
-        } else {
-            verifyDataFree();
+        try {
+            if (originalInstance == null) {
+                verifyDataFree();
+            } else {
+                verifyDataAware();
+            }
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     /**
-     * Verifies migrated query by sending a dry-run query job to BQ to check for syntax and semantic errors.
+     * Verifies migrated query by checking for syntax and semantic errors.
      */
-    public void verifyDataFree() {
-        List<Table> tables = getBigQueryTablesFromSchema();
+    public void verifyDataFree() throws InterruptedException {
+        List<QueryJobResults> results = migratedInstance.dryRunQueries();
 
-        // Create dry-run jobs
-        List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, true);
+        QueryErrors errors = QueryVerifier.classifyErrors(results);
 
-        // Store results for every successful dry-run
-        List<QueryJobResults<JobStatistics>> jobResults = new ArrayList<QueryJobResults<JobStatistics>>();
-
-        for (int i = 0; i < jobInfos.size(); i++) {
-            JobInfo jobInfo = jobInfos.get(i);
-
-            // Retrieve query
-            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
-            String query = queryJobConfiguration.getQuery();
-
-            try {
-                // Run dry-run
-                Job queryJob = bigQuery.create(jobInfo);
-
-                // Store results from dry-run
-                JobStatistics results = queryJob.getStatistics();
-                jobResults.add(QueryJobResults.create(query, results));
-            } catch (BigQueryException e) {
-                // Print out syntax/semantic errors returned from BQ
-                System.err.printf("Error in Query #%d from %s\n%s\n\n", i + 1, migratedQuery.path(), e.getMessage());
-            }
-        }
-
-        // Clear tables created
-        tables.forEach(table -> BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId()));
-
+        // Summary
         System.out.println();
-        System.out.printf("%d/%d (%.2f%%) Queries Verified\n", jobResults.size(), jobInfos.size(), jobResults.size() * 100.0f / jobInfos.size());
-        System.out.printf("Data-Free Verification %s\n", jobResults.size() == jobInfos.size() ? "Succeeded" : "Failed");
+        System.out.printf("Queries Run: %d, No Errors: %d (%.2f%%), Syntax Errors: %d, Semantic Errors: %d\n\n", errors.totalQueries(), errors.noErrors(), errors.successRate(), errors.syntaxErrors(), errors.semanticErrors());
+        System.out.println("Data-Free Verification Completed");
     }
 
     /**
      * Verifies migrated query by sending query jobs to BQ and TD to check for differences in the query results.
      */
-    public void verifyDataAware() {
-        List<Table> tables = getBigQueryTablesFromSchema();
-        populateBigQueryTablesFromData();
+    public void verifyDataAware() throws Exception {
+        List<QueryJobResults> migratedResults = migratedInstance.runQueries();
+        List<QueryJobResults> originalResults = originalInstance.runQueries();
 
-        // Create query jobs
-        List<JobInfo> jobInfos = getJobInfosFromQuery(migratedQuery, false);
+        QueryVerifier.exportToCsv(migratedResults, migratedInstance);
+        QueryVerifier.exportToCsv(originalResults, originalInstance);
 
-        // Store results from every job
-        List<QueryJobResults<TableResult>> bigQueryJobResults = new ArrayList<QueryJobResults<TableResult>>();
+        List<ResultDifferences> resultDifferences = QueryVerifier.compareResults(migratedResults, originalResults);
+        QueryVerifier.exportToCsv(resultDifferences);
 
-        for (int i = 0; i < jobInfos.size(); i++) {
-            JobInfo jobInfo = jobInfos.get(i);
+        QueryErrors migratedErrors = QueryVerifier.classifyErrors(migratedResults);
+        QueryErrors originalErrors = QueryVerifier.classifyErrors(originalResults);
 
-            // Retrieve query
-            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
-            String query = queryJobConfiguration.getQuery();
-
-            QueryJobResults results = null;
-            try {
-                // Run query job
-                Job queryJob = bigQuery.create(jobInfo);
-                queryJob.waitFor();
-
-                results = QueryJobResults.create(query, queryJob.getQueryResults());
-            } catch (BigQueryException e) {
-                // Print out syntax/semantic errors returned from BQ
-                System.err.printf("Error in Query #%d from %s\n%s\n\n", i + 1, migratedQuery.path(), e.getMessage());
-            } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
-            } finally {
-                // Store results
-                bigQueryJobResults.add(results);
+        // Summary
+        System.out.printf("%s Summary\nQueries Run: %d, No Errors: %d (%.2f%%), Syntax Errors: %d, Semantic Errors: %d\n\n", migratedInstance.getName(), migratedErrors.totalQueries(), migratedErrors.noErrors(), migratedErrors.successRate(), migratedErrors.syntaxErrors(), migratedErrors.semanticErrors());
+        System.out.printf("%s Summary\nQueries Run: %d, No Errors: %d (%.2f%%), Syntax Errors: %d, Semantic Errors: %d\n\n", originalInstance.getName(), originalErrors.totalQueries(), originalErrors.noErrors(), originalErrors.successRate(), originalErrors.syntaxErrors(), originalErrors.semanticErrors());
+        System.out.println("Verification Summary");
+        for (int i = 0; i < resultDifferences.size(); i++) {
+            ResultDifferences differences = resultDifferences.get(i);
+            if (!differences.missingResults().isEmpty() || !differences.extraResults().isEmpty()) {
+                System.out.printf("Differences in query %d results: %d rows missing and %d extra rows in migrated query results.\n", i + 1, differences.missingResults().size(), differences.extraResults().size());
             }
         }
-
-        // Clear tables created
-        tables.forEach(table -> BigQueryOptions.getDefaultInstance().getService().delete(table.getTableId()));
-
-        // TODO Run queries in TD
-
-        // TODO Compare results
-
-        bigQueryJobResults.removeIf(Objects::isNull);
-
-        System.out.println();
-        System.out.printf("%d/%d (%.2f%%) Queries Verified\n", bigQueryJobResults.size(), jobInfos.size(), bigQueryJobResults.size() * 100.0f / jobInfos.size());
-        System.out.printf("Data-Aware Verification %s\n", bigQueryJobResults.size() == jobInfos.size() ? "Succeeded" : "Failed");
+        System.out.println("Raw results and diffs have been exported to the \"query_verification_output\" folder.\n");
+        System.out.println("Data-Aware Verification Completed");
     }
 
     /**
-     * Creates BQ tables based on the provided schema
-     * @return List of newly created tables
+     * Finds extra and missing results by locating the differences between the results.
+     * @param migratedResults Parsed results returned from BQ
+     * @param originalResults Parsed results returned from original data warehouse service
+     * @return Differences classified as either extra or missing from migrated results.
      */
-    public List<Table> getBigQueryTablesFromSchema() {
-        List<Table> tables = new ArrayList<Table>();
+    public static List<ResultDifferences> compareResults(List<QueryJobResults> migratedResults, List<QueryJobResults> originalResults) throws IllegalArgumentException {
+        // Check if same amount of queries were run
+        if (migratedResults.size() == originalResults.size()) {
+            List<ResultDifferences> differences = new ArrayList<ResultDifferences>();
 
-        if (migratedSchema != null) {
-            if (migratedSchema.isInJsonFormat()) {
-                // Schema is JSON
-                List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(migratedSchema);
-                if (tableInfos != null) {
-                    tableInfos.forEach(tableInfo -> tables.add(bigQuery.create(tableInfo)));
+            for (int i = 0; i < migratedResults.size(); i++) {
+                Set<List<Object>> migratedJobResults = migratedResults.get(i).results();
+                Set<List<Object>> originalJobResults = originalResults.get(i).results();
+
+                if (migratedJobResults == null) {
+                    migratedJobResults = new HashSet<List<Object>>();
                 }
+                if (originalJobResults == null) {
+                    originalJobResults = new HashSet<List<Object>>();
+                }
+
+                // Rows present in migrated query results, but not original query results
+                List<List<String>> extraResults = new ArrayList<List<String>>();
+
+                for (List<Object> migratedQueryResults : migratedJobResults) {
+                    // Rows that exist in both results are removed from missing results set
+                    if (!originalJobResults.remove(migratedQueryResults)) {
+                        // Rows in the migrated results that don't exist in original results are classified as extra in migrated results
+                        extraResults.add(toStringTypes(migratedQueryResults));
+                    }
+                }
+
+                // Any leftover rows in the original results without a match are classified as missing in migrated results
+                List<List<String>> missingResults = originalJobResults.stream().map(QueryVerifier::toStringTypes).collect(Collectors.toList());
+
+                differences.add(ResultDifferences.create(extraResults, missingResults));
+            }
+
+            return differences;
+        } else {
+            throw new IllegalArgumentException("Number of statements in migrated query file should be equal to the number of statements in the original query file.");
+        }
+    }
+
+    /**
+     * Converts the object types to strings.
+     * @param row List of objects
+     * @return List of strings
+     */
+    private static List<String> toStringTypes(List<Object> row) {
+        return row.stream().map(object -> {
+            if (object instanceof Date) {
+                // Format date objects
+                return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSSSSS zzz").format(object);
             } else {
-                // Schema is DDL
-                JobInfo jobInfo = configureJob(migratedSchema.schema(), false);
-                Job schemaJob = bigQuery.create(jobInfo);
-                try {
-                    schemaJob.waitFor();
-                } catch (InterruptedException e) {
-                    System.err.println(e.getMessage());
-                }
-
-                List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(migratedSchema);
-                tableIds.forEach(tableId -> tables.add(bigQuery.getTable(tableId)));
+                // All other types can use toString()
+                return object.toString();
             }
-
-            if (tables.isEmpty()) {
-                System.err.println(migratedSchema.path() + " is not correctly formatted.");
-            }
-        }
-
-        return tables;
+        }).collect(Collectors.toList());
     }
 
     /**
-     * Populates BQ tables based on the provided table data
+     * Counts and classifies the syntax/semantic errors returned from running queries.
+     * @param results List of results
+     * @return Number of queries that had syntax errors, semantic errors, and no errors.
      */
-    public void populateBigQueryTablesFromData() {
-        for (QueryVerificationData queryVerificationData : data) {
-            Table table = bigQuery.getTable(queryVerificationData.datasetName(), queryVerificationData.tableName());
+    public static QueryErrors classifyErrors(List<QueryJobResults> results) {
+        int noErrors = 0;
+        int syntaxErrors = 0;
+        int semanticErrors = 0;
 
-            // Check if no schema was provided for this table
-            if (table == null) {
-                System.err.println(queryVerificationData.tableName() + " has no provided schema.");
+        // Look for errors that occurred for each query
+        for (QueryJobResults result : results) {
+            if (result.error() == null) {
+                noErrors++;
+            } else {
+                String query = result.query().query();
 
-                // Try to continue verification
+                // Locate line number of query in file
+                int index = query.indexOf(result.statement());
+                query = query.substring(0, index);
+                int lineNumber = query.length() - query.replace("\n", "").length() + 1;
+
+                System.err.printf("Error in query (line %d) from %s\n%s\n\n", lineNumber, result.query().path(), result.error());
+
+                // Classify error as syntax or semantic
+                if (result.error().startsWith("Syntax error")) {
+                    syntaxErrors++;
+                } else {
+                    semanticErrors++;
+                }
+            }
+        }
+
+        return QueryErrors.create(results.size(), noErrors, syntaxErrors, semanticErrors);
+    }
+
+    /**
+     * Exports query results to CSV files.
+     * @param results List of results
+     * @param instance Data warehouse service used
+     * @throws IOException
+     */
+    public static void exportToCsv(List<QueryJobResults> results, DataWarehouseManager instance) throws IOException {
+        exportToCsv(results.stream().map(QueryJobResults::rawResults).collect(Collectors.toList()), instance.getName(), "");
+    }
+
+    /**
+     * Exports diff results to CSV files.
+     * @param differences between original and migrated results
+     * @throws IOException
+     */
+    public static void exportToCsv(List<ResultDifferences> differences) throws IOException {
+        exportToCsv(differences.stream().map(ResultDifferences::missingResults).collect(Collectors.toList()), "diff", "missing");
+        exportToCsv(differences.stream().map(ResultDifferences::extraResults).collect(Collectors.toList()), "diff", "extra");
+    }
+
+    private static void exportToCsv(List<List<List<String>>> rawResults, String folderName, String fileNameSuffix) throws IOException {
+        Path csvOutputDirectory = Paths.get("query_verification_output", folderName);
+
+        if (csvOutputDirectory.toFile().exists()) {
+            // Clear out old output files in the same path
+            Files.walk(csvOutputDirectory).forEach(subPath -> {
+                // Delete files previously generated by query verification
+                if (subPath.getFileName().toString().matches("query\\d+" + fileNameSuffix + "\\.csv")) {
+                    subPath.toFile().delete();
+                }
+            });
+            if (csvOutputDirectory.toFile().length() == 0 ) {
+                Files.deleteIfExists(csvOutputDirectory);
+            }
+        }
+        Files.createDirectories(csvOutputDirectory);
+
+        for (int i = 0; i < rawResults.size(); i++) {
+            List<List<String>> queryResults = rawResults.get(i);
+
+            // Skip if results are empty
+            if (queryResults == null || queryResults.isEmpty()) {
                 continue;
             }
 
-            TableId tableId = table.getTableId();
+            // Filepath for each query is "output/[data_warehouse_name]/query[id].csv"
+            File csvOutputFile = new File(String.format("%s/query%d%s.csv", csvOutputDirectory, i + 1, fileNameSuffix));
+            csvOutputFile.createNewFile();
+            FileWriter writer = new FileWriter(csvOutputFile);
 
-            // Copy contents of CSV file
-            WriteChannelConfiguration writeChannelConfiguration = WriteChannelConfiguration.newBuilder(tableId).setFormatOptions(FormatOptions.csv()).build();
-            TableDataWriteChannel writer = bigQuery.writer(writeChannelConfiguration);
-            try {
-                writer.write(ByteBuffer.wrap(queryVerificationData.contents().getBytes()));
-                writer.close();
-            } catch (IOException e) {
-                System.err.println("I/O Exception: " + e.getMessage());
-            }
-
-            // Run table data writing job
-            Job writeJob = writer.getJob();
-            try {
-                writeJob = writeJob.waitFor();
-
-                // Check for errors in writing table data
-                if (writeJob.getStatus().getError() != null) {
-                    BigQueryError error = writeJob.getStatus().getError();
-                    System.err.printf("%s is not correctly formatted.\n%s\n", queryVerificationData.path(), error.getMessage());
+            // Convert list to csv row and write in file
+            queryResults.stream().map(row -> String.join(",", row)).forEach(row -> {
+                try {
+                    writer.write(row + System.lineSeparator());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                System.err.println(e.getMessage());
-            }
+            });
+
+            writer.close();
         }
-    }
-
-    /**
-     * Reads JSON schema to create table fields based on the schema
-     * @param queryVerificationSchema Schema to read from
-     * @return List of new table info
-     */
-    public static List<TableInfo> getTableInfoFromJsonSchema(QueryVerificationSchema queryVerificationSchema) {
-        List<TableInfo> tableInfos = new ArrayList<TableInfo>();
-        for (JsonElement schemaElement : queryVerificationSchema.getJsonArray()) {
-            if (queryVerificationSchema.getJsonArray().size() == 0) {
-                return null;
-            }
-            JsonObject schemaObject = schemaElement.getAsJsonObject();
-
-            if (schemaObject.has("tableReference")) {
-                JsonObject tableReference = schemaObject.get("tableReference").getAsJsonObject();
-
-                if (tableReference.has("datasetId") && tableReference.has("tableId")) {
-                    TableId tableId = TableId.of(tableReference.get("datasetId").getAsString(), tableReference.get("tableId").getAsString());
-
-                    // Deserialize fields
-                    FieldList fieldList = null;
-                    try {
-                        JsonArray schemaFields = schemaObject.getAsJsonArray("fields");
-
-                        Gson gson = new GsonBuilder()
-                                .registerTypeAdapter(FieldList.class, new BigQuerySchemaJsonDeserializer())
-                                .create();
-                        fieldList = gson.fromJson(schemaFields, FieldList.class);
-                    } finally {
-                        if (fieldList == null || fieldList.isEmpty()) {
-                            // Error in formatting of fields
-                            System.err.println(tableId.getTable() + " is not correctly formatted.");
-
-                            // Skip table and try to continue verification even without this table
-                            continue;
-                        }
-
-                        Schema schema = Schema.of(fieldList);
-                        TableDefinition tableDefinition = StandardTableDefinition.of(schema);
-
-                        tableInfos.add(TableInfo.newBuilder(tableId, tableDefinition).build());
-                    }
-                }
-            }
-        }
-        return tableInfos;
-    }
-
-    /**
-     * Read DDL schema to identify tables being created
-     * @param queryVerificationSchema Schema to read from
-     * @return List of new table ids
-     */
-    public static List<TableId> getTableIdsFromDdlSchema(QueryVerificationSchema queryVerificationSchema) {
-        List<TableId> tableIds = new ArrayList<TableId>();
-
-        // Separate DDL schema into statements
-        // TODO Account for edge case where semicolon could be inside statement
-        String[] statements = queryVerificationSchema.schema().split(";");
-
-        for (String statement : statements) {
-            statement = statement.trim().replaceAll("\\s+", " ");
-
-            // Basic validation for DDL
-            if (statement.toUpperCase().startsWith("CREATE TABLE")) {
-                String[] schema = statement.split(" ");
-                if (schema.length >= 3) {
-                    String[] tableName = schema[2].split("\\.");
-
-                    // Table name may appear as project.dataset.table or dataset.table
-                    if (tableName.length == 2 || tableName.length == 3) {
-                        TableId tableId = TableId.of(tableName[tableName.length - 2], tableName[tableName.length - 1]);
-                        tableIds.add(tableId);
-                    }
-                }
-            }
-        }
-        return tableIds;
-    }
-
-    /**
-     * Creates jobs for each query from a file
-     * @param queryVerificationQuery
-     * @param dryRun indicating if the query should be run
-     * @return
-     */
-    public static List<JobInfo> getJobInfosFromQuery(QueryVerificationQuery queryVerificationQuery, boolean dryRun) {
-        List<JobInfo> jobInfos = new ArrayList<JobInfo>();
-
-        // Separate query into individual statements
-        String[] statements = queryVerificationQuery.query().split(";");
-
-        for (String statement : statements) {
-            statement = statement.trim();
-
-            JobInfo jobInfo = configureJob(statement, dryRun);
-            jobInfos.add(jobInfo);
-        }
-
-        return jobInfos;
-    }
-
-    /**
-     * Create configuration for query jobs
-     * @param query to run
-     * @param dryRun indicating if the query should be run
-     * @return Generated query job info
-     */
-    public static JobInfo configureJob(String query, boolean dryRun) {
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query)
-                .setDryRun(dryRun)
-                .build();
-        JobId jobId = JobId.of(UUID.randomUUID().toString());
-        JobInfo jobInfo = JobInfo.newBuilder(queryConfig)
-                .setJobId(jobId)
-                .build();
-        return jobInfo;
     }
 
 }

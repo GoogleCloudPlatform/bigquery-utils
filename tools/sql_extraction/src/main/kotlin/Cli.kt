@@ -3,9 +3,11 @@ package com.google.cloud.sqlecosystem.sqlextraction
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.path
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -18,7 +20,8 @@ fun main(args: Array<String>) = Cli(
     SqlExtractor(
         DataFlowSolver(
             listOf(
-                JavaFrontEnd()
+                JavaFrontEnd(),
+                PythonFrontEnd()
             )
         ), ConfidenceRater()
     )
@@ -77,6 +80,17 @@ private class Cli(
         "--progress", help = "Print progress to STDERR"
     ).flag()
 
+    private val confidenceThreshold: Double by option(
+        "--threshold",
+        help = "Minimum confidence value (inclusive between 0 and 1) " +
+                "required for a detected query to be included in final " +
+                "output (default is 0.5)"
+    ).double().default(0.5)
+
+    private val parallelize: Boolean by option(
+        "--parallel", help = "Analyze multiple files in parallel"
+    ).flag()
+
     private val debug: Boolean by option(
         "--debug", "--verbose", help = "Print debug logs to STDERR"
     ).flag()
@@ -93,7 +107,7 @@ private class Cli(
             System.err.println("0.0% Analyzing files...")
         }
 
-        val output = sqlExtractor.process(files, showProgress)
+        val output = sqlExtractor.process(files, confidenceThreshold, showProgress, parallelize)
         logger.debug { "output: ${Gson().toJson(output)}" }
 
         val builder = GsonBuilder()
