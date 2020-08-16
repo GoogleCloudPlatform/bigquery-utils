@@ -21,7 +21,8 @@ class JavaFrontEnd : FrontEnd {
         val lexer = Java9Lexer(fileStream)
         val tokens = CommonTokenStream(lexer as TokenSource)
         val parser = Java9Parser(tokens as TokenStream)
-        // todo: analyze compilationUnit using the engine
-        parser.compilationUnit()
+        val tree = parser.compilationUnit()
+
+        JavaAnalyzer(engine).visit(tree)
     }
 }

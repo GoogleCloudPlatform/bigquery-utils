@@ -11,6 +11,7 @@ BigQuery.
 
 This repository is broken up into:
 
+*   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
     *   [billing](/scripts/billing) - Example queries over the GCP billing
         export

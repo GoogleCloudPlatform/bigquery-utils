@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
     implementation("io.github.microutils:kotlin-logging:1.7.9")
     implementation("org.slf4j:slf4j-simple:1.7.29")
     antlr("org.antlr:antlr4:4.7.2")
@@ -41,7 +42,12 @@ task<de.undercouch.gradle.tasks.download.Download>("downloadGrammars") {
         mkdir("gen/main/antlr")
         mkdir("src/main/antlr")
     }
-    src(listOf("https://raw.githubusercontent.com/antlr/grammars-v4/master/java/java9/Java9.g4"))
+    src(
+        listOf(
+            "https://raw.githubusercontent.com/antlr/grammars-v4/master/java/java9/Java9.g4",
+            "https://raw.githubusercontent.com/antlr/grammars-v4/master/python/python3/Python3.g4"
+        )
+    )
     dest("gen/main/antlr/")
     overwrite(false) // no need to download a copy every time
     println(System.getProperty("user.dir"))
