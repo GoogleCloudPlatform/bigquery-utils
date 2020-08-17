@@ -135,7 +135,7 @@ public class QueryBreakdownTest {
     InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
     String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/singleton.txt");
+        + "/InputTestFiles/bigqueryReferenceQueries.txt");
     qb.run(query, false, 0, ir.getLocationTracker());
   }
 }

@@ -41,7 +41,7 @@ public class QueryBreakdown {
    * it to the specified output file or commandline. The provided errorLimit will stop the
    * tool from running over a certain time.
    *
-   * TODO: output file feature and runtime limit support
+   * TODO: runtime limit support
    */
   public void run(String originalQuery, boolean jsonOutput, int errorLimit,
       LocationTracker locationTracker) {
@@ -131,12 +131,19 @@ public class QueryBreakdown {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
+      System.out.println(inputQuery);
       /* generates new queries through deletion and replacement */
-
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
       // if statement checks for EOF
-      if (pos.getLineNum() != 0 && pos.getColumnNum() != 0) {
+      if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0) &&
+          !(pos.getColumnNum() == pos.getEndColumnNum()
+              && pos.getLineNum() == pos.getEndLineNum()
+          && (inputQuery.length() - 1 ==
+              findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
+              || inputQuery.length() ==
+              findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
+          ))) {
         // gets the error location in the original query
         int originalStartColumn =
             locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
@@ -209,7 +216,6 @@ public class QueryBreakdown {
    * This is a design decision made due to the fact that we need to expose to the loop the word
    * being replaced and the word we're replacing with.
    *
-   * TODO: deal with instances where there are no replacement options
    */
   static ArrayList<ReplacedComponent> replacement(String inputQuery, int startLine, int startColumn,
       int endColumn, Collection<String> expectedTokens) {
@@ -234,14 +240,9 @@ public class QueryBreakdown {
   }
 
   /**
-   * This method filters out EOF from the expected tokens as well as the quotations
+   * This method filters out quotations from the expected tokens
    */
   static ArrayList<String> expectedTokensFilter(Collection<String> expectedTokens) {
-    // remove EOF
-    if (expectedTokens.contains("<EOF>")) {
-      expectedTokens.remove("<EOF>");
-    }
-
     // filter out the quotations
     ArrayList<String> filtered = new ArrayList<>();
     for (String s : expectedTokens) {
