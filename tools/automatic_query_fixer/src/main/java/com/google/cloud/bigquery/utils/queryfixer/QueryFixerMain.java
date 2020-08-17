@@ -110,12 +110,15 @@ public class QueryFixerMain {
     switch (mode) {
       case AUTO_MODE:
         // TODO: Implement Non-interactive mode
-        FixResult fixResult = queryFixer.fix(query);
-        if (fixResult.getOptions().isEmpty()) {
+        List<FixResult> fixResults = queryFixer.autoFix(query);
+
+        printFixResults(query, fixResults, cmd.getOptionValue(OUTPUT));
+
+        FixResult latestResult = fixResults.get(fixResults.size() - 1);
+        if (latestResult.getStatus() != FixResult.Status.NO_ERROR) {
           return;
         }
-        String newQuery = fixResult.getOptions().get(0).getFixedQuery();
-        printQueryResult(newQuery, bigQueryOptions);
+        printQueryResult(latestResult.getQuery(), bigQueryOptions);
         break;
 
       case USER_ASSISTANCE_MODE:
@@ -125,8 +128,8 @@ public class QueryFixerMain {
 
       case FIX_ONCE_MODE:
       case FO_MODE:
-        fixResult = fixQueryInFullInteractMode(queryFixer, query);
-        printFixResult(query, fixResult, cmd.getOptionValue(OUTPUT));
+        FixResult fixResult = fixQueryInFullInteractMode(queryFixer, query);
+        printFixResult(fixResult, cmd.getOptionValue(OUTPUT));
         break;
 
       default:
@@ -151,9 +154,9 @@ public class QueryFixerMain {
     return queryFixer.fix(query);
   }
 
-  private static void printFixResult(String query, FixResult fixResult, String outputFormat) {
+  private static void printFixResult(FixResult fixResult, String outputFormat) {
     if (outputFormat == null || outputFormat.equalsIgnoreCase(NATURAL_OUTPUT)) {
-      System.out.println("Input query: " + query);
+      System.out.println("Input query: " + fixResult.getQuery());
       printFixResultInCommandLine(fixResult);
     } else if (outputFormat.equalsIgnoreCase(JSON_OUTPUT)) {
       printFixResultAsJson(fixResult);
@@ -183,6 +186,49 @@ public class QueryFixerMain {
 
     System.out.println("It can be fixed by the approach: " + fixResult.getApproach());
     printFixOptions(fixResult.getOptions());
+  }
+
+  private static void printFixResults(String query, List<FixResult> fixResults, String outputFormat) {
+    if (outputFormat == null || outputFormat.equalsIgnoreCase(NATURAL_OUTPUT)) {
+      System.out.println("Input query: " + query);
+      printFixResultsInCommandLine(fixResults);
+    } else if (outputFormat.equalsIgnoreCase(JSON_OUTPUT)) {
+      printFixResultsAsJson(fixResults);
+    } else {
+      System.out.println("Output format (-o) is incorrect. Use --help for usage.");
+      System.exit(1);
+    }
+  }
+
+  private static void printFixResultsAsJson(List<FixResult> fixResults) {
+    Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    System.out.println(gson.toJson(fixResults));
+  }
+
+  private static void printFixResultsInCommandLine(List<FixResult> fixResults) {
+    for (FixResult fixResult : fixResults) {
+//      printFixResultInCommandLine(fixResult);
+//      System.out.println("The option 1. is selected!");
+      if (fixResult.getStatus() == FixResult.Status.NO_ERROR) {
+        System.out.println("The input query is valid. No errors to fix.");
+        return;
+      }
+
+      System.out.println("The query has an error: " + fixResult.getError());
+
+      if (fixResult.getStatus() == FixResult.Status.FAILURE) {
+        System.out.println("Failed to fix the input query.");
+        return;
+      }
+
+      System.out.println();
+      System.out.println("It is fixed by the approach: " + fixResult.getApproach());
+      FixOption option = fixResult.getOptions().get(0);
+      System.out.println(String.format("Fix Action: %s", option.getDescription()));
+      System.out.println();
+      System.out.println(String.format("Fixed query: %s", option.getFixedQuery()));
+      System.out.println("-----------------------------------\n");
+    }
   }
 
   private static void printFixOptions(List<FixOption> options) {

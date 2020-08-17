@@ -54,7 +54,7 @@ public class TableNotFoundFixer implements IFixer {
 
     if (similarTables.getStrings().isEmpty()
         || similarTables.getDistance() > editDistanceThreshold) {
-      return FixResult.failure(err);
+      return FixResult.failure(query, err);
     }
 
     // This method only finds the first occurrence of the incorrect table. It is possible that this
@@ -75,7 +75,7 @@ public class TableNotFoundFixer implements IFixer {
                 })
             .collect(Collectors.toList());
 
-    return FixResult.success(/*approach= */ "Replace the table name.", fixOptions, err);
+    return FixResult.success(query, /*approach= */ "Replace the table name.", fixOptions, err);
   }
 
   private TableId constructTableId(String fullTableName) {
