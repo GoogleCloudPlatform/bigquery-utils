@@ -21,7 +21,7 @@ A common pattern in data warehousing for tracking results of DML statements is t
         Note: gcloud **alpha** is needed in order to use the parameter `--use-partitioned-tables` 
     *   [Cloud Console Logs Viewer](https://cloud.google.com/logging/docs/export/configure_export_v2#dest-create)
         Use this filter:
-        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobChange.job.jobConfig.queryConfig.statementType="SCRIPT" AND AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" )
+        #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobChange.job.jobConfig.queryConfig.statementType="SCRIPT" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" )
         *   [Partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
             is not required, but it is strongly recommended to select it for your BigQuery destination
             
@@ -44,52 +44,29 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
-* Run this query to see job name, query, create time, start time, end time, job runtime, count of inserted rows and deleted rows, and total billed bytes
+* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, job runtime, and count of inserted rows and deleted rows
   
   
   ```  
-  SELECT
-   jobChange.jobStats.parentJobName,
-   jobChange.jobName,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as statementType,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as query,
-   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as createTime,
-   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as startTime,
-   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as endTime,
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
-   ARRAY_AGG(tableDataChange.deletedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as deletedRowsCount,
-   ARRAY_AGG(tableDataChange.insertedRowsCount IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as insertedRowsCount,
-   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as totalBilledBytes,
-  FROM YOUR_VIEW
-  WHERE
-  (jobChange.jobConfig.queryConfig.statementType="INSERT" OR
-  jobChange.jobConfig.queryConfig.statementType="DELETE" OR
-  jobChange.jobConfig.queryConfig.statementType="UPDATE" OR
-  jobChange.jobConfig.queryConfig.statementType="MERGE")
-  AND jobChange.jobStats.parentJobName IS NOT NULL
-  GROUP BY 1,2
+  SELECT 
+   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   jobChange.jobConfig.queryConfig.query,
+   jobChange.jobStats.queryStats.totalBilledBytes,
+   jobChange.jobConfig.queryConfig.statementType,
+   jobChange.jobStats.createTime,
+   jobChange.jobStats.startTime,
+   jobChange.jobStats.endTime,
+   jobRuntimeMs,
+   tableDataChange.deletedRowsCount,
+   tableDataChange.insertedRowsCount,
+  FROM YOUR_VIEW 
+  WHERE 
+  hasJobChangeEvent AND
+  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+  ORDER BY 
+   jobChange.jobStats.startTime DESC,
+   common_script_job_id
 
-  ``` 
-* Run this query to see job name, query, job create time, job start time, job end time, query, job runtime, and total billed bytes for SELECT queries. 
-  
-  ```
-  SELECT
-   jobChange.jobStats.parentJobName,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.statementType IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as statementType,
-   ARRAY_AGG(tableDataRead.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
-   ARRAY_AGG(jobChange.jobConfig.queryConfig.query IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as query,
-   ARRAY_AGG(jobChange.jobStats.createTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as createTime,
-   ARRAY_AGG(jobChange.jobStats.startTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as startTime,
-   ARRAY_AGG(jobChange.jobStats.endTime IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as endTime,
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
-   ARRAY_AGG(jobChange.jobStats.queryStats.totalBilledBytes IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as totalBilledBytes,
-  FROM YOUR_VIEW
-  WHERE
-  (jobChange.jobConfig.queryConfig.statementType="SELECT") AND
-  jobChange.jobStats.parentJobName IS NOT NULL
-  GROUP BY 1
-
-  ```
 * Run this query to see reservation usage and runtime for scripts.
   
   ```
