@@ -20,3 +20,11 @@ def test_crawler_args():
     new_crawler = crawler.Crawler(["test-url"], 5, 10)
     assert new_crawler.max_depth == 5
     assert new_crawler.max_size == 10
+
+# Test that crawler correctly handles Google Cloud arguments
+def test_crawler_cloud_args():
+    new_crawler = crawler.Crawler(["test-url"], gcs="gcs-project.gcs-bucket", bq="bq-project.bq-dataset")
+    assert new_crawler.log.gcs_project == "gcs-project"
+    assert new_crawler.log.gcs_bucket == "gcs-bucket"
+    assert new_crawler.log.bq_project == "bq-project"
+    assert new_crawler.log.bq_dataset == "bq-dataset"

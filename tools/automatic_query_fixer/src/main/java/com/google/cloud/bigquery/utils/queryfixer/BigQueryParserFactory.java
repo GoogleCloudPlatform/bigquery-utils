@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 import java.io.Reader;
 
 /**
- * A factory to generate parsers. The default generated parser is Babel Parser with BigQuery
+ * A factory to generate parsers. The default generated parser is a Babel Parser with BigQuery
  * dialect.
  */
 public class BigQueryParserFactory {

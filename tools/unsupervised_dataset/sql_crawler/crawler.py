@@ -10,20 +10,29 @@ class Crawler(object):
         will explore websites to look for SQL queries.
     """
 
-    def __init__(self, links, max_depth=3, max_size=500):
+    def __init__(self, links, max_depth=3, max_size=100, gcs=None, bq=None, stream=False):
         """ Initializes the crawler and instance variables.
 
         Args:
             links: The root URLs to begin crawling from. Can be one or more.
             max_depth: The maximum depth for the crawler to explore.
-            max_size: THe maximum number of links the crawler should explore.
+            max_size: The maximum number of links the crawler should explore.
+            gcs: Optional location to store result to Google Cloud Storage.
+            bq: Optional location to store result to Google BigQuery.
 
         """
         self.link_queue = queue.Queue()
         self.seen = set()
         self.max_depth = max_depth
         self.max_size = max_size
-        self.log = crawler_log.CrawlerLog()
+        self.log = crawler_log.CrawlerLog(stream)
+
+        if gcs:
+            self.log.set_gcs(gcs)
+
+        if bq:
+            self.log.set_bq(bq)
+
         self.count = 0
 
         for link in links:
@@ -57,8 +66,8 @@ class Crawler(object):
                 self.add_new_link(link, node_depth)
 
             queries = extractor.extract_queries(html_response)
-            for query in queries:
-                self.log.log_query(query, node_url)
+            if queries:
+                self.log.log_queries(queries, node_url)
 
             self.log.log_page(node_url, len(queries))
             self.count += 1
