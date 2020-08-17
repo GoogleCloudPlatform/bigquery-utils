@@ -44,7 +44,7 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
-* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, job runtime, and count of inserted rows and deleted rows
+* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, job runtime, and count of inserted rows and deleted rows for DML queries in a script.
   
   
   ```  
@@ -62,24 +62,58 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   FROM YOUR_VIEW 
   WHERE 
   hasJobChangeEvent AND
+  hasTableDataChangeEvent AND
   (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
   ORDER BY 
    jobChange.jobStats.startTime DESC,
    common_script_job_id
-
-* Run this query to see reservation usage and runtime for scripts.
-  
+   
   ```
+
+* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, and job runtime table read queries in a script.
+
+```  
   SELECT 
-   jobChange.jobStats.parentJobName,
-   ARRAY_AGG(tableDataChange.jobName IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobName,
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.name ORDER BY jobChange.jobStats.startTime) as reservationName,
-   ARRAY_CONCAT_AGG(jobChange.jobStats.reservationUsage.slotMs ORDER BY jobChange.jobStats.startTime) as reservationSlotMs,
-   ARRAY_AGG(jobRuntimeMs IGNORE NULLS ORDER BY jobChange.jobStats.startTime) as jobRuntimeMs,
-  FROM YOUR_VIEW
-  WHERE jobChange.jobStats.reservationUsage.slotMs IS NOT NULL AND
-  jobChange.jobStats.parentJobName IS NOT NULL
-  GROUP BY 1
+   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   jobChange.jobConfig.queryConfig.query,
+   jobChange.jobStats.queryStats.totalBilledBytes,
+   jobChange.jobConfig.queryConfig.statementType,
+   jobChange.jobStats.createTime,
+   jobChange.jobStats.startTime,
+   jobChange.jobStats.endTime,
+   jobRuntimeMs,
+  FROM YOUR_VIEW 
+  WHERE 
+  hasJobChangeEvent AND 
+  hasTableDataReadEvent AND
+  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+  ORDER BY 
+   jobChange.jobStats.startTime DESC,
+   common_script_job_id
+   
+  ```
+
+* Run this query to see slot usage for query that uses reservations.
+
+  ```
+  
+  SELECT 
+   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   jobChange.jobStats.reservationUsage.name,
+   jobChange.jobStats.reservationUsage.slotMs,
+   jobChange.jobConfig.queryConfig.statementType,
+   jobChange.jobStats.createTime,
+   jobChange.jobStats.startTime,
+   jobChange.jobStats.endTime,
+   jobRuntimeMs,
+  FROM YOUR_VIEW 
+  WHERE 
+  hasJobChangeEvent AND 
+  jobChange.jobStats.reservationUsage.slotMs IS NOT NULL AND
+  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+  ORDER BY 
+   jobChange.jobStats.startTime DESC,
+   common_script_job_id
   
   ```
   
