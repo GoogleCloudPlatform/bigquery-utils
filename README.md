@@ -24,6 +24,7 @@ This repository is broken up into:
         *   [netezza](/udfs/migration/netezza)
         *   [oracle](/udfs/migration/oracle)
         *   [redshift](/udfs/migration/redshift)
+        *   [snowflake](/udfs/migration/snowflake)
         *   [teradata](/udfs/migration/teradata)
         *   [vertica](/udfs/migration/vertica)
 *   [Views](/views) - Views over system tables such as audit logs or the
