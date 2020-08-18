@@ -23,7 +23,11 @@ public class QueryVerifier {
 
     public QueryVerifier(QueryVerificationQuery migratedQuery, @Nullable QueryVerificationSchema migratedSchema, @Nullable QueryVerificationQuery originalQuery, @Nullable QueryVerificationSchema originalSchema, @Nullable List<QueryVerificationData> data) {
         migratedInstance = new BigQueryManager(migratedQuery, migratedSchema, data);
-        originalInstance = null;
+        if (originalQuery == null) {
+            originalInstance = null;
+        } else {
+            originalInstance = new TeradataManager(originalQuery, originalSchema, data);
+        }
     }
 
     /**

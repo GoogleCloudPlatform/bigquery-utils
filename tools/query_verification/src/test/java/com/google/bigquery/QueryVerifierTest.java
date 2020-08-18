@@ -41,7 +41,11 @@ public class QueryVerifierTest {
 
         List<ResultDifferences> differences = QueryVerifier.compareResults(firstResults, secondResults);
 
-        System.out.println(differences);
+        assertEquals(differences.size(), 2);
+        assertTrue(differences.get(0).missingResults().isEmpty());
+        assertTrue(differences.get(0).extraResults().isEmpty());
+        assertTrue(differences.get(1).missingResults().isEmpty());
+        assertTrue(differences.get(1).extraResults().isEmpty());
     }
 
     @Test
@@ -76,7 +80,11 @@ public class QueryVerifierTest {
 
         List<ResultDifferences> differences = QueryVerifier.compareResults(firstResults, secondResults);
 
-        System.out.println(differences);
+        assertEquals(differences.size(), 2);
+        assertEquals(differences.get(0).missingResults().size(), 3);
+        assertEquals(differences.get(0).extraResults().size(), 3);
+        assertEquals(differences.get(1).missingResults().size(), 1);
+        assertEquals(differences.get(1).extraResults().size(), 1);
     }
 
     @Test
