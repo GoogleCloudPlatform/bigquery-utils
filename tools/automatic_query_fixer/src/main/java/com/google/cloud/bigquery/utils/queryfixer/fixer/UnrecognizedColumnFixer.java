@@ -28,7 +28,7 @@ public class UnrecognizedColumnFixer implements IFixer {
 
   @Override
   public FixResult fix() {
-    // if the failure does not include a suggestion, directly inform users that it cannot be auto
+    // If the failure does not include a suggestion, directly inform users that it cannot be auto
     // fixed.
     if (!err.hasSuggestion()) {
       return FixResult.failure(err, "No similar column was found.");

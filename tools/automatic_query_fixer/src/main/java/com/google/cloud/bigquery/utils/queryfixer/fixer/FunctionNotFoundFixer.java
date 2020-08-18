@@ -28,11 +28,14 @@ public class FunctionNotFoundFixer implements IFixer {
 
   @Override
   public FixResult fix() {
-    // if the failure does not include a suggestion, directly inform users that it cannot be auto
+    // If the failure does not include a suggestion, directly inform users that it cannot be auto
     // fixed.
     if (!err.hasSuggestion()) {
       return FixResult.failure(err, "No similar function was found.");
     }
+
+    // TODO: If the unrecognized function looks like a UDF (i.e. proj.dataset.function), then
+    // request BigQuery for a list of functions and find the most similar one.
 
     IToken token =
         queryTokenProcessor.getTokenAt(
