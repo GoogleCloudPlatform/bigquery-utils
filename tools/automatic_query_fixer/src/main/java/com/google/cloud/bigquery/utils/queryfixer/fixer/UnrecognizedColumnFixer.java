@@ -38,9 +38,9 @@ public class UnrecognizedColumnFixer implements IFixer {
         queryTokenProcessor.getTokenAt(
             query, err.getErrorPosition().getRow(), err.getErrorPosition().getColumn());
     String fixedQuery = queryTokenProcessor.replaceToken(query, token, err.getSuggestion());
-    FixOption fixOption = FixOption.of(err.getSuggestion(), fixedQuery);
+    FixOption fixOption = FixOption.of("Change to" + err.getSuggestion(), fixedQuery);
     return FixResult.success(
-        /*approach= */ "Replace the column",
+        /*approach= */ "Replace the column" + err.getColumnName(),
         Collections.singletonList(fixOption),
         err,
         /*isConfident=*/ true);

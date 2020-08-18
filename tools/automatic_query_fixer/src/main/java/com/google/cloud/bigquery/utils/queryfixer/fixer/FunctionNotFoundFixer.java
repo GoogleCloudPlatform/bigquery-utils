@@ -41,9 +41,10 @@ public class FunctionNotFoundFixer implements IFixer {
         queryTokenProcessor.getTokenAt(
             query, err.getErrorPosition().getRow(), err.getErrorPosition().getColumn());
     String fixedQuery = queryTokenProcessor.replaceToken(query, token, err.getSuggestion());
-    FixOption fixOption = FixOption.of(err.getSuggestion(), fixedQuery);
+    FixOption fixOption = FixOption.of("Change to " + err.getSuggestion(), fixedQuery);
+
     return FixResult.success(
-        /*suggestion= */ "Modify the function",
+        /*approach=*/ "Replace the function " + err.getFunctionName(),
         Collections.singletonList(fixOption),
         err,
         /*isConfident=*/ true);

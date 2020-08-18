@@ -32,22 +32,22 @@ public class FixResult {
   /** Is query fixer confident about this fixing */
   Boolean isConfident;
 
-  /** The reason why this fix is failed. It is only not null when the Status is FAILURE. */
-  String failureReason;
+  /** The detail why the query fails to be fixed. It is only not null when the Status is FAILURE. */
+  String failureDetail;
 
   /**
    * Create a Failure FixResult indicating that a {@link BigQuerySqlError} can not be fixed.
    *
    * @param error un-fixable error
-   * @param failureReason reason why this fix is failed.
+   * @param failureDetail reason why this fix is failed.
    * @return FixResult with FAILURE Status
    */
-  public static FixResult failure(BigQuerySqlError error, String failureReason) {
+  public static FixResult failure(BigQuerySqlError error, String failureDetail) {
     return FixResult.builder()
         .status(Status.FAILURE)
         .error(error.getErrorSource().getMessage())
         .errorPosition(error.getErrorPosition())
-        .failureReason(failureReason)
+        .failureDetail(failureDetail)
         .build();
   }
 

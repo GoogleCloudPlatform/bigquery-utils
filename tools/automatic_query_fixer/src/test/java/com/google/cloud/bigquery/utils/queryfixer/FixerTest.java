@@ -91,6 +91,7 @@ public class FixerTest {
     assertEquals(8, result.getErrorPosition().getColumn());
   }
 
+  // TODO: It is recommended to use parameterized tests to cover more complex cases.
   @Test
   public void fixFunctionNotFound() {
     String query =
