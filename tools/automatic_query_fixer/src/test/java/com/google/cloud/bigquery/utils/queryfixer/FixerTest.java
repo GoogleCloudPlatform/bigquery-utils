@@ -6,9 +6,7 @@ import com.google.cloud.bigquery.utils.queryfixer.entity.FixOption;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
 import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySqlError;
 import com.google.cloud.bigquery.utils.queryfixer.errors.SqlErrorFactory;
-import com.google.cloud.bigquery.utils.queryfixer.fixer.FixerFactory;
-import com.google.cloud.bigquery.utils.queryfixer.fixer.IFixer;
-import com.google.cloud.bigquery.utils.queryfixer.fixer.TableNotFoundFixer;
+import com.google.cloud.bigquery.utils.queryfixer.fixer.*;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.CalciteTokenizer;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
@@ -72,6 +70,46 @@ public class FixerTest {
 
     assertEquals(1, result.getErrorPosition().getRow());
     assertEquals(22, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void fixUnrecognizedColumn() {
+    String query = "SELECT state From `bigquery-public-data.austin_311.311_request` LIMIT 10";
+    String message = "Unrecognized name: state; Did you mean status? at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof UnrecognizedColumnFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT status From `bigquery-public-data.austin_311.311_request` LIMIT 10",
+        result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
+  // TODO: It is recommended to use parameterized tests to cover more complex cases.
+  @Test
+  public void fixFunctionNotFound() {
+    String query =
+        "SELECT CONCAT(\"prefix\", maxs(status), \"suffix\") From `bigquery-public-data.austin_311.311_request` LIMIT 10";
+    String message = "Function not found: maxs; Did you mean max? at [1:25]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof FunctionNotFoundFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT CONCAT(\"prefix\", max(status), \"suffix\") From `bigquery-public-data.austin_311.311_request` LIMIT 10",
+        result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(25, result.getErrorPosition().getColumn());
   }
 
   private String fullMockTable(String table) {
