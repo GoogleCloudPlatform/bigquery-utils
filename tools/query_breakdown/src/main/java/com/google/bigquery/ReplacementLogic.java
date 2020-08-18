@@ -14,10 +14,12 @@ public class ReplacementLogic {
    *
    * We choose ArrayLists as the data structure because we want to impose a certain ordering
    * with the recommendations: certain recommendations should be "better" than others
+   *
+   * n is an integer that controls the number of replacement options
    */
   public static ArrayList<String> replace (String component, ArrayList<String> options) {
-    // n controls the number of replacement options
     int n = 3;
+
     ArrayList<String> result = new ArrayList<>();
 
     if (options.size() <= n) {

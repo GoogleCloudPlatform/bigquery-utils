@@ -135,10 +135,10 @@ public class QueryBreakdown {
       /* generates new queries through deletion and replacement */
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
-      // if statement checks for EOF
+      // if statement checks for EOF and same line number
       if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0) &&
+          pos.getLineNum() == pos.getEndLineNum() &&
           !(pos.getColumnNum() == pos.getEndColumnNum()
-              && pos.getLineNum() == pos.getEndLineNum()
           && (inputQuery.length() - 1 ==
               findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
               || inputQuery.length() ==
@@ -153,7 +153,7 @@ public class QueryBreakdown {
         /* deletion: gets the new query, creates a node, and calls the loop again */
         // gets the new query
         String deletionQuery = deletion(inputQuery, pos.getLineNum(), pos.getColumnNum(),
-            pos.getEndColumnNum());
+            pos.getEndLineNum(), pos.getEndColumnNum());
 
         // updates the location tracker to reflect the deletion
         LocationTracker deletedLt = locationTracker.delete
@@ -168,7 +168,7 @@ public class QueryBreakdown {
 
         /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
         ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
-            pos.getColumnNum(), pos.getEndColumnNum(),
+            pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum(),
             ((SqlParseException) e).getExpectedTokenNames());
 
         // recursively loops through the new queries
@@ -200,9 +200,9 @@ public class QueryBreakdown {
    * generates a new query with that component deleted.
    */
   static String deletion(String inputQuery, int startLine, int startColumn,
-      int endColumn) {
+      int endLine, int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
-    int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
+    int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     sb.delete(index[0], index[1]);
     return sb.toString();
   }
@@ -216,9 +216,10 @@ public class QueryBreakdown {
    * This is a design decision made due to the fact that we need to expose to the loop the word
    * being replaced and the word we're replacing with.
    *
+   * n is the number of replacements we choose to have
    */
   static ArrayList<ReplacedComponent> replacement(String inputQuery, int startLine, int startColumn,
-      int endColumn, Collection<String> expectedTokens) {
+      int endLine, int endColumn, Collection<String> expectedTokens) {
     // call ReplacementLogic
     ArrayList<String> finalList = ReplacementLogic.replace(inputQuery,
         expectedTokensFilter(expectedTokens));
@@ -226,7 +227,7 @@ public class QueryBreakdown {
     ArrayList<ReplacedComponent> result = new ArrayList<>();
 
     // get word to replace from
-    int[] index = returnIndex(inputQuery, startLine, startColumn, endColumn);
+    int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     String replaceFrom = inputQuery.substring(index[0], index[1]);
 
     // generate the new queries. We need to re-instantiate the StringBuilder each time
@@ -257,17 +258,23 @@ public class QueryBreakdown {
    * This helper method returns the beginning and ending index for the component of the given
    * query specified by the startLine, startColumn, and endColumn
    */
-  static int[] returnIndex(String inputQuery, int startLine, int startColumn, int endColumn) {
+  static int[] returnIndex(String inputQuery, int startLine, int startColumn, int endLine,
+      int endColumn) {
     int[] result = new int[2];
     // when the exception occurs in line 1
-    if (startLine == 1) {
+    if (startLine == 1 && endLine == 1) {
       result[0] = startColumn - 1;
       result[1] = endColumn;
     }
+    else if (startLine == 1) {
+      result[0] = startColumn - 1;
+      result[1] = findNthIndexOf(inputQuery, '\n', endLine - 1) + endColumn + 1;
+    }
     else {
-      int position = findNthIndexOf(inputQuery, '\n', startLine -1);
+      int position = findNthIndexOf(inputQuery, '\n', startLine - 1);
+      int endPosition = findNthIndexOf(inputQuery, '\n', endLine - 1);
       result[0] = position + startColumn;
-      result[1] = position + endColumn + 1;
+      result[1] = endPosition + endColumn + 1;
     }
 
     return result;
