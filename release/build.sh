@@ -54,6 +54,8 @@ function get_dataset() {
       dataset="or";;
     *"redshift"*)
       dataset="rs";;
+    *"snowflake"*)
+      dataset="sf";;      
     *"teradata"*)
       dataset="td";;
     *"vertica"*)
