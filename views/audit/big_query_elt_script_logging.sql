@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW `project_id.dataset_id.view_name` AS (
+CREATE OR REPLACE VIEW `project_id.dataset_id.bq_script_logs` AS (
 WITH jobChangeEvent AS (
   SELECT
     protopayload_auditlog.authenticationInfo.principalEmail,
