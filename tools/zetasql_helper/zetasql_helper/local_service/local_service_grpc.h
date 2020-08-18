@@ -6,13 +6,14 @@
 
 namespace bigquery::utils::zetasql_helper::local_service {
 
-    // Implementation of ZetaSql Helper LocalService Grpc service.
-    class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Service {
-    public:
+// Implementation of ZetaSql Helper LocalService Grpc service.
+class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Service {
+ public:
 
-        grpc::Status Hello(grpc::ServerContext *context, const HelloRequest *request, HelloResponse *response) override;
+  // A dummy method right now. It will be converted to a health check in future.
+  grpc::Status Hello(grpc::ServerContext *context, const HelloRequest *request, HelloResponse *response) override;
 
-    };
+};
 
 }  // bigquery::utils::zetasql_helper::local_service
 
