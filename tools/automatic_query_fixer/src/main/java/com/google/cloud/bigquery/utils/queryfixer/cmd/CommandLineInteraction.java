@@ -40,9 +40,12 @@ public abstract class CommandLineInteraction {
     if (outputFormat == null) {
       outputFormat = NATURAL_OUTPUT;
     }
+    outputFormat = outputFormat.toLowerCase();
+
     if (mode == null) {
       mode = AUTO_MODE;
     }
+    mode = mode.toLowerCase();
 
     switch (mode) {
       case AUTO_MODE:

@@ -21,9 +21,9 @@ public class QueryFixerMain {
       QueryFixerOptions.printHelpAndExit();
     }
 
-    String credentialPath = queryFixerOptions.getOptionValue(CREDENTIAL);
+    String credentialsPath = queryFixerOptions.getOptionValue(CREDENTIALS);
     String projectId = queryFixerOptions.getOptionValue(PROJECT_ID);
-    BigQueryOptions bigQueryOptions = buildBigQueryOptions(credentialPath, projectId);
+    BigQueryOptions bigQueryOptions = buildBigQueryOptions(credentialsPath, projectId);
 
     String query = queryFixerOptions.getQuery();
     if (query == null) {
@@ -41,19 +41,25 @@ public class QueryFixerMain {
   }
 
   /** Create the BigQueryOption based on user-input credentials path and project ID. */
-  private static BigQueryOptions buildBigQueryOptions(String credentialPath, String projectId) {
+  private static BigQueryOptions buildBigQueryOptions(String credentialsPath, String projectId) {
     if (projectId == null) {
       System.out.println("Project ID should not be null. Please provide it through the flag -p.");
       printHelpAndExit();
     }
 
-    // If no credentials is provided, the program uses the default path in the Env variable:
-    // GOOGLE_APPLICATION_CREDENTIALS:
-    if (credentialPath == null) {
+    // If no credentials is provided, the program uses:
+    // <ol>
+    // <li> the default path in the Env variable: GOOGLE_APPLICATION_CREDENTIALS.
+    // <li> Default credentials location (OS dependent). For example,
+    // "~/.config/gcloud/application_default_credentials.json" in Linux. Usually, it should be same
+    // path of the credentials you create through calling the command "gcloud auth
+    // application-default login".
+    // </ol>
+    if (credentialsPath == null) {
       return BigQueryOptions.newBuilder().setProjectId(projectId).build();
     }
 
-    File credentialsFile = new File(credentialPath);
+    File credentialsFile = new File(credentialsPath);
     GoogleCredentials credentials;
     try (FileInputStream serviceAccountStream = new FileInputStream(credentialsFile)) {
       credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);

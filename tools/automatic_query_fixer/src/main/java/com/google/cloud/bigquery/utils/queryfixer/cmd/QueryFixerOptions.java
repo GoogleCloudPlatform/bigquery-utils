@@ -5,8 +5,8 @@ import org.apache.commons.cli.*;
 /** A class responsible for reading the program configurations/options from user input. */
 public class QueryFixerOptions {
 
-  public static final String CREDENTIAL_SHORTCUT = "c";
-  public static final String CREDENTIAL = "credential";
+  public static final String CREDENTIALS_SHORTCUT = "c";
+  public static final String CREDENTIALS = "credentials";
 
   public static final String PROJECT_ID_SHORTCUT = "p";
   public static final String PROJECT_ID = "project-id";
@@ -52,8 +52,8 @@ public class QueryFixerOptions {
 
     Option option =
         new Option(
-            /*opt=*/ CREDENTIAL_SHORTCUT,
-            /*long-opt=*/ CREDENTIAL,
+            /*opt=*/ CREDENTIALS_SHORTCUT,
+            /*long-opt=*/ CREDENTIALS,
             /*hasArg=*/ true,
             /*description=*/ "The path to the credential file of the service account connecting to BigQuery. Otherwise, the default application-login credential will be used.");
     options.addOption(option);
