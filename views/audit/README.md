@@ -44,13 +44,14 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
-* Run this query to see a detailed list of scripts which modified tables. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
+* Run this query to see a detailed list of scripts which modified tables. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
   
   
   ```  
   SELECT 
    COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
    jobChange.jobConfig.queryConfig.query,
+   jobChange.jobConfig.queryConfig.destinationTable,
    jobChange.jobStats.queryStats.totalBilledBytes,
    jobChange.jobConfig.queryConfig.statementType,
    jobChange.jobStats.createTime,
@@ -62,20 +63,21 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   FROM YOUR_VIEW 
   WHERE 
   hasJobChangeEvent AND
-  hasTableDataChangeEvent AND
   (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
   ORDER BY 
-   jobChange.jobStats.startTime DESC,
-   common_script_job_id
+   eventTimestamp DESC,
+   common_script_job_id,
+   jobChange.jobStats.startTime
    
   ```
 
-* Run this query to see a detailed list of scripts which read tables. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
+* Run this query to see a detailed list of jobs that modify tables. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time. 
 
 ```  
   SELECT 
    COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
    jobChange.jobConfig.queryConfig.query,
+   jobChange.jobConfig.queryConfig.destinationTable,
    jobChange.jobStats.queryStats.totalBilledBytes,
    jobChange.jobConfig.queryConfig.statementType,
    jobChange.jobStats.createTime,
@@ -86,14 +88,15 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   WHERE 
   hasJobChangeEvent AND 
   hasTableDataReadEvent AND
-  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+  jobChange.jobStats.parentJobName IS NOT NULL
   ORDER BY 
-   jobChange.jobStats.startTime DESC,
-   common_script_job_id
+   eventTimestamp DESC,
+   common_script_job_id,
+   jobChange.jobStats.startTime
    
   ```
 
-* Run this query to see a detailed list of scripts which use slot reservations. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
+* Run this query to see a detailed list of scripts which use slot reservations. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
 
   ```
   
@@ -102,6 +105,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    jobChange.jobStats.reservationUsage.name,
    jobChange.jobStats.reservationUsage.slotMs,
    jobChange.jobConfig.queryConfig.statementType,
+   jobChange.jobConfig.queryConfig.destinationTable,
    jobChange.jobStats.createTime,
    jobChange.jobStats.startTime,
    jobChange.jobStats.endTime,
@@ -109,11 +113,12 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
   FROM YOUR_VIEW 
   WHERE 
   hasJobChangeEvent AND 
-  jobChange.jobStats.reservationUsage.slotMs IS NOT NULL AND
-  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+  ((jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) OR 
+  jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
   ORDER BY 
-   jobChange.jobStats.startTime DESC,
-   common_script_job_id
+   eventTimestamp DESC,
+   common_script_job_id,
+   jobChange.jobStats.startTime
   
   ```
   
