@@ -44,7 +44,7 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
-* Run this query to see a detailed list of scripts which modified tables. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
+* Run this query to see a detailed list of scripts. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
   
   
   ```  
@@ -62,8 +62,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    tableDataChange.insertedRowsCount,
   FROM YOUR_VIEW 
   WHERE 
-  hasJobChangeEvent AND
-  (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+   hasJobChangeEvent AND
+   (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
   ORDER BY 
    eventTimestamp DESC,
    common_script_job_id,
@@ -75,7 +75,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
 
 ```  
   SELECT 
-   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   jobChange.jobStats.parentJobName,
+   jobId,
    jobChange.jobConfig.queryConfig.query,
    jobChange.jobConfig.queryConfig.destinationTable,
    jobChange.jobStats.queryStats.totalBilledBytes,
@@ -86,12 +87,13 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    jobRuntimeMs,
   FROM YOUR_VIEW 
   WHERE 
-  hasJobChangeEvent AND 
-  hasTableDataReadEvent AND
-  jobChange.jobStats.parentJobName IS NOT NULL
+   hasJobChangeEvent AND 
+   hasTableDataReadEvent AND
+   jobChange.jobStats.parentJobName IS NOT NULL
   ORDER BY 
    eventTimestamp DESC,
-   common_script_job_id,
+   parentJobName,
+   jobId,
    jobChange.jobStats.startTime
    
   ```
@@ -112,8 +114,8 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    jobRuntimeMs,
   FROM YOUR_VIEW 
   WHERE 
-  hasJobChangeEvent AND 
-  ((jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) OR 
+   hasJobChangeEvent AND 
+   ((jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) OR 
   jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
   ORDER BY 
    eventTimestamp DESC,
