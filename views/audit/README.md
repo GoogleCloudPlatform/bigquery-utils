@@ -93,7 +93,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    
   ```
 
-* Run this query to see slot usage for query that uses reservations.
+* Run this query to see slot usage for scripts that uses reservations.
 
   ```
   
