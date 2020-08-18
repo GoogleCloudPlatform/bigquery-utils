@@ -234,7 +234,7 @@ tableDeletionEvent AS (
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableDeletion.jobName') AS tableDeletionJobName,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.tableDeletion.reason') AS tableDeletionReason,
-  FROM `project_id.dataset_id.cloudaudit_googleapis_com_system_event`
+  FROM `project_id.dataset_id.cloudaudit_googleapis_com_activity`
 ),
 /*
  * TableDataRead: Data from tableDataRead audit logs
