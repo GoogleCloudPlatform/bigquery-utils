@@ -46,7 +46,7 @@ public class FixResult {
    * @param failureDetail reason why this fix is failed.
    * @return FixResult with FAILURE Status
    */
-  public static FixResult failure(String query, BigQuerySqlError error,  String failureDetail) {
+  public static FixResult failure(String query, BigQuerySqlError error, String failureDetail) {
     return FixResult.builder()
         .status(Status.FAILURE)
         .query(query)
@@ -67,7 +67,11 @@ public class FixResult {
    * @return FixResult with ERROR_FIXED Status
    */
   public static FixResult success(
-      String query, String approach, List<FixOption> options, BigQuerySqlError error, boolean isConfident) {
+      String query,
+      String approach,
+      List<FixOption> options,
+      BigQuerySqlError error,
+      boolean isConfident) {
     return FixResult.builder()
         .status(Status.ERROR_FIXED)
         .query(query)

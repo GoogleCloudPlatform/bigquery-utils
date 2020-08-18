@@ -66,7 +66,11 @@ public class FixerTest {
     List<String> tables =
         result.getOptions().stream().map(FixOption::getAction).collect(Collectors.toList());
 
-    assertThat(tables, contains(fullMockTable(TABLE_2018), fullMockTable(TABLE_2019)));
+    assertThat(
+        tables,
+        contains(
+            convertToAction(fullMockTable(TABLE_2018)),
+            convertToAction(fullMockTable(TABLE_2019))));
 
     assertEquals(1, result.getErrorPosition().getRow());
     assertEquals(22, result.getErrorPosition().getColumn());
@@ -125,5 +129,9 @@ public class FixerTest {
   private void setupBigQueryService_mockListTableNames() {
     when(bigQueryServiceMock.listTableNames(any(String.class), any(String.class)))
         .thenReturn(ImmutableList.of(TABLE_2018, TABLE_2019, TABLE_2020));
+  }
+
+  private String convertToAction(String identifier) {
+    return String.format("Change to `%s`", identifier);
   }
 }
