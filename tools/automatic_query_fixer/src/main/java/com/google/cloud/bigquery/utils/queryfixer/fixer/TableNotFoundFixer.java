@@ -71,11 +71,12 @@ public class TableNotFoundFixer implements IFixer {
                       constructFullTableName(
                           fullTableId.getProject(), fullTableId.getDataset(), table);
                   String fixedQuery = replaceTable(fullTableName, tableStartIndex);
-                  return FixOption.of(fullTableName, fixedQuery);
+                  return FixOption.of(String.format("Change to `%s`", fullTableName), fixedQuery);
                 })
             .collect(Collectors.toList());
 
-    return FixResult.success(query, /*approach= */ "Replace the table name.", fixOptions, err);
+    String approach = String.format("Replace the table name `%s`", err.getTableName());
+    return FixResult.success(query, approach, fixOptions, err);
   }
 
   private TableId constructTableId(String fullTableName) {

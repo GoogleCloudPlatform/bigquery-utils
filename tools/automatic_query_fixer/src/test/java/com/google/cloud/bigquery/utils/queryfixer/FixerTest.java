@@ -66,7 +66,7 @@ public class FixerTest {
     FixResult result = fixer.fix();
     assertEquals(2, result.getOptions().size());
     List<String> tables =
-        result.getOptions().stream().map(FixOption::getDescription).collect(Collectors.toList());
+        result.getOptions().stream().map(FixOption::getAction).collect(Collectors.toList());
 
     assertThat(tables, contains(fullMockTable(TABLE_2018), fullMockTable(TABLE_2019)));
 

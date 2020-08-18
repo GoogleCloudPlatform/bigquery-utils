@@ -88,7 +88,7 @@ public class AutomaticQueryFixer {
     return results;
   }
 
-  public List<FixResult> autoFixUntilMultipleOptions(String query) {
+  public List<FixResult> autoFixUntilUncertainOptions(String query) {
     List<FixResult> results = new ArrayList<>();
     // A set to store all the fixed queries. It is used to detect whether a cycle exists when
     // automatically fixing queries.
@@ -105,7 +105,7 @@ public class AutomaticQueryFixer {
       results.add(result);
 
       // If there is no fix options or multiple of them, break the loop.
-      if (result.getOptions().size() != 1) {
+      if (result.getOptions() == null || result.getOptions().size() != 1) {
         break;
       }
       query = result.getOptions().get(0).getFixedQuery();
