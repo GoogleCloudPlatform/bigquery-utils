@@ -44,7 +44,7 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 Change all occurrences of `YOUR_VIEW` to the full path to the view. 
 
-* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, job runtime, and count of inserted rows and deleted rows for DML queries in a script.
+* Run this query to see a detailed list of scripts which modified tables. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
   
   
   ```  
@@ -70,7 +70,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    
   ```
 
-* Run this query to see job name, query, total number of billed bytes, job creation time, job start time, job end time, and job runtime table read queries in a script.
+* Run this query to see a detailed list of scripts which read tables. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
 
 ```  
   SELECT 
@@ -93,7 +93,7 @@ Change all occurrences of `YOUR_VIEW` to the full path to the view.
    
   ```
 
-* Run this query to see slot usage for scripts that uses reservations.
+* Run this query to see a detailed list of scripts which use slot reservations. The results are ordered with the most recent script runs first, and then further ordering is applied using the script's job id.
 
   ```
   
