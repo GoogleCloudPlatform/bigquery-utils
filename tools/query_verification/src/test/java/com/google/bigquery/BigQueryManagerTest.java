@@ -4,6 +4,7 @@ import com.google.cloud.bigquery.*;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -163,9 +164,9 @@ public class BigQueryManagerTest {
 
         assertEquals(results.size(), 9);
         assertEquals(results.get(0), true);
-        assertEquals(results.get(1), 2.25);
+        assertEquals(results.get(1), BigDecimal.valueOf(2.25f).setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR));
         assertEquals(results.get(2), 10L);
-        assertEquals(results.get(3), new BigDecimal("3.333333333"));
+        assertEquals(results.get(3), new BigDecimal("3.333333333").setScale(QueryVerifier.DECIMAL_PRECISION, RoundingMode.FLOOR));
         assertEquals(dateFormat.format(results.get(4)), dateFormat.format(date));
         assertEquals(results.get(5), date);
         assertEquals(timeFormat.format(results.get(6)), timeFormat.format(date));

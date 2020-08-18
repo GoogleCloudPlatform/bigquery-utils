@@ -2,5 +2,5 @@ out
 node_modules
 .vscode-test/
 *.vsix
-/resources/sql_extraction
+/resources/automatic_query_fixer
 !/.vscode/
