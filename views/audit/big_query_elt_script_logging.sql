@@ -327,6 +327,7 @@ SELECT
   eventName,
   projectId,
   jobId,
+  parentJobId,
   IF(jobChangeJobName IS NULL, False, True) AS hasJobChangeEvent,
   IF(tableDeletionJobName is NULL, False, True) AS hasTableDeletionEvent,
   IF(tableDataReadJobName IS NULL, False, True) AS hasTableDataReadEvent,
