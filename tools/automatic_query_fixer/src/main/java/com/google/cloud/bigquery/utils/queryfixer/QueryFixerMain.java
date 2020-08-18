@@ -1,15 +1,22 @@
 package com.google.cloud.bigquery.utils.queryfixer;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.utils.queryfixer.cmd.CommandLineInteraction;
 import com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.*;
+import static java.lang.System.exit;
 
 public class QueryFixerMain {
 
   public static void main(String[] args) {
-    QueryFixerOptions queryFixerOptions = QueryFixerOptions.readFlags(args);
+    QueryFixerOptions queryFixerOptions = QueryFixerOptions.readUserInput(args);
     if (queryFixerOptions == null) {
       QueryFixerOptions.printHelpAndExit();
     }
@@ -24,6 +31,7 @@ public class QueryFixerMain {
       // extract info (time, code position) that distracts users.
       System.out.println(
           "Please provide the query as an argument, enclosed by double quote. Use --help for instruction.");
+      exit(1);
     }
     String mode = queryFixerOptions.getOptionValue(MODE);
     String outputFormat = queryFixerOptions.getOptionValue(OUTPUT);
@@ -32,14 +40,30 @@ public class QueryFixerMain {
     interaction.interact(query);
   }
 
+  /** Create the BigQueryOption based on user-input credentials path and project ID. */
   private static BigQueryOptions buildBigQueryOptions(String credentialPath, String projectId) {
+    if (projectId == null) {
+      System.out.println("Project ID should not be null. Please provide it through the flag -p.");
+      printHelpAndExit();
+    }
+
+    // If no credentials is provided, the program uses the default path in the Env variable:
+    // GOOGLE_APPLICATION_CREDENTIALS:
     if (credentialPath == null) {
       return BigQueryOptions.newBuilder().setProjectId(projectId).build();
-    } else {
-      // TODO: should support this in near future.
-      System.out.println("Customized credential path is not supported");
-      System.exit(1);
+    }
+
+    File credentialsFile = new File(credentialPath);
+    GoogleCredentials credentials;
+    try (FileInputStream serviceAccountStream = new FileInputStream(credentialsFile)) {
+      credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
+    } catch (IOException e) {
+      System.out.println(
+          "Cannot read the credentials from the flag -c. Please provide a correct credentials path with read permission.");
+      exit(1);
+      // The program will never go down, but the compiler needs a extra RETURN to realize it.
       return null;
     }
+    return BigQueryOptions.newBuilder().setProjectId(projectId).setCredentials(credentials).build();
   }
 }

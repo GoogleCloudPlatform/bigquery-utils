@@ -12,17 +12,29 @@ import java.util.List;
 
 import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.*;
 
+/**
+ * A base class to implement the interaction between users and the query fixer. It has three modes:
+ * Auto, User-assist, and Fix-once (fully interactive). Each mode is represented by a subclass.
+ */
 public abstract class CommandLineInteraction {
   final String outputFormat;
   final BigQueryOptions bigQueryOptions;
   final AutomaticQueryFixer queryFixer;
 
-  public CommandLineInteraction(@NonNull String outputFormat, BigQueryOptions bigQueryOptions) {
+  CommandLineInteraction(@NonNull String outputFormat, BigQueryOptions bigQueryOptions) {
     this.outputFormat = outputFormat;
     this.bigQueryOptions = bigQueryOptions;
     this.queryFixer = new AutomaticQueryFixer(bigQueryOptions);
   }
 
+  /**
+   * Create an instance of {@link CommandLineInteraction} based on the mode and output format.
+   *
+   * @param mode The mode of the Query Fixer.
+   * @param outputFormat the output format: either natural or json.
+   * @param bigQueryOptions options to connect BigQuery server.
+   * @return an instance of CommandLineInteraction.
+   */
   public static CommandLineInteraction create(
       String mode, String outputFormat, @NonNull BigQueryOptions bigQueryOptions) {
     if (outputFormat == null) {
@@ -48,6 +60,11 @@ public abstract class CommandLineInteraction {
     }
   }
 
+  /**
+   * Start the interaction between users and the query fixer.
+   *
+   * @param query input query.
+   */
   public abstract void interact(String query);
 
   static void printFixResultsInCommandLine(List<FixResult> fixResults) {
@@ -57,6 +74,12 @@ public abstract class CommandLineInteraction {
     printFixResultInCommandLine(fixResults.get(fixResults.size() - 1));
   }
 
+  /**
+   * Intermediate {@link FixResult} represents the intermediate result of an automatic fixing
+   * process. Sometimes a query may have multiple errors and the query fixer will fix them
+   * iteratively. If a further fix can be applied to the current state, then the current {@link
+   * FixResult} is considered as intermediate.
+   */
   static void printIntermediateFixResultInCommandLine(FixResult fixResult) {
     // There is no need to check the status, because intermediate FixResults can only have
     // ERROR_FIXED as status.

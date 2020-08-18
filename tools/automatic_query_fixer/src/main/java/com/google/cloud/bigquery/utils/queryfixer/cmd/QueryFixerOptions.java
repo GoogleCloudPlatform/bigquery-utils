@@ -2,6 +2,7 @@ package com.google.cloud.bigquery.utils.queryfixer.cmd;
 
 import org.apache.commons.cli.*;
 
+/** A class responsible for reading the program configurations/options from user input. */
 public class QueryFixerOptions {
 
   public static final String CREDENTIAL_SHORTCUT = "c";
@@ -32,7 +33,13 @@ public class QueryFixerOptions {
     this.commandLine = commandLine;
   }
 
-  public static QueryFixerOptions readFlags(String[] args) {
+  /**
+   * Read the program options from both the flag options and arguments.
+   *
+   * @param args User input.
+   * @return QueryFixerOptions instance.
+   */
+  public static QueryFixerOptions readUserInput(String[] args) {
     CommandLine commandLine = buildCommandLine(args);
     if (commandLine == null) {
       return null;
@@ -79,7 +86,7 @@ public class QueryFixerOptions {
       System.out.println("Please provide arguments.");
       return null;
     }
-
+    // A parser to resolve the information from the CLI Input.
     CommandLineParser parser = new DefaultParser();
     try {
       return parser.parse(options, args);
@@ -89,16 +96,28 @@ public class QueryFixerOptions {
     }
   }
 
+  /**
+   * Read the value of a flag option.
+   *
+   * @param option the name of a flag.
+   * @return Value in string.
+   */
   public String getOptionValue(String option) {
     return commandLine.getOptionValue(option);
   }
 
+  /** A static function to print the help menu. */
   public static void printHelpAndExit() {
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp("-opt <value> --long-opt <value> \"query\"", options);
     System.exit(1);
   }
 
+  /**
+   * Get the input query from the user input.
+   *
+   * @return query.
+   */
   public String getQuery() {
     if (commandLine.getArgList().isEmpty()) {
       return null;

@@ -8,12 +8,24 @@ import java.util.List;
 import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.JSON_OUTPUT;
 import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.NATURAL_OUTPUT;
 
+/**
+ * A class responsible for the interaction between users and the query fixer in Auto mode. It
+ * continually tries to fix every error in a query until the query is correct or unable to be fixed.
+ * If an error can be fixed in multiple ways, then the first method will be selected. In this mode,
+ * the query fixer takes the input query and outputs the final fix results without interacting with
+ * users during the fix process.
+ */
 public class AutoModeInteraction extends CommandLineInteraction {
 
   AutoModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
     super(outputFormat, bigQueryOptions);
   }
 
+  /**
+   * Interact with users in Auto mode.
+   *
+   * @param query input query.
+   */
   public void interact(String query) {
     List<FixResult> fixResults = queryFixer.autoFix(query);
     printFixResults(query, fixResults);
@@ -61,7 +73,7 @@ public class AutoModeInteraction extends CommandLineInteraction {
   private void printFixResults(String query, List<FixResult> fixResults) {
     switch (outputFormat) {
       case NATURAL_OUTPUT:
-        System.out.println("Input query: " + query);
+        System.out.println("Input query: " + query + "\n");
         printFixResultsInCommandLine(fixResults);
         break;
       case JSON_OUTPUT:
