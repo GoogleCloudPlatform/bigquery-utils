@@ -4,7 +4,7 @@ WITH jobChangeEvent AS (
     protopayload_auditlog.authenticationInfo.principalEmail,
     resource.labels.project_id AS projectId,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.requestMetadata.callerIp') AS callerIp,
-    timestamp as eventTimestamp,
+    timestamp,
     protopayload_auditlog.serviceName,
     protopayload_auditlog.methodName,
     CONCAT(
