@@ -12,6 +12,13 @@ WITH jobChangeEvent AS (
       ":",
       SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobName'),"/")[SAFE_OFFSET(3)]
     ) AS jobId,
+    CONCAT(
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobStats.parentJobName'),
+        "/")[SAFE_OFFSET(1)],
+      ":",
+      SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.parentJobName'),
+        "/")[SAFE_OFFSET(3)]
+    ) AS parentJobId,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobName') AS jobChangeJobName,
     /*
      * JobStatus: Running state of a job
