@@ -30,7 +30,6 @@ public class Skeleton {
   /**
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
    */
-  // TODO (spoiledhua): change input and output to Query Objects
   public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) throws IOException {
 
     for (String dialect : user.getDialectIndicators().keySet()) {
@@ -72,7 +71,7 @@ public class Skeleton {
   }
 
   /**
-   * Gets mappings between dialects and the appropriate skeletons
+   * @return mappings between dialects and their corresponding skeletons
    */
   public Map<String, List<String>> getDialectSkeletons() {
     return dialectSkeletons;

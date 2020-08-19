@@ -8,24 +8,24 @@ import java.util.List;
 public class Dependency {
 
   /* the current node */
-  private String node;
+  private FeatureType node;
 
   /* the possible neighbors to the current node */
-  private List<String> neighbors;
+  private List<FeatureType> neighbors;
 
-  public String getNode() {
+  public FeatureType getNode() {
     return this.node;
   }
 
-  public void setNode(String node) {
+  public void setNode(FeatureType node) {
     this.node = node;
   }
 
-  public List<String> getNeighbors() {
+  public List<FeatureType> getNeighbors() {
     return this.neighbors;
   }
 
-  public void setNeighbors(List<String> neighbors) {
+  public void setNeighbors(List<FeatureType> neighbors) {
     this.neighbors = neighbors;
   }
 }

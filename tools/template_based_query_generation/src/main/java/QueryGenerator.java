@@ -1,20 +1,16 @@
-import com.google.gson.Gson;
 import data.Table;
 import graph.MarkovChain;
 import graph.Node;
-import parser.*;
+import parser.FeatureType;
+import parser.User;
+import parser.Utils;
 import query.Query;
 import query.Skeleton;
 import token.Tokenizer;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Class that parses config file and creates queries from markov chain
@@ -32,38 +28,35 @@ public class QueryGenerator {
 
   private final MarkovChain<Query> markovChain;
   private Random r = new Random();
-  private Node<Query> source = new Node<>(new Query(FeatureType.FEATURE_ROOT), r);
   private final User user = Utils.getUser(Paths.get(filePathUser));
+  private Node<Query> source = new Node<>(new Query(user.getStartFeature()), r);
+  private Node<Query> sink = new Node<>(new Query(user.getEndFeature()), r);
 
   /**
-   *
-   * @throws IOException
+   * Query generator that converts query skeletons to real query strings ready for output
+   * @throws IOException if the IO for user parsing fails
    */
   public QueryGenerator() throws IOException {
-    // TODO (Victor):
-    //  1. Use parser.Utils to parse user json and create graph.MarkovChain and nodes
-    //  2. Generate number of queries given in config
-    //  3. pass to them to Keyword or query.Skeleton
 
-    // create nodes
-    Map<String, Node<Query>> nodeMap = new HashMap<>();
-    addNodeMap(nodeMap, Paths.get(filePathConfigDDL), r);
-    addNodeMap(nodeMap, Paths.get(filePathConfigDML), r);
-    addNodeMap(nodeMap, Paths.get(filePathConfigDQL), r);
+    // create map of references to nodes
+    Map<FeatureType, Node<Query>> nodeMap = new HashMap<>();
+    Utils.addNodeMap(nodeMap, Paths.get(filePathConfigDDL), r);
+    Utils.addNodeMap(nodeMap, Paths.get(filePathConfigDML), r);
+    Utils.addNodeMap(nodeMap, Paths.get(filePathConfigDQL), r);
+    nodeMap.put(user.getStartFeature(), source);
+    nodeMap.put(user.getEndFeature(), sink);
 
-    // TODO (Victor): Parse these two helper nodes from user config
-    nodeMap.put(user.getStart(), source);
-    nodeMap.put(user.getEnd(), new Node<>(new Query(FeatureType.FEATURE_SINK), r));
+    // create map of nodes to their neighbors
+    Map<FeatureType, List<FeatureType>> neighborMap = new HashMap<>();
+    Utils.addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDDL));
+    Utils.addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDML));
+    Utils.addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDQL));
+    Utils.addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesRoot));
 
-    Map<String, List<String>> neighborMap = new HashMap<>();
-    addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDDL));
-    addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDML));
-    addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesDQL));
-    addNeighborMap(neighborMap, nodeMap.keySet(), Paths.get(filePathDependenciesRoot));
-
-    for (String nodeKey : nodeMap.keySet()) {
+    // set neighbors for each node
+    for (FeatureType nodeKey : nodeMap.keySet()) {
       HashSet<Node<Query>> nodeNeighbors = new HashSet<>();
-      for (String neighbor : neighborMap.get(nodeKey)) {
+      for (FeatureType neighbor : neighborMap.get(nodeKey)) {
         if (nodeMap.keySet().contains(neighbor)) {
           nodeNeighbors.add(nodeMap.get(neighbor));
         }
@@ -75,7 +68,7 @@ public class QueryGenerator {
   }
 
   /**
-   * generates queries from markov chain starting from root
+   * @return real queries from markov chain starting from root
    */
   public void generateQueries() throws IOException {
     Map<String, List<String>> dialectQueries = new HashMap<>();
@@ -111,41 +104,4 @@ public class QueryGenerator {
       exception.printStackTrace();
     }
   }
-
-  private Map<String, Node<Query>> addNodeMap(Map<String, Node<Query>> nodeMap, Path input, Random r) {
-    try {
-      BufferedReader reader = Files.newBufferedReader(input, UTF_8);
-      Gson gson = new Gson();
-      FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
-
-      for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
-        if (featureIndicator.getIsIncluded()) {
-          nodeMap.put(featureIndicator.getFeature().name(), new Node<>(new Query(featureIndicator.getFeature()), r));
-        }
-      }
-    } catch (IOException exception) {
-      exception.printStackTrace();
-    }
-
-    return nodeMap;
-  }
-
-  private Map<String, List<String>> addNeighborMap(Map<String, List<String>> neighborMap, Set<String> nodes, Path input) {
-    try {
-      BufferedReader reader = Files.newBufferedReader(input, UTF_8);
-      Gson gson = new Gson();
-      Dependencies dependencies = gson.fromJson(reader, Dependencies.class);
-
-      for (Dependency dependency : dependencies.getDependencies()) {
-        if (nodes.contains(dependency.getNode())) {
-          neighborMap.put(dependency.getNode(), dependency.getNeighbors());
-        }
-      }
-    } catch (IOException exception) {
-      exception.printStackTrace();
-    }
-
-    return neighborMap;
-  }
-
 }

@@ -25,7 +25,7 @@ public class Table {
   public Table(String name) {
     this.name = name;
     this.numRows = 0;
-    this.schema = new ArrayList<MutablePair<String, DataType>>();
+    this.schema = new ArrayList<>();
   }
 
   /**
@@ -72,7 +72,7 @@ public class Table {
    * @return name of random column of given type
    */
   public String getRandomColumn(DataType type) {
-    List<MutablePair<String, DataType>> columns = new ArrayList<MutablePair<String, DataType>>();
+    List<MutablePair<String, DataType>> columns = new ArrayList<>();
     for (MutablePair<String, DataType> col: this.schema) {
       if (col.getRight() == type) columns.add(col);
     }
@@ -89,37 +89,37 @@ public class Table {
    */
   public List<?> generateColumn(int numRows, DataType dataType) throws IllegalArgumentException {
     if (dataType.isIntegerType()) {
-      List<Integer> data = new ArrayList<Integer>();
+      List<Integer> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomIntegerData(dataType));
       }
       return data;
     } else if (dataType.isLongType()) {
-      List<Long> data = new ArrayList<Long>();
+      List<Long> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomLongData(dataType));
       }
       return data;
     } else if (dataType.isDoubleType()) {
-      List<Double> data = new ArrayList<Double>();
+      List<Double> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomDoubleData(dataType));
       }
       return data;
     } else if (dataType.isBigDecimalType()) {
-      List<BigDecimal> data = new ArrayList<BigDecimal>();
+      List<BigDecimal> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomBigDecimalData(dataType));
       }
       return data;
     } else if (dataType.isStringType()) {
-      List<String> data = new ArrayList<String>();
+      List<String> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomStringData(dataType));
       }
       return data;
     } else if (dataType.isBooleanType()) {
-      List<Boolean> data = new ArrayList<Boolean>();
+      List<Boolean> data = new ArrayList<>();
       for (int i = 0; i < numRows; i++) {
         data.add(Utils.generateRandomBooleanData(dataType));
       }

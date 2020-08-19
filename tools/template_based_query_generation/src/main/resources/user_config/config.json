@@ -1,6 +1,6 @@
 {
-  "start": "FEATURE_ROOT",
-  "end": "FEATURE_SINK",
+  "startFeature": "FEATURE_ROOT",
+  "endFeature": "FEATURE_SINK",
   "datasetName": "hello",
   "numColumns": 5,
   "numQueries": 1000,

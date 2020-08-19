@@ -6,7 +6,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import data.DataType;
 import data.Table;
+import graph.Node;
 import org.apache.commons.lang3.tuple.MutablePair;
+import query.Query;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -16,10 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -302,7 +301,59 @@ public class Utils {
   }
 
   /**
-   * Creates an User object from the main user config file
+   * Appends mappings between references and their appropriate nodes to an existing map
+   *
+   * @param nodeMap mapping between references and nodes
+   * @param inputPath relative path of the config file
+   * @param r Random instance used for randomization
+   * @return the original map with new key-value pairs
+   */
+  public static Map<FeatureType, Node<Query>> addNodeMap(Map<FeatureType, Node<Query>> nodeMap, Path inputPath, Random r) {
+    try {
+      BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+      Gson gson = new Gson();
+      FeatureIndicators featureIndicators = gson.fromJson(reader, FeatureIndicators.class);
+
+      for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
+        if (featureIndicator.getIsIncluded()) {
+          nodeMap.put(featureIndicator.getFeature(), new Node<>(new Query(featureIndicator.getFeature()), r));
+        }
+      }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+
+    return nodeMap;
+  }
+
+  /**
+   * Appends mappings between features and their neighbors to an existing map
+   *
+   * @param neighborMap mapping between features and their neighbors
+   * @param nodes set of nodes to be connected
+   * @param inputPath relative path of the config file
+   * @return the original map with new key-value pairs
+   */
+  public static Map<FeatureType, List<FeatureType>> addNeighborMap(Map<FeatureType, List<FeatureType>> neighborMap, Set<FeatureType> nodes, Path inputPath) {
+    try {
+      BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+      Gson gson = new Gson();
+      Dependencies dependencies = gson.fromJson(reader, Dependencies.class);
+
+      for (Dependency dependency : dependencies.getDependencies()) {
+        if (nodes.contains(dependency.getNode())) {
+          neighborMap.put(dependency.getNode(), dependency.getNeighbors());
+        }
+      }
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+
+    return neighborMap;
+  }
+
+  /**
+   * Creates a User object from the main user config file
    *
    * @param inputPath relative path of the config file
    * @return a User object describing user preferences
