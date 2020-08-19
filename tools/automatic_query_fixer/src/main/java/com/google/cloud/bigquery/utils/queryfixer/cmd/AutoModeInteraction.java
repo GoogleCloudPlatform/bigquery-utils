@@ -2,6 +2,7 @@ package com.google.cloud.bigquery.utils.queryfixer.cmd;
 
 import com.google.cloud.bigquery.*;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
+import com.google.common.flogger.FluentLogger;
 
 import java.util.List;
 
@@ -16,6 +17,9 @@ import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.N
  * users during the fix process.
  */
 public class AutoModeInteraction extends CommandLineInteraction {
+
+  private static final int PREVIEW_SIZE = 10;
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   AutoModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
     super(outputFormat, bigQueryOptions);
@@ -45,7 +49,7 @@ public class AutoModeInteraction extends CommandLineInteraction {
 
     QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query).build();
     try {
-      int maxCount = 10;
+      int maxCount = PREVIEW_SIZE;
       int count = 0;
       System.out.println("=".repeat(20));
       System.out.println("Now query: " + query);
@@ -55,18 +59,19 @@ public class AutoModeInteraction extends CommandLineInteraction {
       for (Field field : result.getSchema().getFields()) {
         System.out.printf("%s,", field.getName());
       }
-      System.out.print("\n");
+      System.out.println();
 
       for (FieldValueList row : bigQuery.query(queryConfig).iterateAll()) {
         for (FieldValue val : row) {
           System.out.printf("%s,", val.getValue());
         }
-        System.out.print("\n");
+        System.out.println();
         if (++count >= maxCount) {
           break;
         }
       }
-    } catch (InterruptedException ignored) {
+    } catch (InterruptedException exception) {
+      logger.atWarning().withCause(exception).log("Unable to preview the fixed query.");
     }
   }
 

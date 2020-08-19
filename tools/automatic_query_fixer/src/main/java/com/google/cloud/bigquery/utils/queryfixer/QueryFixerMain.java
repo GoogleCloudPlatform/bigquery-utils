@@ -67,7 +67,8 @@ public class QueryFixerMain {
       System.out.println(
           "Cannot read the credentials from the flag -c. Please provide a correct credentials path with read permission.");
       exit(1);
-      // The program will never go down, but the compiler needs a extra RETURN to realize it.
+      // The program will never reach to this point, but the compiler needs an extra RETURN to avoid compilation error.
+      // The reason is that compiler does not recognize `exit` function as a breaking point.
       return null;
     }
     return BigQueryOptions.newBuilder().setProjectId(projectId).setCredentials(credentials).build();
