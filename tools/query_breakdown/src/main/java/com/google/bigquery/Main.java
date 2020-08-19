@@ -11,9 +11,9 @@ import java.io.IOException;
  * Usage: query_breakdown -i <PATH> [-j] [-l <INTEGER>]
  * -i, --inputFile, PATH: this command specifies the path to the file containing queries to be
  *                    inputted into the tool. It is therefore mandatory
- * -j, --json, PATH: this command specifies whether the program should output the results in a
+ * -j, --json: this command specifies whether the program should output the results in a
  *                   json format. It is therefore optional
- * -l, --limit, PATH: this command specifies the path to an integer that the tool takes as a
+ * -l, --limit, INTEGER: this command specifies the path to an integer that the tool takes as a
  *                    limit for the number of errors to be explored, thereby controlling the
  *                    runtime. It is therefore optional
  *
