@@ -47,6 +47,7 @@ public class FixerTest {
     fixerFactory = new FixerFactory(tokenProcessor, bigQueryServiceMock);
   }
 
+  //TODO: More test cases are need to test different table name, like `a.b`.c, `a.b.c`, `a`.`b`.c, and a.b.c.
   @Test
   public void fixTableNotFound() {
     setupBigQueryService_mockListTableNames();
