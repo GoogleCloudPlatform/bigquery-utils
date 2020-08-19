@@ -11,6 +11,9 @@ import java.util.List;
 @Value
 public class FixResult {
 
+  /** Query to be fixed. */
+  String query;
+
   /** Status of fixing the error. It is either ERROR_FIXED, NO_ERROR. or Failure. */
   Status status;
 
@@ -38,13 +41,15 @@ public class FixResult {
   /**
    * Create a Failure FixResult indicating that a {@link BigQuerySqlError} can not be fixed.
    *
+   * @param query query to be fixed
    * @param error un-fixable error
    * @param failureDetail reason why this fix is failed.
    * @return FixResult with FAILURE Status
    */
-  public static FixResult failure(BigQuerySqlError error, String failureDetail) {
+  public static FixResult failure(String query, BigQuerySqlError error, String failureDetail) {
     return FixResult.builder()
         .status(Status.FAILURE)
+        .query(query)
         .error(error.getErrorSource().getMessage())
         .errorPosition(error.getErrorPosition())
         .failureDetail(failureDetail)
@@ -54,6 +59,7 @@ public class FixResult {
   /**
    * Create a Success FixResult with the details on fixing a {@link BigQuerySqlError} in a query.
    *
+   * @param query query to be fixed
    * @param approach approach to fix the error
    * @param options detailed options to fix the error by the given approach.
    * @param error error to fix
@@ -61,9 +67,14 @@ public class FixResult {
    * @return FixResult with ERROR_FIXED Status
    */
   public static FixResult success(
-      String approach, List<FixOption> options, BigQuerySqlError error, boolean isConfident) {
+      String query,
+      String approach,
+      List<FixOption> options,
+      BigQuerySqlError error,
+      boolean isConfident) {
     return FixResult.builder()
         .status(Status.ERROR_FIXED)
+        .query(query)
         .options(options)
         .approach(approach)
         .error(error.getErrorSource().getMessage())
@@ -75,10 +86,26 @@ public class FixResult {
   /**
    * Create a FixResult indicating a query has no error.
    *
+   * @param query query to be fixed
    * @return FixResult with NO_ERROR Status
    */
-  public static FixResult noError() {
-    return FixResult.builder().status(Status.NO_ERROR).build();
+  public static FixResult noError(String query) {
+    return FixResult.builder().status(Status.NO_ERROR).query(query).build();
+  }
+
+  /**
+   * Create a Failure FixResult caused by an infinite loop in a fix process.
+   *
+   * @param query query to be fixed
+   * @return FixResult with FAILURE
+   */
+  public static FixResult infiniteLoop(String query) {
+    return FixResult.builder()
+        .status(Status.FAILURE)
+        .query(query)
+        .failureDetail(
+            "The query has been fixed before in this process, which indicates that an infinite loop exist in the fix process.")
+        .build();
   }
 
   public enum Status {

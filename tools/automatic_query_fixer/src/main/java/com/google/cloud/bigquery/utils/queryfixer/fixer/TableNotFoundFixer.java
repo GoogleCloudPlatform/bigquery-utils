@@ -54,7 +54,7 @@ public class TableNotFoundFixer implements IFixer {
 
     if (similarTables.getStrings().isEmpty()
         || similarTables.getDistance() > editDistanceThreshold) {
-      return FixResult.failure(err, "No similar table was found.");
+      return FixResult.failure(query, err, "No similar table was found.");
     }
 
     // This method only finds the first occurrence of the incorrect table. It is possible that this
@@ -71,12 +71,12 @@ public class TableNotFoundFixer implements IFixer {
                       constructFullTableName(
                           fullTableId.getProject(), fullTableId.getDataset(), table);
                   String fixedQuery = replaceTable(fullTableName, tableStartIndex);
-                  return FixOption.of(fullTableName, fixedQuery);
+                  return FixOption.of(String.format("Change to `%s`", fullTableName), fixedQuery);
                 })
             .collect(Collectors.toList());
 
-    return FixResult.success(
-        /*approach= */ "Replace the table name.", fixOptions, err, /*isConfident=*/ true);
+    String approach = String.format("Replace the table name `%s`", err.getTableName());
+    return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/true);
   }
 
   private TableId constructTableId(String fullTableName) {
