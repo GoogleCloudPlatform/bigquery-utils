@@ -31,7 +31,7 @@ public class FunctionNotFoundFixer implements IFixer {
     // If the failure does not include a suggestion, directly inform users that it cannot be auto
     // fixed.
     if (!err.hasSuggestion()) {
-      return FixResult.failure(err, "No similar function was found.");
+      return FixResult.failure(query, err, "No similar function was found.");
     }
 
     // TODO: If the unrecognized function looks like a UDF (i.e. proj.dataset.function), then
@@ -41,12 +41,12 @@ public class FunctionNotFoundFixer implements IFixer {
         queryTokenProcessor.getTokenAt(
             query, err.getErrorPosition().getRow(), err.getErrorPosition().getColumn());
     String fixedQuery = queryTokenProcessor.replaceToken(query, token, err.getSuggestion());
-    FixOption fixOption = FixOption.of("Change to " + err.getSuggestion(), fixedQuery);
 
+    String approach = String.format("Replace the function `%s`", err.getFunctionName());
+    String action = String.format("Change to `%s`", err.getSuggestion());
+
+    FixOption fixOption = FixOption.of(action, fixedQuery);
     return FixResult.success(
-        /*approach=*/ "Replace the function " + err.getFunctionName(),
-        Collections.singletonList(fixOption),
-        err,
-        /*isConfident=*/ true);
+        query, approach, Collections.singletonList(fixOption), err, /*isConfident=*/ true);
   }
 }
