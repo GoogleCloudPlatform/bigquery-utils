@@ -16,9 +16,10 @@ public abstract class QueryJobResults {
     @Nullable public abstract QueryVerificationQuery query();
     @Nullable public abstract String error();
     @Nullable public abstract Set<List<Object>> results();
+    @Nullable public abstract List<List<String>> rawResults();
 
-    public static QueryJobResults create(String statement, QueryVerificationQuery query, String error, Set<List<Object>> results) {
-        return new AutoValue_QueryJobResults(statement, query, error, results);
+    public static QueryJobResults create(String statement, QueryVerificationQuery query, String error, Set<List<Object>> results, List<List<String>> rawResults) {
+        return new AutoValue_QueryJobResults(statement, query, error, results, rawResults);
     }
 
 }

@@ -1,23 +1,32 @@
 {
-  "DDL_FEATURE_ROOT": [
-    "DDL_CREATE"
-  ],
-  "DDL_CREATE": [
-    "DDL_PARTITION",
-    "DDL_CLUSTER",
-    "DDL_AS",
-    "FEATURE_SINK"
-  ],
-  "DDL_PARTITION": [
-    "DDL_CLUSTER",
-    "DDL_AS",
-    "FEATURE_SINK"
-  ],
-  "DDL_CLUSTER": [
-    "DDL_AS",
-    "FEATURE_SINK"
-  ],
-  "DDL_AS": [
-    "FEATURE_SINK"
+  "dependencies": [
+    {
+      "node": "DDL_FEATURE_ROOT",
+      "neighbors": [
+        "DDL_CREATE"
+      ]
+    },
+    {
+      "node": "DDL_CREATE",
+      "neighbors": [
+        "DDL_PARTITION",
+        "DDL_CLUSTER",
+        "DDL_AS",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DDL_PARTITION",
+      "neighbors": [
+        "DDL_CLUSTER",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DDL_CLUSTER",
+      "neighbors": [
+        "FEATURE_SINK"
+      ]
+    }
   ]
 }

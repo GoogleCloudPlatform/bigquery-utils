@@ -1,19 +1,5 @@
 {
   "start": "FEATURE_ROOT",
-  "end": "FEATURE_SINK",
-  "queryTypes": [
-    {
-      "queryType": "DDL_FEATURE_ROOT",
-      "isIncluded": true
-    },
-    {
-      "queryType": "DML_FEATURE_ROOT",
-      "isIncluded": true
-    },
-    {
-      "queryType": "DQL_FEATURE_ROOT",
-      "isIncluded": true
-    }
-  ]
+  "end": "FEATURE_SINK"
 }
 

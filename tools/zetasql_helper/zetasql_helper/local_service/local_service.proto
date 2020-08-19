@@ -1,0 +1,22 @@
+syntax = "proto2";
+
+package bigquery.utils.zetasql_helper.local_service;
+
+
+option java_package = "com.google.bigquery.utils.zetasqlhelper";
+option java_outer_classname = "LocalService";
+
+service ZetaSqlHelperLocalService {
+
+  rpc Hello(HelloRequest) returns (HelloResponse) {
+  }
+
+}
+
+message HelloRequest {
+  optional string name = 1;
+}
+
+message HelloResponse {
+  optional string greeting = 1;
+}
