@@ -44,7 +44,7 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
   
   ```  
   SELECT 
-   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   COALESCE(parentJobId, jobId) AS common_script_job_id,
    jobChange.jobConfig.queryConfig.query,
    jobChange.jobConfig.queryConfig.destinationTable,
    jobChange.jobStats.queryStats.totalBilledBytes,
@@ -70,7 +70,7 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
 
 ```  
   SELECT 
-   jobChange.jobStats.parentJobName,
+   parentJobId,
    jobId,
    jobChange.jobConfig.queryConfig.query,
    jobChange.jobConfig.queryConfig.destinationTable,
@@ -98,7 +98,7 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
   ```
   
   SELECT 
-   COALESCE(jobChange.jobStats.parentJobName, jobId) AS common_script_job_id,
+   COALESCE(parentJobId, jobId) AS common_script_job_id,
    jobChange.jobStats.reservationUsage.name,
    jobChange.jobStats.reservationUsage.slotMs,
    jobChange.jobConfig.queryConfig.statementType,
