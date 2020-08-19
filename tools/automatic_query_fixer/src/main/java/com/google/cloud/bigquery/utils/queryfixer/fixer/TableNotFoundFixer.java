@@ -45,17 +45,17 @@ public class TableNotFoundFixer implements IFixer {
 
   @Override
   public FixResult fix() {
-    TableId fullTableId = constructTableId(err.getTableName());
+    TableId incorrectTableId = constructTableId(err.getTableName());
     List<String> tableNames =
-        bigQueryService.listTableNames(fullTableId.getProject(), fullTableId.getDataset());
+        bigQueryService.listTableNames(incorrectTableId.getProject(), incorrectTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
-        StringUtil.findSimilarWords(tableNames, fullTableId.getTable());
+        StringUtil.findSimilarWords(tableNames, incorrectTableId.getTable());
 
     // This is an arbitrary standard. It requires the candidate table should share at least 50%
     // similarity as the incorrect table typo.
     // TODO: this could be user configurable in future.
-    int editDistanceThreshold = (fullTableId.getTable().length() + 1) / 2;
+    int editDistanceThreshold = (incorrectTableId.getTable().length() + 1) / 2;
 
     if (similarTables.getStrings().isEmpty()
         || similarTables.getDistance() > editDistanceThreshold) {
@@ -64,7 +64,7 @@ public class TableNotFoundFixer implements IFixer {
 
     // This method only finds the first occurrence of the incorrect table. It is possible that this
     // table exists in multiple positions of this query.
-    SubstringView incorrectTableView = findSubstringViewOfIncorrectTable(fullTableId);
+    SubstringView incorrectTableView = findSubstringViewOfIncorrectTable(incorrectTableId);
     if (incorrectTableView == null) {
       return FixResult.failure(query, err, "Cannot locate the incorrect table position.");
     }
@@ -75,7 +75,7 @@ public class TableNotFoundFixer implements IFixer {
                 table -> {
                   String fullTableName =
                       constructFullTableName(
-                          fullTableId.getProject(), fullTableId.getDataset(), table);
+                          incorrectTableId.getProject(), incorrectTableId.getDataset(), table);
                   String fixedQuery = replaceTable(fullTableName, incorrectTableView);
                   return FixOption.of(String.format("Change to `%s`", fullTableName), fixedQuery);
                 })
