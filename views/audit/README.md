@@ -1,4 +1,4 @@
-This directory contains helper SELECT statements to query BigQuery audit logs \
+This directory contains helper views to query BigQuery audit logs \
 More information regarding each is detailed below:
 
 
