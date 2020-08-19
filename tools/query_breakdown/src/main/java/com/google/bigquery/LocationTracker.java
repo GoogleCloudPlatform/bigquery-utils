@@ -51,11 +51,14 @@ public class LocationTracker {
     }
   }
 
+  /**
+   * This method removes the specified line from location
+   */
   public void removeLine(int lineNumber) {
     if (lineNumber < 0 ||  lineNumber > location.size()) {
       return;
     }
-    location.get(lineNumber - 1).clear();
+    location.remove(lineNumber - 1);
   }
 
   /**
@@ -81,14 +84,14 @@ public class LocationTracker {
     }
     else {
       // different line case
-      for (int x = startColumn; x < location.get(startLine - 1).size() + 1; x++) {
+      for (int x = startColumn; x < location.get(startLine - 1).size(); x++) {
         locationTracker.remove(startLine, startColumn);
       }
       for (int y = 1; y < endColumn + 1; y++) {
         locationTracker.remove(endLine, 1);
       }
       if (endLine - startLine > 1) {
-        for (int z = startLine; z < endLine - 1; z++) {
+        for (int z = startLine + 1; z < endLine; z++) {
           locationTracker.removeLine(z);
         }
       }

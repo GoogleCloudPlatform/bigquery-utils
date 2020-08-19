@@ -13,7 +13,8 @@ public class LocationTrackerTest {
     InputReader ir = new InputReader();
     String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
     ir.readFromString(query);
-    assertEquals(4, ir.getLocationTracker().getOriginalPosition(3, 4));
+    Pair expected = new Pair(3, 4);
+    assertEquals(expected, ir.getLocationTracker().getOriginalPosition(3, 4));
   }
 
   @Test
@@ -21,7 +22,9 @@ public class LocationTrackerTest {
     InputReader ir = new InputReader();
     String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
     ir.readFromString(query);
-    assertEquals(4, ir.getLocationTracker().cloneTracker().getOriginalPosition(3, 4));
+    Pair expected = new Pair(3, 4);
+    assertEquals(expected,
+        ir.getLocationTracker().cloneTracker().getOriginalPosition(3, 4));
   }
 
   @Test
@@ -31,7 +34,8 @@ public class LocationTrackerTest {
     ir.readFromString(query);
     LocationTracker locationTracker =
         ir.getLocationTracker().delete(3, 1, 3,5);
-    assertEquals(6, locationTracker.getOriginalPosition(3, 1));
+    Pair expected = new Pair(3, 6);
+    assertEquals(expected, locationTracker.getOriginalPosition(3, 1));
   }
 
   @Test
@@ -41,7 +45,9 @@ public class LocationTrackerTest {
     ir.readFromString(query);
     LocationTracker locationTracker =
         ir.getLocationTracker().delete(1, 5, 3,5);
-    assertEquals(5, locationTracker.getOriginalPosition(1, 4));
-    assertEquals(5, locationTracker.getOriginalPosition(1, 5));
+    Pair expected = new Pair(1, 4);
+    Pair expected2 = new Pair(3, 10);
+    assertEquals(expected, locationTracker.getOriginalPosition(1, 4));
+    assertEquals(expected2, locationTracker.getOriginalPosition(2, 5));
   }
 }

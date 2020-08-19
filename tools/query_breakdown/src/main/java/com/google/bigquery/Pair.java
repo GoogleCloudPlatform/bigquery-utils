@@ -1,5 +1,8 @@
 package com.google.bigquery;
 
+/**
+ * The Pair class is designed to keep the (x, y) coordinates of a token throughout the tool
+ */
 public class Pair {
   private final int x;
   private final int y;
