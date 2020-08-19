@@ -39,83 +39,90 @@ A common pattern in data warehousing for tracking results of DML statements is t
 #### Usage Examples
 In the following examples, change all occurrences of `project_id.dataset_id` to your own values. 
 
-* Run this query to see a detailed list of scripts. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
+* Run the following query to see the 100 most recent BigQuery scripting statements. The results are ordered with the most recent script statement first, and then further ordering is applied using the script's job id and statement start time.
   
   
   ```  
   SELECT 
-   COALESCE(parentJobId, jobId) AS common_script_job_id,
-   jobChange.jobConfig.queryConfig.query,
-   jobChange.jobConfig.queryConfig.destinationTable,
-   jobChange.jobStats.queryStats.totalBilledBytes,
-   jobChange.jobConfig.queryConfig.statementType,
-   jobChange.jobStats.createTime,
-   jobChange.jobStats.startTime,
-   jobChange.jobStats.endTime,
-   jobRuntimeMs,
-   tableDataChange.deletedRowsCount,
-   tableDataChange.insertedRowsCount,
-  FROM project_id.dataset_id.bq_script_logs 
+    COALESCE(parentJobId, jobId) AS common_script_job_id,
+    jobChange.jobConfig.queryConfig.query,
+    jobChange.jobConfig.queryConfig.destinationTable,
+    jobChange.jobStats.queryStats.totalBilledBytes,
+    jobChange.jobConfig.queryConfig.statementType,
+    jobChange.jobStats.createTime,
+    jobChange.jobStats.startTime,
+    jobChange.jobStats.endTime,
+    jobRuntimeMs,
+    tableDataChange.deletedRowsCount,
+    tableDataChange.insertedRowsCount,
+  FROM
+    project_id.dataset_id.bq_script_logs 
   WHERE 
-   hasJobChangeEvent AND
-   (jobChange.jobStats.parentJobName IS NOT NULL OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+    hasJobChangeEvent
+    AND (
+      jobChange.jobStats.parentJobName IS NOT NULL
+      OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT'
+    )
   ORDER BY 
-   eventTimestamp DESC,
-   common_script_job_id,
-   jobChange.jobStats.startTime
+    eventTimestamp DESC,
+    common_script_job_id,
+    jobChange.jobStats.startTime
+  LIMIT 100
    
   ```
 
-* Run this query to see a detailed list of jobs that modify tables. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time. 
+* Run the following query to see the 100 most recent BigQuery scripting statements that modify table data. The results are ordered with the most recent script statement first, and then further ordering is applied using the statement's job id and statement start time. 
 
 ```  
   SELECT 
-   parentJobId,
-   jobId,
-   jobChange.jobConfig.queryConfig.query,
-   jobChange.jobConfig.queryConfig.destinationTable,
-   jobChange.jobStats.queryStats.totalBilledBytes,
-   jobChange.jobConfig.queryConfig.statementType,
-   jobChange.jobStats.createTime,
-   jobChange.jobStats.startTime,
-   jobChange.jobStats.endTime,
-   jobRuntimeMs,
-  FROM project_id.dataset_id.bq_script_logs 
+    parentJobId,
+    jobId,
+    jobChange.jobConfig.queryConfig.query,
+    jobChange.jobConfig.queryConfig.destinationTable,
+    jobChange.jobStats.queryStats.totalBilledBytes,
+    jobChange.jobConfig.queryConfig.statementType,
+    jobChange.jobStats.createTime,
+    jobChange.jobStats.startTime,
+    jobChange.jobStats.endTime,
+    jobRuntimeMs,
+  FROM
+    project_id.dataset_id.bq_script_logs 
   WHERE 
-   hasJobChangeEvent AND 
-   hasTableDataReadEvent AND
-   jobChange.jobStats.parentJobName IS NOT NULL
+    hasJobChangeEvent
+    AND hasTableDataChangeEvent 
+    AND jobChange.jobStats.parentJobName IS NOT NULL
   ORDER BY 
-   eventTimestamp DESC,
-   parentJobName,
-   jobId,
-   jobChange.jobStats.startTime
-   
+    eventTimestamp DESC,
+    jobId,
+    jobChange.jobStats.startTime
+  LIMIT 100
   ```
 
-* Run this query to see a detailed list of scripts which use slot reservations. The results are ordered with the most recent event first, and then further ordering is applied using the script's job id and script run time.
+* Run the following query to see the 100 most recent BigQuery scripting statements which use slot reservations. The results are ordered with the most recent script statement first, and then further ordering is applied using the script's job id and statement start time.
 
   ```
-  
   SELECT 
-   COALESCE(parentJobId, jobId) AS common_script_job_id,
-   jobChange.jobStats.reservationUsage.name,
-   jobChange.jobStats.reservationUsage.slotMs,
-   jobChange.jobConfig.queryConfig.statementType,
-   jobChange.jobConfig.queryConfig.destinationTable,
-   jobChange.jobStats.createTime,
-   jobChange.jobStats.startTime,
-   jobChange.jobStats.endTime,
-   jobRuntimeMs,
-  FROM project_id.dataset_id.bq_script_logs 
+    COALESCE(parentJobId, jobId) AS common_script_job_id,
+    jobChange.jobStats.reservationUsage.name,
+    jobChange.jobStats.reservationUsage.slotMs,
+    jobChange.jobConfig.queryConfig.statementType,
+    jobChange.jobConfig.queryConfig.destinationTable,
+    jobChange.jobStats.createTime,
+    jobChange.jobStats.startTime,
+    jobChange.jobStats.endTime,
+    jobRuntimeMs,
+  FROM 
+    project_id.dataset_id.bq_script_logs 
   WHERE 
-   hasJobChangeEvent AND 
-   ((jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) OR 
-  jobChange.jobConfig.queryConfig.statementType = 'SCRIPT')
+    hasJobChangeEvent 
+    AND (
+      (jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) 
+      OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT' 
+    )
   ORDER BY 
-   eventTimestamp DESC,
-   common_script_job_id,
-   jobChange.jobStats.startTime
-  
+    eventTimestamp DESC,
+    common_script_job_id,
+    jobChange.jobStats.startTime
+  LIMIT 100
   ```
   
