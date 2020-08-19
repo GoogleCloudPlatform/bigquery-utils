@@ -30,7 +30,18 @@ public class LocationTrackerTest {
     String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
     ir.readFromString(query);
     LocationTracker locationTracker =
-        ir.getLocationTracker().delete(3, 1, 5);
+        ir.getLocationTracker().delete(3, 1, 3,5);
     assertEquals(6, locationTracker.getOriginalPosition(3, 1));
+  }
+
+  @Test
+  public void locationTrackerDeletionMultipleLinesTest() {
+    InputReader ir = new InputReader();
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    ir.readFromString(query);
+    LocationTracker locationTracker =
+        ir.getLocationTracker().delete(1, 5, 3,5);
+    assertEquals(5, locationTracker.getOriginalPosition(1, 4));
+    assertEquals(5, locationTracker.getOriginalPosition(1, 5));
   }
 }

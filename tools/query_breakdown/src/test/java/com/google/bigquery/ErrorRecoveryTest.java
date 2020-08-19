@@ -39,10 +39,16 @@ public class ErrorRecoveryTest {
   @Test
   public void deletionMultipleLinesNoSpaceAcrossLines() {
     String query = "SELECT a FROM A" + '\n' + "SELECT b FROM B WHERE b > 3";
-    assertEquals("SELECT a " + "b FROM B WHERE b > 3",
+    assertEquals("SELECT a " + "\nb FROM B WHERE b > 3",
         QueryBreakdown.deletion(query, 1, 10, 2,7));
   }
 
+  @Test
+  public void deletionLineGreaterThanOneMultiple() {
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    assertEquals("SELE\n" + " A = 3; SELECT b FROM B",
+        QueryBreakdown.deletion(query, 1, 5, 3,5));
+  }
 
   @Test
   public void replacementExpectedSingle() {

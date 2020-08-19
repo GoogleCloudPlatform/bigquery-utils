@@ -145,9 +145,9 @@ public class QueryBreakdown {
               findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
           ))) {
         // gets the error location in the original query
-        int originalStartColumn =
+        Pair originalStart =
             locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
-        int originalEndColumn =
+        Pair originalEnd =
             locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
 
         /* deletion: gets the new query, creates a node, and calls the loop again */
@@ -157,11 +157,11 @@ public class QueryBreakdown {
 
         // updates the location tracker to reflect the deletion
         LocationTracker deletedLt = locationTracker.delete
-            (pos.getLineNum(), pos.getColumnNum(), pos.getEndColumnNum());
+            (pos.getLineNum(), pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum());
 
         // creates a node for this deletion
-        Node deletionNode = new Node(parent, pos.getLineNum(), originalStartColumn,
-            pos.getEndLineNum(), originalEndColumn, depth + 1 );
+        Node deletionNode = new Node(parent, originalStart.getX(), originalStart.getY(),
+            originalEnd.getX(), originalEnd.getY(), depth + 1);
 
         // calls the loop again
         loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
@@ -176,8 +176,8 @@ public class QueryBreakdown {
           // updates the location tracker to reflect the replacement
           LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
               pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
-          Node replacementNode = new Node(parent, pos.getLineNum(), originalStartColumn,
-              pos.getEndLineNum(), originalEndColumn, r.getOriginal(), r.getReplacement(),
+          Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
+              originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
               depth + 1);
           loop(r.getQuery(), errorLimit, replacementNode, depth + 1, replacedLt);
         }
@@ -204,6 +204,9 @@ public class QueryBreakdown {
     StringBuilder sb = new StringBuilder(inputQuery);
     int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     sb.delete(index[0], index[1]);
+    if (startLine != endLine) {
+      sb.insert(index[0], '\n');
+    }
     return sb.toString();
   }
 
