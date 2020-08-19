@@ -1,0 +1,1 @@
+INSERT INTO `nikunjbhartia-test-clients.bqtestdataset.job_stats_partitioned` (id, status, creation_ts) values (@id, @status, @creation_ts)
