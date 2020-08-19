@@ -66,7 +66,7 @@ public class TableNotFoundFixer implements IFixer {
     // table exists in multiple positions of this query.
     SubstringView incorrectTableView = findSubstringViewOfIncorrectTable(fullTableId);
     if (incorrectTableView == null) {
-      return FixResult.failure(err, "Cannot locate the incorrect table position.");
+      return FixResult.failure(query, err, "Cannot locate the incorrect table position.");
     }
 
     List<FixOption> fixOptions =
