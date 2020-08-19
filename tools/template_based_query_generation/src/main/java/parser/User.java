@@ -8,10 +8,10 @@ import java.util.Map;
  */
 public class User {
   /* the start of the Markov chain */
-  String start;
+  FeatureType startFeature;
 
   /* the end of the Markov chain */
-  String end;
+  FeatureType endFeature;
 
   /* the maximum number of columns in the resulting sample data */
   int numColumns;
@@ -24,20 +24,20 @@ public class User {
 
   String bigQueryTable;
 
-  public String getStart() {
-    return start;
+  public FeatureType getStartFeature() {
+    return startFeature;
   }
 
-  public void setStart(String start) {
-    this.start = start;
+  public void setStartFeature(FeatureType startFeature) {
+    this.startFeature = startFeature;
   }
 
-  public String getEnd() {
-    return end;
+  public FeatureType getEndFeature() {
+    return endFeature;
   }
 
-  public void setEnd(String end) {
-    this.end = end;
+  public void setEndFeature(FeatureType endFeature) {
+    this.endFeature = endFeature;
   }
 
   public int getNumColumns() {
