@@ -3,6 +3,7 @@ package com.google.bigquery;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -11,25 +12,20 @@ import java.io.IOException;
  */
 public class InputReader {
 
-  private LocationTracker locationTracker;
+  private List<String> queries;
+  private List<LocationTracker> locationTrackers;
 
   /**
-   * Constructor for the class
+   * Constructor for the class. The constructor will take in a txt file name, use BufferedReader to
+   * parse the input, and return all the queries split into a string array format.
+   * We also initialize LocationTracker instances since this is where we are processing the input.
+   * Finally, we keep track of the starting position of each individual query to keep track of the
+   * original location.
    */
-  public InputReader() {
-    locationTracker = new LocationTracker();
-  }
-
-  /**
-   * This method will take in a txt file name, use BufferedReader to parse the input, and return
-   * all the queries in a string format. We also initialize a LocationTracker instance since
-   * this is where we are processing the input.
-   *
-   * TODO: more robust method for input parsing needed (ex: comments)
-   */
-  public String readInput(String filename) throws IOException {
+  public InputReader(String filename) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filename));
     StringBuilder sb = new StringBuilder();
+    LocationTracker locationTracker = new LocationTracker();
 
     // local state for input reading
     int current = reader.read();
@@ -45,6 +41,15 @@ public class InputReader {
     while (current != -1) {
       sb.append((char) current);
 
+      // break down query using semicolon
+      if ((char) current == ';') {
+        queries.add(sb.toString());
+        sb = new StringBuilder();
+        locationTrackers.add(locationTracker);
+        locationTracker = new LocationTracker();
+        locationTracker.addLine();
+      }
+      
       // line changes
       if ((char) current == '\n') {
         locationTracker.add(line, column);
@@ -61,14 +66,19 @@ public class InputReader {
       current = reader.read();
     }
 
+    // deals with case where a single query or the last query don't have semicolons
+    if (sb.length() != 0) {
+      queries.add(sb.toString());
+      locationTrackers.add(locationTracker);
+    }
+
     reader.close();
-    return sb.toString();
   }
 
   /**
    * Method created to initialize a LocationTracker instance from an input string for testing
    */
-  public void readFromString(String input) {
+  public void readFromString(String input, LocationTracker locationTracker) {
     // local state for input reading
     int current = 0;
     int line = 1;
@@ -102,9 +112,16 @@ public class InputReader {
   }
 
   /**
-   * Getter method for LocationTracker of the input
+   * Getter method for the array of queries
    */
-  public LocationTracker getLocationTracker() {
-    return locationTracker;
+  public List<String> getQueries() {
+    return queries;
+  }
+
+  /**
+   * Getter method for the array of location trackers
+   */
+  public List<LocationTracker> getLocationTrackers() {
+    return locationTrackers;
   }
 }
