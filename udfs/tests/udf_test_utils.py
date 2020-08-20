@@ -28,6 +28,7 @@ BIGQUERY_TEST_DATASET_MAPPINGS = {
     'netezza': 'nz_test',
     'oracle': 'or_test',
     'redshift': 'rs_test',
+    'snowflake': 'sf_test',    
     'teradata': 'td_test',
     'vertica': 've_test',
     'community': 'fn_test',

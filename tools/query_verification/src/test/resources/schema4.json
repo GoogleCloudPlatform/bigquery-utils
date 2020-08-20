@@ -1,0 +1,18 @@
+[
+  {
+    "fields": [
+      {
+        "name": "stringField",
+        "type": "VARCHAR(255)"
+      },
+      {
+        "name": "integerField",
+        "type": "BIGINT"
+      }
+    ],
+    "tableReference": {
+      "datasetId": "dataset",
+      "tableId": "table"
+    }
+  }
+]
