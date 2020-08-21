@@ -14,7 +14,7 @@ public class TokenImpl implements IToken {
   }
 
   @Override public Kind getKind() {
-    if (token.kind == 788) {
+    if (token.kind == 786 || token.kind == 788) {
       return Kind.IDENTIFIER;
     }
     return Kind.OTHERS;

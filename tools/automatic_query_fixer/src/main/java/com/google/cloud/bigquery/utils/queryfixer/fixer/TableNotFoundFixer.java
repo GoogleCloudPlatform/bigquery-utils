@@ -47,7 +47,8 @@ public class TableNotFoundFixer implements IFixer {
   public FixResult fix() {
     TableId incorrectTableId = constructTableId(err.getTableName());
     List<String> tableNames =
-        bigQueryService.listTableNames(incorrectTableId.getProject(), incorrectTableId.getDataset());
+        bigQueryService.listTableNames(
+            incorrectTableId.getProject(), incorrectTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
         StringUtil.findSimilarWords(tableNames, incorrectTableId.getTable());
@@ -82,7 +83,7 @@ public class TableNotFoundFixer implements IFixer {
             .collect(Collectors.toList());
 
     String approach = String.format("Replace the table name `%s`", err.getTableName());
-    return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/true);
+    return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/ true);
   }
 
   private TableId constructTableId(String fullTableName) {
@@ -107,10 +108,21 @@ public class TableNotFoundFixer implements IFixer {
   }
 
   private SubstringView findSubstringViewOfIncorrectTable(TableId fullTableId) {
-    String regex =
-        String.format(
-            "`?%s`?.`?%s`?.`?%s`?",
-            fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
+    String regex;
+    // If the project ID is the default one, then the actual table may not include project ID,
+    // which looks like "dataset.table".
+    if (fullTableId.getProject().equals(bigQueryService.getBigQueryOptions().getProjectId())) {
+      regex =
+          String.format(
+              "(`?%s`?\\.)?`?%s`?\\.`?%s`?",
+              fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
+    } else {
+      regex =
+          String.format(
+              "`?%s`?\\.`?%s`?\\.`?%s`?",
+              fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
+    }
+
     List<SubstringView> substringViews = PatternMatcher.findAllSubstrings(query, regex);
 
     // Iterate the substring and check if this substring is an identifier. If yes, this substring
