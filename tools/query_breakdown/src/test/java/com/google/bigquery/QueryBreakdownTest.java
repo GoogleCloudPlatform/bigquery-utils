@@ -51,7 +51,7 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/simpleDeletion.txt");
-    qb.run(query, "", 0, ir.getLocationTracker());
+    qb.run(query, false, 0, ir.getLocationTracker());
     assertEquals("Unparseable portion: Start Line 1, End Line 1, "
         + "Start Column 1, End Column 4, DELETION\n", outContent.toString());
   }
@@ -65,7 +65,7 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleDeletion.txt");
-    qb.run(query, "", 0, ir.getLocationTracker());
+    qb.run(query, false, 0, ir.getLocationTracker());
     assertEquals(
         "Unparseable portion: Start Line 1, End Line 1, "
             + "Start Column 1, End Column 4, DELETION\n"
@@ -85,7 +85,7 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/singleDeletionReplacement.txt");
-    qb.run(query, "", 0, ir.getLocationTracker());
+    qb.run(query, false, 0, ir.getLocationTracker());
     assertEquals(
         "Unparseable portion: Start Line 1, End Line 1, "
             + "Start Column 1, End Column 4, DELETION\n"

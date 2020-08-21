@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.Stack;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
@@ -41,7 +43,7 @@ public class QueryBreakdown {
    *
    * TODO: output file feature and runtime limit support
    */
-  public void run(String originalQuery, String outputFile, int errorLimit,
+  public void run(String originalQuery, boolean jsonOutput, int errorLimit,
       LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
@@ -62,23 +64,51 @@ public class QueryBreakdown {
       stack.push(current);
       current = current.getParent();
     }
-
-    // we then pop the stack and output results one by one
-    while (!stack.empty()) {
-      current = stack.pop();
-      if (current.getErrorHandlingType().equals("DELETION")) {
-        // print out the result
-        System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
-                + "Start Column %3$s, End Column %4$s, %5$s", current.getStartLine(),
-            current.getEndLine(), current.getStartColumn(), current.getEndColumn(),
-            current.getErrorHandlingType()));
+    
+    if (jsonOutput) {
+      JSONArray jsonArray = new JSONArray();
+      while(!stack.empty()) {
+        current = stack.pop();
+        JSONObject errorPosition = new JSONObject();
+        errorPosition.put("startLine", current.getStartLine());
+        errorPosition.put("startColumn", current.getStartColumn());
+        errorPosition.put("endLine", current.getEndLine());
+        errorPosition.put("endColumn", current.getEndColumn());
+        if (current.getErrorHandlingType().equals("DELETION")) {
+          JSONObject deletionJson = new JSONObject();
+          deletionJson.put("error_position", errorPosition);
+          deletionJson.put("error_type", "DELETION");
+          jsonArray.add(deletionJson);
+        }
+        else {
+          JSONObject replaceJson = new JSONObject();
+          replaceJson.put("error_position", errorPosition);
+          replaceJson.put("error_type", "REPLACEMENT");
+          replaceJson.put("replacedFrom", current.getReplaceFrom());
+          replaceJson.put("replacedTo", current.getReplaceTo());
+          jsonArray.add(replaceJson);
+        }
       }
-      else {
-        System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
-                + "Start Column %3$s, End Column %4$s, %5$s: replaced %6$s with %7$s",
-            current.getStartLine(), current.getEndLine(), current.getStartColumn(),
-            current.getEndColumn(), current.getErrorHandlingType(), current.getReplaceFrom(),
-            current.getReplaceTo()));
+      System.out.println(jsonArray);
+    }
+    else {
+      // we then pop the stack and output results one by one
+      while (!stack.empty()) {
+        current = stack.pop();
+        if (current.getErrorHandlingType().equals("DELETION")) {
+          // print out the result
+          System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+                  + "Start Column %3$s, End Column %4$s, %5$s", current.getStartLine(),
+              current.getEndLine(), current.getStartColumn(), current.getEndColumn(),
+              current.getErrorHandlingType()));
+        }
+        else {
+          System.out.println(String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+                  + "Start Column %3$s, End Column %4$s, %5$s: replaced %6$s with %7$s",
+              current.getStartLine(), current.getEndLine(), current.getStartColumn(),
+              current.getEndColumn(), current.getErrorHandlingType(), current.getReplaceFrom(),
+              current.getReplaceTo()));
+        }
       }
     }
   }
