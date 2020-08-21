@@ -46,7 +46,7 @@ public class LocationTrackerTest {
     LocationTracker locationTracker2 =
         trackers.get(1).delete(1, 2, 1,6);
     Pair expected = new Pair(3, 6);
-    Pair expected2 = new Pair(3, 20);
+    Pair expected2 = new Pair(3, 19);
     assertEquals(expected, locationTracker.getOriginalPosition(3, 1));
     assertEquals(expected2, locationTracker2.getOriginalPosition(1, 2));
   }
@@ -58,12 +58,12 @@ public class LocationTrackerTest {
     LocationTracker locationTracker =
         trackers.get(0).delete(1, 5, 3,5);
     LocationTracker locationTracker2 =
-        trackers.get(1).delete(1, 1, 1,6);
+        trackers.get(1).delete(1, 1, 2,5);
     Pair expected = new Pair(1, 4);
     Pair expected2 = new Pair(3, 10);
-    Pair expected3 = new Pair(4, 8);
+    Pair expected3 = new Pair(4, 7);
     assertEquals(expected, locationTracker.getOriginalPosition(1, 4));
     assertEquals(expected2, locationTracker.getOriginalPosition(2, 5));
-    assertEquals(expected3, locationTracker2.getOriginalPosition(1, 2));
+    assertEquals(expected3, locationTracker2.getOriginalPosition(2, 2));
   }
 }

@@ -25,6 +25,13 @@ public class LocationTracker {
   }
 
   /**
+   * Getter method for location field
+   */
+  public ArrayList<ArrayList<Pair>> getLocation() {
+    return location;
+  }
+
+  /**
    * This method interacts with the InputReader and adds a pair to the line-1th list in the
    * location field. The pair represents the position (x, y) in the original query.
    * x and y are 1-indexed, so we adjust accordingly.
@@ -87,8 +94,13 @@ public class LocationTracker {
       for (int x = startColumn; x < location.get(startLine - 1).size(); x++) {
         locationTracker.remove(startLine, startColumn);
       }
-      for (int y = 1; y < endColumn + 1; y++) {
-        locationTracker.remove(endLine, 1);
+      if (endColumn == locationTracker.getLocation().get(endLine - 1).size()) {
+        locationTracker.removeLine(endLine);
+      }
+      else {
+        for (int y = 1; y < endColumn + 1; y++) {
+          locationTracker.remove(endLine, 1);
+        }
       }
       if (endLine - startLine > 1) {
         for (int z = startLine + 1; z < endLine; z++) {

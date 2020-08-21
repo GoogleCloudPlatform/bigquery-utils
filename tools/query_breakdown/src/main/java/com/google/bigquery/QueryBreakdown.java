@@ -205,6 +205,7 @@ public class QueryBreakdown {
     int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     sb.delete(index[0], index[1]);
     if (startLine != endLine) {
+      // we add a new line character whenever we multi-line delete to keep queries in same line
       sb.insert(index[0], '\n');
     }
     return sb.toString();
