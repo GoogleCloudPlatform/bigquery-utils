@@ -16,8 +16,6 @@ public class LocationTracker {
      (deletion and replacement won't change the line numbers)
    */
   private ArrayList<ArrayList<Pair>> location;
-  private int xOffset = 0;
-  private int yOffset = 0;
 
   /**
    * Constructor for the class
@@ -26,21 +24,13 @@ public class LocationTracker {
     location = new ArrayList<>();
   }
 
-  public void setxOffset(int xOffset) {
-    this.xOffset = xOffset;
-  }
-
-  public void setyOffset(int yOffset) {
-    this.yOffset = yOffset;
-  }
-
   /**
-   * This method interacts with the InputReader and adds a pair to the location field that
-   * represents the position (x, y) in the original query. x and y are 1-indexed, so we
-   * adjust accordingly.
+   * This method interacts with the InputReader and adds a pair to the line-1th list in the
+   * location field. The pair represents the position (x, y) in the original query.
+   * x and y are 1-indexed, so we adjust accordingly.
    */
-  public void add(int x, int y) {
-    location.get(x - 1).add(new Pair(x, y));
+  public void add(int line, int x, int y) {
+    location.get(line - 1).add(new Pair(x, y));
   }
 
   /**
@@ -123,7 +113,7 @@ public class LocationTracker {
     else if (replaceFrom.length() < replaceTo.length()) {
       LocationTracker locationTracker = cloneTracker();
       for (int i = endColumn; i < endColumn + replaceTo.length() - replaceFrom.length(); i++) {
-        locationTracker.add(-1, i);
+        locationTracker.add(line, -1, i);
       }
       return locationTracker;
     }
@@ -147,7 +137,7 @@ public class LocationTracker {
       locationTracker.addLine();
       ArrayList<Pair> lineOriginal = location.get(i);
       for (int j = 0; j < lineOriginal.size(); j++) {
-        locationTracker.add(lineOriginal.get(j).getX(), lineOriginal.get(j).getY());
+        locationTracker.add(i + 1, lineOriginal.get(j).getX(), lineOriginal.get(j).getY());
       }
     }
     return locationTracker;

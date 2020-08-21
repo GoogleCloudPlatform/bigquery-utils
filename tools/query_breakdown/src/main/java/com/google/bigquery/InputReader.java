@@ -39,7 +39,6 @@ public class InputReader {
 
     // local position within the query
     int localLine = 1;
-    int localColumn = 1;
 
     // for the first line
     if (current != -1) {
@@ -54,27 +53,25 @@ public class InputReader {
       if ((char) current == ';') {
         queries.add(sb.toString());
         sb = new StringBuilder();
-        locationTracker.add(localLine, localColumn);
+        locationTracker.add(localLine, line, column);
         locationTrackers.add(locationTracker);
         locationTracker = new LocationTracker();
         locationTracker.addLine();
         column++;
         localLine = 1;
-        localColumn = 1;
       }
 
       // line changes
       else if ((char) current == '\n') {
-        locationTracker.add(localLine, localColumn);
+        locationTracker.add(localLine, line, column);
         column = 1;
         line++;
         localLine++;
-        localColumn = 1;
         locationTracker.addLine();
       }
       else {
-        locationTracker.add(localLine, localColumn);
-        localColumn++;
+        locationTracker.add(localLine, line, column);
+        column++;
       }
 
       // advance current pointer
@@ -102,7 +99,6 @@ public class InputReader {
     int line = 1;
     int column = 1;
     int localLine = 1;
-    int localColumn = 1;
     boolean lastline = false;
 
     // empty string
@@ -117,28 +113,26 @@ public class InputReader {
       lastline = false;
       // break down query using semicolon
       if (input.charAt(current) == ';') {
-        locationTracker.add(localLine, localColumn);
+        locationTracker.add(localLine, line, column);
         trackers.add(locationTracker);
         locationTracker = new LocationTracker();
         locationTracker.addLine();
         column++;
         localLine = 1;
-        localColumn = 1;
         lastline = true;
       }
 
       // line changes
       else if (input.charAt(current) == '\n') {
-        locationTracker.add(localLine, localColumn);
+        locationTracker.add(localLine, line, column);
         column = 1;
         line++;
         localLine++;
-        localColumn = 1;
         locationTracker.addLine();
       }
       else {
-        locationTracker.add(localLine, localColumn);
-        localColumn++;
+        locationTracker.add(localLine, line, column);
+        column++;
       }
 
       // advance current pointer
