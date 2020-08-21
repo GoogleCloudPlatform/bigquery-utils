@@ -45,7 +45,7 @@ public class TableNotFoundFixer implements IFixer {
         bigQueryService.listTableNames(fullTableId.getProject(), fullTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
-        StringUtil.findSimilarWords(tableNames, fullTableId.getTable());
+        StringUtil.findSimilarWords(tableNames, fullTableId.getTable(), /*caseSensitive=*/false);
 
     // This is an arbitrary standard. It requires the candidate table should share at least 50%
     // similarity as the incorrect table typo.

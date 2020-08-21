@@ -18,12 +18,14 @@ public class StringUtil {
    *
    * @param dict dictionary of words
    * @param target target word
+   * @param caseSensitive whether considering case sensitive.
    * @return a list of Strings and their edit distance to the target.
    */
-  public static SimilarStrings findSimilarWords(Collection<String> dict, String target) {
+  public static SimilarStrings findSimilarWords(
+      Collection<String> dict, String target, boolean caseSensitive) {
     List<Pair<Integer, String>> distanceWordPairs =
         dict.stream()
-            .map(word -> Pair.of(editDistance(word, target), word))
+            .map(word -> Pair.of(editDistance(word, target, caseSensitive), word))
             .collect(Collectors.toList());
 
     if (distanceWordPairs.isEmpty()) {
@@ -41,7 +43,20 @@ public class StringUtil {
     return new SimilarStrings(words, minDistance);
   }
 
-  private static int editDistance(String word1, String word2) {
+  /**
+   * Compute the edit distance between two strings.
+   *
+   * @param word1 a string.
+   * @param word2 another string.
+   * @param caseSensitive whether considering case sensitive.
+   * @return the edit distance between word1 and word2.
+   */
+  public static int editDistance(String word1, String word2, boolean caseSensitive) {
+    if (!caseSensitive) {
+      word1 = word1.toLowerCase();
+      word2 = word2.toLowerCase();
+    }
+
     int len1 = word1.length();
     int len2 = word2.length();
 
@@ -98,6 +113,10 @@ public class StringUtil {
   public static class SimilarStrings {
     List<String> strings;
     int distance;
+
+    public boolean isEmpty() {
+      return strings.isEmpty();
+    }
 
     public static SimilarStrings empty() {
       return new SimilarStrings(new ArrayList<>(), -1);
