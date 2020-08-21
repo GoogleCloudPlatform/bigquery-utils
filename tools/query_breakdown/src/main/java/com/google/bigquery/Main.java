@@ -2,10 +2,12 @@ package com.google.bigquery;
 
 import static java.lang.System.exit;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import org.json.simple.JSONArray;
 
 /**
  * This file is the main file for the command line tool.
@@ -63,11 +65,29 @@ public class Main {
           + "location trackers");
       exit(1);
     }
+
+    // runs the tool on multiple queries
     List<String> queries = ir.getQueries();
     List<LocationTracker> locationTrackers = ir.getLocationTrackers();
+    List<Node> endResult = new ArrayList<>();
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-      qb.run(queries.get(i), jsonOutput, errorLimit, locationTrackers.get(i));
+      List<Node> result = qb.run(queries.get(i), errorLimit, locationTrackers.get(i));
+      endResult.addAll(result);
+    }
+
+    // outputs the results
+    if (jsonOutput) {
+      JSONArray jsonArray = new JSONArray();
+      for (Node node: endResult) {
+        jsonArray.add(node.toJSON());
+      }
+      System.out.println(jsonArray);
+    }
+    else {
+      for (Node node: endResult) {
+        System.out.println(node.toString());
+      }
     }
   }
 
