@@ -16,12 +16,22 @@ public class LocationTracker {
      (deletion and replacement won't change the line numbers)
    */
   private ArrayList<ArrayList<Pair>> location;
+  private int xOffset = 0;
+  private int yOffset = 0;
 
   /**
    * Constructor for the class
    */
   public LocationTracker() {
     location = new ArrayList<>();
+  }
+
+  public void setxOffset(int xOffset) {
+    this.xOffset = xOffset;
+  }
+
+  public void setyOffset(int yOffset) {
+    this.yOffset = yOffset;
   }
 
   /**

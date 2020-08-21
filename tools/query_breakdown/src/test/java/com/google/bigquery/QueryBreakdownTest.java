@@ -9,6 +9,7 @@ import java.io.PrintStream;
 import org.junit.Test;
 
 public class QueryBreakdownTest {
+  /**
   @Test
   public void findNthIndexOfDNE() {
     String test = "abcde";
@@ -138,4 +139,5 @@ public class QueryBreakdownTest {
         + "/InputTestFiles/bigqueryReferenceQueries.txt");
     qb.run(query, false, 0, ir.getLocationTracker());
   }
+  **/
 }

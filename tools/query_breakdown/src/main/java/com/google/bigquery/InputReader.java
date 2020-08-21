@@ -3,6 +3,7 @@ package com.google.bigquery;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,12 +26,20 @@ public class InputReader {
   public InputReader(String filename) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filename));
     StringBuilder sb = new StringBuilder();
+    queries = new ArrayList<>();
+    locationTrackers = new ArrayList<>();
     LocationTracker locationTracker = new LocationTracker();
 
     // local state for input reading
     int current = reader.read();
+
+    // absolute position in the original document
     int line = 1;
     int column = 1;
+
+    // local position within the query
+    int localLine = 1;
+    int localColumn = 1;
 
     // for the first line
     if (current != -1) {
@@ -45,21 +54,27 @@ public class InputReader {
       if ((char) current == ';') {
         queries.add(sb.toString());
         sb = new StringBuilder();
+        locationTracker.add(localLine, localColumn);
         locationTrackers.add(locationTracker);
         locationTracker = new LocationTracker();
         locationTracker.addLine();
+        column++;
+        localLine = 1;
+        localColumn = 1;
       }
-      
+
       // line changes
-      if ((char) current == '\n') {
-        locationTracker.add(line, column);
+      else if ((char) current == '\n') {
+        locationTracker.add(localLine, localColumn);
         column = 1;
         line++;
+        localLine++;
+        localColumn = 1;
         locationTracker.addLine();
       }
       else {
-        locationTracker.add(line, column);
-        column++;
+        locationTracker.add(localLine, localColumn);
+        localColumn++;
       }
 
       // advance current pointer
@@ -78,37 +93,64 @@ public class InputReader {
   /**
    * Method created to initialize a LocationTracker instance from an input string for testing
    */
-  public void readFromString(String input, LocationTracker locationTracker) {
+  public static List<LocationTracker> readFromString(String input) {
+    List<LocationTracker> trackers = new ArrayList<>();
+    LocationTracker locationTracker = new LocationTracker();
+
     // local state for input reading
     int current = 0;
     int line = 1;
     int column = 1;
+    int localLine = 1;
+    int localColumn = 1;
+    boolean lastline = false;
 
     // empty string
     if (input == null || input.length() == 0) {
-      return;
+      return null;
     }
 
     // for the first line
     locationTracker.addLine();
 
-    // loop for input reading
     while (current < input.length()) {
+      lastline = false;
+      // break down query using semicolon
+      if (input.charAt(current) == ';') {
+        locationTracker.add(localLine, localColumn);
+        trackers.add(locationTracker);
+        locationTracker = new LocationTracker();
+        locationTracker.addLine();
+        column++;
+        localLine = 1;
+        localColumn = 1;
+        lastline = true;
+      }
+
       // line changes
-      if (input.charAt(current) == '\n') {
-        locationTracker.add(line, column);
+      else if (input.charAt(current) == '\n') {
+        locationTracker.add(localLine, localColumn);
         column = 1;
         line++;
+        localLine++;
+        localColumn = 1;
         locationTracker.addLine();
       }
       else {
-        locationTracker.add(line, column);
-        column++;
+        locationTracker.add(localLine, localColumn);
+        localColumn++;
       }
 
       // advance current pointer
       current++;
     }
+
+    // deals with case where a single query or the last query don't have semicolons
+    if (!lastline) {
+      trackers.add(locationTracker);
+    }
+
+    return trackers;
   }
 
   /**
