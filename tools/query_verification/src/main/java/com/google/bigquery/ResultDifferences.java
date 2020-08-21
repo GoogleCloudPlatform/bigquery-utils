@@ -10,10 +10,10 @@ import java.util.List;
 @AutoValue
 abstract class ResultDifferences {
 
-    public abstract List<List<Object>> extraResults();
-    public abstract List<List<Object>> missingResults();
+    public abstract List<List<String>> extraResults();
+    public abstract List<List<String>> missingResults();
 
-    public static ResultDifferences create(List<List<Object>> extraResults, List<List<Object>> missingResults) {
+    public static ResultDifferences create(List<List<String>> extraResults, List<List<String>> missingResults) {
         return new AutoValue_ResultDifferences(extraResults, missingResults);
     }
 

@@ -10,7 +10,7 @@ class Crawler(object):
         will explore websites to look for SQL queries.
     """
 
-    def __init__(self, links, max_depth=3, max_size=100, gcs=None, bq=None):
+    def __init__(self, links, max_depth=3, max_size=100, gcs=None, bq=None, stream=False):
         """ Initializes the crawler and instance variables.
 
         Args:
@@ -25,7 +25,7 @@ class Crawler(object):
         self.seen = set()
         self.max_depth = max_depth
         self.max_size = max_size
-        self.log = crawler_log.CrawlerLog()
+        self.log = crawler_log.CrawlerLog(stream)
 
         if gcs:
             self.log.set_gcs(gcs)
@@ -66,8 +66,8 @@ class Crawler(object):
                 self.add_new_link(link, node_depth)
 
             queries = extractor.extract_queries(html_response)
-            for query in queries:
-                self.log.log_query(query, node_url)
+            if queries:
+                self.log.log_queries(queries, node_url)
 
             self.log.log_page(node_url, len(queries))
             self.count += 1

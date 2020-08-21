@@ -1,33 +1,72 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
+import {AutoFixerRunner} from './auto_fixer_runner';
+import {AutoFixerActionProvider} from './code_action_provider';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "vscode-automatic-query-fixer" is now active!'
+  const isWindows = process.platform === 'win32';
+  const execPath = path.join(
+    __filename,
+    '..',
+    '..',
+    'resources',
+    'automatic_query_fixer',
+    'bin',
+    isWindows ? 'AutomaticQueryFixer.bat' : 'AutomaticQueryFixer'
   );
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  const disposable = vscode.commands.registerCommand(
-    'vscode-automatic-query-fixer.helloWorld',
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection(
+    'autofix'
+  );
+  context.subscriptions.push(diagnosticCollection);
+  const codeActionProvider = new AutoFixerActionProvider(diagnosticCollection);
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      [{scheme: 'file'}, {scheme: 'untitled'}],
+      codeActionProvider
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'vscode-automatic-query-fixer.runAutoFixer',
+      async () => {
+        vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Analyzing query',
+            cancellable: true,
+          },
+          async (progress, token) => {
+            try {
+              const openEditor = vscode.window.activeTextEditor;
+              if (!openEditor) {
+                return;
+              }
+
+              const fixes = await new AutoFixerRunner(execPath).analyze(
+                openEditor.document.getText(),
+                progress,
+                token
+              );
+
+              codeActionProvider.setFixes(fixes, openEditor);
+            } catch (error) {
+              vscode.window.showErrorMessage(error);
+              throw error;
+            }
+          }
+        );
+      }
+    )
+  );
+
+  vscode.workspace.onDidChangeTextDocument(
     () => {
-      // The code you place here will be executed every time your command is executed
-
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        'Hello World from vscode-automatic-query-fixer!'
-      );
-    }
+      diagnosticCollection.clear();
+      codeActionProvider.clear();
+    },
+    null,
+    context.subscriptions
   );
-
-  context.subscriptions.push(disposable);
 }
-
-// this method is called when your extension is deactivated
-export function deactivate() {}
