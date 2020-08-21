@@ -151,13 +151,10 @@ public class BigQueryManager implements DataWarehouseManager {
         List<JobInfo> jobInfos = new ArrayList<JobInfo>();
 
         // Separate query into individual statements
-        String[] statements = query.query().split(";");
+        // TODO Account for edge case where semicolon could be inside statement
+        List<String> statements = Arrays.stream(query.query().split(";")).map(String::trim).filter(statement -> !statement.isEmpty()).collect(Collectors.toList());
 
         for (String statement : statements) {
-            statement = statement.trim();
-            if (statement.isEmpty())
-                continue;
-
             JobInfo jobInfo = configureJob(statement, dryRun);
             jobInfos.add(jobInfo);
         }

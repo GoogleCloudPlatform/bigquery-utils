@@ -9,7 +9,7 @@ version '1.0-SNAPSHOT'
 
 
 application {
-    mainClassName = "com.google.cloud.bigquery.utils.auto_query_fixer.Application"
+    mainClassName = "com.google.cloud.bigquery.utils.queryfixer.QueryFixerMain"
 }
 
 repositories {
