@@ -56,12 +56,10 @@ WITH jobChangeEvent AS (
       '$.jobChange.job.jobStats.endTime')) AS jobStatsEndTime,
     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.totalSlotMs') AS INT64) AS jobStatsTotalSlotMs,
-    REGEXP_EXTRACT_ALL(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobStats.reservationUsage'),
-      r'"name":\"(.*?)\"}') AS jobStatsReservationUsageName,
-    REGEXP_EXTRACT_ALL(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.reservationUsage'),
-      r'"slotMs":\"(.*?)\"}') AS jobStatsReservationUsageSlotMs,
+    JSON_EXTRACT_SCALAR(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.reservationUsage'), "["),"]"), '$.name') AS jobStatsReservationUsageName,
+    JSON_EXTRACT_SCALAR(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.reservationUsage'), "["),"]"), '$.slotMs') AS jobStatsReservationUsageSlotMs,
     /*
      * Query: Query job statistics
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query_1
