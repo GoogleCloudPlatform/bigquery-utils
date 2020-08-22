@@ -43,12 +43,12 @@ public class QueryBreakdown {
    *
    * TODO: runtime limit support
    */
-  public List<Node> run(String originalQuery, int errorLimit,
+  public List<Node> run(String originalQuery, int errorLimit, int replacementLimit,
       LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
     // this will set the variable solution
-    loop(originalQuery, errorLimit, root, 0, locationTracker);
+    loop(originalQuery, errorLimit, replacementLimit, root, 0, locationTracker);
 
     List<Node> returnNodes = new ArrayList<>();
 
@@ -83,7 +83,7 @@ public class QueryBreakdown {
    *
    * TODO: implement errorLimit logic, deal with exception casting
    */
-  private void loop(String inputQuery, int errorLimit, Node parent, int depth,
+  private void loop(String inputQuery, int errorLimit, int replacementLimit, Node parent, int depth,
       LocationTracker locationTracker) {
     // termination for branch
     if (depth > minimumUnparseableComp) {
@@ -123,11 +123,12 @@ public class QueryBreakdown {
             originalEnd.getX(), originalEnd.getY(), depth + 1);
 
         // calls the loop again
-        loop(deletionQuery, errorLimit, deletionNode, depth + 1, deletedLt);
+        loop(deletionQuery, errorLimit, replacementLimit,
+            deletionNode, depth + 1, deletedLt);
 
         /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
-        ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, pos.getLineNum(),
-            pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum(),
+        ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, replacementLimit,
+            pos.getLineNum(), pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum(),
             ((SqlParseException) e).getExpectedTokenNames());
 
         // recursively loops through the new queries
@@ -138,7 +139,8 @@ public class QueryBreakdown {
           Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
               originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
               depth + 1);
-          loop(r.getQuery(), errorLimit, replacementNode, depth + 1, replacedLt);
+          loop(r.getQuery(), errorLimit, replacementLimit,
+              replacementNode, depth + 1, replacedLt);
         }
 
         /* termination to end the loop if the instance was not a full run through the query.
@@ -181,10 +183,11 @@ public class QueryBreakdown {
    *
    * n is the number of replacements we choose to have
    */
-  static ArrayList<ReplacedComponent> replacement(String inputQuery, int startLine, int startColumn,
+  static ArrayList<ReplacedComponent> replacement(String inputQuery, int replacementLimit,
+      int startLine, int startColumn,
       int endLine, int endColumn, Collection<String> expectedTokens) {
     // call ReplacementLogic
-    ArrayList<String> finalList = ReplacementLogic.replace(inputQuery,
+    ArrayList<String> finalList = ReplacementLogic.replace(inputQuery, replacementLimit,
         expectedTokensFilter(expectedTokens));
 
     ArrayList<ReplacedComponent> result = new ArrayList<>();

@@ -11,24 +11,30 @@ import org.json.simple.JSONArray;
 
 /**
  * This file is the main file for the command line tool.
- * Usage: query_breakdown -i <PATH> [-j] [-l <INTEGER>]
+ * Usage: query_breakdown -i <PATH> [-j] [-l <INTEGER>] [-r <INTEGER>]
  * -i, --inputFile, PATH: this command specifies the path to the file containing queries to be
  *                    inputted into the tool. It is therefore mandatory
  * -j, --json: this command specifies whether the program should output the results in a
  *                   json format. It is therefore optional
  * -l, --limit, INTEGER: this command specifies the path to an integer that the tool takes as a
- *                    limit for the number of errors to be explored, thereby controlling the
- *                    runtime. It is therefore optional
+ *                    limit for the number of errors to be explored (limit on depth), thereby
+ *                    controlling the runtime. It is therefore optional
+ * -r, --replacement, INTEGER: this command specifies the number of replacements that can be
+ *                             recommended by the ReplacementLogic class, thereby controlling
+ *                             the runtime and performance. It is therefore optional
  *
- * Sample Usage: query_breakdown -i input.txt
- *               query_breakdown -i input2.txt -j -l 3
- *               query_breakdown -i input3.txt -j
- *               query_breakdown -i input4.txt -l 6
+ * Sample Usages: query_breakdown -i input.txt
+ *                query_breakdown -i input2.txt -j -l 24 -r 4
+ *                query_breakdown -i input3.txt -j
+ *                query_breakdown -i input4.txt -l 6 -r 2
+ *                query_breakdown -i input5.txt -r 3
+ *                query_breakdown -i input6.txt -l 25
  */
 public class Main {
   public static void main(String[] args) {
     String inputFile = null;
-    int errorLimit = 0;
+    int errorLimit = 100; // default value for depth limit
+    int replacementLimit = 3; // default value for number of recommended replacements
     boolean jsonOutput = false;
     CommandLine cl = createCommand(args);
 
@@ -44,7 +50,10 @@ public class Main {
       jsonOutput = true;
     }
     if (cl.hasOption("l")) {
-      errorLimit = Integer.parseInt( cl.getOptionValue("l"));
+      errorLimit = Integer.parseInt(cl.getOptionValue("l"));
+    }
+    if (cl.hasOption("r")) {
+      replacementLimit = Integer.parseInt(cl.getOptionValue("r"));
     }
 
     InputReader ir = null;
@@ -72,7 +81,8 @@ public class Main {
     List<Node> endResult = new ArrayList<>();
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-      List<Node> result = qb.run(queries.get(i), errorLimit, locationTrackers.get(i));
+      List<Node> result = qb.run(queries.get(i), errorLimit, replacementLimit,
+          locationTrackers.get(i));
       endResult.addAll(result);
     }
 
@@ -135,6 +145,10 @@ public class Main {
         .desc("this command specifies the path to an integer that the tools takes "
             + "as a limit for the number of errors to be explored, thereby controlling"
             + "the runtime. It is therefore optional").build());
+    options.addOption(Option.builder("r").longOpt("replacement").hasArg(true)
+        .argName("INTEGER").desc("this command specifies the number of replacements that can be"
+            + "recommended by the ReplacementLogic class, thereby controlling"
+            + "the runtime and performance. It is therefore optional").build());
     return options;
   }
 }
