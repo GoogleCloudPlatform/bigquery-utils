@@ -95,9 +95,8 @@ public class QueryBreakdown {
       /* generates new queries through deletion and replacement */
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
-      // if statement checks for EOF and same line number
+      // if statement checks for EOF
       if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0) &&
-          pos.getLineNum() == pos.getEndLineNum() &&
           !(pos.getColumnNum() == pos.getEndColumnNum()
           && (inputQuery.length() - 1 ==
               findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()

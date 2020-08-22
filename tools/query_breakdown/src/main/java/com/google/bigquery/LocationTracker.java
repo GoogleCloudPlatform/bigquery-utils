@@ -90,10 +90,13 @@ public class LocationTracker {
       }
     }
     else {
-      // different line case
+      /* different line case */
+      // startLine
       for (int x = startColumn; x < location.get(startLine - 1).size(); x++) {
         locationTracker.remove(startLine, startColumn);
       }
+
+      // endLine
       if (endColumn == locationTracker.getLocation().get(endLine - 1).size()) {
         locationTracker.removeLine(endLine);
       }
@@ -102,6 +105,8 @@ public class LocationTracker {
           locationTracker.remove(endLine, 1);
         }
       }
+
+      // lines in the middle
       if (endLine - startLine > 1) {
         for (int z = startLine + 1; z < endLine; z++) {
           locationTracker.removeLine(z);
