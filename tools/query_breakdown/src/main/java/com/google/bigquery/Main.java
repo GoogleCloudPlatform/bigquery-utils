@@ -78,6 +78,10 @@ public class Main {
 
     // outputs the results
     if (jsonOutput) {
+      if (endResult.isEmpty()) {
+        System.out.println("[]");
+        return;
+      }
       JSONArray jsonArray = new JSONArray();
       for (Node node: endResult) {
         jsonArray.add(node.toJSON());
@@ -85,6 +89,10 @@ public class Main {
       System.out.println(jsonArray);
     }
     else {
+      if (endResult.isEmpty()) {
+        System.out.println("The entire query can be parsed without error");
+        return;
+      }
       for (Node node: endResult) {
         System.out.println(node.toString());
       }

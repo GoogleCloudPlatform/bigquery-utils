@@ -70,7 +70,7 @@ public class Node {
    */
   @Override
   public String toString() {
-    if (type.equals("DELETION")) {
+    if (type.equals(ErrorHandlingType.DELETION)) {
       return String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
               + "Start Column %3$s, End Column %4$s, %5$s", startLine,
           endLine, startColumn, endColumn, type);

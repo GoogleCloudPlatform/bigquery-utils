@@ -9,7 +9,8 @@ import org.apache.calcite.sql.parser.SqlParserPos;
 
 /**
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
- * also be in charge of outputting the results.
+ * also be in charge of outputting the results. A new instance of QueryBreakdown is created and
+ * utilized per query.
  *
  * Note: functions in this class are left as package private for testing purposes. The visibility
  * (public/private) will properly be set in upcoming PR's.
@@ -49,9 +50,11 @@ public class QueryBreakdown {
     // this will set the variable solution
     loop(originalQuery, errorLimit, root, 0, locationTracker);
 
+    List<Node> returnNodes = new ArrayList<>();
+
     // case where entire query can be parsed
     if (solution.equals(root)) {
-      System.out.println("The entire query can be parsed without error");
+      return returnNodes;
     }
 
     // write termination logic for output (tracing the node back, reconstructing path, output)
@@ -64,7 +67,6 @@ public class QueryBreakdown {
       current = current.getParent();
     }
 
-    List<Node> returnNodes = new ArrayList<>();
     while(!stack.empty()) {
       current = stack.pop();
       returnNodes.add(current);
@@ -90,7 +92,6 @@ public class QueryBreakdown {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
-      System.out.println(inputQuery);
       /* generates new queries through deletion and replacement */
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
@@ -107,7 +108,7 @@ public class QueryBreakdown {
         Pair originalStart =
             locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());
         Pair originalEnd =
-            locationTracker.getOriginalPosition(pos.getLineNum(), pos.getEndColumnNum());;
+            locationTracker.getOriginalPosition(pos.getEndLineNum(), pos.getEndColumnNum());
 
         /* deletion: gets the new query, creates a node, and calls the loop again */
         // gets the new query

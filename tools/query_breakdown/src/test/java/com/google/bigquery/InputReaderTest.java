@@ -51,4 +51,13 @@ public class InputReaderTest {
     assertEquals(2, ir.getQueries().size());
     assertEquals(2, ir.getLocationTrackers().size());
   }
+
+  @Test
+  public void inputReaderEmpty() throws IOException {
+    String absPath = new File("").getAbsolutePath();
+    InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/empty.txt");
+    assertEquals(0, ir.getQueries().size());
+    assertEquals(0, ir.getLocationTrackers().size());
+  }
 }
