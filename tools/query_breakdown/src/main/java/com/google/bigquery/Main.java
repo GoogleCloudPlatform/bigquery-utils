@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import org.apache.log4j.BasicConfigurator;
 import org.json.simple.JSONArray;
 
 /**
@@ -32,6 +33,8 @@ import org.json.simple.JSONArray;
  */
 public class Main {
   public static void main(String[] args) {
+    // deals with logger error for apache calcite
+    //BasicConfigurator.configure();
     String inputFile = null;
     int errorLimit = 100; // default value for depth limit
     int replacementLimit = 3; // default value for number of recommended replacements
@@ -122,7 +125,7 @@ public class Main {
     try {
       cl = parser.parse(options, args);
     } catch (ParseException e) {
-      System.out.println("there was an issue parsing the commandline" + e.getMessage());
+      System.out.println("there was an issue parsing the commandline\n" + e.getMessage());
       help.printHelp("query_breakdown", options, true);
     }
 

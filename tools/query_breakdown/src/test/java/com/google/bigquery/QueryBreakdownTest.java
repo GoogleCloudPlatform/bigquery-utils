@@ -98,14 +98,13 @@ public class QueryBreakdownTest {
     assertEquals(0, result.size());
   }
 
-  /**
   @Test
   public void QueryBreakdownRunTestA() throws IOException {
-    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-    InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/bigqueryReferenceQueries.txt");
-    qb.run(query, false, 0, ir.getLocationTracker());
-  } **/
+    String[] args = new String[2];
+    args[0] = "-i";
+    args[1] = absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/bigqueryReferenceQueries.txt";
+    Main.main(args);
+  }
 }
