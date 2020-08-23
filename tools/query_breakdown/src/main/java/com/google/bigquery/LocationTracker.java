@@ -121,27 +121,47 @@ public class LocationTracker {
    * case by the length of the string we replaceFrom to the string that we replaceTo. Depending
    * on the length, we either leave location as is, add to it, or delete from it.
    */
-  public LocationTracker replace(int line, int startColumn, int endColumn, String replaceFrom,
-      String replaceTo) {
-    if (replaceFrom.length() == replaceTo.length()) {
+  public LocationTracker replace(int startLine, int startColumn, int endLine,
+      int endColumn, String replaceFrom, String replaceTo) {
+    if (replaceFrom.length() == replaceTo.length() && startLine == endLine) {
       return this;
+
     }
+    LocationTracker locationTracker = cloneTracker();
+    int end = (startLine == endLine) ? endColumn : location.get(startLine - 1).size();
+    int longer = (startLine == endLine) ? replaceTo.length() - replaceFrom.length() :
+        replaceTo.length() - (end - startColumn);
+    int shorter = (startLine == endLine) ? replaceFrom.length() - replaceTo.length() :
+        end - startColumn - replaceTo.length();
     // if we replace the token with a longer token and need to add to the locationTracker
-    else if (replaceFrom.length() < replaceTo.length()) {
-      LocationTracker locationTracker = cloneTracker();
-      for (int i = endColumn; i < endColumn + replaceTo.length() - replaceFrom.length(); i++) {
-        locationTracker.add(line, -1, i);
+    if (longer > 0) {
+      for (int i = end; i < end + longer; i++) {
+        locationTracker.add(startLine, -1, i);
       }
-      return locationTracker;
     }
     // if we replace the token with a shorter token and need to subtract from the locationTracker
     else {
-      LocationTracker locationTracker = cloneTracker();
-      for (int j = endColumn - replaceFrom.length() + replaceTo.length(); j < endColumn; j++) {
-        locationTracker.remove(line, startColumn + replaceTo.length());
+      for (int j = end - shorter; j < end; j++) {
+        locationTracker.remove(startLine, startColumn + replaceTo.length());
       }
-      return locationTracker;
     }
+    if (startLine != endLine) {
+      if (endColumn == locationTracker.getLocation().get(endLine - 1).size()) {
+        locationTracker.removeLine(endLine);
+      }
+      else {
+        for (int k = 1; k < endColumn + 1; k++) {
+          locationTracker.remove(endLine, 1);
+        }
+      }
+      // lines in the middle
+      if (endLine - startLine > 1) {
+        for (int z = startLine + 1; z < endLine; z++) {
+          locationTracker.removeLine(z);
+        }
+      }
+    }
+    return locationTracker;
   }
 
   /**

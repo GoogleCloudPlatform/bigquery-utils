@@ -97,7 +97,7 @@ public class QueryBreakdown {
 
       // if statement checks for EOF
       if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0) &&
-          !(pos.getColumnNum() == pos.getEndColumnNum()
+          !(pos.getLineNum() == pos.getEndLineNum() && pos.getColumnNum() == pos.getEndColumnNum()
           && (inputQuery.length() - 1 ==
               findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
               || inputQuery.length() ==
@@ -135,7 +135,7 @@ public class QueryBreakdown {
         for (ReplacedComponent r: replacementQueries) {
           // updates the location tracker to reflect the replacement
           LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
-              pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
+              pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
           Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
               originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
               depth + 1);
@@ -181,7 +181,7 @@ public class QueryBreakdown {
    * This is a design decision made due to the fact that we need to expose to the loop the word
    * being replaced and the word we're replacing with.
    *
-   * n is the number of replacements we choose to have
+   * replacementLimit is the number of replacements we choose to have
    */
   static ArrayList<ReplacedComponent> replacement(String inputQuery, int replacementLimit,
       int startLine, int startColumn,
@@ -201,6 +201,10 @@ public class QueryBreakdown {
       // replace the token
       StringBuilder sb = new StringBuilder(inputQuery);
       sb.replace(index[0], index[1], replaceTo);
+      if (startLine != endLine) {
+        // we add a new line character whenever we multi-line delete to keep queries in same line
+        sb.insert(index[0] + replaceTo.length(), '\n');
+      }
       result.add(new ReplacedComponent(sb.toString(), replaceFrom, replaceTo));
     }
     return result;
