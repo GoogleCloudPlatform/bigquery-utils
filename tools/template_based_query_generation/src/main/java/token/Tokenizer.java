@@ -146,7 +146,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<table " + placeHolder + ">");
   }
 
   /**
@@ -177,7 +176,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", bqToken);
     dialectExpressions.put("mySql", mySqlToken);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<table_schema " + placeHolder + ">");
   }
 
   /**
@@ -213,7 +211,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<partition_exp " + placeHolder + ">");
   }
 
   /**
@@ -228,7 +225,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", column);
     dialectExpressions.put("mySql", column);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<cluster_exp " + placeHolder + ">");
   }
 
   /**
@@ -242,7 +238,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<insert_exp " + placeHolder + ">");
   }
 
   /**
@@ -282,7 +277,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", bqToken);
     dialectExpressions.put("mySql", mySqlToken);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<values_exp " + placeHolder + ">");
   }
 
   /**
@@ -297,7 +291,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", ("" + bool).toUpperCase());
     dialectExpressions.put("mySql", ("" + bool).toUpperCase());
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<condition " + placeHolder + ">");
   }
 
   /**
@@ -311,7 +304,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", "*");
     dialectExpressions.put("mySql", "*");
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<select_exp " + placeHolder + ">");
   }
 
   /**
@@ -325,7 +317,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", user.getBigQueryTable() + "." + this.table.getName());
     dialectExpressions.put("mySql", this.table.getName());
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<from_item " + placeHolder + ">");
   }
 
   /**
@@ -340,7 +331,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", column);
     dialectExpressions.put("mySql", column);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<group_exp " + placeHolder + ">");
   }
 
   /**
@@ -355,7 +345,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", column);
     dialectExpressions.put("mySql", column);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<order_exp " + placeHolder + ">");
   }
 
   /**
@@ -370,7 +359,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", "" + count);
     dialectExpressions.put("mySql", "" + count);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<count " + placeHolder + ">");
   }
 
   /**
@@ -385,7 +373,6 @@ public class Tokenizer {
     dialectExpressions.put("bigQuery", "" + count);
     dialectExpressions.put("mySql", "" + count);
     token.setDialectExpressions(dialectExpressions);
-    token.setTokenPlaceHolder("<skip_rows " + placeHolder + ">");
   }
 
 }

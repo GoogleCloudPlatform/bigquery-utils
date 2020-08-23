@@ -6,7 +6,6 @@ import java.util.Map;
  * class that represents a token or expression
  */
 public class Token {
-  private String tokenPlaceHolder;
   private Map<String, String> dialectExpressions;
   private TokenInfo tokenInfo;
 
@@ -14,18 +13,9 @@ public class Token {
     this.tokenInfo = tokenInfo;
   }
 
-  public Token(String tokenPlaceHolder, Map<String, String> dialectExpressions, TokenInfo tokenInfo) {
-    this.tokenPlaceHolder = tokenPlaceHolder;
+  public Token(Map<String, String> dialectExpressions, TokenInfo tokenInfo) {
     this.dialectExpressions = dialectExpressions;
     this.tokenInfo = tokenInfo;
-  }
-
-  public void setTokenPlaceHolder(String tokenPlaceHolder) {
-    this.tokenPlaceHolder = tokenPlaceHolder;
-  }
-
-  public String getTokenPlaceHolder() {
-    return tokenPlaceHolder;
   }
 
   public void setDialectExpressions(Map<String, String> dialectExpressions) {
