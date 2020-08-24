@@ -104,7 +104,8 @@ public class QueryBreakdownTest {
     String[] args = new String[2];
     args[0] = "-i";
     args[1] = absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/singleDeletionReplacement.txt";
+        + "/InputTestFiles/bigqueryReferenceQueries.txt";
+    //args[2] = "-j";
     Main.main(args);
   }
 }

@@ -18,9 +18,9 @@ import org.json.simple.JSONObject;
  *                    inputted into the tool. It is therefore mandatory
  * -j, --json: this command specifies whether the program should output the results in a
  *                   json format. It is therefore optional
- * -l, --limit, INTEGER: this command specifies the path to an integer that the tool takes as a
- *                    limit for the number of errors to be explored (limit on depth), thereby
- *                    controlling the runtime. It is therefore optional
+ * -l, --limit, INTEGER: this command specifies the path to an integer that the tool takes
+ *                       as a limit for the number of seconds a tool can spend on a query, thereby
+ *                        controlling the overall runtime. It is therefore optional
  * -r, --replacement, INTEGER: this command specifies the number of replacements that can be
  *                             recommended by the ReplacementLogic class, thereby controlling
  *                             the runtime and performance. It is therefore optional
@@ -37,7 +37,7 @@ public class Main {
     // deals with logger error for apache calcite
     //BasicConfigurator.configure();
     String inputFile = null;
-    int errorLimit = 100; // default value for depth limit
+    int runtimeLimit = 100; // default value for runtime limit, measured in seconds
     int replacementLimit = 3; // default value for number of recommended replacements
     boolean jsonOutput = false;
     CommandLine cl = createCommand(args);
@@ -54,7 +54,7 @@ public class Main {
       jsonOutput = true;
     }
     if (cl.hasOption("l")) {
-      errorLimit = Integer.parseInt(cl.getOptionValue("l"));
+      runtimeLimit = Integer.parseInt(cl.getOptionValue("l"));
     }
     if (cl.hasOption("r")) {
       replacementLimit = Integer.parseInt(cl.getOptionValue("r"));
@@ -85,7 +85,7 @@ public class Main {
     List<Node> endResult = new ArrayList<>();
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-      List<Node> result = qb.run(queries.get(i), errorLimit, replacementLimit,
+      List<Node> result = qb.run(queries.get(i), runtimeLimit, replacementLimit,
           locationTrackers.get(i));
       endResult.addAll(result);
     }
@@ -164,8 +164,8 @@ public class Main {
                     + "json format. It is therefore optional").build());
     options.addOption(Option.builder("l").longOpt("limit").hasArg(true).argName("INTEGER")
         .desc("this command specifies the path to an integer that the tools takes "
-            + "as a limit for the number of errors to be explored, thereby controlling"
-            + "the runtime. It is therefore optional").build());
+            + "as a limit for the number of seconds a tool can spend on a query, thereby "
+            + "controlling the overall runtime. It is therefore optional").build());
     options.addOption(Option.builder("r").longOpt("replacement").hasArg(true)
         .argName("INTEGER").desc("this command specifies the number of replacements that can be"
             + "recommended by the ReplacementLogic class, thereby controlling"

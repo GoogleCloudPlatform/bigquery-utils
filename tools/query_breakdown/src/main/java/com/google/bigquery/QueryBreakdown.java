@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.Collection;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
 
 /**
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
@@ -43,12 +47,21 @@ public class QueryBreakdown {
    *
    * TODO: runtime limit support
    */
-  public List<Node> run(String originalQuery, int errorLimit, int replacementLimit,
+  public List<Node> run(String originalQuery, int runtimeLimit, int replacementLimit,
       LocationTracker locationTracker) {
 
     // uses the loop function to generate and traverse the tree of possible error recoveries
     // this will set the variable solution
-    loop(originalQuery, errorLimit, replacementLimit, root, 0, locationTracker);
+    try {
+      SimpleTimeLimiter limiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
+      limiter.runUninterruptiblyWithTimeout(
+          () -> loop(originalQuery, replacementLimit, root, 0, locationTracker),
+          runtimeLimit, TimeUnit.SECONDS);
+    }
+    catch (TimeoutException te) {
+      // abort function
+    }
+    //loop(originalQuery, replacementLimit, root, 0, locationTracker);
 
     List<Node> returnNodes = new ArrayList<>();
 
@@ -83,7 +96,7 @@ public class QueryBreakdown {
    *
    * TODO: implement errorLimit logic, deal with exception casting
    */
-  private void loop(String inputQuery, int errorLimit, int replacementLimit, Node parent, int depth,
+  private void loop(String inputQuery, int replacementLimit, Node parent, int depth,
       LocationTracker locationTracker) {
     // termination for branch
     if (depth > minimumUnparseableComp) {
@@ -123,8 +136,7 @@ public class QueryBreakdown {
             originalEnd.getX(), originalEnd.getY(), deletionNumber);
 
         // calls the loop again
-        loop(deletionQuery, errorLimit, replacementLimit,
-            deletionNode, depth + 1, deletedLt);
+        loop(deletionQuery, replacementLimit, deletionNode, depth + 1, deletedLt);
 
         /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
         ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, replacementLimit,
@@ -139,8 +151,7 @@ public class QueryBreakdown {
           Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
               originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
               r.getOriginal().length());
-          loop(r.getQuery(), errorLimit, replacementLimit,
-              replacementNode, depth + 1, replacedLt);
+          loop(r.getQuery(), replacementLimit, replacementNode, depth + 1, replacedLt);
         }
 
         /* termination to end the loop if the instance was not a full run through the query.

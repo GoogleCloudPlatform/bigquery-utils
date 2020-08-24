@@ -88,7 +88,7 @@ public class Node {
     errorPosition.put("startColumn", startColumn);
     errorPosition.put("endLine", endLine);
     errorPosition.put("endColumn", endColumn);
-    if (type.equals("DELETION")) {
+    if (type.equals(ErrorHandlingType.DELETION)) {
       JSONObject deletionJson = new JSONObject();
       deletionJson.put("error_position", errorPosition);
       deletionJson.put("error_type", "DELETION");
