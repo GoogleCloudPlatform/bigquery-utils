@@ -92,22 +92,21 @@ public class QueryBreakdown {
     try {
       parser.parseQuery(inputQuery);
     } catch (Exception e) {
-      System.out.println(inputQuery);
       /* generates new queries through deletion and replacement */
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
       /* !(pos.getLineNum() == pos.getEndLineNum() && pos.getColumnNum() == pos.getEndColumnNum()
-          && (inputQuery.length() - 1 ==
-              findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
-              || inputQuery.length() ==
-              findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
-          ))
-       */
-      // if statement checks for EOF
-      if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0) &&
-          !(e.getCause().toString().contains("Encountered") &&
-              e.getCause().toString().contains("\"<EOF>\"")) &&
-          !e.getCause().toString().contains("SqlValidatorException")) {
+         && (inputQuery.length() - 1 ==
+             findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
+             || inputQuery.length() ==
+             findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
+         ))
+      */
+      // if statement checks for EOF and validator
+      if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0)
+          && !(e.getCause().toString().contains("Encountered \"<EOF>\""))
+          && !(e.getCause().toString().contains("Encountered: <EOF>"))
+          && !e.getCause().toString().contains("SqlValidatorException")) {
         // gets the error location in the original query
         Pair originalStart =
             locationTracker.getOriginalPosition(pos.getLineNum(), pos.getColumnNum());

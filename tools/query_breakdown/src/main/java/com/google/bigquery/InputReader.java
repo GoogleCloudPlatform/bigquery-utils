@@ -51,9 +51,8 @@ public class InputReader {
 
       // break down query using semicolon
       if ((char) current == ';') {
-        queries.add(sb.toString());
+        queries.add(sb.substring(0, sb.length() - 1));
         sb = new StringBuilder();
-        locationTracker.add(localLine, line, column);
         locationTrackers.add(locationTracker);
         locationTracker = new LocationTracker();
         locationTracker.addLine();

@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
-import org.apache.log4j.BasicConfigurator;
 import org.json.simple.JSONArray;
 
 /**
