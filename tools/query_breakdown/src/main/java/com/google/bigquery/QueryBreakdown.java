@@ -44,8 +44,6 @@ public class QueryBreakdown {
    * This is the method that will run QueryBreakdown given an original query and output
    * it to the specified output file or commandline. The provided errorLimit will stop the
    * tool from running over a certain time.
-   *
-   * TODO: runtime limit support
    */
   public List<Node> run(String originalQuery, int runtimeLimit, int replacementLimit,
       LocationTracker locationTracker) {
@@ -59,10 +57,23 @@ public class QueryBreakdown {
           runtimeLimit, TimeUnit.SECONDS);
     }
     catch (TimeoutException te) {
-      // abort function
+      // abort logic
+      if (solution != null) {
+        return runTermination();
+      }
+      int numLines = locationTracker.getLocation().size();
+      Node deletionNode = new Node(null, 1, 1, numLines,
+          locationTracker.getLocation().get(numLines - 1).size(), originalQuery.length());
+      List<Node> returnNodes = new ArrayList<>();
+      returnNodes.add(deletionNode);
+      return returnNodes;
     }
-    //loop(originalQuery, replacementLimit, root, 0, locationTracker);
+    // correctly terminated
+    // loop(originalQuery, replacementLimit, root, 0, locationTracker);
+    return runTermination();
+  }
 
+  private List<Node> runTermination() {
     List<Node> returnNodes = new ArrayList<>();
 
     // case where entire query can be parsed
@@ -93,8 +104,6 @@ public class QueryBreakdown {
    * the parsing doesn't throw any errors, and in the case that it went through a smaller
    * number of unparseable components than the global minimum, it sets the solution as
    * the global solution and also alters the minimumUnparseableComp variable.
-   *
-   * TODO: implement errorLimit logic, deal with exception casting
    */
   private void loop(String inputQuery, int replacementLimit, Node parent, int depth,
       LocationTracker locationTracker) {
@@ -104,9 +113,9 @@ public class QueryBreakdown {
     }
     try {
       parser.parseQuery(inputQuery);
-    } catch (Exception e) {
+    } catch (SqlParseException e) {
       /* generates new queries through deletion and replacement */
-      SqlParserPos pos = ((SqlParseException) e).getPos();
+      SqlParserPos pos = e.getPos();
 
       // if statement checks for EOF and validator
       if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0)
@@ -131,6 +140,7 @@ public class QueryBreakdown {
         // counts number of characters deleted keeping in mind multi-line new line addition
         int deletionNumber = (pos.getLineNum() == pos.getEndLineNum()) ? inputQuery.length() -
             deletionQuery.length() : inputQuery.length() - deletionQuery.length() + 1;
+
         // creates a node for this deletion
         Node deletionNode = new Node(parent, originalStart.getX(), originalStart.getY(),
             originalEnd.getX(), originalEnd.getY(), deletionNumber);
@@ -141,7 +151,7 @@ public class QueryBreakdown {
         /* replacement: gets the new queries, creates nodes, and calls the loop for each of them */
         ArrayList<ReplacedComponent> replacementQueries = replacement(inputQuery, replacementLimit,
             pos.getLineNum(), pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum(),
-            ((SqlParseException) e).getExpectedTokenNames());
+            e.getExpectedTokenNames());
 
         // recursively loops through the new queries
         for (ReplacedComponent r: replacementQueries) {
@@ -159,7 +169,10 @@ public class QueryBreakdown {
         up the tree */
         return;
       }
+    } catch (Exception e) {
+      return;
     }
+
     // termination condition: if the parsing doesn't throw exceptions, then the leaf is reached
     if (depth < minimumUnparseableComp) {
       minimumUnparseableComp = depth;

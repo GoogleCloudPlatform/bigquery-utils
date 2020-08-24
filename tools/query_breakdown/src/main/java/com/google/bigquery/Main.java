@@ -7,6 +7,9 @@ import java.util.List;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import java.text.DecimalFormat;
 import org.json.simple.JSONObject;
@@ -34,8 +37,10 @@ import org.json.simple.JSONObject;
  */
 public class Main {
   public static void main(String[] args) {
-    // deals with logger error for apache calcite
-    //BasicConfigurator.configure();
+    // deals with logger errors from calcite parser
+    BasicConfigurator.configure();
+    Logger.getRootLogger().setLevel(Level.OFF);
+
     String inputFile = null;
     int runtimeLimit = 100; // default value for runtime limit, measured in seconds
     int replacementLimit = 3; // default value for number of recommended replacements
