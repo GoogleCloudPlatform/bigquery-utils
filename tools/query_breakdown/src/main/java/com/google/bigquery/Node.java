@@ -143,4 +143,6 @@ public class Node {
   public String getErrorHandlingType() {
     return type.toString();
   }
+
+  public int getUnparseableCount() { return unparseableCount; }
 }

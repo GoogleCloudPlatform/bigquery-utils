@@ -17,6 +17,8 @@ public class InputReader {
   private List<String> queries;
   private List<LocationTracker> locationTrackers;
 
+  private int docLength;
+
   /**
    * Constructor for the class. The constructor will take in a txt file name, use BufferedReader to
    * parse the input, and return all the queries split into a string array format.
@@ -29,6 +31,7 @@ public class InputReader {
     queries = new ArrayList<>();
     locationTrackers = new ArrayList<>();
     LocationTracker locationTracker = new LocationTracker();
+    docLength = 0;
 
     // local state for input reading
     int current = reader.read();
@@ -47,6 +50,7 @@ public class InputReader {
 
     // loop for input reading
     while (current != -1) {
+      docLength++;
       sb.append((char) current);
 
       // break down query using semicolon
@@ -158,5 +162,12 @@ public class InputReader {
    */
   public List<LocationTracker> getLocationTrackers() {
     return locationTrackers;
+  }
+
+  /**
+   * Getter method for the length of the input document
+   */
+  public int getDocLength() {
+    return docLength;
   }
 }

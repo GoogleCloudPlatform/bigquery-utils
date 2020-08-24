@@ -95,13 +95,6 @@ public class QueryBreakdown {
       /* generates new queries through deletion and replacement */
       SqlParserPos pos = ((SqlParseException) e).getPos();
 
-      /* !(pos.getLineNum() == pos.getEndLineNum() && pos.getColumnNum() == pos.getEndColumnNum()
-         && (inputQuery.length() - 1 ==
-             findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
-             || inputQuery.length() ==
-             findNthIndexOf(inputQuery, '\n', pos.getLineNum() - 1) + pos.getColumnNum()
-         ))
-      */
       // if statement checks for EOF and validator
       if ((pos.getLineNum() != 0 && pos.getColumnNum() != 0)
           && !(e.getCause().toString().contains("Encountered \"<EOF>\""))
@@ -122,9 +115,12 @@ public class QueryBreakdown {
         LocationTracker deletedLt = locationTracker.delete
             (pos.getLineNum(), pos.getColumnNum(), pos.getEndLineNum(), pos.getEndColumnNum());
 
+        // counts number of characters deleted keeping in mind multi-line new line addition
+        int deletionNumber = (pos.getLineNum() == pos.getEndLineNum()) ? inputQuery.length() -
+            deletionQuery.length() : inputQuery.length() - deletionQuery.length() + 1;
         // creates a node for this deletion
         Node deletionNode = new Node(parent, originalStart.getX(), originalStart.getY(),
-            originalEnd.getX(), originalEnd.getY(), depth + 1);
+            originalEnd.getX(), originalEnd.getY(), deletionNumber);
 
         // calls the loop again
         loop(deletionQuery, errorLimit, replacementLimit,
@@ -142,7 +138,7 @@ public class QueryBreakdown {
               pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
           Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
               originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
-              depth + 1);
+              r.getOriginal().length());
           loop(r.getQuery(), errorLimit, replacementLimit,
               replacementNode, depth + 1, replacedLt);
         }

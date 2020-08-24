@@ -8,6 +8,8 @@ import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import org.json.simple.JSONArray;
+import java.text.DecimalFormat;
+import org.json.simple.JSONObject;
 
 /**
  * This file is the main file for the command line tool.
@@ -88,6 +90,8 @@ public class Main {
       endResult.addAll(result);
     }
 
+    int totalUnparseable = 0;
+
     // outputs the results
     if (jsonOutput) {
       if (endResult.isEmpty()) {
@@ -97,7 +101,16 @@ public class Main {
       JSONArray jsonArray = new JSONArray();
       for (Node node: endResult) {
         jsonArray.add(node.toJSON());
+        totalUnparseable += node.getUnparseableCount();
       }
+
+      // add performance metric
+      DecimalFormat df = new DecimalFormat("##.#");
+      double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
+      JSONObject performance = new JSONObject();
+      performance.put("performance", df.format(x));
+      jsonArray.add(performance);
+
       System.out.println(jsonArray);
     }
     else {
@@ -107,7 +120,13 @@ public class Main {
       }
       for (Node node: endResult) {
         System.out.println(node.toString());
+        totalUnparseable += node.getUnparseableCount();
       }
+
+      // print out performance metric
+      DecimalFormat df = new DecimalFormat("##.#");
+      double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
+      System.out.println("Percentage of Parseable Components: " + df.format(x) + "%");
     }
   }
 
