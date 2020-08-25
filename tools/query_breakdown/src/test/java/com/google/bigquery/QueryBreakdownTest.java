@@ -6,39 +6,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.List;
 import org.junit.Test;
 
 public class QueryBreakdownTest {
-  @Test
-  public void findNthIndexOfDNE() {
-    String test = "abcde";
-    assertEquals(-1, QueryBreakdown.findNthIndexOf(test, 'f', 1));
-  }
 
-  @Test
-  public void findNthIndexOfFirst() {
-    String test = "abcde";
-    assertEquals(2, QueryBreakdown.findNthIndexOf(test, 'c', 1));
-  }
-
-  @Test
-  public void findNthIndexOfMultiple() {
-    String test = "abcddde";
-    assertEquals(5, QueryBreakdown.findNthIndexOf(test, 'd', 3));
-  }
-
-  @Test
-  public void findNthIndexOfMultipleDNE() {
-    String test = "abcddde";
-    assertEquals(-1, QueryBreakdown.findNthIndexOf(test, 'd', 4));
-  }
-
-  @Test
-  public void findNthIndexOfMultipleNewLines() {
-    String test = "abc\nd\ne";
-    assertEquals(3, QueryBreakdown.findNthIndexOf(test, '\n', 1));
-    assertEquals(5, QueryBreakdown.findNthIndexOf(test, '\n', 2));
-    assertEquals(-1, QueryBreakdown.findNthIndexOf(test, '\n', 3));
+  private void printNodes(List<Node> list) {
+    for (Node n: list) {
+      System.out.println(n.toString());
+    }
   }
 
   @Test
@@ -47,11 +23,11 @@ public class QueryBreakdownTest {
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     System.setOut(new PrintStream(outContent));
     QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-    InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+    InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/simpleDeletion.txt");
-    qb.run(query, false, 0, ir.getLocationTracker());
+    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    printNodes(result);
     assertEquals("Unparseable portion: Start Line 1, End Line 1, "
         + "Start Column 1, End Column 4, DELETION\n", outContent.toString());
   }
@@ -61,11 +37,15 @@ public class QueryBreakdownTest {
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     System.setOut(new PrintStream(outContent));
     QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-    InputReader ir = new InputReader();
+    QueryBreakdown qb2 = new QueryBreakdown(new CalciteParser());
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+    InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleDeletion.txt");
-    qb.run(query, false, 0, ir.getLocationTracker());
+    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result2 =
+        qb2.run(ir.getQueries().get(1), 0, ir.getLocationTrackers().get(1));
+    printNodes(result);
+    printNodes(result2);
     assertEquals(
         "Unparseable portion: Start Line 1, End Line 1, "
             + "Start Column 1, End Column 4, DELETION\n"
@@ -81,11 +61,15 @@ public class QueryBreakdownTest {
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     System.setOut(new PrintStream(outContent));
     QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-    InputReader ir = new InputReader();
+    QueryBreakdown qb2 = new QueryBreakdown(new CalciteParser());
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+    InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/singleDeletionReplacement.txt");
-    qb.run(query, false, 0, ir.getLocationTracker());
+    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result2 =
+        qb2.run(ir.getQueries().get(1), 0, ir.getLocationTrackers().get(1));
+    printNodes(result);
+    printNodes(result2);
     assertEquals(
         "Unparseable portion: Start Line 1, End Line 1, "
             + "Start Column 1, End Column 4, DELETION\n"
@@ -95,4 +79,27 @@ public class QueryBreakdownTest {
             + "Start Column 28, End Column 31, REPLACEMENT: replaced BLAH with BY\n",
         outContent.toString());
   }
+
+  @Test
+  public void QueryBreakdownRunSingleton() throws IOException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    String absPath = new File("").getAbsolutePath();
+    InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/singleton.txt");
+    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    assertEquals(0, result.size());
+  }
+
+  /**
+  @Test
+  public void QueryBreakdownRunTestA() throws IOException {
+    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
+    InputReader ir = new InputReader();
+    String absPath = new File("").getAbsolutePath();
+    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/bigqueryReferenceQueries.txt");
+    qb.run(query, false, 0, ir.getLocationTracker());
+  } **/
 }
