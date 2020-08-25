@@ -2,6 +2,7 @@ package com.google.bigquery;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 
 /**
  * This class implements all the replacement logic.
@@ -36,7 +37,8 @@ public class ReplacementLogic {
     HashSet<Integer> seen = new HashSet<>();
     // randomly populate result until full
     while (result.size() < n && seen.size() < options.size()) {
-      int random = randomNumber(options.size() - 1);
+      Random randomGenerator = new Random();
+      int random = randomGenerator.nextInt(n);
       if (seen.contains(random)) {
         continue;
       }
@@ -50,10 +52,5 @@ public class ReplacementLogic {
       }
     }
     return result;
-  }
-
-  // helper function that returns a random integer between 0 - n
-  private static int randomNumber(int n) {
-    return (int) (Math.random() * (n + 1));
   }
 }
