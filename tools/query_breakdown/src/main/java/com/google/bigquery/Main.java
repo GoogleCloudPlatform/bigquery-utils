@@ -133,6 +133,7 @@ public class Main {
       double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
       System.out.println("Percentage of Parseable Components: " + df.format(x) + "%");
     }
+    exit(0);
   }
 
   /**
