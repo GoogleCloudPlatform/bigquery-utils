@@ -66,6 +66,8 @@ export function activate(context: vscode.ExtensionContext) {
                 'The entire query can be parsed without error'
               );
             } else {
+              console.log("iit hit hhere!");
+              console.log(json);
               // highlights and creates hovers for queries
               decorate(currentEditor);
             }

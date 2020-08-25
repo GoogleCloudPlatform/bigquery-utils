@@ -91,7 +91,7 @@ public class Main {
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
       List<Node> result = qb.run(queries.get(i), runtimeLimit, replacementLimit,
-          locationTrackers.get(i));
+          locationTrackers.get(i), inputFile);
       endResult.addAll(result);
     }
 

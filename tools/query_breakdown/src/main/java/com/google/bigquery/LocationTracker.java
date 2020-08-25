@@ -41,6 +41,15 @@ public class LocationTracker {
   }
 
   /**
+   * This method interacts with the InputReader and adds a pair to the column - 1th element of the
+   * line - 1th list in the location field. The pair represents the position (x, y) in the original
+   * query. x and y are 1-indexed, so we adjust accordingly.
+   */
+  public void add(int line, int column, int x, int y) {
+    location.get(line - 1).add(column - 1, new Pair(x, y));
+  }
+
+  /**
    * This method adds an empty line to the location field
    */
   public void addLine() {
@@ -135,8 +144,10 @@ public class LocationTracker {
         end - startColumn - replaceTo.length();
     // if we replace the token with a longer token and need to add to the locationTracker
     if (longer > 0) {
-      for (int i = end; i < end + longer; i++) {
-        locationTracker.add(startLine, -1, i);
+      for (int i = end + 1; i <= end + longer; i++) {
+        /* adding letters that are not in the original document, but still need to have them
+           appear in the original document in the frontend as well as cli*/
+        locationTracker.add(startLine, i, startLine, i);
       }
     }
     // if we replace the token with a shorter token and need to subtract from the locationTracker

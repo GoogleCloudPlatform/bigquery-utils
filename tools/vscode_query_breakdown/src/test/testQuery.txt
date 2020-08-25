@@ -1,2 +1,44 @@
-BLAH SELECT a FROM A;
-BLAH SELECT b FROM B GROUP BLAH b
+WITH Roster AS
+ (SELECT 'Adams' as LastName, 50 as SchoolID UNION ALL
+  SELECT 'Buchanan', 52 UNION ALL
+  SELECT 'Coolidge', 52 UNION ALL
+  SELECT 'Davis', 51 UNION ALL
+  SELECT 'Eisenhower', 77)
+SELECT * FROM Roster;
+
+WITH PlayerStats AS
+ (SELECT 'Adams' as LastName, 51 as OpponentID, 3 as PointsScored UNION ALL
+  SELECT 'Buchanan', 77, 0 UNION ALL
+  SELECT 'Coolidge', 77, 1 UNION ALL
+  SELECT 'Adams', 52, 4 UNION ALL
+  SELECT 'Buchanan', 50, 13)
+SELECT * FROM PlayerStats;
+
+WITH TeamMascot AS
+ (SELECT 50 as SchoolID, 'Jaguars' as Mascot UNION ALL
+  SELECT 51, 'Knights' UNION ALL
+  SELECT 52, 'Lakers' UNION ALL
+  SELECT 53, 'Mustangs')
+SELECT * FROM TeamMascot;
+
+SELECT * FROM (SELECT "apple" AS fruit, "carrot" AS vegetable);
+
+WITH groceries AS
+  (SELECT "milk" AS dairy,
+   "eggs" AS protein,
+   "bread" AS grain)
+SELECT g.*
+FROM groceries AS g;
+
+WITH locations AS
+  (SELECT STRUCT("Seattle" AS city, "Washington" AS state) AS location
+  UNION ALL
+  SELECT STRUCT("Phoenix" AS city, "Arizona" AS state) AS location)
+SELECT l.location.*
+FROM locations l;
+
+WITH locations AS
+  (SELECT ARRAY<STRUCT<city STRING, state STRING>>[("Seattle", "Washington"),
+    ("Phoenix", "Arizona")] AS location)
+SELECT l.LOCATION[offset(0)].*
+FROM locations l;
