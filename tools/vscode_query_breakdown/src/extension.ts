@@ -10,11 +10,11 @@ import {QueryBreakdownRunner} from './query_breakdown_runner';
 
 // colors for the highlight
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#21bf2b',
+  backgroundColor: '#34A853',
 });
 
 const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#8f1713',
+  backgroundColor: '#4285F4',
 });
 
 // variable to keep track of results of backend
