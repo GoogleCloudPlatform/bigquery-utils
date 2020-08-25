@@ -34,7 +34,6 @@ export class QueryBreakdownRunner {
       if (config.replacementLimit) {
         command = command + ' -r ' + config.replacementLimit;
       }
-      console.log(command);
       // executes the jar file
       const process = exec(
         command

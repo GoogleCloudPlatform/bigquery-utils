@@ -26,6 +26,21 @@
         "command": "vscode-query-breakdown.run",
         "title": "Query_Breakdown"
       }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "vscode_query_breakdown_view",
+          "name": "Query Breakdown",
+          "icon": "resource/dep.svg"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "vscode_query_breakdown_view",
+        "contents": "[Find Unparseable Components](command:vscode-query-breakdown.run)"
+      }
     ]
   },
   "scripts": {
