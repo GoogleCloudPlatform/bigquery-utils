@@ -34,14 +34,12 @@ WITH jobChangeEvent AS (
       '$.jobChange.job.jobStatus.errorResult.message') AS jobStatusErrorResultMessage,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStatus.errorResult.details') AS jobStatusErrorResultDetails,
-    REGEXP_EXTRACT_ALL(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStatus.errors'),r'"message":\"(.*?)\"}'
-    ) AS jobStatusEncounteredErrorMessages,
-    REGEXP_EXTRACT_ALL(
-      JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.jobChange.job.jobStatus.errors'),r'"code":\"(.*?)\"}'
-    ) AS jobStatusEncounteredErrorCodes,
+    JSON_EXTRACT_SCALAR(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.errors'), "["),"]"), '$.message') AS jobStatusEncounteredErrorMessages,
+    JSON_EXTRACT_SCALAR(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.errors'), "["),"]"), '$.code') AS jobStatusEncounteredErrorCodes,
+    JSON_EXTRACT_SCALAR(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
+      '$.jobChange.job.jobStats.errors'), "["),"]"), '$.details') AS jobStatusEncounteredErrorDetails,
     /*
      * JobStats: Job statistics that may change after job starts.
      * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstats
@@ -460,7 +458,8 @@ SELECT
         jobStatusErrorResultDetails AS details
       ) AS errorResult,
       jobStatusEncounteredErrorMessages AS encounteredErrorMessages,
-      jobStatusEncounteredErrorCodes AS encounteredErrorCodes
+      jobStatusEncounteredErrorCodes AS encounteredErrorCodes,
+      jobStatusEncounteredErrorDetails AS encounteredErrorDetails,
     ) AS jobStatus,
     /*
      * JobStats STRUCT
