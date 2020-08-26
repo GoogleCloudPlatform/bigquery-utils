@@ -2,12 +2,7 @@ package com.google.cloud.bigquery.utils.queryfixer;
 
 import com.google.cloud.bigquery.BigQueryError;
 import com.google.cloud.bigquery.BigQueryException;
-import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySqlError;
-import com.google.cloud.bigquery.utils.queryfixer.errors.FunctionNotFoundError;
-import com.google.cloud.bigquery.utils.queryfixer.errors.SqlErrorFactory;
-import com.google.cloud.bigquery.utils.queryfixer.errors.TableNotFoundError;
-import com.google.cloud.bigquery.utils.queryfixer.errors.UnrecognizedColumnError;
-
+import com.google.cloud.bigquery.utils.queryfixer.errors.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +41,36 @@ public class SqlErrorFactoryTest {
     BigQueryException exception = buildException(message);
     BigQuerySqlError sqlError = factory.getError(exception);
     assertTrue(sqlError instanceof FunctionNotFoundError);
+  }
+
+  @Test
+  public void getExpectKeywordButGotOthersError() {
+    String message = "Syntax error: Expected keyword BY but got identifier \"bar\" at [1:34]";
+    BigQueryException exception = buildException(message);
+    BigQuerySqlError sqlError = factory.getError(exception);
+    assertTrue(sqlError instanceof ExpectKeywordButGotOthersError);
+    ExpectKeywordButGotOthersError error = (ExpectKeywordButGotOthersError) sqlError;
+    assertEquals("BY", error.getExpectedKeyword());
+  }
+
+  @Test
+  public void getIllegalInputCharacterError() {
+    String message = "Syntax error: Illegal input character \"$\" at [1:78]";
+    BigQueryException exception = buildException(message);
+    BigQuerySqlError sqlError = factory.getError(exception);
+    assertTrue(sqlError instanceof IllegalInputCharacterError);
+    IllegalInputCharacterError error = (IllegalInputCharacterError) sqlError;
+    assertEquals("$", error.getIllegalCharacter());
+  }
+
+  @Test
+  public void getUnexpectedKeywordError() {
+    String message = "Syntax error: Unexpected keyword HASH at [1:8]";
+    BigQueryException exception = buildException(message);
+    BigQuerySqlError sqlError = factory.getError(exception);
+    assertTrue(sqlError instanceof UnexpectedKeywordError);
+    UnexpectedKeywordError error = (UnexpectedKeywordError) sqlError;
+    assertEquals("HASH", error.getKeyword());
   }
 
   @Test

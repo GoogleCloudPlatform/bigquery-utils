@@ -1,0 +1,5 @@
+WITH locations AS
+  (SELECT ARRAY<STRUCT<city STRING, state STRING>>[("Seattle", "Washington"),
+    ("Phoenix", "Arizona")] AS location)
+SELECT l.LOCATION[offset(0)].*
+FROM locations l;
