@@ -111,6 +111,8 @@ public class TableNotFoundFixer implements IFixer {
     String regex;
     // If the project ID is the default one, then the actual table may not include project ID,
     // which looks like "dataset.table".
+    // TODO: default dataset may be supported if we allow users to specify it in the query fixer's
+    // input flags.
     if (fullTableId.getProject().equals(bigQueryService.getBigQueryOptions().getProjectId())) {
       regex =
           String.format(
