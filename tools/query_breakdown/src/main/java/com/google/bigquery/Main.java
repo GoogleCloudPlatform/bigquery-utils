@@ -9,7 +9,6 @@ import java.util.List;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
@@ -40,7 +39,7 @@ import org.json.simple.JSONObject;
 public class Main {
   public static void main(String[] args) {
     // deals with logger errors from calcite parser
-    BasicConfigurator.configure();
+    //BasicConfigurator.configure();
     Logger.getRootLogger().setLevel(Level.OFF);
 
     String inputFile = null;
@@ -89,7 +88,7 @@ public class Main {
     FileWriter writer = null;
     try {
       String absPath = new File("").getAbsolutePath();
-      File outputFile = new File(absPath + "/output/output.txt");
+      File outputFile = new File(absPath + "/output.txt");
       outputFile.createNewFile();
       writer = new FileWriter(outputFile);
     } catch (IOException e) {
@@ -169,7 +168,7 @@ public class Main {
       double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
       System.out.println("Percentage of Parseable Components: " + df.format(x) + "%");
     }
-    //exit(0);
+    exit(0);
   }
 
   /**
