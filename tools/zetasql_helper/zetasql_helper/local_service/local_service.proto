@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package bigquery.utils.zetasql_helper.local_service;
 
+import "zetasql_helper/token/parse_token.proto";
 
 option java_package = "com.google.bigquery.utils.zetasqlhelper";
 option java_outer_classname = "LocalService";
@@ -9,6 +10,9 @@ option java_outer_classname = "LocalService";
 service ZetaSqlHelperLocalService {
 
   rpc Hello(HelloRequest) returns (HelloResponse) {
+  }
+
+  rpc Tokenize(TokenizeRequest) returns (TokenizeResponse) {
   }
 
 }
@@ -19,4 +23,12 @@ message HelloRequest {
 
 message HelloResponse {
   optional string greeting = 1;
+}
+
+message TokenizeRequest {
+  optional string query = 1;
+}
+
+message TokenizeResponse {
+  repeated ParseTokenProto parse_token = 1;
 }

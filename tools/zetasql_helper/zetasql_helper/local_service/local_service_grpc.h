@@ -3,6 +3,7 @@
 
 #include "zetasql_helper/local_service/local_service.grpc.pb.h"
 #include "zetasql_helper/local_service/local_service.pb.h"
+#include "zetasql_helper/local_service/local_service.h"
 
 namespace bigquery::utils::zetasql_helper::local_service {
 
@@ -13,6 +14,11 @@ class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Serv
   // A dummy method right now. It will be converted to a health check in future.
   grpc::Status Hello(grpc::ServerContext *context, const HelloRequest *request, HelloResponse *response) override;
 
+  grpc::Status Tokenize(grpc::ServerContext *context, const TokenizeRequest *req,
+                        TokenizeResponse *resp) override;
+
+ private:
+  ZetaSqlHelperLocalServiceImpl service_;
 };
 
 }  // bigquery::utils::zetasql_helper::local_service
