@@ -1,5 +1,6 @@
 package com.google.cloud.bigquery.utils.queryfixer.util;
 
+import com.google.cloud.bigquery.utils.queryfixer.entity.SubstringView;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -53,5 +54,26 @@ public class PatternMatcher {
     }
 
     return contents;
+  }
+
+  /**
+   * Find all the substrings that matches a regex in a string.
+   *
+   * @param source string to be matched.
+   * @param regex regex to match substring
+   * @return A list of {@link SubstringView}
+   */
+  public static List<SubstringView> findAllSubstrings(
+      @NonNull String source, @NonNull String regex) {
+
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(source);
+
+    List<SubstringView> substringViews = new ArrayList<>();
+    while (matcher.find()) {
+      substringViews.add(SubstringView.of(source, matcher.start(), matcher.end()));
+    }
+
+    return substringViews;
   }
 }

@@ -23,7 +23,8 @@ public class FixerFactory {
   public IFixer getFixer(String query, BigQuerySqlError error) {
 
     if (error instanceof TableNotFoundError) {
-      return new TableNotFoundFixer(query, (TableNotFoundError) error, bigQueryService);
+      return new TableNotFoundFixer(
+          query, (TableNotFoundError) error, bigQueryService, queryTokenProcessor);
     }
 
     if (error instanceof UnrecognizedColumnError) {
