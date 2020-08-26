@@ -2,6 +2,8 @@ package com.google.bigquery;
 
 import static java.lang.System.exit;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.cli.*;
@@ -84,6 +86,18 @@ public class Main {
       exit(1);
     }
 
+    FileWriter writer = null;
+    try {
+      String absPath = new File("").getAbsolutePath();
+      File outputFile = new File(absPath + "/output/output.txt");
+      outputFile.createNewFile();
+      writer = new FileWriter(outputFile);
+    } catch (IOException e) {
+      System.out.println("there was an I/O error while creating an output file");
+      e.printStackTrace();
+      exit(1);
+    }
+
     // runs the tool on multiple queries
     List<String> queries = ir.getQueries();
     List<LocationTracker> locationTrackers = ir.getLocationTrackers();
@@ -91,8 +105,30 @@ public class Main {
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
       List<Node> result = qb.run(queries.get(i), runtimeLimit, replacementLimit,
-          locationTrackers.get(i), inputFile);
+          locationTrackers.get(i));
       endResult.addAll(result);
+      try {
+        writer.write("Original Query: " + queries.get(i) + "\n");
+        if (result.isEmpty()) {
+          writer.write("Resulting Query: " + "the entire query can be parsed without error"
+              + "\n\n");
+        }
+        else {
+          writer.write("Resulting Query: " + qb.getFinalString() + "\n\n");
+        }
+      } catch (IOException e) {
+        System.out.println("there was an I/O error while writing to an output file");
+        e.printStackTrace();
+        exit(1);
+      }
+    }
+
+    try {
+      writer.close();
+    } catch (IOException e) {
+      System.out.println("there was an I/O error while closing the writer");
+      e.printStackTrace();
+      exit(1);
     }
 
     int totalUnparseable = 0;
@@ -133,7 +169,7 @@ public class Main {
       double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
       System.out.println("Percentage of Parseable Components: " + df.format(x) + "%");
     }
-    exit(0);
+    //exit(0);
   }
 
   /**

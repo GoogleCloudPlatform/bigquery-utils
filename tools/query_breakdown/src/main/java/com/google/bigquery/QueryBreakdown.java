@@ -29,6 +29,8 @@ public class QueryBreakdown {
   private final Node root;
   private final Parser parser;
 
+  private String finalString;
+
   /**
    * Constructor for the QueryBreakdown object. We model this class as an object rather than
    * through static methods because the user should be able to call QueryBreakdown multiple
@@ -66,10 +68,10 @@ public class QueryBreakdown {
           locationTracker.getLocation().get(numLines - 1).size(), originalQuery.length());
       List<Node> returnNodes = new ArrayList<>();
       returnNodes.add(deletionNode);
+      finalString = "";
       return returnNodes;
     }
     // correctly terminated
-    // loop(originalQuery, replacementLimit, root, 0, locationTracker);
     return runTermination();
   }
 
@@ -170,6 +172,9 @@ public class QueryBreakdown {
         return;
       }
     } catch (Exception e) {
+      /* this is boiler plate code when a different exception is thrown from using
+         a different parser
+       */
       return;
     }
 
@@ -177,6 +182,7 @@ public class QueryBreakdown {
     if (depth < minimumUnparseableComp) {
       minimumUnparseableComp = depth;
       solution = parent;
+      finalString = inputQuery;
     }
   }
 
@@ -288,5 +294,12 @@ public class QueryBreakdown {
       n -= 1;
     }
     return position;
+  }
+
+  /**
+   * Getter method for finalString variable
+   */
+  public String getFinalString() {
+    return finalString;
   }
 }
