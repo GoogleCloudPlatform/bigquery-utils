@@ -2,6 +2,7 @@ package com.google.cloud.bigquery.utils.queryfixer;
 
 import com.google.cloud.bigquery.BigQueryError;
 import com.google.cloud.bigquery.BigQueryException;
+import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixOption;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
 import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySqlError;
@@ -47,11 +48,46 @@ public class FixerTest {
     fixerFactory = new FixerFactory(tokenProcessor, bigQueryServiceMock);
   }
 
+  // TODO: More test cases are need to test different table name, like `a.b`.c, `a.b.c`, `a`.`b`.c,
+  // and a.b.c.
   @Test
   public void fixTableNotFound() {
-    setupBigQueryService_mockListTableNames();
+    setupBigQueryService_mockListTableNamesAndProjectId(
+        ImmutableList.of(TABLE_2018, TABLE_2019, TABLE_2020), "");
+
     String query =
         String.format("Select max(foo) from %s group by bar limit 10", fullMockTable(TABLE_2017));
+    String message =
+        String.format(
+            "Not found: Table bigquery-public-data:mock.%s was not found in location US",
+            TABLE_2017);
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof TableNotFoundFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(2, result.getOptions().size());
+    List<String> tables =
+        result.getOptions().stream().map(FixOption::getAction).collect(Collectors.toList());
+
+    assertThat(
+        tables,
+        contains(
+            convertToAction(fullMockTable(TABLE_2018)),
+            convertToAction(fullMockTable(TABLE_2019))));
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(22, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void fixTableNotFound_defaultProjectId() {
+    setupBigQueryService_mockListTableNamesAndProjectId(
+        ImmutableList.of(TABLE_2018, TABLE_2019, TABLE_2020), "bigquery-public-data");
+
+    String query =
+        String.format("Select max(foo) from %s group by bar limit 10", "`mock`." + TABLE_2017);
     String message =
         String.format(
             "Not found: Table bigquery-public-data:mock.%s was not found in location US",
@@ -126,9 +162,13 @@ public class FixerTest {
     return errorFactory.getError(exception);
   }
 
-  private void setupBigQueryService_mockListTableNames() {
+  private void setupBigQueryService_mockListTableNamesAndProjectId(
+      List<String> tables, String projectId) {
     when(bigQueryServiceMock.listTableNames(any(String.class), any(String.class)))
-        .thenReturn(ImmutableList.of(TABLE_2018, TABLE_2019, TABLE_2020));
+        .thenReturn(tables);
+
+    BigQueryOptions options = BigQueryOptions.newBuilder().setProjectId(projectId).build();
+    when(bigQueryServiceMock.getBigQueryOptions()).thenReturn(options);
   }
 
   private String convertToAction(String identifier) {

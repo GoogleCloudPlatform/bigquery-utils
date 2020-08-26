@@ -2,11 +2,10 @@ package com.google.cloud.bigquery.utils.queryfixer.fixer;
 
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.utils.queryfixer.QueryPositionConverter;
-import com.google.cloud.bigquery.utils.queryfixer.entity.FixOption;
-import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
-import com.google.cloud.bigquery.utils.queryfixer.entity.Position;
+import com.google.cloud.bigquery.utils.queryfixer.entity.*;
 import com.google.cloud.bigquery.utils.queryfixer.errors.TableNotFoundError;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
+import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
 import com.google.cloud.bigquery.utils.queryfixer.util.PatternMatcher;
 import com.google.cloud.bigquery.utils.queryfixer.util.StringUtil;
 
@@ -29,28 +28,35 @@ public class TableNotFoundFixer implements IFixer {
   private final String query;
   private final TableNotFoundError err;
   private final BigQueryService bigQueryService;
+  private final QueryTokenProcessor queryTokenProcessor;
   private final QueryPositionConverter queryPositionConverter;
 
-  public TableNotFoundFixer(String query, TableNotFoundError err, BigQueryService bigQueryService) {
+  public TableNotFoundFixer(
+      String query,
+      TableNotFoundError err,
+      BigQueryService bigQueryService,
+      QueryTokenProcessor queryTokenProcessor) {
     this.query = query;
     this.err = err;
     this.bigQueryService = bigQueryService;
+    this.queryTokenProcessor = queryTokenProcessor;
     this.queryPositionConverter = new QueryPositionConverter(query);
   }
 
   @Override
   public FixResult fix() {
-    TableId fullTableId = constructTableId(err.getTableName());
+    TableId incorrectTableId = constructTableId(err.getTableName());
     List<String> tableNames =
-        bigQueryService.listTableNames(fullTableId.getProject(), fullTableId.getDataset());
+        bigQueryService.listTableNames(
+            incorrectTableId.getProject(), incorrectTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
-        StringUtil.findSimilarWords(tableNames, fullTableId.getTable());
+        StringUtil.findSimilarWords(tableNames, incorrectTableId.getTable());
 
     // This is an arbitrary standard. It requires the candidate table should share at least 50%
     // similarity as the incorrect table typo.
     // TODO: this could be user configurable in future.
-    int editDistanceThreshold = (fullTableId.getTable().length() + 1) / 2;
+    int editDistanceThreshold = (incorrectTableId.getTable().length() + 1) / 2;
 
     if (similarTables.getStrings().isEmpty()
         || similarTables.getDistance() > editDistanceThreshold) {
@@ -58,10 +64,11 @@ public class TableNotFoundFixer implements IFixer {
     }
 
     // This method only finds the first occurrence of the incorrect table. It is possible that this
-    // table exists in multiple positions of this query. What is worse, it is possible that the
-    // table name is also part of a literal, then this auto fixing may have problem. The ultimate
-    // solution for this issue is to use Parser to find the correct position of this table.
-    int tableStartIndex = findTheIndexOfIncorrectTable();
+    // table exists in multiple positions of this query.
+    SubstringView incorrectTableView = findSubstringViewOfIncorrectTable(incorrectTableId);
+    if (incorrectTableView == null) {
+      return FixResult.failure(query, err, "Cannot locate the incorrect table position.");
+    }
 
     List<FixOption> fixOptions =
         similarTables.getStrings().stream()
@@ -69,14 +76,14 @@ public class TableNotFoundFixer implements IFixer {
                 table -> {
                   String fullTableName =
                       constructFullTableName(
-                          fullTableId.getProject(), fullTableId.getDataset(), table);
-                  String fixedQuery = replaceTable(fullTableName, tableStartIndex);
+                          incorrectTableId.getProject(), incorrectTableId.getDataset(), table);
+                  String fixedQuery = replaceTable(fullTableName, incorrectTableView);
                   return FixOption.of(String.format("Change to `%s`", fullTableName), fixedQuery);
                 })
             .collect(Collectors.toList());
 
     String approach = String.format("Replace the table name `%s`", err.getTableName());
-    return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/true);
+    return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/ true);
   }
 
   private TableId constructTableId(String fullTableName) {
@@ -100,24 +107,45 @@ public class TableNotFoundFixer implements IFixer {
     return String.format("%s.%s.%s", projectId, datasetId, tableName);
   }
 
-  private int findTheIndexOfIncorrectTable() {
-    // The table in the error message is presented in the legacySQL mode, but this fixer is used to
-    // fix the
-    // standardSQL. Thus, the table name needs to be converted to the one consistent with
-    // standardSQL.
-    // The change is from project:dataset.table to project.dataset.table.
-    String tableName = err.getTableName().replace(':', '.');
-    int index = query.indexOf(tableName);
+  private SubstringView findSubstringViewOfIncorrectTable(TableId fullTableId) {
+    String regex;
+    // If the project ID is the default one, then the actual table may not include project ID,
+    // which looks like "dataset.table".
+    // TODO: default dataset may be supported if we allow users to specify it in the query fixer's
+    // input flags.
+    if (fullTableId.getProject().equals(bigQueryService.getBigQueryOptions().getProjectId())) {
+      regex =
+          String.format(
+              "(`?%s`?\\.)?`?%s`?\\.`?%s`?",
+              fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
+    } else {
+      regex =
+          String.format(
+              "`?%s`?\\.`?%s`?\\.`?%s`?",
+              fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
+    }
 
-    // Since the TableNotFound error has no position info, this method will convert the index to the
-    // position and assign to the `err`.
-    Position position = queryPositionConverter.indexToPos(index);
-    this.err.setErrorPosition(position);
-    return index;
+    List<SubstringView> substringViews = PatternMatcher.findAllSubstrings(query, regex);
+
+    // Iterate the substring and check if this substring is an identifier. If yes, this substring
+    // should be the incorrect table we are looking for.
+    for (SubstringView view : substringViews) {
+      Position position = queryPositionConverter.indexToPos(view.getStart());
+      IToken token = queryTokenProcessor.getTokenAt(query, position.getRow(), position.getColumn());
+
+      if (token.getKind() != IToken.Kind.IDENTIFIER) {
+        continue;
+      }
+
+      this.err.setErrorPosition(position);
+      return view;
+    }
+
+    return null;
   }
 
-  private String replaceTable(String newTable, int startIndex) {
+  private String replaceTable(String newTable, SubstringView replacedTable) {
     return StringUtil.replaceStringBetweenIndex(
-        query, startIndex, startIndex + err.getTableName().length(), newTable);
+        query, replacedTable.getStart(), replacedTable.getEnd(), newTable);
   }
 }
