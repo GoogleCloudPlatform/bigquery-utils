@@ -47,7 +47,7 @@ public class FixerFactory {
     if (error instanceof ExpectKeywordButGotOthersError) {
       ExpectKeywordButGotOthersError expectKeywordError = (ExpectKeywordButGotOthersError) error;
 
-      // the parser probably expects multiple keywords, but the error messages only provide the last
+      // The parser probably expects multiple keywords, but the error messages only provide the last
       // option, which usually is END_OF_INPUT. Therefore, if this happens, we can only search near
       // the error position and see if an identifier may be converted to a keyword.
       if (ExpectKeywordButGotOthersError.END_OF_INPUT.equals(

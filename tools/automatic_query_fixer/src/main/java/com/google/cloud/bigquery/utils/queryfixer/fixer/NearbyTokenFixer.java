@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * ExpectKeywordButGotOthersError} but expects "end of input". It basically means there may be
  * multiple expected tokens but the error message cannot recognize them, so the fixer will try to
  * see if the tokens near the error position are similar to any keywords. If yes, then replace the
- * token to the similar keyword anc check if the error is eliminated from the query.
+ * token to the similar keyword and check if the error is eliminated from the query.
  *
  * <p>Here is an example with an input query:
  *

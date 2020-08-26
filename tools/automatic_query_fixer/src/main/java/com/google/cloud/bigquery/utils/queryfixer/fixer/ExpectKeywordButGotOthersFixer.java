@@ -58,7 +58,7 @@ public class ExpectKeywordButGotOthersFixer implements IFixer {
     fixOptions.add(insertKeyword(token));
 
     String approach =
-        String.format("Put keyword %s at the error position", err.getExpectedKeyword());
+        String.format("Insert keyword %s at the error position", err.getExpectedKeyword());
     return FixResult.success(query, approach, fixOptions, err, /*isConfident=*/ true);
   }
 
