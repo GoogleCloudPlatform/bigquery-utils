@@ -21,7 +21,7 @@ public class Node<E> {
 	public Node(E obj, int seed) {
 		this.obj = obj;
 		this.r = new Random(seed);
-		this.setNeighbors(new HashMap<Node<E>, Double>());
+		this.setNeighbors(new HashMap<>());
 	}
 
 	/**
@@ -31,14 +31,14 @@ public class Node<E> {
 	public Node(E obj, Random r) {
 		this.obj = obj;
 		this.r = r;
-		this.setNeighbors(new HashMap<Node<E>, Double>());
+		this.setNeighbors(new HashMap<>());
 	}
 
 	/**
 	 * updates neighborList and cProbabilities when neighbors is changed
 	 */
 	private void updateProbabilities(HashMap<Node<E>, Double> neighbors) {
-		TreeMap<Double, Node<E>> newCumulativeProbabilities = new TreeMap<Double, Node<E>>();
+		TreeMap<Double, Node<E>> newCumulativeProbabilities = new TreeMap<>();
 		if (neighbors.size() != 0) {
 			double total = 0;
 			for (Node<E> n: neighbors.keySet()) {
@@ -90,7 +90,7 @@ public class Node<E> {
 	 * @param neighbors
 	 */
 	public void setNeighbors(HashSet<Node<E>> neighbors) {
-		HashMap<Node<E>, Double> edges = new HashMap<Node<E>, Double>();
+		HashMap<Node<E>, Double> edges = new HashMap<>();
 		double c = (neighbors.size() == 0) ? 0 : 1.0/neighbors.size();
 		for (Node<E> n: neighbors) {
 			edges.put(n, c);

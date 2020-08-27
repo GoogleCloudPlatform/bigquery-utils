@@ -2,173 +2,91 @@
   "features": [
     {
       "feature": "DQL_SELECT",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "SELECT",
-            "bigQuery": "SELECT"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "select_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "SELECT",
+        "bigQuery": "SELECT",
+        "mySql": "SELECT"
+      }
+    },
+    {
+      "feature": "DQL_*",
+      "dialectMap": {
+        "postgres": "*",
+        "bigQuery": "*",
+        "mySql": "*"
+      }
+    },
+    {
+      "feature": "DQL_DISTINCT",
+      "dialectMap": {
+        "postgres": "DISTINCT",
+        "bigQuery": "DISTINCT",
+        "mySql": "DISTINCT"
+      }
     },
     {
       "feature": "DQL_FROM",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "FROM",
-            "bigQuery": "FROM"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "from_item",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "FROM",
+        "bigQuery": "FROM",
+        "mySql": "FROM"
+      }
     },
     {
       "feature": "DQL_WHERE",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "WHERE",
-            "bigQuery": "WHERE"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "condition",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "feature": "DQL_GROUP",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "GROUP BY",
-            "bigQuery": "GROUP BY"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "group_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "WHERE",
+        "bigQuery": "WHERE",
+        "mySql": "WHERE"
+      }
     },
     {
       "feature": "DQL_HAVING",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "HAVING",
-            "bigQuery": "HAVING"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "condition",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "HAVING",
+        "bigQuery": "HAVING",
+        "mySql": "HAVING"
+      }
     },
     {
-      "feature": "DQL_ORDER",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "ORDER BY",
-            "bigQuery": "ORDER BY"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "order_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "feature": "DQL_ORDER_BY",
+      "dialectMap": {
+        "postgres": "ORDER BY",
+        "bigQuery": "ORDER BY",
+        "mySql": "ORDER BY"
+      }
     },
     {
       "feature": "DQL_ASC",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "ASC",
-            "bigQuery": "ASC"
-          },
-          "tokenInfos": [
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "ASC",
+        "bigQuery": "ASC",
+        "mySql": "ASC"
+      }
     },
     {
       "feature": "DQL_DESC",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "DESC",
-            "bigQuery": "DESC"
-          },
-          "tokenInfos": [
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "DESC",
+        "bigQuery": "DESC",
+        "mySql": "DESC"
+      }
     },
     {
       "feature": "DQL_LIMIT",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "LIMIT",
-            "bigQuery": "LIMIT"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "count",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "LIMIT",
+        "bigQuery": "LIMIT",
+        "mySql": "LIMIT"
+      }
     },
     {
       "feature": "DQL_OFFSET",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "OFFSET",
-            "bigQuery": "OFFSET"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "skip_rows",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "OFFSET",
+        "bigQuery": "OFFSET",
+        "mySql": "OFFSET"
+      }
     }
   ]
 }

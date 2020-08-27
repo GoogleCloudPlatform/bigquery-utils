@@ -1,6 +1,6 @@
 package parser;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class that contains all keyword variants of a feature
@@ -11,7 +11,7 @@ public class Feature {
   private String feature;
 
   /* All possible keyword variants and their PostgreSQL and BigQuery mappings and token requirements */
-  private List<Mapping> allMappings;
+  private Map<String, String> dialectMap;
 
   public String getFeature() {
     return this.feature;
@@ -21,11 +21,11 @@ public class Feature {
     this.feature = feature;
   }
 
-  public List<Mapping> getAllMappings() {
-    return this.allMappings;
+  public Map<String, String> getDialectMap() {
+    return this.dialectMap;
   }
 
-  public void setAllMappings(List<Mapping> allMappings) {
-    this.allMappings = allMappings;
+  public void setDialectMap(Map<String, String> dialectMap) {
+    this.dialectMap = dialectMap;
   }
 }
