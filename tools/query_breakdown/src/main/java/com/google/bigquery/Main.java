@@ -158,7 +158,6 @@ public class Main {
       JSONObject runtime = new JSONObject();
       runtime.put("runtime", runtimeSeconds);
       jsonArray.add(runtime);
-
       System.out.println(jsonArray);
     }
     else {
