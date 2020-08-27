@@ -1,7 +1,6 @@
 package com.google.cloud.bigquery.utils.queryfixer.fixer;
 
-import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySqlError;
-import com.google.cloud.bigquery.utils.queryfixer.errors.TableNotFoundError;
+import com.google.cloud.bigquery.utils.queryfixer.errors.*;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
 import lombok.AllArgsConstructor;
@@ -24,7 +23,41 @@ public class FixerFactory {
   public IFixer getFixer(String query, BigQuerySqlError error) {
 
     if (error instanceof TableNotFoundError) {
-      return new TableNotFoundFixer(query, (TableNotFoundError) error, bigQueryService);
+      return new TableNotFoundFixer(
+          query, (TableNotFoundError) error, bigQueryService, queryTokenProcessor);
+    }
+
+    if (error instanceof UnrecognizedColumnError) {
+      return new UnrecognizedColumnFixer(
+          query, (UnrecognizedColumnError) error, queryTokenProcessor);
+    }
+
+    if (error instanceof FunctionNotFoundError) {
+      FunctionNotFoundError functionError = (FunctionNotFoundError) error;
+      return new FunctionNotFoundFixer(query, functionError, queryTokenProcessor);
+    }
+
+    if (error instanceof UnexpectedKeywordError) {
+      return new UnexpectedKeywordFixer(query, (UnexpectedKeywordError) error, queryTokenProcessor);
+    }
+
+    if (error instanceof IllegalInputCharacterError) {
+      return new IllegalInputCharacterFixer(query, (IllegalInputCharacterError) error);
+    }
+
+    if (error instanceof ExpectKeywordButGotOthersError) {
+      ExpectKeywordButGotOthersError expectKeywordError = (ExpectKeywordButGotOthersError) error;
+
+      // The parser probably expects multiple keywords, but the error messages only provide the last
+      // option, which usually is END_OF_INPUT. Therefore, if this happens, we can only search near
+      // the error position and see if an identifier may be converted to a keyword.
+      if (ExpectKeywordButGotOthersError.END_OF_INPUT.equals(
+          expectKeywordError.getExpectedKeyword())) {
+
+        return new NearbyTokenFixer(query, expectKeywordError, queryTokenProcessor);
+      }
+
+      return new ExpectKeywordButGotOthersFixer(query, expectKeywordError, queryTokenProcessor);
     }
 
     return null;
