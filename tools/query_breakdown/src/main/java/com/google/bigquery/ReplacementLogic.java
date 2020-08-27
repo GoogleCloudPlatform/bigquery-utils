@@ -19,8 +19,16 @@ public class ReplacementLogic {
    */
   public static ArrayList<String> replace (String component, int replacementLimit,
       ArrayList<String> options) {
-
     ArrayList<String> result = new ArrayList<>();
+
+    /*
+     * The component field in the input arguments of this function denotes the component that the
+     * tool replaces from. Therefore, we use that information to determine good replacements if any.
+     * The example code is below where we deem that A AS is a good replacement for AS in cases
+     * where :
+     *
+     * if (component.equals("AS")) { result.add("A AS"); return result; }
+     */
 
     if (options.size() <= replacementLimit) {
       for (int i = 0; i < options.size(); i++) {

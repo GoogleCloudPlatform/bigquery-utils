@@ -106,7 +106,7 @@ public class QueryBreakdownTest {
     args[1] = absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/bigqueryReferenceQueries.txt";
     args[2] = "-l";
-    args[3] = "800";
+    args[3] = "80000";
     //args[2] = "-j";
     Main.main(args);
   }

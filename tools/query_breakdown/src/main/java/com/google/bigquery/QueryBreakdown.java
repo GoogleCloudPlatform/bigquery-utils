@@ -219,15 +219,15 @@ public class QueryBreakdown {
   static ArrayList<ReplacedComponent> replacement(String inputQuery, int replacementLimit,
       int startLine, int startColumn,
       int endLine, int endColumn, Collection<String> expectedTokens) {
-    // call ReplacementLogic
-    ArrayList<String> finalList = ReplacementLogic.replace(inputQuery, replacementLimit,
-        expectedTokensFilter(expectedTokens));
-
-    ArrayList<ReplacedComponent> result = new ArrayList<>();
-
     // get word to replace from
     int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     String replaceFrom = inputQuery.substring(index[0], index[1]);
+
+    // call ReplacementLogic
+    ArrayList<String> finalList = ReplacementLogic.replace(replaceFrom, replacementLimit,
+        expectedTokensFilter(expectedTokens));
+
+    ArrayList<ReplacedComponent> result = new ArrayList<>();
 
     // generate the new queries. We need to re-instantiate the StringBuilder each time
     for (String replaceTo: finalList) {
