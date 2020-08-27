@@ -56,7 +56,7 @@ public class QueryBreakdown {
       SimpleTimeLimiter limiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
       limiter.runUninterruptiblyWithTimeout(
           () -> loop(originalQuery, replacementLimit, root, 0, locationTracker),
-          runtimeLimit, TimeUnit.SECONDS);
+          runtimeLimit, TimeUnit.MILLISECONDS);
     }
     catch (TimeoutException te) {
       // abort logic

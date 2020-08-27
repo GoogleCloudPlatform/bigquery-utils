@@ -24,8 +24,8 @@ import org.json.simple.JSONObject;
  * -j, --json: this command specifies whether the program should output the results in a
  *                   json format. It is therefore optional
  * -l, --limit, INTEGER: this command specifies the path to an integer that the tool takes
- *                       as a limit for the number of seconds a tool can spend on a query, thereby
- *                        controlling the overall runtime. It is therefore optional
+ *                       as a limit for the number of milliseconds a tool can spend on a query,
+ *                       thereby controlling the overall runtime. It is therefore optional
  * -r, --replacement, INTEGER: this command specifies the number of replacements that can be
  *                             recommended by the ReplacementLogic class, thereby controlling
  *                             the runtime and performance. It is therefore optional
@@ -44,7 +44,7 @@ public class Main {
     long start = System.nanoTime();
 
     String inputFile = null;
-    int runtimeLimit = 100; // default value for runtime limit, measured in seconds
+    int runtimeLimit = 100000; // default value for runtime limit, measured in seconds
     int replacementLimit = 3; // default value for number of recommended replacements
     boolean jsonOutput = false;
     CommandLine cl = createCommand(args);
@@ -217,7 +217,7 @@ public class Main {
                     + "json format. It is therefore optional").build());
     options.addOption(Option.builder("l").longOpt("limit").hasArg(true).argName("INTEGER")
         .desc("this command specifies the path to an integer that the tools takes "
-            + "as a limit for the number of seconds a tool can spend on a query, thereby "
+            + "as a limit for the number of milliseconds a tool can spend on a query, thereby "
             + "controlling the overall runtime. It is therefore optional").build());
     options.addOption(Option.builder("r").longOpt("replacement").hasArg(true)
         .argName("INTEGER").desc("this command specifies the number of replacements that can be"
