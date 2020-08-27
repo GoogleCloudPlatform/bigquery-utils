@@ -1,24 +1,32 @@
 package token;
 
 import parser.Utils;
+import query.SkeletonPiece;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class QueryRegex {
 
-  private List<String> flattenedQueries = new ArrayList<>();
+  private List<List<SkeletonPiece>> querySkeletons = new ArrayList<>();
+  private int maxOptionalExpressions;
+  private Random r = new Random();
 
   // for every feature in the input list of features, map each feature to its raw query
   public QueryRegex(List<String> featureRegexList, int maxOptionalExpressions) {
     if (maxOptionalExpressions < 1) {
       // throw error
     }
+    this.maxOptionalExpressions = maxOptionalExpressions - 1;
+
+    TokenProvider tokenProvider = new TokenProvider(r);
 
     for (String featureRegex : featureRegexList) {
       String currentString = featureRegex;
       StringBuilder sb = new StringBuilder();
+
       while (currentString.contains("[") || currentString.contains("{") || currentString.contains("|")) {
         int i = 0;
         while (i < currentString.length()) {
@@ -36,7 +44,7 @@ public class QueryRegex {
               }
             }
             String optionalExpression = currentString.substring(start + 1, i);
-            int randomExpressionCount = Utils.getRandomInteger(maxOptionalExpressions);
+            int randomExpressionCount = Utils.getRandomInteger(this.maxOptionalExpressions);
             for (int j = 0; j < randomExpressionCount; j++) {
               sb.append(optionalExpression);
             }
@@ -74,12 +82,34 @@ public class QueryRegex {
         currentString = sb.toString();
         sb = new StringBuilder();
       }
+      List<String> rawQuery = new ArrayList<>(Arrays.asList(currentString.split(" ")));
+      List<SkeletonPiece> querySkeleton = new ArrayList<>();
+      for (String querySlice : rawQuery) {
+        if (querySlice.charAt(0) == '<') {
+          // slice is an expression
+          if (querySlice.contains(",")) {
+            List<String> optionals = new ArrayList<>(Arrays.asList(querySlice.split(",")));
+            for (String optional : optionals) {
+              String tokenExpression = optional.substring(1, optional.length() - 1);
+              querySkeleton.add(tokenProvider.tokenize(tokenExpression));
+            }
+          } else {
+            String tokenExpression = querySlice.substring(1, querySlice.length() - 1);
+            querySkeleton.add(tokenProvider.tokenize(tokenExpression));
+          }
+        } else {
+          // otherwise the slice is a feature
+          SkeletonPiece sp = new SkeletonPiece();
+          sp.setKeyword(querySlice);
+          querySkeleton.add(sp);
+        }
+      }
 
-      flattenedQueries.add(currentString);
+      querySkeletons.add(querySkeleton);
     }
   }
 
-  public List<String> getFlattenedQueries() {
-    return flattenedQueries;
+  public List<List<SkeletonPiece>> getQuerySkeletons() {
+    return querySkeletons;
   }
 }
