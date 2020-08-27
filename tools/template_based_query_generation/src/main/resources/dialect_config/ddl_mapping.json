@@ -6,7 +6,8 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE",
-            "bigQuery": "CREATE TABLE"
+            "bigQuery": "CREATE TABLE",
+            "mySql": "CREATE TABLE"
           },
           "tokenInfos": [
             {
@@ -24,7 +25,8 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE IF NOT EXISTS",
-            "bigQuery": "CREATE TABLE IF NOT EXISTS"
+            "bigQuery": "CREATE TABLE IF NOT EXISTS",
+            "mySql": "CREATE TABLE IF NOT EXISTS"
           },
           "tokenInfos": [
             {
@@ -42,7 +44,8 @@
         {
           "dialectMap": {
             "postgres": "CREATE TABLE",
-            "bigQuery": "CREATE OR REPLACE TABLE"
+            "bigQuery": "CREATE OR REPLACE TABLE",
+            "mySql": "CREATE TABLE"
           },
           "tokenInfos": [
             {
@@ -65,7 +68,8 @@
         {
           "dialectMap": {
             "postgres": "PARTITION BY",
-            "bigQuery": "PARTITION BY"
+            "bigQuery": "PARTITION BY",
+            "mySql": "PARTITION BY"
           },
           "tokenInfos": [
             {
@@ -83,7 +87,8 @@
         {
           "dialectMap": {
             "postgres": "COLLATE",
-            "bigQuery": "CLUSTER BY"
+            "bigQuery": "CLUSTER BY",
+            "mySql": "COLLATE"
           },
           "tokenInfos": [
             {

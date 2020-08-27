@@ -1,16 +1,17 @@
 package query;
 
 import com.google.common.collect.ImmutableList;
-import parser.Keywords;
-import parser.KeywordsMapping;
-import parser.Mapping;
-import parser.Utils;
+import parser.*;
 import token.Token;
 import token.TokenInfo;
 import token.Tokenizer;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * keyword parser that adds token placeholders to randomized keywords
@@ -21,16 +22,21 @@ public class Skeleton {
 
   private final KeywordsMapping keywordsMapping = new KeywordsMapping();
 
-  private final ImmutableList<String> postgreSkeleton;
-  private final ImmutableList<String> bigQuerySkeleton;
+  private Map<String, List<String>> dialectSkeletons = new HashMap<>();
+
+  private final String filePathUser = "./src/main/resources/user_config/config.json";
+  private final User user = Utils.getUser(Paths.get(filePathUser));
 
   /**
    * Constructor of randomized keyword parser that splices token placeholders with generated keywords
    */
-  // TODO (spoiledhua): change input and output to query.Query Objects
-  public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) {
-    ImmutableList.Builder<String> postgresBuilder = ImmutableList.builder();
-    ImmutableList.Builder<String> bigQueryBuilder = ImmutableList.builder();
+  public Skeleton(List<Query> rawQueries, Tokenizer tokenizer) throws IOException {
+
+    for (String dialect : user.getDialectIndicators().keySet()) {
+      if (user.getDialectIndicators().get(dialect)) {
+        dialectSkeletons.put(dialect, new ArrayList<>());
+      }
+    }
 
     for (Query rawQuery : rawQueries) {
       ImmutableList<Mapping> mappingList = getLanguageMap(rawQuery.getType().name());
@@ -38,49 +44,37 @@ public class Skeleton {
       // choose a random variant from the list of possible keyword variants
       int randomIndex = Utils.getRandomInteger(mappingList.size() - 1);
       Mapping keywordVariant = mappingList.get(randomIndex);
-      postgresBuilder.add(keywordVariant.getDialectMap().get("postgres"));
-      bigQueryBuilder.add(keywordVariant.getDialectMap().get("bigQuery"));
-      List<TokenInfo> tokenInfos = keywordVariant.getTokenInfos();
 
-      List<Token> tokens = new ArrayList<>();
-      for (TokenInfo tokenInfo : tokenInfos) {
-        Token token = new Token(tokenInfo);
-        tokens.add(token);
-      }
+      for (String dialect : user.getDialectIndicators().keySet()) {
+        if (user.getDialectIndicators().get(dialect)) {
+          dialectSkeletons.get(dialect).add(keywordVariant.getDialectMap().get(dialect));
+          List<TokenInfo> tokenInfos = keywordVariant.getTokenInfos();
 
-      rawQuery.setTokens(tokens);
-      for (Token token : tokens) {
-        tokenizer.generateToken(token);
-        if (token.getTokenInfo().getRequired()) {
-          postgresBuilder.add(token.getPostgresTokenExpression());
-          bigQueryBuilder.add(token.getBigQueryTokenExpression());
-        } else if (Utils.getRandomInteger(1) == 1) {
-          postgresBuilder.add(token.getPostgresTokenExpression());
-          bigQueryBuilder.add(token.getBigQueryTokenExpression());
+          List<Token> tokens = new ArrayList<>();
+          for (TokenInfo tokenInfo : tokenInfos) {
+            Token token = new Token(tokenInfo);
+            tokens.add(token);
+          }
+
+          rawQuery.setTokens(tokens);
+          for (Token token : tokens) {
+            tokenizer.generateToken(token);
+            if (token.getTokenInfo().getRequired()) {
+              dialectSkeletons.get(dialect).add(token.getDialectExpressions().get(dialect));
+            } else if (Utils.getRandomInteger(1) == 1) {
+              dialectSkeletons.get(dialect).add(token.getDialectExpressions().get(dialect));
+            }
+          }
         }
       }
     }
-
-    postgreSkeleton = postgresBuilder.build();
-    bigQuerySkeleton = bigQueryBuilder.build();
   }
 
   /**
-   * Gets strings of skeleton PostgreSQL statements from generated keywords
-   *
-   * @return a list of skeleton PostgreSQL statements
+   * @return mappings between dialects and their corresponding skeletons
    */
-  public ImmutableList<String> getPostgreSkeleton() {
-    return postgreSkeleton;
-  }
-
-  /**
-   * Gets strings of skeleton BigQuery statements from generated keywords
-   *
-   * @return a list of skeleton BigQuery statements
-   */
-  public ImmutableList<String> getBigQuerySkeleton() {
-    return bigQuerySkeleton;
+  public Map<String, List<String>> getDialectSkeletons() {
+    return dialectSkeletons;
   }
 
   /**

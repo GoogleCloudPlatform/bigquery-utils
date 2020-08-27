@@ -9,13 +9,7 @@
     {
       "node": "DQL_SELECT",
       "neighbors": [
-        "DQL_FROM",
-        "DQL_WHERE",
-        "DQL_GROUP",
-        "DQL_HAVING",
-        "DQL_ORDER",
-        "DQL_LIMIT",
-        "FEATURE_SINK"
+        "DQL_FROM"
       ]
     },
     {
@@ -23,7 +17,6 @@
       "neighbors": [
         "DQL_WHERE",
         "DQL_GROUP",
-        "DQL_HAVING",
         "DQL_ORDER",
         "DQL_LIMIT",
         "FEATURE_SINK"
@@ -33,7 +26,6 @@
       "node": "DQL_WHERE",
       "neighbors": [
         "DQL_GROUP",
-        "DQL_HAVING",
         "DQL_ORDER",
         "DQL_LIMIT",
         "FEATURE_SINK"
@@ -42,10 +34,7 @@
     {
       "node": "DQL_GROUP",
       "neighbors": [
-        "DQL_HAVING",
-        "DQL_ORDER",
-        "DQL_LIMIT",
-        "FEATURE_SINK"
+        "DQL_HAVING"
       ]
     },
     {
