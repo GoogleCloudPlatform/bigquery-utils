@@ -57,6 +57,17 @@ public class FixResult {
   }
 
   /**
+   * Create a Failure FixResult indicating that a {@link BigQuerySqlError} can not be fixed.
+   *
+   * @param query query to be fixed
+   * @param error un-fixable error
+   * @return FixResult with FAILURE Status
+   */
+  public static FixResult failure(String query, BigQuerySqlError error) {
+    return failure(query, error, null);
+  }
+
+  /**
    * Create a Success FixResult with the details on fixing a {@link BigQuerySqlError} in a query.
    *
    * @param query query to be fixed
