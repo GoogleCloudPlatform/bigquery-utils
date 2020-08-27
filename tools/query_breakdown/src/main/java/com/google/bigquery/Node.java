@@ -1,6 +1,7 @@
 package com.google.bigquery;
 
 import java.util.ArrayList;
+import org.json.simple.JSONObject;
 
 /**
  * This class represents a single node in the tree visualization of the algorithm. Below are fields
@@ -69,10 +70,38 @@ public class Node {
    */
   @Override
   public String toString() {
-    return String.format("Parent: %1$s, %2$s\nstartline: %3$s\nstartColumn: %4$s"
-        + "\nendLine: %5$s\nendColumn: %6$s\ntype: %7$s\nreplaceFrom: %8$s\nreplaceTo: %9$s\n"
-        + "unparseableCount: %10$s\n", parent.getStartColumn(), parent.getEndColumn(), startLine,
-        startColumn, endLine, endColumn, type, replaceFrom, replaceTo, unparseableCount);
+    if (type.equals(ErrorHandlingType.DELETION)) {
+      return String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+              + "Start Column %3$s, End Column %4$s, %5$s", startLine,
+          endLine, startColumn, endColumn, type);
+    }
+    else {
+      return String.format("Unparseable portion: Start Line %1$s, End Line %2$s, "
+              + "Start Column %3$s, End Column %4$s, %5$s: replaced %6$s with %7$s",
+          startLine, endLine, startColumn, endColumn, type, replaceFrom, replaceTo);
+    }
+  }
+
+  public JSONObject toJSON() {
+    JSONObject errorPosition = new JSONObject();
+    errorPosition.put("startLine", startLine);
+    errorPosition.put("startColumn", startColumn);
+    errorPosition.put("endLine", endLine);
+    errorPosition.put("endColumn", endColumn);
+    if (type.equals("DELETION")) {
+      JSONObject deletionJson = new JSONObject();
+      deletionJson.put("error_position", errorPosition);
+      deletionJson.put("error_type", "DELETION");
+      return deletionJson;
+    }
+    else {
+      JSONObject replaceJson = new JSONObject();
+      replaceJson.put("error_position", errorPosition);
+      replaceJson.put("error_type", "REPLACEMENT");
+      replaceJson.put("replacedFrom", replaceFrom);
+      replaceJson.put("replacedTo", replaceTo);
+      return replaceJson;
+    }
   }
 
   /**

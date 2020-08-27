@@ -2,8 +2,14 @@ package com.google.cloud.sqlecosystem.sqlextraction
 
 import com.google.cloud.sqlecosystem.sqlextraction.output.Output
 import com.google.cloud.sqlecosystem.sqlextraction.output.Query
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 
 private val LOGGER = KotlinLogging.logger { }
 
@@ -22,11 +28,12 @@ class SqlExtractor(
     fun process(
         filePaths: Sequence<Path>,
         confidenceThreshold: Double = 0.0,
-        showProgress: Boolean = false
+        showProgress: Boolean = false,
+        parallelize: Boolean = false
     ): Output {
-        val queries = ArrayList<Query>()
+        val queries = ConcurrentLinkedQueue<Query>()
 
-        var numCompleted = 0
+        val numCompleted = AtomicInteger(0)
         val (length, processedFilePaths) = if (showProgress) {
             // iterate paths to count up the length
             val list = filePaths.toList()
@@ -35,32 +42,72 @@ class SqlExtractor(
             Pair(1, filePaths)
         }
 
-        for (filePath in processedFilePaths) {
-            LOGGER.debug { "Scanning $filePath" }
-            if (showProgress) {
-                System.err.printf("%.1f%% Analyzing %s...", numCompleted * 100.0 / length, filePath)
-                System.err.println()
-            }
-
-            queries.addAll(
-                dataFlowSolver.solveDataFlow(DataFlowEngine(), filePath)
-                    .map {
-                        Query(
-                            filePath.toString(),
-                            confidenceRater.rate(it.query),
-                            it.query,
-                            it.usages
+        val coroutineDispatcher = Executors.newWorkStealingPool().asCoroutineDispatcher()
+        runBlocking {
+            for (filePath in processedFilePaths) {
+                if (parallelize) {
+                    launch(coroutineDispatcher) {
+                        analyzeFile(
+                            filePath,
+                            showProgress,
+                            numCompleted,
+                            length,
+                            confidenceThreshold,
+                            queries
                         )
-                    }.filter { it.confidence >= confidenceThreshold }
-            )
-            numCompleted++
-
-            if (showProgress) {
-                System.err.printf("%.1f%% Analyzed %s.", numCompleted * 100.0 / length, filePath)
-                System.err.println()
+                    }
+                } else {
+                    analyzeFile(
+                        filePath,
+                        showProgress,
+                        numCompleted,
+                        length,
+                        confidenceThreshold,
+                        queries
+                    )
+                }
             }
         }
 
         return Output(queries.sortedByDescending { it.confidence })
+    }
+
+    private fun analyzeFile(
+        filePath: Path,
+        showProgress: Boolean,
+        numCompleted: AtomicInteger,
+        numTotal: Int,
+        confidenceThreshold: Double,
+        queries: ConcurrentLinkedQueue<Query>
+    ) {
+        LOGGER.debug { "Scanning $filePath" }
+        if (showProgress) {
+            System.err.printf(
+                "%.1f%% Analyzing %s...%n",
+                numCompleted.get() * 100.0 / numTotal,
+                filePath
+            )
+        }
+
+        queries.addAll(
+            dataFlowSolver.solveDataFlow(DataFlowEngine(), filePath)
+                .map {
+                    Query(
+                        filePath.toString(),
+                        confidenceRater.rate(it.query),
+                        it.query,
+                        it.usages
+                    )
+                }.filter { it.confidence >= confidenceThreshold }
+        )
+        val incremented = numCompleted.incrementAndGet()
+
+        if (showProgress) {
+            System.err.printf(
+                "%.1f%% Analyzed %s.%n",
+                incremented * 100.0 / numTotal,
+                filePath
+            )
+        }
     }
 }
