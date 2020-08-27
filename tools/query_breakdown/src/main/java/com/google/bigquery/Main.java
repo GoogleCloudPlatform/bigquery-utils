@@ -40,7 +40,6 @@ import org.json.simple.JSONObject;
 public class Main {
   public static void main(String[] args) {
     // deals with logger errors from calcite parser
-    //BasicConfigurator.configure();
     Logger.getRootLogger().setLevel(Level.OFF);
     long start = System.nanoTime();
 
