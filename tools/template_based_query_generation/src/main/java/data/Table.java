@@ -57,6 +57,10 @@ public class Table {
     return this.numRows;
   }
 
+  public int getNumColumns() {
+    return this.schema.size();
+  }
+
   /**
    *
    * @return name of random column of schema
@@ -71,10 +75,17 @@ public class Table {
    * @param type
    * @return name of random column of given type
    */
-  public String getRandomColumn(DataType type) {
+  public String getRandomColumn(String columnName, DataType type) {
     List<MutablePair<String, DataType>> columns = new ArrayList<>();
     for (MutablePair<String, DataType> col: this.schema) {
       if (col.getRight() == type) columns.add(col);
+    }
+    int newColumnProbability = Utils.getRandomInteger(columns.size());
+    // add new column of specified datatype with probability 1/(n+1)
+    // where n is the number of existing columns of that datatype
+    if (newColumnProbability == 0) {
+      addColumn(columnName, type);
+      return columnName;
     }
     MutablePair<String, DataType> p = Utils.getRandomElement(columns);
     return p.getLeft();

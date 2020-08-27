@@ -8,7 +8,6 @@ import data.DataType;
 import data.Table;
 import graph.Node;
 import org.apache.commons.lang3.tuple.MutablePair;
-import query.Query;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -245,7 +244,7 @@ public class Utils {
 
     for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
       if (featureIndicator.getIsIncluded()) {
-        builder.add(featureIndicator.getFeature().name());
+        builder.add(featureIndicator.getFeature());
       }
     }
 
@@ -260,20 +259,18 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return an immutable map between user-defined keywords and PostgreSQL or BigQuery from the config file
    */
-  public static ImmutableMap<String, ImmutableList<Mapping>> makeImmutableKeywordMap(Path inputPath, ImmutableSet<String> keywords) throws IOException {
+  public static ImmutableMap<String, Map<String, String>> makeImmutableKeywordMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
     Features features = gson.fromJson(reader, Features.class);
 
-    ImmutableMap.Builder<String, ImmutableList<Mapping>> builder = ImmutableMap.builder();
+    ImmutableMap.Builder<String, Map<String, String>> builder = ImmutableMap.builder();
 
     for (Feature feature : features.getFeatures()) {
-      if (keywords.contains(feature.getFeature())) {
-        builder.put(feature.getFeature(), ImmutableList.copyOf(feature.getAllMappings()));
-      }
+      builder.put(feature.getFeature(), feature.getDialectMap());
     }
 
-    ImmutableMap<String, ImmutableList<Mapping>> map = builder.build();
+    ImmutableMap<String, Map<String, String>> map = builder.build();
 
     return map;
   }
@@ -300,6 +297,14 @@ public class Utils {
     return map;
   }
 
+  public static ImmutableMap<String, String> makeRegexMap(Path inputPath) throws IOException {
+    BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
+    Gson gson = new Gson();
+    RegexMap regexMap = gson.fromJson(reader, RegexMap.class);
+
+    return ImmutableMap.copyOf(regexMap.getRegexMapping());
+  }
+
   /**
    * Appends mappings between references and their appropriate nodes to an existing map
    *
@@ -308,7 +313,7 @@ public class Utils {
    * @param r Random instance used for randomization
    * @return the original map with new key-value pairs
    */
-  public static Map<FeatureType, Node<Query>> addNodeMap(Map<FeatureType, Node<Query>> nodeMap, Path inputPath, Random r) {
+  public static Map<String, Node<String>> addNodeMap(Map<String, Node<String>> nodeMap, Path inputPath, Random r) {
     try {
       BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
       Gson gson = new Gson();
@@ -316,7 +321,7 @@ public class Utils {
 
       for (FeatureIndicator featureIndicator : featureIndicators.getFeatureIndicators()) {
         if (featureIndicator.getIsIncluded()) {
-          nodeMap.put(featureIndicator.getFeature(), new Node<>(new Query(featureIndicator.getFeature()), r));
+          nodeMap.put(featureIndicator.getFeature(), new Node<>(featureIndicator.getFeature(), r));
         }
       }
     } catch (IOException exception) {
@@ -334,7 +339,7 @@ public class Utils {
    * @param inputPath relative path of the config file
    * @return the original map with new key-value pairs
    */
-  public static Map<FeatureType, List<FeatureType>> addNeighborMap(Map<FeatureType, List<FeatureType>> neighborMap, Set<FeatureType> nodes, Path inputPath) {
+  public static Map<String, List<String>> addNeighborMap(Map<String, List<String>> neighborMap, Set<String> nodes, Path inputPath) {
     try {
       BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
       Gson gson = new Gson();
@@ -375,11 +380,11 @@ public class Utils {
    * @throws IllegalArgumentException
    */
   public static int generateRandomIntegerData(DataType dataType) throws IllegalArgumentException {
-    if (dataType == DataType.SMALL_INT) {
+    if (dataType == DataType.SMALLINT) {
       return 	random.nextInt(-32768,32769);
     } else if (dataType == DataType.INTEGER) {
       return 	random.nextInt();
-    } else if (dataType == DataType.SMALL_SERIAL) {
+    } else if (dataType == DataType.SMALLSERIAL) {
       return 	random.nextInt(1, 32768);
     } else if (dataType == DataType.SERIAL) {
       int num = random.nextInt();
@@ -400,9 +405,9 @@ public class Utils {
    * @throws IllegalArgumentException
    */
   public static long generateRandomLongData(DataType dataType) {
-    if (dataType == DataType.BIG_INT) {
+    if (dataType == DataType.BIGINT) {
       return 	random.nextLong();
-    } else if (dataType == DataType.BIG_SERIAL) {
+    } else if (dataType == DataType.BIGSERIAL) {
       long num = random.nextLong();
       if (num == Long.MIN_VALUE) {
         return 0;
@@ -423,7 +428,7 @@ public class Utils {
   public static double generateRandomDoubleData(DataType dataType) {
     if (dataType == DataType.REAL) {
       return random.nextFloat();
-    } else if (dataType == DataType.BIG_REAL) {
+    } else if (dataType == DataType.BIGREAL) {
       return random.nextDouble();
     } else {
       throw new IllegalArgumentException("dataType cannot be represented by a double type");

@@ -8,10 +8,10 @@ import java.util.Map;
  */
 public class User {
   /* the start of the Markov chain */
-  FeatureType startFeature;
+  String startFeature;
 
   /* the end of the Markov chain */
-  FeatureType endFeature;
+  String endFeature;
 
   /* the maximum number of columns in the resulting sample data */
   int numColumns;
@@ -22,21 +22,19 @@ public class User {
   /* an indicator describing which dialects to output */
   Map<String, Boolean> dialectIndicators = new HashMap<>();
 
-  String bigQueryTable;
-
-  public FeatureType getStartFeature() {
+  public String getStartFeature() {
     return startFeature;
   }
 
-  public void setStartFeature(FeatureType startFeature) {
+  public void setStartFeature(String startFeature) {
     this.startFeature = startFeature;
   }
 
-  public FeatureType getEndFeature() {
+  public String getEndFeature() {
     return endFeature;
   }
 
-  public void setEndFeature(FeatureType endFeature) {
+  public void setEndFeature(String endFeature) {
     this.endFeature = endFeature;
   }
 
@@ -62,13 +60,5 @@ public class User {
 
   public void setDialectIndicators(Map<String, Boolean> dialectIndicators) {
     this.dialectIndicators = dialectIndicators;
-  }
-
-  public String getBigQueryTable() {
-    return bigQueryTable;
-  }
-
-  public void setBigQueryTable(String bigQueryTable) {
-    this.bigQueryTable = bigQueryTable;
   }
 }
