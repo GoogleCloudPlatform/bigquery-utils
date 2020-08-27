@@ -147,7 +147,7 @@ public class LocationTracker {
       for (int i = end + 1; i <= end + longer; i++) {
         /* adding letters that are not in the original document, but still need to have them
            appear in the original document in the frontend as well as cli*/
-        locationTracker.add(startLine, i, startLine, i);
+        locationTracker.add(startLine, i, location.get(startLine - 1).get(end - 1).getX(), i);
       }
     }
     // if we replace the token with a shorter token and need to subtract from the locationTracker

@@ -7,6 +7,7 @@ export interface ResultJson {
   replacedFrom: string;
   replacedTo: string;
   performance: string;
+  runtime: string;
 }
 
 export interface ErrorLocation {

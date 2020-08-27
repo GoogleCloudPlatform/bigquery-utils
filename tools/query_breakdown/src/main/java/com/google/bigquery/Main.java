@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class Main {
     // deals with logger errors from calcite parser
     //BasicConfigurator.configure();
     Logger.getRootLogger().setLevel(Level.OFF);
+    long start = System.nanoTime();
 
     String inputFile = null;
     int runtimeLimit = 100; // default value for runtime limit, measured in seconds
@@ -107,7 +109,7 @@ public class Main {
           locationTrackers.get(i));
       endResult.addAll(result);
       try {
-        writer.write("Original Query: " + queries.get(i) + "\n");
+        writer.write("Original Query: " + queries.get(i) + "\n\n");
         if (result.isEmpty()) {
           writer.write("Resulting Query: " + "the entire query can be parsed without error"
               + "\n\n");
@@ -151,6 +153,13 @@ public class Main {
       performance.put("performance", df.format(x));
       jsonArray.add(performance);
 
+      // add runtime
+      long end = System.nanoTime();
+      float runtimeSeconds = TimeUnit.NANOSECONDS.toSeconds(end - start);
+      JSONObject runtime = new JSONObject();
+      runtime.put("runtime", runtimeSeconds);
+      jsonArray.add(runtime);
+
       System.out.println(jsonArray);
     }
     else {
@@ -167,6 +176,11 @@ public class Main {
       DecimalFormat df = new DecimalFormat("##.#");
       double x = 100 - (double) totalUnparseable / ir.getDocLength() * 100;
       System.out.println("Percentage of Parseable Components: " + df.format(x) + "%");
+
+      // print out runtime
+      long end = System.nanoTime();
+      float runtimeSeconds = TimeUnit.NANOSECONDS.toSeconds(end - start);
+      System.out.println("Runtime: " + runtimeSeconds + " seconds");
     }
     exit(0);
   }

@@ -10,7 +10,7 @@ import {QueryBreakdownRunner} from './query_breakdown_runner';
 
 // colors for the highlight
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#34A853',
+  backgroundColor: '#137333',
 });
 
 const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
@@ -66,8 +66,6 @@ export function activate(context: vscode.ExtensionContext) {
                 'The entire query can be parsed without error'
               );
             } else {
-              console.log("iit hit hhere!");
-              console.log(json);
               // highlights and creates hovers for queries
               decorate(currentEditor);
             }
@@ -89,7 +87,7 @@ function decorate(editor: vscode.TextEditor) {
   const decorationParseableArray: vscode.DecorationOptions[] = [];
 
   // parses through the json objects
-  for (let i = 0; i < json.length - 1; i++) {
+  for (let i = 0; i < json.length - 2; i++) {
     // finds error position
     const errorRange = new vscode.Range(
       json[i].error_position.startLine - 1,
@@ -133,7 +131,11 @@ function decorate(editor: vscode.TextEditor) {
 
   vscode.window.showInformationMessage(
     'Percentage of Parseable Components: ' +
-      json[json.length - 1].performance +
-      '%'
+      json[json.length - 2].performance + '%'
+  );
+  vscode.window.showInformationMessage(
+    'Runtime: ' +
+    json[json.length - 1].runtime + 
+    ' seconds'
   );
 }
