@@ -147,11 +147,15 @@ public class Utils {
    * @param outputDirectory relative path of a specified directory
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable, Path outputDirectory) throws IOException {
+  public static void writeDirectory(Map<String, Map<String, List<String>>> outputs, List<Table> tables, Path outputDirectory) throws IOException {
     for (String dialect : outputs.keySet()) {
-      writeFile(outputs.get(dialect), outputDirectory.resolve(dialect + ".txt"));
+      writeFile(outputs.get(dialect).get("DQL"), outputDirectory.resolve(dialect + "DQL.txt"));
+      writeFile(outputs.get(dialect).get("DML"), outputDirectory.resolve(dialect + "DML.txt"));
+      writeFile(outputs.get(dialect).get("DDL"), outputDirectory.resolve(dialect + "DDL.txt"));
     }
-    writeData(dataTable, outputDirectory.resolve("data.csv"));
+    for (Table table : tables) {
+      writeData(table, outputDirectory.resolve(table.getName() + ".csv"));
+    }
 
     System.out.println("The output is stored at " + outputDirectory);
   }
@@ -162,7 +166,7 @@ public class Utils {
    * @param outputs collection of statements to write
    * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
-  public static void writeDirectory(Map<String, List<String>> outputs, Table dataTable) throws IOException {
+  public static void writeDirectory(Map<String, Map<String, List<String>>> outputs, List<Table> tables) throws IOException {
     String outputDirectory = getOutputDirectory("outputs");
     File file = new File(outputDirectory);
 
@@ -170,7 +174,7 @@ public class Utils {
       throw new FileNotFoundException("The default \"output\" directory could not be created");
     }
 
-    writeDirectory(outputs, dataTable, file.toPath());
+    writeDirectory(outputs, tables, file.toPath());
   }
 
   /**
@@ -192,12 +196,12 @@ public class Utils {
   /**
    * Write data
    */
-  public static void writeData(Table dataTable, Path outputPath) throws IOException {
+  public static void writeData(Table table, Path outputPath) throws IOException {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
-      List<List<?>> data = dataTable.generateData();
+      List<List<?>> data = table.generateData();
       // traverse data column-first
       String schema = "";
-      for (MutablePair<String, DataType> p : dataTable.getSchema()){
+      for (MutablePair<String, DataType> p : table.getSchema()){
         schema += (p.getLeft() + ":" + p.getRight() + ",");
       }
       System.out.println(schema.substring(0,schema.length()-1));

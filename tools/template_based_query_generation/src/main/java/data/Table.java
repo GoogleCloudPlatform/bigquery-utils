@@ -22,9 +22,9 @@ public class Table {
    * constructs empty table from table name
    * @param name
    */
-  public Table(String name) {
+  public Table(String name, int numRows) {
     this.name = name;
-    this.numRows = 0;
+    this.numRows = numRows;
     this.schema = new ArrayList<>();
   }
 
@@ -59,15 +59,6 @@ public class Table {
 
   public int getNumColumns() {
     return this.schema.size();
-  }
-
-  /**
-   *
-   * @return name of random column of schema
-   */
-  public String getRandomColumn() {
-    MutablePair<String, DataType> p = Utils.getRandomElement(this.schema);
-    return p.getLeft();
   }
 
   /**
@@ -149,7 +140,6 @@ public class Table {
   }
 
   /**
-  /**p
    *
    * @param numRows number of rows to generate
    * @return sample data with number of rows being numRows
@@ -162,7 +152,4 @@ public class Table {
     }
     return data;
   }
-
-
-
 }

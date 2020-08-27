@@ -3,6 +3,7 @@ package token;
 import parser.Utils;
 import query.SkeletonPiece;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,15 +14,14 @@ public class QueryRegex {
   private List<List<SkeletonPiece>> querySkeletons = new ArrayList<>();
   private int maxOptionalExpressions;
   private Random r = new Random();
+  private TokenProvider tokenProvider = new TokenProvider(r);
 
   // for every feature in the input list of features, map each feature to its raw query
-  public QueryRegex(List<String> featureRegexList, int maxOptionalExpressions) {
+  public QueryRegex(List<String> featureRegexList, int maxOptionalExpressions) throws IOException {
     if (maxOptionalExpressions < 1) {
       // throw error
     }
     this.maxOptionalExpressions = maxOptionalExpressions - 1;
-
-    TokenProvider tokenProvider = new TokenProvider(r);
 
     for (String featureRegex : featureRegexList) {
       String currentString = featureRegex;
@@ -111,5 +111,9 @@ public class QueryRegex {
 
   public List<List<SkeletonPiece>> getQuerySkeletons() {
     return querySkeletons;
+  }
+
+  public TokenProvider getTokenProvider() {
+    return tokenProvider;
   }
 }
