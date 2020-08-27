@@ -1,7 +1,7 @@
 {
   "dataTypeMaps": [
     {
-      "dataType": "SMALL_INT",
+      "dataType": "SMALLINT",
       "dialectMap": {
         "postgres": "SMALLINT",
         "bigQuery": "INT64",
@@ -17,7 +17,7 @@
         }
     },
     {
-      "dataType": "BIG_INT",
+      "dataType": "BIGINT",
       "dialectMap": {
         "postgres": "BIGINT",
         "bigQuery": "INT64",
@@ -49,7 +49,7 @@
       }
     },
     {
-      "dataType": "BIG_REAL",
+      "dataType": "BIGREAL",
       "dialectMap": {
         "postgres": "DOUBLE PRECISION",
         "bigQuery": "FLOAT64",
@@ -57,7 +57,7 @@
       }
     },
     {
-      "dataType": "SMALL_SERIAL",
+      "dataType": "SMALLSERIAL",
       "dialectMap": {
         "postgres": "SMALLSERIAL",
         "bigQuery": "INT64",
@@ -73,7 +73,7 @@
       }
     },
     {
-      "dataType": "BIG_SERIAL",
+      "dataType": "BIGSERIAL",
       "dialectMap": {
         "postgres": "BIGSERIAL",
         "bigQuery": "INT64",
