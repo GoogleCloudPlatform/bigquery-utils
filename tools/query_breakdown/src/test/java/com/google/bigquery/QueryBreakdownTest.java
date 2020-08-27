@@ -101,13 +101,13 @@ public class QueryBreakdownTest {
   @Test
   public void QueryBreakdownRunTestA() throws IOException {
     String absPath = new File("").getAbsolutePath();
-    String[] args = new String[4];
+    String[] args = new String[5];
     args[0] = "-i";
     args[1] = absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/bigqueryReferenceQueries.txt";
-    args[2] = "-l";
-    args[3] = "80000";
-    //args[2] = "-j";
+        + "/InputTestFiles/singleDeletionReplacement.txt";
+    args[3] = "-l";
+    args[4] = "40";
+    args[2] = "-j";
     Main.main(args);
   }
 }

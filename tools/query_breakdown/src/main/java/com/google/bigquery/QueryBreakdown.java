@@ -64,9 +64,16 @@ public class QueryBreakdown {
         return runTermination();
       }
       Pair first = locationTracker.getOriginalPosition(1, 1);
+      Pair last;
       int numLines = locationTracker.getLocation().size();
-      Pair last = locationTracker.getOriginalPosition(numLines,
-          locationTracker.getLocation().get(numLines - 1).size());
+      if (locationTracker.getLocation().get(numLines - 1).size() == 0) {
+        last = locationTracker.getOriginalPosition(numLines - 1,
+            locationTracker.getLocation().get(numLines - 2).size());
+      }
+      else {
+        last = locationTracker.getOriginalPosition(numLines,
+            locationTracker.getLocation().get(numLines - 1).size());
+      }
       Node deletionNode = new Node(null, first.getX(), first.getY(), last.getX(),
           last.getY(), originalQuery.length());
       List<Node> returnNodes = new ArrayList<>();
