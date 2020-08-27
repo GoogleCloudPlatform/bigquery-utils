@@ -15,7 +15,6 @@ public class ReplacementLogic {
    *
    * We choose ArrayLists as the data structure because we want to impose a certain ordering
    * with the recommendations: certain recommendations should be "better" than others
-   *
    * replacementLimit is an integer that controls the number of replacement options
    */
   public static ArrayList<String> replace (String component, int replacementLimit,
