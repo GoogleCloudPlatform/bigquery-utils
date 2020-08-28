@@ -7,11 +7,13 @@ public class Pair {
   private final int x;
   private final int y;
 
+  // constructor
   public Pair(int x, int y) {
     this.x = x;
     this.y = y;
   }
 
+  // getter methods
   public int getX() {
     return x;
   }
