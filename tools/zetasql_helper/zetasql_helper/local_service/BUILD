@@ -9,6 +9,7 @@ proto_library(
     name = "local_service_proto",
     srcs = ["local_service.proto"],
     deps = [
+        "//zetasql_helper/token:parse_token_proto"
     ],
 )
 
@@ -25,6 +26,19 @@ cc_grpc_library(
 )
 
 cc_library(
+    name = "local_service",
+    srcs = ["local_service.cc"],
+    hdrs = ["local_service.h"],
+    copts = ["-Wno-sign-compare"],
+    deps = [
+        ":local_service_cc_proto",
+        # dep regarding implementation
+        "//zetasql_helper/token",
+        "@com_google_zetasql//zetasql/parser",
+    ],
+)
+
+cc_library(
     name = "local_service_grpc",
     srcs = ["local_service_grpc.cc"],
     hdrs = ["local_service_grpc.h"],
@@ -34,7 +48,7 @@ cc_library(
         ":local_service_cc_proto",
         "@com_github_grpc_grpc//:grpc++",
         # dep regarding implementation
-        # Empty right now...
+        ":local_service"
     ],
 )
 
@@ -45,5 +59,16 @@ cc_binary(
         ":local_service_grpc",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_grpc_grpc//:grpc++_reflection",
+    ],
+)
+
+cc_test(
+    name = "local_service_test",
+    size = "small",
+    srcs = ["local_service_test.cc"],
+    copts = ["-Wno-sign-compare"],
+    deps = [
+        ":local_service_grpc",
+        "@com_google_googletest//:gtest_main",
     ],
 )

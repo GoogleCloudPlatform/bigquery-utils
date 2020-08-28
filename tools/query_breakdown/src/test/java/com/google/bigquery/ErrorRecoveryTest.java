@@ -83,6 +83,13 @@ public class ErrorRecoveryTest {
   }
 
   @Test
+  public void deletionLineGreaterThanOneMultipleNewLine() {
+    String query = "\n SELECT b FROM B";
+    assertEquals("\nCT b FROM B",
+        QueryBreakdown.deletion(query, 1, 1, 2,5));
+  }
+
+  @Test
   public void replacementExpectedSingle() {
     String query = "SELECT a FROM A GROUP WITH a";
     Parser parser = new CalciteParser();
@@ -102,45 +109,61 @@ public class ErrorRecoveryTest {
   }
 
   @Test
-  public void expectedTokenFilterSingleLine() {
+  public void expectedTokenLimit() {
     String query = "SELECT a WHERE b";
     Parser parser = new CalciteParser();
     try {
       parser.parseQuery(query);
     } catch (Exception e) {
       Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
-      ArrayList<String> expected = new ArrayList<>();
-      expected.add("!=");
-      expected.add("%");
-      expected.add("(");
-      assertEquals(expected.size(),
-          ReplacementLogic.replace("",
-              QueryBreakdown.expectedTokensFilter(test)).size());
-    }
-  }
-
-  /**
-  @Test
-  public void replacementSingleLine() {
-    String query = "SELECT a WHERE b";
-    Parser parser = new CalciteParser();
-    try {
-      parser.parseQuery(query);
-    } catch (Exception e) {
-      Collection<String> test = ((SqlParseException) e).getExpectedTokenNames();
-      ArrayList<ReplacedComponent> expected = new ArrayList<>();
-      expected.add(new ReplacedComponent("SELECT a != b", "WHERE", "!="));
-      expected.add(new ReplacedComponent("SELECT a % b", "WHERE", "%"));
-      expected.add(new ReplacedComponent("SELECT a ( b", "WHERE", "("));
-      ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
+      ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query, 3,
           ((SqlParseException) e).getPos().getLineNum(),
           ((SqlParseException) e).getPos().getColumnNum(),
           ((SqlParseException) e).getPos().getEndLineNum(),
           ((SqlParseException) e).getPos().getEndColumnNum(),
           test);
-      assertEquals(expected, actual);
+      assertEquals(3, actual.size());
     }
-  } **/
+  }
+
+  @Test
+  public void replacementMultipleLinesNoSpaceAcrossLines() {
+    String query = "SELECT a FROM A" + '\n' + "SELECT b FROM B WHERE b > 3";
+    Collection<String> test = new ArrayList<>();
+    test.add("TEST");
+    ArrayList<ReplacedComponent> expected = new ArrayList<>();
+    expected.add(new ReplacedComponent("SELECT a TEST\nb FROM B WHERE b > 3",
+        "FROM A\nSELECT ", "TEST"));
+    ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
+        3, 1, 10, 2, 7, test);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void replacementMultipleGreaterThanOneMultiple() {
+    String query = "SELECT a\n" + "FROM A\n" + "WHERE A = 3; SELECT b FROM B";
+    Collection<String> test = new ArrayList<>();
+    test.add("TEST");
+    ArrayList<ReplacedComponent> expected = new ArrayList<>();
+    expected.add(new ReplacedComponent("SELETEST\n A = 3; SELECT b FROM B",
+        "CT a\nFROM A\nWHERE", "TEST"));
+    ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
+        3, 1, 5, 3, 5, test);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void replacementMultipleGreaterThanOneMultipleNewLine() {
+    String query = "\n SELECT b FROM B";
+    Collection<String> test = new ArrayList<>();
+    test.add("TEST");
+    ArrayList<ReplacedComponent> expected = new ArrayList<>();
+    expected.add(new ReplacedComponent("TEST\nCT b FROM B",
+        "\n" + " SELE", "TEST"));
+    ArrayList<ReplacedComponent> actual =  QueryBreakdown.replacement(query,
+        3, 1, 1, 2, 5, test);
+    assertEquals(expected, actual);
+  }
 
   // incomplete test
   @Test

@@ -16,6 +16,7 @@ public class InputReader {
   // separates the queries and instantiates a new location tracker per each query
   private List<String> queries;
   private List<LocationTracker> locationTrackers;
+  private int docLength;
 
   /**
    * Constructor for the class. The constructor will take in a txt file name, use BufferedReader to
@@ -29,6 +30,7 @@ public class InputReader {
     queries = new ArrayList<>();
     locationTrackers = new ArrayList<>();
     LocationTracker locationTracker = new LocationTracker();
+    docLength = 0;
 
     // local state for input reading
     int current = reader.read();
@@ -47,13 +49,13 @@ public class InputReader {
 
     // loop for input reading
     while (current != -1) {
+      docLength++;
       sb.append((char) current);
 
       // break down query using semicolon
       if ((char) current == ';') {
-        queries.add(sb.toString());
+        queries.add(sb.substring(0, sb.length() - 1));
         sb = new StringBuilder();
-        locationTracker.add(localLine, line, column);
         locationTrackers.add(locationTracker);
         locationTracker = new LocationTracker();
         locationTracker.addLine();
@@ -159,5 +161,12 @@ public class InputReader {
    */
   public List<LocationTracker> getLocationTrackers() {
     return locationTrackers;
+  }
+
+  /**
+   * Getter method for the length of the input document
+   */
+  public int getDocLength() {
+    return docLength;
   }
 }

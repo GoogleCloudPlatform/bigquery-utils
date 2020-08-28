@@ -19,6 +19,9 @@ public class KeywordsMapping {
   private ImmutableMap<String, Map<String, String>> mapDML = new ImmutableMap.Builder<String, Map<String, String>>().build();
   private ImmutableMap<String, Map<String, String>> mapDQL = new ImmutableMap.Builder<String, Map<String, String>>().build();
 
+  /**
+   * Constructor of keywords mapping, parsed from the config file
+   */
   public KeywordsMapping() {
     try {
       mapDDL = Utils.makeImmutableKeywordMap(Paths.get(filePathDDL));

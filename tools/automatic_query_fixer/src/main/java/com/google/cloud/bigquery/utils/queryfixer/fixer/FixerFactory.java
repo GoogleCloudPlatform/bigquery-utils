@@ -37,6 +37,11 @@ public class FixerFactory {
       return new FunctionNotFoundFixer(query, functionError, queryTokenProcessor);
     }
 
+    if (error instanceof NoMatchingSignatureError) {
+      NoMatchingSignatureError noMatchError = (NoMatchingSignatureError) error;
+      return new NoMatchingSignatureFixer(query, noMatchError);
+    }
+
     if (error instanceof UnexpectedKeywordError) {
       return new UnexpectedKeywordFixer(query, (UnexpectedKeywordError) error, queryTokenProcessor);
     }

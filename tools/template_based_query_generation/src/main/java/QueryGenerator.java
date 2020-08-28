@@ -43,7 +43,7 @@ public class QueryGenerator {
    * Query generator that converts query skeletons to real query strings ready for output
    * @throws IOException if the IO for user parsing fails
    */
-  public QueryGenerator()  throws IOException{
+  public QueryGenerator() throws IOException {
 
     // create map of references to nodes
     Map<String, Node<String>> nodeMap = new HashMap<>();

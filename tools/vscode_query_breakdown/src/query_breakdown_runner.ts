@@ -1,6 +1,8 @@
 import {Progress, CancellationToken} from 'vscode';
 import {exec} from 'child_process';
 import {ResultJson} from './resultJson';
+import * as config from './toolconfig.json';
+import { resolveCliPathFromVSCodeExecutablePath } from 'vscode-test';
 
 /**
  * query_breakdown_runner contains the QueryBreakdownRunner class that is used to
@@ -25,13 +27,20 @@ export class QueryBreakdownRunner {
 
       let jsonString = '';
       let errorMessage = '';
-
+      let command = 'java -jar ' + this.execPath + ' -i ' + filepath + ' -j';
+      if (config.runtimeLimit) {
+        command = command + ' -l ' + config.runtimeLimit;
+      }
+      if (config.replacementLimit) {
+        command = command + ' -r ' + config.replacementLimit;
+      }
       // executes the jar file
       const process = exec(
-        'java -jar ' + this.execPath + ' -i ' + filepath + ' -j'
+        command
       )
         .on('close', exitCode => {
           if (!process.killed && exitCode === 0) {
+            console.log(jsonString)
             // returns the array of json objects after parsing the result
             resolve(JSON.parse(jsonString));
           } else {

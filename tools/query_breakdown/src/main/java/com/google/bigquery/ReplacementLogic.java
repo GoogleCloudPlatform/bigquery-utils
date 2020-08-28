@@ -2,7 +2,6 @@ package com.google.bigquery;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 
 /**
  * This class implements all the replacement logic.
@@ -16,15 +15,22 @@ public class ReplacementLogic {
    *
    * We choose ArrayLists as the data structure because we want to impose a certain ordering
    * with the recommendations: certain recommendations should be "better" than others
-   *
-   * n is an integer that controls the number of replacement options
+   * replacementLimit is an integer that controls the number of replacement options
    */
-  public static ArrayList<String> replace (String component, ArrayList<String> options) {
-    int n = 3;
-
+  public static ArrayList<String> replace (String component, int replacementLimit,
+      ArrayList<String> options) {
     ArrayList<String> result = new ArrayList<>();
 
-    if (options.size() <= n) {
+    /*
+     * The component field in the input arguments of this function denotes the component that the
+     * tool replaces from. Therefore, we use that information to determine good replacements if any.
+     * The example code is below where we deem that A AS is a good replacement for AS in cases
+     * where :
+     *
+     * if (component.equals("AS")) { result.add("A AS"); return result; }
+     */
+
+    if (options.size() <= replacementLimit) {
       for (int i = 0; i < options.size(); i++) {
         // gets rid of cases such as <QUOTED_STRING>
         if (options.get(i).charAt(0) != '<' || options.get(i).length() <= 1) {
@@ -36,9 +42,8 @@ public class ReplacementLogic {
 
     HashSet<Integer> seen = new HashSet<>();
     // randomly populate result until full
-    while (result.size() < n && seen.size() < options.size()) {
-      Random randomGenerator = new Random();
-      int random = randomGenerator.nextInt(n);
+    while (result.size() < replacementLimit && seen.size() < options.size()) {
+      int random = randomNumber(options.size() - 1);
       if (seen.contains(random)) {
         continue;
       }
@@ -52,5 +57,10 @@ public class ReplacementLogic {
       }
     }
     return result;
+  }
+
+  // helper function that returns a random integer between 0 - n
+  private static int randomNumber(int n) {
+    return (int) (Math.random() * (n + 1));
   }
 }

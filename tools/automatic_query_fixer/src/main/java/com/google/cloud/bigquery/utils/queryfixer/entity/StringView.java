@@ -4,7 +4,7 @@ import lombok.Value;
 
 /** A view that represents a part of a string. */
 @Value(staticConstructor = "of")
-public class SubstringView {
+public class StringView {
   String source;
   int start;
   // End of a substring (excluded).
