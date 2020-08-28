@@ -25,20 +25,9 @@ option java_outer_classname = "LocalService";
 
 service ZetaSqlHelperLocalService {
 
-  rpc Hello(HelloRequest) returns (HelloResponse) {
-  }
-
   rpc Tokenize(TokenizeRequest) returns (TokenizeResponse) {
   }
 
-}
-
-message HelloRequest {
-  optional string name = 1;
-}
-
-message HelloResponse {
-  optional string greeting = 1;
 }
 
 message TokenizeRequest {
