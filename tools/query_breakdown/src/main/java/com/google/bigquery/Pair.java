@@ -20,6 +20,7 @@ public class Pair {
     return y;
   }
 
+  // override equals method for better equality check between pair objects and testing/debugging
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
