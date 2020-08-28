@@ -68,10 +68,10 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/singleDeletionReplacement.txt");
-    List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
+    List<Node> result = qb.run(ir.getQueries().get(0), 10000, 3,
         ir.getLocationTrackers().get(0));
     List<Node> result2 =
-        qb2.run(ir.getQueries().get(1), 100, 3,
+        qb2.run(ir.getQueries().get(1), 10000, 3,
             ir.getLocationTrackers().get(1));
     printNodes(result);
     printNodes(result2);
@@ -96,18 +96,5 @@ public class QueryBreakdownTest {
     List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
         ir.getLocationTrackers().get(0));
     assertEquals(0, result.size());
-  }
-
-  @Test
-  public void QueryBreakdownRunTestA() throws IOException {
-    String absPath = new File("").getAbsolutePath();
-    String[] args = new String[5];
-    args[0] = "-i";
-    args[1] = absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/singleDeletionReplacement.txt";
-    args[3] = "-l";
-    args[4] = "40";
-    args[2] = "-j";
-    Main.main(args);
   }
 }

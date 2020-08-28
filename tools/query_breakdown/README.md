@@ -30,7 +30,7 @@ mvn install
 ```
 To run: 
 ```
-mvn exec:java -Dexec.args"[args]"
+mvn exec:java -Dexec.args="[args]"
 ```
 
 To test:

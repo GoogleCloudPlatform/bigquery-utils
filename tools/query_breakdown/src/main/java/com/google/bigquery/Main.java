@@ -192,7 +192,9 @@ public class Main {
       float runtimeSeconds = TimeUnit.NANOSECONDS.toSeconds(end - start);
       System.out.println("Runtime: " + runtimeSeconds + " seconds");
     }
-    exit(0);
+
+    // to deal with a bug where program does not terminate in CLI without explicit exit call
+    System.exit(0);
   }
 
   /**
