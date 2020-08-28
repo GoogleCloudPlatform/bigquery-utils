@@ -51,7 +51,7 @@ public class TableNotFoundFixer implements IFixer {
             incorrectTableId.getProject(), incorrectTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
-        StringUtil.findSimilarWords(tableNames, fullTableId.getTable(), /*caseSensitive=*/false);
+        StringUtil.findSimilarWords(tableNames, incorrectTableId.getTable(), /*caseSensitive=*/false);
 
     // This is an arbitrary standard. It requires the candidate table should share at least 50%
     // similarity as the incorrect table typo.
@@ -65,7 +65,7 @@ public class TableNotFoundFixer implements IFixer {
 
     // This method only finds the first occurrence of the incorrect table. It is possible that this
     // table exists in multiple positions of this query.
-    SubstringView incorrectTableView = findSubstringViewOfIncorrectTable(incorrectTableId);
+    StringView incorrectTableView = findSubstringViewOfIncorrectTable(incorrectTableId);
     if (incorrectTableView == null) {
       return FixResult.failure(query, err, "Cannot locate the incorrect table position.");
     }
@@ -107,7 +107,7 @@ public class TableNotFoundFixer implements IFixer {
     return String.format("%s.%s.%s", projectId, datasetId, tableName);
   }
 
-  private SubstringView findSubstringViewOfIncorrectTable(TableId fullTableId) {
+  private StringView findSubstringViewOfIncorrectTable(TableId fullTableId) {
     String regex;
     // If the project ID is the default one, then the actual table may not include project ID,
     // which looks like "dataset.table".
@@ -125,11 +125,11 @@ public class TableNotFoundFixer implements IFixer {
               fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
     }
 
-    List<SubstringView> substringViews = PatternMatcher.findAllSubstrings(query, regex);
+    List<StringView> stringViews = PatternMatcher.findAllSubstrings(query, regex);
 
     // Iterate the substring and check if this substring is an identifier. If yes, this substring
     // should be the incorrect table we are looking for.
-    for (SubstringView view : substringViews) {
+    for (StringView view : stringViews) {
       Position position = queryPositionConverter.indexToPos(view.getStart());
       IToken token = queryTokenProcessor.getTokenAt(query, position.getRow(), position.getColumn());
 
@@ -144,7 +144,7 @@ public class TableNotFoundFixer implements IFixer {
     return null;
   }
 
-  private String replaceTable(String newTable, SubstringView replacedTable) {
+  private String replaceTable(String newTable, StringView replacedTable) {
     return StringUtil.replaceStringBetweenIndex(
         query, replacedTable.getStart(), replacedTable.getEnd(), newTable);
   }

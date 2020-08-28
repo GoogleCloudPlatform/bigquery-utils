@@ -1,3 +1,0 @@
-// ddl syntax
-DDL_CREATE:1
-DDL_AS:1
