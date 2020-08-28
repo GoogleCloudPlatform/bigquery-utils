@@ -1,6 +1,7 @@
 package com.google.cloud.bigquery.utils.queryfixer.util;
 
-import com.google.cloud.bigquery.utils.queryfixer.entity.SubstringView;
+import com.google.cloud.bigquery.utils.queryfixer.entity.Position;
+import com.google.cloud.bigquery.utils.queryfixer.entity.StringView;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -15,6 +16,8 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor
 public class PatternMatcher {
+
+  private static final String POSITION_REGEX = "\\[(.*?):(.*?)\\]";
 
   /**
    * Check if a string matches a regular expression
@@ -61,19 +64,36 @@ public class PatternMatcher {
    *
    * @param source string to be matched.
    * @param regex regex to match substring
-   * @return A list of {@link SubstringView}
+   * @return A list of {@link StringView}
    */
-  public static List<SubstringView> findAllSubstrings(
+  public static List<StringView> findAllSubstrings(
       @NonNull String source, @NonNull String regex) {
 
     Pattern pattern = Pattern.compile(regex);
     Matcher matcher = pattern.matcher(source);
 
-    List<SubstringView> substringViews = new ArrayList<>();
+    List<StringView> stringViews = new ArrayList<>();
     while (matcher.find()) {
-      substringViews.add(SubstringView.of(source, matcher.start(), matcher.end()));
+      stringViews.add(StringView.of(source, matcher.start(), matcher.end()));
     }
 
-    return substringViews;
+    return stringViews;
+  }
+
+  /**
+   * Extract the position information from a string like [x:y], where x and y are row and column
+   * numbers.
+   *
+   * @param posStr a string like [x:y]
+   * @return Position represented by the string
+   */
+  public static Position extractPosition(String posStr) {
+    List<String> contents = PatternMatcher.extract(posStr, POSITION_REGEX);
+    if (contents == null) {
+      return null;
+    }
+    int rowNum = Integer.parseInt(contents.get(0));
+    int colNum = Integer.parseInt(contents.get(1));
+    return new Position(rowNum, colNum);
   }
 }

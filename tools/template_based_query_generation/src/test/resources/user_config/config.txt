@@ -1,2 +1,0 @@
-root:QUERY_ROOT
-seed:123

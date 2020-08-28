@@ -37,6 +37,7 @@ export class QueryBreakdownRunner {
       const process = exec(command)
         .on('close', exitCode => {
           if (!process.killed && exitCode === 0) {
+            console.log(jsonString)
             // returns the array of json objects after parsing the result
             resolve(JSON.parse(jsonString));
           } else {
