@@ -6,16 +6,16 @@ import java.util.Random;
  * Data types in sql dialects
  */
 public enum DataType {
-  SMALL_INT,
+  SMALLINT,
   INTEGER,
-  BIG_INT,
+  BIGINT,
   DECIMAL,
   NUMERIC,
   REAL,
-  BIG_REAL,
-  SMALL_SERIAL,
+  BIGREAL,
+  SMALLSERIAL,
   SERIAL,
-  BIG_SERIAL,
+  BIGSERIAL,
   BOOL,
   STR,
   BYTES,
@@ -37,7 +37,7 @@ public enum DataType {
    * @return true if can be represented by an integer
    */
   public boolean isIntegerType() {
-    return this == SMALL_INT || this == INTEGER || this == SMALL_SERIAL || this == SERIAL;
+    return this == SMALLINT || this == INTEGER || this == SMALLSERIAL || this == SERIAL;
   }
 
   /**
@@ -45,7 +45,7 @@ public enum DataType {
    * @return true if can be represented by a long
    */
   public boolean isLongType() {
-    return this == BIG_INT || this == BIG_SERIAL;
+    return this == BIGINT || this == BIGSERIAL;
   }
 
   /**
@@ -53,7 +53,7 @@ public enum DataType {
    * @return true if can be represented by an double
    */
   public boolean isDoubleType() {
-    return this == BIG_REAL || this == REAL;
+    return this == BIGREAL || this == REAL;
   }
 
   /**
