@@ -26,7 +26,8 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/simpleDeletion.txt");
-    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
+        ir.getLocationTrackers().get(0));
     printNodes(result);
     assertEquals("Unparseable portion: Start Line 1, End Line 1, "
         + "Start Column 1, End Column 4, DELETION\n", outContent.toString());
@@ -41,9 +42,11 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleDeletion.txt");
-    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
+        ir.getLocationTrackers().get(0));
     List<Node> result2 =
-        qb2.run(ir.getQueries().get(1), 0, ir.getLocationTrackers().get(1));
+        qb2.run(ir.getQueries().get(1), 100, 3,
+            ir.getLocationTrackers().get(1));
     printNodes(result);
     printNodes(result2);
     assertEquals(
@@ -65,9 +68,11 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/singleDeletionReplacement.txt");
-    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
+        ir.getLocationTrackers().get(0));
     List<Node> result2 =
-        qb2.run(ir.getQueries().get(1), 0, ir.getLocationTrackers().get(1));
+        qb2.run(ir.getQueries().get(1), 100, 3,
+            ir.getLocationTrackers().get(1));
     printNodes(result);
     printNodes(result2);
     assertEquals(
@@ -88,18 +93,21 @@ public class QueryBreakdownTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath + "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/singleton.txt");
-    List<Node> result = qb.run(ir.getQueries().get(0), 0, ir.getLocationTrackers().get(0));
+    List<Node> result = qb.run(ir.getQueries().get(0), 100, 3,
+        ir.getLocationTrackers().get(0));
     assertEquals(0, result.size());
   }
 
-  /**
   @Test
   public void QueryBreakdownRunTestA() throws IOException {
-    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-    InputReader ir = new InputReader();
     String absPath = new File("").getAbsolutePath();
-    String query = ir.readInput(absPath + "/src/test/java/com/google/bigquery"
-        + "/InputTestFiles/bigqueryReferenceQueries.txt");
-    qb.run(query, false, 0, ir.getLocationTracker());
-  } **/
+    String[] args = new String[5];
+    args[0] = "-i";
+    args[1] = absPath + "/src/test/java/com/google/bigquery"
+        + "/InputTestFiles/singleDeletionReplacement.txt";
+    args[3] = "-l";
+    args[4] = "40";
+    args[2] = "-j";
+    Main.main(args);
+  }
 }

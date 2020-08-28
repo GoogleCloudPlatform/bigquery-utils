@@ -10,11 +10,11 @@ import {QueryBreakdownRunner} from './query_breakdown_runner';
 
 // colors for the highlight
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#21bf2b',
+  backgroundColor: '#137333',
 });
 
 const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#8f1713',
+  backgroundColor: '#4285F4',
 });
 
 // variable to keep track of results of backend
@@ -57,8 +57,15 @@ export function activate(context: vscode.ExtensionContext) {
               progress,
               token
             );
-
-            if (json) {
+            if (!json) {
+              vscode.window.showInformationMessage(
+                'There was an error in fetching results from the backend'
+              );
+            } else if (json.length === 0) {
+              vscode.window.showInformationMessage(
+                'The entire query can be parsed without error'
+              );
+            } else {
               // highlights and creates hovers for queries
               decorate(currentEditor);
             }
@@ -80,7 +87,7 @@ function decorate(editor: vscode.TextEditor) {
   const decorationParseableArray: vscode.DecorationOptions[] = [];
 
   // parses through the json objects
-  for (let i = 0; i < json.length; i++) {
+  for (let i = 0; i < json.length - 2; i++) {
     // finds error position
     const errorRange = new vscode.Range(
       json[i].error_position.startLine - 1,
@@ -121,7 +128,14 @@ function decorate(editor: vscode.TextEditor) {
   // sets the decorations
   editor.setDecorations(decorationTypeParseable, decorationParseableArray);
   editor.setDecorations(decorationTypeUnparseable, decorationUnparseableArray);
-}
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+  vscode.window.showInformationMessage(
+    'Percentage of Parseable Components: ' +
+      json[json.length - 2].performance + '%'
+  );
+  vscode.window.showInformationMessage(
+    'Runtime: ' +
+    json[json.length - 1].runtime + 
+    ' seconds'
+  );
+}
