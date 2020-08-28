@@ -72,11 +72,11 @@ public class TokenProvider {
         return generateConditionExpression(dataType, this.currentTable);
       }
     } else if (tokenExpression.equals("tableName")) {
-      return generateTableNameExpression(tableChoice);
+      return generateTableNameExpression(this.currentTable);
     } else if (tokenExpression.equals("chosenTableName")) {
       return generateTableNameExpression(this.currentTable);
     } else if (tokenExpression.equals("numRows")) {
-      return generateNumRowsExpression(tableChoice);
+      return generateNumRowsExpression(this.currentTable);
     } else if (tokenExpression.equals("schemaValues")) {
       return generateSchemaValuesExpression(this.currentTable);
     }

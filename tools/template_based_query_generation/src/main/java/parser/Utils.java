@@ -156,8 +156,6 @@ public class Utils {
     for (Table table : tables) {
       writeData(table, outputDirectory.resolve(table.getName() + ".csv"));
     }
-
-    System.out.println("The output is stored at " + outputDirectory);
   }
 
   /**
@@ -194,17 +192,16 @@ public class Utils {
   }
 
   /**
-   * Write data
+   * Write data to a csv file
+   *
+   * @param table the table with which to write data from
+   * @param outputPath relative path of a specified file
+   * @throws IOException if the IO fails or creating the necessary files or folders fails
    */
   public static void writeData(Table table, Path outputPath) throws IOException {
     try (BufferedWriter writer = Files.newBufferedWriter(outputPath, UTF_8)) {
       List<List<?>> data = table.generateData();
       // traverse data column-first
-      String schema = "";
-      for (MutablePair<String, DataType> p : table.getSchema()){
-        schema += (p.getLeft() + ":" + p.getRight() + ",");
-      }
-      System.out.println(schema.substring(0,schema.length()-1));
       for (int row = 0; row < data.get(0).size(); row++) {
         StringBuilder sb = new StringBuilder();
         for (int column = 0; column < data.size(); column++) {
@@ -301,6 +298,12 @@ public class Utils {
     return map;
   }
 
+  /**
+   * Creates a map between a feature and its corresponding regex
+   *
+   * @param inputPath relative path of the config file
+   * @return a map between features and their regexes
+   */
   public static ImmutableMap<String, String> makeRegexMap(Path inputPath) throws IOException {
     BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
     Gson gson = new Gson();
@@ -315,9 +318,8 @@ public class Utils {
    * @param nodeMap mapping between references and nodes
    * @param inputPath relative path of the config file
    * @param r Random instance used for randomization
-   * @return the original map with new key-value pairs
    */
-  public static Map<String, Node<String>> addNodeMap(Map<String, Node<String>> nodeMap, Path inputPath, Random r) {
+  public static void addNodeMap(Map<String, Node<String>> nodeMap, Path inputPath, Random r) {
     try {
       BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
       Gson gson = new Gson();
@@ -331,8 +333,6 @@ public class Utils {
     } catch (IOException exception) {
       exception.printStackTrace();
     }
-
-    return nodeMap;
   }
 
   /**
@@ -341,9 +341,8 @@ public class Utils {
    * @param neighborMap mapping between features and their neighbors
    * @param nodes set of nodes to be connected
    * @param inputPath relative path of the config file
-   * @return the original map with new key-value pairs
    */
-  public static Map<String, List<String>> addNeighborMap(Map<String, List<String>> neighborMap, Set<String> nodes, Path inputPath) {
+  public static void addNeighborMap(Map<String, List<String>> neighborMap, Set<String> nodes, Path inputPath) {
     try {
       BufferedReader reader = Files.newBufferedReader(inputPath, UTF_8);
       Gson gson = new Gson();
@@ -357,8 +356,6 @@ public class Utils {
     } catch (IOException exception) {
       exception.printStackTrace();
     }
-
-    return neighborMap;
   }
 
   /**
@@ -374,8 +371,6 @@ public class Utils {
 
     return user;
   }
-  // TODO(spoiledhua): refactor IO exception handling
-
 
   /**
    *

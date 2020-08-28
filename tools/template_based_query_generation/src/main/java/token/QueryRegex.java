@@ -104,15 +104,22 @@ public class QueryRegex {
           querySkeleton.add(sp);
         }
       }
-
       querySkeletons.add(querySkeleton);
     }
   }
 
+  /**
+   *
+   * @return the list of skeleton pieces to be translated by the query generator
+   */
   public List<List<SkeletonPiece>> getQuerySkeletons() {
     return querySkeletons;
   }
 
+  /**
+   *
+   * @return the token provider used to tokenize the skeleton pieces
+   */
   public TokenProvider getTokenProvider() {
     return tokenProvider;
   }
