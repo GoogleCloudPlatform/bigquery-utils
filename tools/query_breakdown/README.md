@@ -42,6 +42,10 @@ To create an executable jar file (in target folder):
 mvn clean compile assembly:single
 ```
 
+## Input Format
+The input must be a txt file containing queries that are separated by semicolons. Different queries
+should be in different lines (a line cannot contain two queries). 
+
 ## Output Format
 The Query Breakdown tool will outpuut the results in three ways: 
 
