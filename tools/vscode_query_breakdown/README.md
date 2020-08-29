@@ -19,3 +19,5 @@ message that the extension is running ("Finding Unparseable Components") will sh
 right. When finished, the unparesable and paresable components of 
 the queries in the txt file will be highlighted, the runtime and performance metric will pop up 
 on the bottom right, and an output.txt file will be created/overwritten. 
+
+Through toolconfig.json, the runtime spent on each query as well as the number of replacements recommended can be configured.
