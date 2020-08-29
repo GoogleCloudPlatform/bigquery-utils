@@ -14,8 +14,8 @@ import java.util.List;
 public class InputReader {
 
   // separates the queries and instantiates a new location tracker per each query
-  private List<String> queries;
-  private List<LocationTracker> locationTrackers;
+  private final List<String> queries;
+  private final List<LocationTracker> locationTrackers;
   private int docLength;
 
   /**

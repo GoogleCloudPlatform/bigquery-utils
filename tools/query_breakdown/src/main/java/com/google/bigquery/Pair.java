@@ -32,11 +32,6 @@ public class Pair {
       return false;
     }
     Pair p = (Pair) obj;
-    if (p.getX() == x && p.getY() == y) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return p.getX() == x && p.getY() == y;
   }
 }

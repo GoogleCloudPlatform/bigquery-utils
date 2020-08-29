@@ -132,11 +132,4 @@ public class ErrorRecoveryTest {
         3, 1, 1, 2, 5, test);
     assertEquals(expected, actual);
   }
-
-  // incomplete test
-  @Test
-  public void replacementSingleLineTwoErrors() {
-    String query = "SELECT a WHERE A GROUP WITH a";
-    QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
-  }
 }

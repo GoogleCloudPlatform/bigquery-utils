@@ -54,7 +54,6 @@ public class ReplacementLogic {
       }
       else if (options.get(random).charAt(0) == '<' && options.get(random).length() > 1) {
         seen.add(random);
-        continue;
       }
       else {
         result.add(options.get(random));
