@@ -5,7 +5,7 @@ tool
 ## Requirement
 The latest backend version of the tool, which can be found in the query_breakdown folder in
 bigquery-utils/tools, must exist in jar format in resources/query_breakdown/bin folder as 
-"query_breakdown.jar". The latest version as of 08/28/2020 is already included in this directory.
+"query_breakdown.jar".
 
 ## Usage
 Run the extension using the VSCode UI, and in the Extension Development Host window, 
