@@ -52,6 +52,10 @@ public class SqlErrorFactory {
       return error;
     }
 
+    if ((error = NoMatchingSignatureError.parse(exception)) != null) {
+      return error;
+    }
+
     if ((error = tryUnexpectedKeywordError(exception)) != null) {
       return error;
     }
@@ -117,7 +121,7 @@ public class SqlErrorFactory {
     String unrecognizedName = contents.get(0);
     String suggestion = contents.get(2);
     String errPosStr = contents.get(3);
-    Position errorPosition = extractPosition(errPosStr);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
 
     return new UnrecognizedColumnError(unrecognizedName, errorPosition, suggestion, exception);
   }
@@ -146,7 +150,7 @@ public class SqlErrorFactory {
     String functionName = contents.get(0);
     String suggestion = contents.get(2);
     String errPosStr = contents.get(3);
-    Position errorPosition = extractPosition(errPosStr);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
 
     return new FunctionNotFoundError(functionName, errorPosition, suggestion, exception);
   }
@@ -170,7 +174,7 @@ public class SqlErrorFactory {
 
     String keyword = contents.get(0);
     String errPosStr = contents.get(1);
-    Position errorPosition = extractPosition(errPosStr);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
     return new UnexpectedKeywordError(keyword, errorPosition, exception);
   }
   /**
@@ -193,7 +197,7 @@ public class SqlErrorFactory {
     }
     String illegalCharacter = contents.get(0);
     String errPosStr = contents.get(1);
-    Position errorPosition = extractPosition(errPosStr);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
     return new IllegalInputCharacterError(illegalCharacter, errorPosition, exception);
   }
 
@@ -220,7 +224,7 @@ public class SqlErrorFactory {
 
     String expectedKeyword = extractExpectedKeyword(contents.get(0));
     String errPosStr = contents.get(2);
-    Position errorPosition = extractPosition(errPosStr);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
     return new ExpectKeywordButGotOthersError(expectedKeyword, errorPosition, exception);
   }
 
@@ -230,15 +234,5 @@ public class SqlErrorFactory {
       return ExpectKeywordButGotOthersError.END_OF_INPUT;
     }
     return contents.get(0);
-  }
-
-  private Position extractPosition(String posStr) {
-    List<String> contents = PatternMatcher.extract(posStr, /*regex= */ "\\[(.*?):(.*?)\\]");
-    if (contents == null) {
-      return null;
-    }
-    int rowNum = Integer.parseInt(contents.get(0));
-    int colNum = Integer.parseInt(contents.get(1));
-    return new Position(rowNum, colNum);
   }
 }

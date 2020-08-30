@@ -1,0 +1,19 @@
+WITH locations AS
+  (SELECT STRUCT("Seattle" AS city, "Washington" AS state) AS location
+  UNION ALL
+  SELECT STRUCT("Phoenix" AS city, "Arizona" AS state) AS location)
+SELECT l.location.*
+FROM locations l;
+
+WITH locations AS
+  (SELECT ARRAY<STRUCT<city STRING, state STRING>>[("Seattle", "Washington"),
+    ("Phoenix", "Arizona")] AS location)
+SELECT l.LOCATION[offset(0)].*
+FROM locations l;
+
+SELECT *
+FROM UNNEST(ARRAY<STRUCT<x INT64, y STRING>>[(1, 'foo'), (3, 'bar')]);
+
+SELECT *, struct_value
+FROM UNNEST(ARRAY<STRUCT<x INT64, y STRING>>[(1, 'foo'), (3, 'bar')])
+       AS struct_value;

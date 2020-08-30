@@ -11,7 +11,6 @@
       "neighbors": [
         "DDL_PARTITION",
         "DDL_CLUSTER",
-        "DDL_AS",
         "FEATURE_SINK"
       ]
     },
