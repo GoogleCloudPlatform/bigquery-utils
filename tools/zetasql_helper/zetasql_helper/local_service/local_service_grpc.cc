@@ -70,5 +70,24 @@ grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::Tokenize(grpc::ServerContext *co
   return ToGrpcStatus(service_.Tokenize(request, response));
 }
 
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::ExtractFunctionRange(grpc::ServerContext *context,
+                                                                     const ExtractFunctionRangeRequest *request,
+                                                                     ExtractFunctionRangeResponse *response) {
+  return ToGrpcStatus(service_.ExtractFunctionRange(request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::LocateTableRanges(grpc::ServerContext *context,
+                                                                  const LocateTableRangesRequest *request,
+                                                                  LocateTableRangesResponse *response) {
+
+  return ToGrpcStatus(service_.LocateTableRanges(request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::AllKeywords(grpc::ServerContext *context,
+                                                            const AllKeywordsRequest *request,
+                                                            AllKeywordsResponse *response) {
+
+  return ToGrpcStatus(service_.GetAllKeywords(request, response));
+}
 
 } // bigquery::utils::zetasql_helper::local_service

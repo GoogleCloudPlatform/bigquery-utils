@@ -30,6 +30,17 @@ class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Serv
   grpc::Status Tokenize(grpc::ServerContext *context, const TokenizeRequest *req,
                         TokenizeResponse *resp) override;
 
+  grpc::Status ExtractFunctionRange(grpc::ServerContext *context, const ExtractFunctionRangeRequest *request,
+                                    ExtractFunctionRangeResponse *response) override;
+
+  grpc::Status LocateTableRanges(grpc::ServerContext *context,
+                                 const LocateTableRangesRequest *request,
+                                 LocateTableRangesResponse *response) override;
+
+  grpc::Status AllKeywords(grpc::ServerContext *context,
+                           const AllKeywordsRequest *request,
+                           AllKeywordsResponse *response) override;
+
  private:
   ZetaSqlHelperLocalServiceImpl service_;
 };

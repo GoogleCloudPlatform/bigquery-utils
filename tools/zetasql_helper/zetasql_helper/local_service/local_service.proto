@@ -18,7 +18,9 @@ syntax = "proto2";
 
 package bigquery.utils.zetasql_helper.local_service;
 
+import "zetasql/public/parse_location_range.proto";
 import "zetasql_helper/token/parse_token.proto";
+import "zetasql_helper/scanner/function_range.proto";
 
 option java_package = "com.google.bigquery.utils.zetasqlhelper";
 option java_outer_classname = "LocalService";
@@ -26,6 +28,15 @@ option java_outer_classname = "LocalService";
 service ZetaSqlHelperLocalService {
 
   rpc Tokenize(TokenizeRequest) returns (TokenizeResponse) {
+  }
+
+  rpc ExtractFunctionRange(ExtractFunctionRangeRequest) returns (ExtractFunctionRangeResponse) {
+  }
+
+  rpc LocateTableRanges(LocateTableRangesRequest) returns (LocateTableRangesResponse) {
+  }
+
+  rpc AllKeywords(AllKeywordsRequest) returns (AllKeywordsResponse) {
   }
 
 }
@@ -36,4 +47,33 @@ message TokenizeRequest {
 
 message TokenizeResponse {
   repeated ParseTokenProto parse_token = 1;
+}
+
+message ExtractFunctionRangeRequest {
+  optional string query = 1;
+  optional int32 line_number = 2;
+  optional int32 column_number = 3;
+
+}
+
+message ExtractFunctionRangeResponse {
+  optional FunctionRangeProto function_range = 1;
+}
+
+message LocateTableRangesRequest {
+  optional string query = 1;
+  optional string table_regex = 2;
+
+}
+
+message LocateTableRangesResponse {
+  repeated zetasql.ParseLocationRangeProto table_ranges = 1;
+}
+
+message AllKeywordsRequest {
+
+}
+
+message AllKeywordsResponse {
+  repeated string keywords = 1;
 }

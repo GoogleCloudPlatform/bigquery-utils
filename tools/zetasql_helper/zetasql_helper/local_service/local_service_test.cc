@@ -16,6 +16,7 @@
 
 #include "googletest/include/gtest/gtest.h"
 #include "zetasql_helper/local_service/local_service_grpc.h"
+#include "zetasql/public/parse_location.h"
 
 namespace bigquery::utils::zetasql_helper::local_service {
 
@@ -44,6 +45,47 @@ TEST_F(LocalServiceTest, TokenizeTest) {
   EXPECT_EQ(::bigquery::utils::zetasql_helper::ParseTokenProto_Kind::ParseTokenProto_Kind_KEYWORD, tokens[0].kind());
   EXPECT_EQ("1", tokens[1].image());
   EXPECT_EQ("foo", tokens[2].image());
+}
+
+std::string range_to_string(absl::string_view query, const zetasql::ParseLocationRangeProto& range_proto) {
+  auto range = zetasql::ParseLocationRange::Create(range_proto).value();
+  auto start = range.start().GetByteOffset();
+  auto length = range.end().GetByteOffset() - range.start().GetByteOffset();
+  return std::string(query.substr(start, length));
+}
+
+TEST_F(LocalServiceTest, ExtractFunctionRangeTest) {
+  std::string query = "select foo.bar((select a from b), \", a, b, c\", foo.bar(1,2,3))";
+  ExtractFunctionRangeRequest request;
+  ExtractFunctionRangeResponse response;
+  request.set_query(query);
+  request.set_line_number(1);
+  request.set_column_number(8);
+  GetService().ExtractFunctionRange(nullptr, &request, &response);
+
+  auto function_range = response.function_range();
+
+  EXPECT_EQ("foo.bar((select a from b), \", a, b, c\", foo.bar(1,2,3))",
+            range_to_string(query, function_range.function()));
+  EXPECT_EQ("foo.bar", range_to_string(query, function_range.name()));
+  EXPECT_EQ("(select a from b)", range_to_string(query, function_range.arguments(0)));
+  EXPECT_EQ("\", a, b, c\"", range_to_string(query, function_range.arguments(1)));
+  EXPECT_EQ("foo.bar(1,2,3)", range_to_string(query, function_range.arguments(2)));
+}
+
+TEST_F(LocalServiceTest, LocateTableRangesTest) {
+  std::string query = "SELECT `哈哈`, status FROM bigquery-public-data.`austin_311.311_request`"
+                      "cross join `austin_311`.311_request\n"
+                      "where status = '`bigquery-public-data.austin_311.311_request`'";
+  LocateTableRangesRequest request;
+  LocateTableRangesResponse response;
+  request.set_query(query);
+  request.set_table_regex("(bigquery-public-data.)?austin_311.311_request");
+  GetService().LocateTableRanges(nullptr, &request, &response);
+
+  EXPECT_EQ(2, response.table_ranges().size());
+  EXPECT_EQ("bigquery-public-data.`austin_311.311_request`", range_to_string(query, response.table_ranges()[0]));
+  EXPECT_EQ("`austin_311`.311_request", range_to_string(query, response.table_ranges()[1]));
 }
 
 }
