@@ -74,7 +74,7 @@ TEST_F(LocalServiceTest, ExtractFunctionRangeTest) {
 }
 
 TEST_F(LocalServiceTest, LocateTableRangesTest) {
-  std::string query = "SELECT `哈哈`, status FROM bigquery-public-data.`austin_311.311_request`"
+  std::string query = "SELECT `特殊字符 (unicode characters)`, status FROM bigquery-public-data.`austin_311.311_request`"
                       "cross join `austin_311`.311_request\n"
                       "where status = '`bigquery-public-data.austin_311.311_request`'";
   LocateTableRangesRequest request;
