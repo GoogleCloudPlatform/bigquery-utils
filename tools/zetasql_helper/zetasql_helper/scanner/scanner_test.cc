@@ -59,9 +59,9 @@ TEST_F(LocationTest, LocateTableTest2) {
 }
 
 TEST_F(LocationTest, ExtractFunction) {
-  std::string query = "select \"哈哈\", * from (select timestamp(10232) as x)";
+  std::string query = "select \"特殊字符 (unicode characters)\", * from (select timestamp(10232) as x)";
   int line = 1;
-  int col = 29;
+  int col = 52;
 
   std::unique_ptr<FunctionRange> output;
   auto status = ExtractFunctionRange(query, line, col, &output);
@@ -71,6 +71,6 @@ TEST_F(LocationTest, ExtractFunction) {
   EXPECT_EQ("timestamp(10232)", range_to_string(query, output->function));
   EXPECT_EQ(1, output->arguments.size());
   EXPECT_EQ("10232", range_to_string(query, output->arguments[0]));
-//  EXPECT_EQ(2, ranges[0].start().GetByteOffset())
+
 }
 
