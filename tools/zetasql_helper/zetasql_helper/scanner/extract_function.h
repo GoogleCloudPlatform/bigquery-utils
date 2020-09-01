@@ -33,7 +33,7 @@ struct FunctionRange {
   zetasql::ParseLocationRange name;
   std::vector<zetasql::ParseLocationRange> arguments;
 
-  FunctionRange(const zetasql::ASTFunctionCall *function_call);
+  FunctionRange(const zetasql::ASTFunctionCall& function_call);
 
   // Serialize the FunctionRange to its Protobuf object.
   zetasql_base::StatusOr<FunctionRangeProto> ToProto() const;
@@ -53,7 +53,7 @@ struct FunctionRange {
 absl::Status ExtractFunctionRange(absl::string_view query,
                                   int row,
                                   int column,
-                                  std::unique_ptr<FunctionRange> *output);
+                                  std::unique_ptr<FunctionRange>* output);
 
 }
 

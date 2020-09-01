@@ -38,7 +38,7 @@ TEST_F(LocalServiceTest, TokenizeTest) {
   request.set_query(query);
   GetService().Tokenize(nullptr, &request, &response);
 
-  auto tokens = response.parse_token();
+  auto tokens = response.parse_tokens();
 
   EXPECT_EQ(4, tokens.size());
   EXPECT_EQ("select", tokens[0].image());
@@ -88,5 +88,13 @@ TEST_F(LocalServiceTest, LocateTableRangesTest) {
   EXPECT_EQ("`austin_311`.311_request", range_to_string(query, response.table_ranges()[1]));
 }
 
+
+TEST_F(LocalServiceTest, GetAllKeywords) {
+  GetAllKeywordsRequest request;
+  GetAllKeywordsResponse response;
+  GetService().GetAllKeywords(nullptr, &request, &response);
+
+  EXPECT_EQ(231, response.keywords().size());
+}
 }
 

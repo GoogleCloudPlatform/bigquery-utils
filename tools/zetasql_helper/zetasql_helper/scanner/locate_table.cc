@@ -24,7 +24,7 @@ namespace bigquery::utils::zetasql_helper {
 
 absl::Status LocateTableRanges(absl::string_view query,
                                absl::string_view table_regex,
-                               std::vector<zetasql::ParseLocationRange> &output) {
+                               std::vector<zetasql::ParseLocationRange>& output) {
 
   std::unique_ptr<zetasql::ParserOutput> parser_output;
   auto options = BigQueryOptions();
@@ -45,7 +45,7 @@ absl::Status LocateTableRanges(absl::string_view query,
   };
 
   auto table_nodes = find_all_nodes(parser_output->statement(), find_table);
-  for (auto table_node : table_nodes) {
+  for (const auto table_node : table_nodes) {
     output.push_back(table_node->GetParseLocationRange());
   }
 

@@ -24,6 +24,12 @@ class LocationTest : public ::testing::Test {
 
 };
 
+std::string range_to_string(absl::string_view query, zetasql::ParseLocationRange& range) {
+  auto start = range.start().GetByteOffset();
+  auto length = range.end().GetByteOffset() - range.start().GetByteOffset();
+  return std::string(query.substr(start, length));
+}
+
 TEST_F(LocationTest, LocateTableTest1) {
   std::string query =
       "SELECT `特殊字符 (unicode characters)`, status FROM bigquery-public-data.`austin_311.311_request`"
@@ -37,14 +43,10 @@ TEST_F(LocationTest, LocateTableTest1) {
 
   EXPECT_TRUE(status.ok());
   EXPECT_EQ(2, ranges.size());
-//  EXPECT_EQ(2, ranges[0].start().GetByteOffset())
+  EXPECT_EQ("bigquery-public-data.`austin_311.311_request`", range_to_string(query, ranges[0]));
+  EXPECT_EQ("`austin_311`.311_request", range_to_string(query, ranges[1]));
 }
 
-std::string range_to_string(absl::string_view query, zetasql::ParseLocationRange &range) {
-  auto start = range.start().GetByteOffset();
-  auto length = range.end().GetByteOffset() - range.start().GetByteOffset();
-  return std::string(query.substr(start, length));
-}
 
 TEST_F(LocationTest, LocateTableTest2) {
   std::string query = "Select max(foo) from bigquery-public-data.mock.survey_2017 group by bar limit 10";

@@ -36,7 +36,7 @@ service ZetaSqlHelperLocalService {
   rpc LocateTableRanges(LocateTableRangesRequest) returns (LocateTableRangesResponse) {
   }
 
-  rpc AllKeywords(AllKeywordsRequest) returns (AllKeywordsResponse) {
+  rpc GetAllKeywords(GetAllKeywordsRequest) returns (GetAllKeywordsResponse) {
   }
 
 }
@@ -46,12 +46,43 @@ message TokenizeRequest {
 }
 
 message TokenizeResponse {
-  repeated ParseTokenProto parse_token = 1;
+  repeated ParseTokenProto parse_tokens = 1;
+}
+
+message FixColumnNotGroupedRequest {
+  // The input query with "Column Not Grouped" error
+  optional string query = 1;
+  // Name of the missing column in the GROUP BY clause
+  optional string missing_column = 2;
+  // line number of the error
+  optional int32 line_number = 3;
+  // column number of the error
+  optional int32 column_number = 4;
+
+}
+
+message FixColumnNotGroupedResponse {
+  optional string fixed_query = 1;
+}
+
+message FixDuplicateColumnsRequest {
+  // The input query with "Duplicate Columns" error
+  optional string query = 1;
+  // Name of the duplicate columns
+  optional string duplicate_column = 2;
+
+}
+
+message FixDuplicateColumnsResponse {
+  optional string fixed_query = 1;
 }
 
 message ExtractFunctionRangeRequest {
+  // Query to extract the function range
   optional string query = 1;
+  // Line number of the function starting point
   optional int32 line_number = 2;
+  // Column number of the function starting point
   optional int32 column_number = 3;
 
 }
@@ -61,7 +92,9 @@ message ExtractFunctionRangeResponse {
 }
 
 message LocateTableRangesRequest {
+  // Query to locate the tables meeting a regex
   optional string query = 1;
+  // Regex to match table names
   optional string table_regex = 2;
 
 }
@@ -70,10 +103,9 @@ message LocateTableRangesResponse {
   repeated zetasql.ParseLocationRangeProto table_ranges = 1;
 }
 
-message AllKeywordsRequest {
-
+message GetAllKeywordsRequest {
 }
 
-message AllKeywordsResponse {
+message GetAllKeywordsResponse {
   repeated string keywords = 1;
 }

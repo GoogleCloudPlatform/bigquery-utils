@@ -35,7 +35,7 @@ namespace bigquery::utils::zetasql_helper {
 absl::Status LocateTableRanges(
     absl::string_view query,
     absl::string_view table_regex,
-    std::vector<zetasql::ParseLocationRange> &output);
+    std::vector<zetasql::ParseLocationRange>& output);
 
 } //bigquery::utils::zetasql_helper
 

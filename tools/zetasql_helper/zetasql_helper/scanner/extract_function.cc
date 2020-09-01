@@ -21,11 +21,11 @@
 
 namespace bigquery::utils::zetasql_helper {
 
-FunctionRange::FunctionRange(const zetasql::ASTFunctionCall *function_call) {
-  function = function_call->GetParseLocationRange();
-  name = function_call->function()->GetParseLocationRange();
+FunctionRange::FunctionRange(const zetasql::ASTFunctionCall& function_call) {
+  function = function_call.GetParseLocationRange();
+  name = function_call.function()->GetParseLocationRange();
   std::vector<zetasql::ParseLocationRange> ranges;
-  for (auto argument : function_call->arguments()) {
+  for (auto argument : function_call.arguments()) {
     ranges.push_back(argument->GetParseLocationRange());
   }
   arguments = ranges;
@@ -34,24 +34,20 @@ FunctionRange::FunctionRange(const zetasql::ASTFunctionCall *function_call) {
 zetasql_base::StatusOr<FunctionRangeProto> FunctionRange::ToProto() const {
   FunctionRangeProto proto;
   // location range transfer
-  auto status_or_function_proto = function.ToProto();
-  ZETASQL_RETURN_IF_ERROR(status_or_function_proto.status());
+  ZETASQL_ASSIGN_OR_RETURN(auto function_proto, function.ToProto());
 
-  auto range_proto = new zetasql::ParseLocationRangeProto(status_or_function_proto.value());
+  auto range_proto = new zetasql::ParseLocationRangeProto(function_proto);
   proto.set_allocated_function(range_proto);
 
   // name range transfer
-  auto status_or_name_proto = name.ToProto();
-  ZETASQL_RETURN_IF_ERROR(status_or_name_proto.status());
+  ZETASQL_ASSIGN_OR_RETURN(auto name_proto, name.ToProto());
 
-  range_proto = new zetasql::ParseLocationRangeProto(status_or_name_proto.value());
+  range_proto = new zetasql::ParseLocationRangeProto(name_proto);
   proto.set_allocated_name(range_proto);
 
-  for (auto &argument_range : arguments) {
-
-    auto status_or_argument_proto = argument_range.ToProto();
-    ZETASQL_RETURN_IF_ERROR(status_or_argument_proto.status());
-    proto.add_arguments()->CopyFrom(status_or_argument_proto.value());
+  for (const auto& argument_range : arguments) {
+    ZETASQL_ASSIGN_OR_RETURN(auto argument_proto, argument_range.ToProto());
+    proto.add_arguments()->CopyFrom(argument_proto);
   }
 
   return proto;
@@ -61,17 +57,14 @@ zetasql_base::StatusOr<FunctionRangeProto> FunctionRange::ToProto() const {
 absl::Status ExtractFunctionRange(absl::string_view query,
                                   int row,
                                   int column,
-                                  std::unique_ptr<FunctionRange> *output) {
+                                  std::unique_ptr<FunctionRange>* output) {
 
   std::unique_ptr<zetasql::ParserOutput> parser_output;
   auto options = BigQueryOptions();
-  auto status = ParseStatement(query, options.GetParserOptions(), &parser_output);
-  if (!status.ok()) {
-    return status;
-  }
+  ZETASQL_RETURN_IF_ERROR(ParseStatement(query, options.GetParserOptions(), &parser_output));
 
   auto offset = get_offset(query, row, column);
-  auto predicator = [offset](const zetasql::ASTNode *node) {
+  auto predicator = [offset](const zetasql::ASTNode* node) {
     return node->GetParseLocationRange().start().GetByteOffset() == offset &&
         node->node_kind() == zetasql::ASTNodeKind::AST_FUNCTION_CALL;
   };
@@ -81,12 +74,12 @@ absl::Status ExtractFunctionRange(absl::string_view query,
     return absl::Status(absl::StatusCode::kInvalidArgument, "Line and/or column numbers are incorrect");
   }
 
-  auto function_call = dynamic_cast<const zetasql::ASTFunctionCall *>(candidate);
+  auto function_call = dynamic_cast<const zetasql::ASTFunctionCall*>(candidate);
   if (function_call == nullptr) {
     return absl::Status(absl::StatusCode::kInvalidArgument, "The provided position is not function node.");
   }
 
-  *output = absl::make_unique<FunctionRange>(function_call);
+  *output = absl::make_unique<FunctionRange>(*function_call);
   return absl::OkStatus();
 }
 
