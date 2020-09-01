@@ -19,12 +19,12 @@ public class QueryFixerOptions {
   public static final String MODE_SHORTCUT = "m";
   public static final String MODE = "mode";
   public static final String AUTO_MODE = "auto";
-  public static final String USER_ASSISTANCE_MODE = "user-assistance";
-  // The abbreviation of USER_ASSISTANCE_MODE
+  public static final String USER_ASSISTED_MODE = "user-assisted";
+  // The abbreviation of USER_ASSISTED_MODE
   public static final String UA_MODE = "ua";
-  public static final String FIX_ONCE_MODE = "fix-once";
-  // The abbreviation of FIX_ONCE_MODE
-  public static final String FO_MODE = "fo";
+  public static final String SUGGESTION_MODE = "suggestion";
+  // The abbreviation of SUGGESTION_MODE
+  public static final String SG_MODE = "fo";
 
   private static final Options options = createOptions();
   private final CommandLine commandLine;

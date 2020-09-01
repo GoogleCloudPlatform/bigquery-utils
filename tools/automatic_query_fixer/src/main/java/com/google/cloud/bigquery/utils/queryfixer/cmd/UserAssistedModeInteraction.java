@@ -7,19 +7,19 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * A class responsible for the interaction between users and the query fixer in User Assist mode. It
- * continually fixes errors in a query until the query is correct or unable to be fixed. However, If
- * an error can be fixed in multiple ways, then the program will request users to choose one of the
- * fix options by entering their number.
+ * A class responsible for the interaction between users and the query fixer in User-assisted mode.
+ * It continually fixes errors in a query until the query is correct or unable to be fixed. However,
+ * If an error can be fixed in multiple ways, then the program will request users to choose one of
+ * the fix options by entering their number.
  */
-public class UserAssistModeInteraction extends CommandLineInteraction {
+public class UserAssistedModeInteraction extends CommandLineInteraction {
 
-  UserAssistModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
+  UserAssistedModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
     super(outputFormat, bigQueryOptions);
   }
 
   /**
-   * Interact with users in User Assist mode. If multiple options exist to fix an error, the query
+   * Interact with users in User-assisted mode. If multiple options exist to fix an error, the query
    * fixer will ask users to type in a number to choose which options to fix the current error.
    *
    * @param query input query.
