@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 
+/**
+ * Maps features to mappings between dialects and the features' representations in those dialects
+ */
 public class KeywordsMapping {
 
   private final String filePathDDL = "./src/main/resources/dialect_config/ddl_mapping.json";
@@ -46,13 +49,13 @@ public class KeywordsMapping {
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DDL word
+   * Returns the dialect map associated with a DDL feature
    *
    * @param word the DDL word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DDL set does not contain the word
    */
-  public Map<String, String> getMappingDDL(String word) throws IllegalArgumentException {
+  private Map<String, String> getMappingDDL(String word) throws IllegalArgumentException {
     if (!mapDDL.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DDL set");
     }
@@ -61,13 +64,13 @@ public class KeywordsMapping {
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DML word
+   * Returns the dialect map associated with a DML feature
    *
    * @param word the DML word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DML set does not contain the word
    */
-  public Map<String, String> getMappingDML(String word) throws IllegalArgumentException {
+  private Map<String, String> getMappingDML(String word) throws IllegalArgumentException {
     if (!mapDML.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DML set");
     }
@@ -76,13 +79,13 @@ public class KeywordsMapping {
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DQL word
+   * Returns the dialect map associated with a DQL feature
    *
    * @param word the DQL word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DQL set does not contain the word
    */
-  public Map<String, String> getMappingDQL(String word) throws IllegalArgumentException {
+  private Map<String, String> getMappingDQL(String word) throws IllegalArgumentException {
     if (!mapDQL.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DQL set");
     }
