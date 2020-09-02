@@ -9,7 +9,9 @@ proto_library(
     name = "local_service_proto",
     srcs = ["local_service.proto"],
     deps = [
-        "//zetasql_helper/token:parse_token_proto"
+        "//zetasql_helper/token:parse_token_proto",
+        "//zetasql_helper/scanner:function_range_proto",
+        "@com_google_zetasql//zetasql/public:parse_location_range_proto",
     ],
 )
 
@@ -34,6 +36,8 @@ cc_library(
         ":local_service_cc_proto",
         # dep regarding implementation
         "//zetasql_helper/token",
+        "//zetasql_helper/scanner:locate_table",
+        "//zetasql_helper/scanner:extract_function",
         "@com_google_zetasql//zetasql/parser",
     ],
 )

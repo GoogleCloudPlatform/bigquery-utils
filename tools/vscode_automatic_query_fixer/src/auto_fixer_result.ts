@@ -12,6 +12,6 @@ export interface ErrorPosition {
 }
 
 export interface FixOption {
-  description: string;
+  action: string;
   fixedQuery: string;
 }

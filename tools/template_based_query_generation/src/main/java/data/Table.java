@@ -22,9 +22,9 @@ public class Table {
    * constructs empty table from table name
    * @param name
    */
-  public Table(String name) {
+  public Table(String name, int numRows) {
     this.name = name;
-    this.numRows = 0;
+    this.numRows = numRows;
     this.schema = new ArrayList<>();
   }
 
@@ -59,14 +59,25 @@ public class Table {
 
   public int getNumColumns() {
     return this.schema.size();
-  }
 
-  /**
+   /**
    *
-   * @return name of random column of schema
+   * @param type
+   * @return name of random column of given type
    */
-  public String getRandomColumn() {
-    MutablePair<String, DataType> p = Utils.getRandomElement(this.schema);
+  public String getRandomColumn(String columnName, DataType type) {
+    List<MutablePair<String, DataType>> columns = new ArrayList<>();
+    for (MutablePair<String, DataType> col: this.schema) {
+      if (col.getRight() == type) columns.add(col);
+    }
+    int newColumnProbability = Utils.getRandomInteger(columns.size());
+    // add new column of specified datatype with probability 1/(n+1)
+    // where n is the number of existing columns of that datatype
+    if (newColumnProbability == 0) {
+      addColumn(columnName, type);
+      return columnName;
+    }
+    MutablePair<String, DataType> p = Utils.getRandomElement(columns);
     return p.getLeft();
   }
 
@@ -149,7 +160,6 @@ public class Table {
   }
 
   /**
-  /**p
    *
    * @param numRows number of rows to generate
    * @return sample data with number of rows being numRows
@@ -162,7 +172,4 @@ public class Table {
     }
     return data;
   }
-
-
-
 }
