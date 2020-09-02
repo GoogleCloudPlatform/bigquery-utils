@@ -11,7 +11,7 @@
     "DML_VALUES": "DML_VALUES <schemaValues>",
     "DML_DELETE": "DML_DELETE <tableName>",
     "DML_WHERE": "DML_WHERE <condition_>",
-    "DDL_CREATE": "DDL_CREATE {DDL_TABLE|DDL_TABLE_IF_NOT_EXISTS|DDL_OR_REPLACE_TABLE} <tableName>",
+    "DDL_CREATE": "DDL_CREATE {DDL_TABLE|DDL_TABLE_IF_NOT_EXISTS|DDL_OR_REPLACE_TABLE} <tableName> <schemaData>",
     "DDL_PARTITION": "DDL_PARTITION <column_>",
     "DDL_CLUSTER": "DDL_CLUSTER <column_>"
   }

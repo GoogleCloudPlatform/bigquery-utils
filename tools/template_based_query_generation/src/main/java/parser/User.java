@@ -16,8 +16,14 @@ public class User {
   /* the maximum number of columns in the resulting sample data */
   int numColumns;
 
+  /* the number of rows in each table */
+  int numRows;
+
   /* the number of queries to be generated */
   int numQueries;
+
+  /* the number of tables in the database */
+  int numTables;
 
   /* an indicator describing which dialects to output */
   Map<String, Boolean> dialectIndicators = new HashMap<>();
@@ -46,8 +52,24 @@ public class User {
     this.numColumns = numColumns;
   }
 
+  public int getNumRows() {
+    return this.numRows;
+  }
+
+  public void setNumRows(int numRows) {
+    this.numRows = numRows;
+  }
+  
   public int getNumQueries() {
     return numQueries;
+  }
+
+  public void setNumTables(int numTables) {
+    this.numTables = numTables;
+  }
+
+  public int getNumTables() {
+    return numTables;
   }
 
   public void setNumQueries(int numQueries) {
