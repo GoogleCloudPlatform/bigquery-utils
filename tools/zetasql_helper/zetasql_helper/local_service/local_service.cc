@@ -19,6 +19,8 @@
 #include "zetasql_helper/scanner/extract_function.h"
 #include "zetasql/parser/keywords.h"
 #include "zetasql_helper/scanner/locate_table.h"
+#include "zetasql_helper/fixer/fix_column_not_grouped.h"
+#include "zetasql_helper/fixer/fix_duplicate_columns.h"
 
 namespace bigquery::utils::zetasql_helper::local_service {
 
@@ -79,6 +81,36 @@ absl::Status ZetaSqlHelperLocalServiceImpl::GetAllKeywords(const GetAllKeywordsR
   }
 
   return absl::Status();
+}
+
+
+absl::Status ZetaSqlHelperLocalServiceImpl::FixColumnNotGrouped(
+    const FixColumnNotGroupedRequest& request,
+    FixColumnNotGroupedResponse* response) {
+
+  std::string fix_query;
+  ZETASQL_RETURN_IF_ERROR(
+      ::bigquery::utils::zetasql_helper::FixColumnNotGrouped(
+          request.query(), request.missing_column(), request.line_number(), request.column_number(),
+          &fix_query
+      ));
+
+  response->set_fixed_query(std::string(fix_query));
+  return absl::OkStatus();
+}
+
+absl::Status ZetaSqlHelperLocalServiceImpl::FixDuplicateColumns(
+    const FixDuplicateColumnsRequest& request,
+    FixDuplicateColumnsResponse* response) {
+
+  std::string fixed_query;
+  ZETASQL_RETURN_IF_ERROR(
+      ::bigquery::utils::zetasql_helper::FixDuplicateColumns(
+          request.query(), request.duplicate_column(), &fixed_query
+      ));
+
+  response->set_fixed_query(fixed_query);
+  return absl::OkStatus();
 }
 
 }//bigquery::utils::zetasql_helper::local_service

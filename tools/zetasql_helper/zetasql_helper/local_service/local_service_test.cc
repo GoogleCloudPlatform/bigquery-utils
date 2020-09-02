@@ -89,12 +89,57 @@ TEST_F(LocalServiceTest, LocateTableRangesTest) {
 }
 
 
-TEST_F(LocalServiceTest, GetAllKeywords) {
+TEST_F(LocalServiceTest, GetAllKeywordsTest) {
   GetAllKeywordsRequest request;
   GetAllKeywordsResponse response;
   GetService().GetAllKeywords(nullptr, &request, &response);
 
   EXPECT_EQ(231, response.keywords().size());
+}
+
+TEST_F(LocalServiceTest, FixDuplicateColumnsTest) {
+  std::string query = "SELECT status, status FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+  std::string duplicate_column = "status";
+
+  FixDuplicateColumnsRequest request;
+  request.set_query(query);
+  request.set_duplicate_column(duplicate_column);
+
+  FixDuplicateColumnsResponse response;
+  GetService().FixDuplicateColumns(nullptr, &request, &response);
+
+
+  EXPECT_EQ("SELECT\n"
+            "  status AS status_1,\n"
+            "  status AS status_2\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "LIMIT 1000\n", response.fixed_query());
+}
+
+TEST_F(LocalServiceTest, FixColumnNotGrouped) {
+  std::string query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+  std::string missing_column = "status";
+  int line_number = 1;
+  int col_number = 8;
+
+  FixColumnNotGroupedRequest request;
+  request.set_query(query);
+  request.set_missing_column(missing_column);
+  request.set_line_number(line_number);
+  request.set_column_number(col_number);
+
+  FixColumnNotGroupedResponse response;
+  GetService().FixColumnNotGrouped(nullptr, &request, &response);
+
+
+  EXPECT_EQ("SELECT\n"
+            "  status,\n"
+            "  max(unique_key)\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "GROUP BY status\n"
+            "LIMIT 1000\n", response.fixed_query());
 }
 }
 

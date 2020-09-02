@@ -90,4 +90,18 @@ grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::GetAllKeywords(grpc::ServerConte
   return ToGrpcStatus(service_.GetAllKeywords(*request, response));
 }
 
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::FixColumnNotGrouped(grpc::ServerContext* context,
+                                                                    const FixColumnNotGroupedRequest* request,
+                                                                    FixColumnNotGroupedResponse* response) {
+
+  return ToGrpcStatus(service_.FixColumnNotGrouped(*request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::FixDuplicateColumns(grpc::ServerContext* context,
+                                                                    const FixDuplicateColumnsRequest* request,
+                                                                    FixDuplicateColumnsResponse* response) {
+
+  return ToGrpcStatus(service_.FixDuplicateColumns(*request, response));
+}
+
 } // bigquery::utils::zetasql_helper::local_service

@@ -41,6 +41,12 @@ class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Serv
                            const GetAllKeywordsRequest* request,
                            GetAllKeywordsResponse* response) override;
 
+  grpc::Status FixColumnNotGrouped(grpc::ServerContext* context, const FixColumnNotGroupedRequest* request,
+                                   FixColumnNotGroupedResponse* response) override;
+
+  grpc::Status FixDuplicateColumns(grpc::ServerContext* context, const FixDuplicateColumnsRequest* request,
+                                   FixDuplicateColumnsResponse* response) override;
+
  private:
   ZetaSqlHelperLocalServiceImpl service_;
 };

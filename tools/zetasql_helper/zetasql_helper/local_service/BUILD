@@ -38,6 +38,8 @@ cc_library(
         "//zetasql_helper/token",
         "//zetasql_helper/scanner:locate_table",
         "//zetasql_helper/scanner:extract_function",
+        "//zetasql_helper/fixer:fix_duplicate_columns",
+        "//zetasql_helper/fixer:fix_column_not_grouped",
         "@com_google_zetasql//zetasql/parser",
     ],
 )
