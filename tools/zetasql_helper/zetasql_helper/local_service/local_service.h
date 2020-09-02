@@ -27,8 +27,17 @@ class ZetaSqlHelperLocalServiceImpl {
   ZetaSqlHelperLocalServiceImpl(const ZetaSqlHelperLocalServiceImpl &) = delete;
   ZetaSqlHelperLocalServiceImpl &operator=(const ZetaSqlHelperLocalServiceImpl &) = delete;
 
-  absl::Status Tokenize(const TokenizeRequest *req,
-                        TokenizeResponse *resp);
+  absl::Status Tokenize(const TokenizeRequest& req,
+                        TokenizeResponse* resp);
+
+  absl::Status ExtractFunctionRange(const ExtractFunctionRangeRequest& request,
+                                    ExtractFunctionRangeResponse* response);
+
+  absl::Status LocateTableRanges(const LocateTableRangesRequest& request,
+                                 LocateTableRangesResponse* response);
+
+  absl::Status GetAllKeywords(const GetAllKeywordsRequest&request,
+                              GetAllKeywordsResponse* response);
 
   ZetaSqlHelperLocalServiceImpl() = default;
 };

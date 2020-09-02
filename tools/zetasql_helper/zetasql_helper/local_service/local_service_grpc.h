@@ -27,8 +27,19 @@ namespace bigquery::utils::zetasql_helper::local_service {
 class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Service {
  public:
 
-  grpc::Status Tokenize(grpc::ServerContext *context, const TokenizeRequest *req,
-                        TokenizeResponse *resp) override;
+  grpc::Status Tokenize(grpc::ServerContext* context, const TokenizeRequest* request,
+                        TokenizeResponse* response) override;
+
+  grpc::Status ExtractFunctionRange(grpc::ServerContext* context, const ExtractFunctionRangeRequest* request,
+                                    ExtractFunctionRangeResponse *response) override;
+
+  grpc::Status LocateTableRanges(grpc::ServerContext* context,
+                                 const LocateTableRangesRequest* request,
+                                 LocateTableRangesResponse* response) override;
+
+  grpc::Status GetAllKeywords(grpc::ServerContext* context,
+                           const GetAllKeywordsRequest* request,
+                           GetAllKeywordsResponse* response) override;
 
  private:
   ZetaSqlHelperLocalServiceImpl service_;
