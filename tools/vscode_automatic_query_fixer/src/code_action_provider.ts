@@ -33,7 +33,7 @@ export class AutoFixerActionProvider implements vscode.CodeActionProvider {
       }
 
       // highlight the immediate token
-      const regex = new RegExp('.[^(\\s|\\t|\\n)]*');
+      const regex = new RegExp('[^(\\s|\\t|\\n)]*');
       const range = fix.errorPosition
         ? openEditor.document.getWordRangeAtPosition(
             new vscode.Position(
