@@ -104,10 +104,10 @@ bool is_path_expression(const zetasql::ASTNode* node, absl::string_view name) {
 }
 
 void add_column_to_group_by_clause(
-    zetasql::ASTSelect *select_node,
+    zetasql::ASTSelect* select_node,
     absl::string_view column,
-    zetasql_base::UnsafeArena *arena,
-    zetasql::IdStringPool *id_string_pool
+    zetasql_base::UnsafeArena* arena,
+    zetasql::IdStringPool* id_string_pool
 ) {
 
   auto group_by = get_or_create_group_by_node(select_node, arena);
@@ -117,24 +117,24 @@ void add_column_to_group_by_clause(
   ((zetasql::ASTNode*) group_by)->InitFields();
 }
 
-zetasql::ASTGroupBy *get_or_create_group_by_node(
-    zetasql::ASTSelect *select_node,
-    zetasql_base::UnsafeArena *arena) {
+zetasql::ASTGroupBy* get_or_create_group_by_node(
+    zetasql::ASTSelect* select_node,
+    zetasql_base::UnsafeArena* arena) {
 
   if (select_node->group_by() != nullptr) {
-    return const_cast<zetasql::ASTGroupBy *>(select_node->group_by());
+    return const_cast<zetasql::ASTGroupBy*>(select_node->group_by());
   }
 
   auto group_by_node = new(zetasql_base::AllocateInArena, arena) zetasql::ASTGroupBy;
   select_node->AddChild(group_by_node);
-  ((zetasql::ASTNode *) select_node)->InitFields();
+  ((zetasql::ASTNode*) select_node)->InitFields();
   return group_by_node;
 }
 
-zetasql::ASTGroupingItem *new_grouping_column(
+zetasql::ASTGroupingItem* new_grouping_column(
     absl::string_view column,
-    zetasql_base::UnsafeArena *arena,
-    zetasql::IdStringPool *id_string_pool
+    zetasql_base::UnsafeArena* arena,
+    zetasql::IdStringPool* id_string_pool
 ) {
 
   // (grouping_item)->(path_expression)->(identifier)
@@ -142,15 +142,15 @@ zetasql::ASTGroupingItem *new_grouping_column(
 
   auto identifier = new(zetasql_base::AllocateInArena, arena) zetasql::ASTIdentifier;
   identifier->SetIdentifier(id_string_pool->Make(column));
-  ((zetasql::ASTNode *) identifier)->InitFields();
+  ((zetasql::ASTNode*) identifier)->InitFields();
 
   auto pathExpression = new(zetasql_base::AllocateInArena, arena) zetasql::ASTPathExpression;
   pathExpression->AddChild(identifier);
-  ((zetasql::ASTNode *) pathExpression)->InitFields();
+  ((zetasql::ASTNode*) pathExpression)->InitFields();
 
   auto grouping_item = new(zetasql_base::AllocateInArena, arena) zetasql::ASTGroupingItem;
   grouping_item->AddChild(pathExpression);
-  ((zetasql::ASTNode *) grouping_item)->InitFields();
+  ((zetasql::ASTNode*) grouping_item)->InitFields();
   return grouping_item;
 }
 

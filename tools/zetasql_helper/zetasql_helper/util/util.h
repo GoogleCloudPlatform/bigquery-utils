@@ -39,7 +39,7 @@ absl::string_view remove_backtick(absl::string_view column);
 // be returned.
 // Should use Concept in C++20, but the current version is c++1z.
 template<typename NodePredicator>
-const zetasql::ASTNode *find_node(const zetasql::ASTNode *root, NodePredicator predicator) {
+const zetasql::ASTNode* find_node(const zetasql::ASTNode* root, NodePredicator predicator) {
   if (root == nullptr) {
     return nullptr;
   }
@@ -62,8 +62,8 @@ const zetasql::ASTNode *find_node(const zetasql::ASTNode *root, NodePredicator p
 // signature like <code> bool(zetasql::ASTNode*) </code>. If no node meets the predicator,
 // an empty vector will be returned.
 template<typename NodePredicator>
-std::vector<const zetasql::ASTNode *> find_all_nodes(const zetasql::ASTNode *root, NodePredicator predicator) {
-  std::vector<const zetasql::ASTNode *> nodes;
+std::vector<const zetasql::ASTNode*> find_all_nodes(const zetasql::ASTNode* root, NodePredicator predicator) {
+  std::vector<const zetasql::ASTNode*> nodes;
   find_all_nodes(root, predicator, nodes);
   return nodes;
 }
@@ -71,9 +71,9 @@ std::vector<const zetasql::ASTNode *> find_all_nodes(const zetasql::ASTNode *roo
 // A helper function used by the previous one. It tries to push all the AST nodes satisfied with
 // the node predicator into the input vector.
 template<typename NodePredicator>
-void find_all_nodes(const zetasql::ASTNode *root,
+void find_all_nodes(const zetasql::ASTNode* root,
                     NodePredicator predicator,
-                    std::vector<const zetasql::ASTNode *> &nodes) {
+                    std::vector<const zetasql::ASTNode*> &nodes) {
   if (root == nullptr) {
     return;
   }

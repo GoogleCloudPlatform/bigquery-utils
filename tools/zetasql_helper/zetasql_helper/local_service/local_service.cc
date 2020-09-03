@@ -26,7 +26,7 @@ namespace bigquery::utils::zetasql_helper::local_service {
 
 absl::Status ZetaSqlHelperLocalServiceImpl::Tokenize(
     const TokenizeRequest& request,
-    TokenizeResponse *response) {
+    TokenizeResponse* response) {
 
   std::vector<zetasql::ParseToken> tokens;
   ZETASQL_RETURN_IF_ERROR(::bigquery::utils::zetasql_helper::Tokenize(request.query(), tokens));
@@ -40,7 +40,7 @@ absl::Status ZetaSqlHelperLocalServiceImpl::Tokenize(
 
 absl::Status ZetaSqlHelperLocalServiceImpl::ExtractFunctionRange(
     const ExtractFunctionRangeRequest& request,
-    ExtractFunctionRangeResponse *response) {
+    ExtractFunctionRangeResponse* response) {
 
   std::unique_ptr<::bigquery::utils::zetasql_helper::FunctionRange> output;
   ZETASQL_RETURN_IF_ERROR(
@@ -74,7 +74,7 @@ absl::Status ZetaSqlHelperLocalServiceImpl::LocateTableRanges(const LocateTableR
 }
 
 absl::Status ZetaSqlHelperLocalServiceImpl::GetAllKeywords(const GetAllKeywordsRequest& request,
-                                                           GetAllKeywordsResponse *response) {
+                                                           GetAllKeywordsResponse* response) {
   auto keywordInfos = zetasql::parser::GetAllKeywords();
   for (const auto& keywordInfo : keywordInfos) {
     response->add_keywords(keywordInfo.keyword());

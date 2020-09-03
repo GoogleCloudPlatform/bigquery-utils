@@ -31,8 +31,8 @@ absl::Status LocateTableRanges(absl::string_view query,
   ZETASQL_RETURN_IF_ERROR(ParseStatement(query, options.GetParserOptions(), &parser_output));
 
   // Predicate to find a table whose name meets the table_rex
-  auto find_table = [table_regex](const zetasql::ASTNode *node) {
-    auto table_path = dynamic_cast<const zetasql::ASTTablePathExpression *>(node);
+  auto find_table = [table_regex](const zetasql::ASTNode* node) {
+    auto table_path = dynamic_cast<const zetasql::ASTTablePathExpression*>(node);
     if (table_path == nullptr) {
       return false;
     }

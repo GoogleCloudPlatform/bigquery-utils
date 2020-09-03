@@ -68,7 +68,7 @@ find_select_list_with_duplicate_columns(const zetasql::ASTNode& node, absl::stri
   };
 
   auto candidate = find_node(&node, predicator);
-  return dynamic_cast<const zetasql::ASTSelectList *>(candidate);
+  return dynamic_cast<const zetasql::ASTSelectList*>(candidate);
 
 }
 
@@ -89,7 +89,7 @@ std::string get_column_name(const zetasql::ASTSelectColumn* column_node) {
       continue;
     }
 
-    auto path_expression = dynamic_cast<const zetasql::ASTPathExpression *>(child);
+    auto path_expression = dynamic_cast<const zetasql::ASTPathExpression*>(child);
 
     // If the child is of ASTSelectColumn is not ASTPathExpression, then the name should be empty
     if (path_expression == nullptr) {
@@ -112,7 +112,7 @@ void replace_duplicate_columns_of_select_list(
   // Find all the duplicate columns
   for (auto column : select_list.columns()) {
     if (column_name == get_column_name(column)) {
-      duplicate_columns.push_back(const_cast<zetasql::ASTSelectColumn *>(column));
+      duplicate_columns.push_back(const_cast<zetasql::ASTSelectColumn*>(column));
     }
   }
 
@@ -148,11 +148,11 @@ zetasql::ASTAlias* create_alias_node(
 ) {
   auto identifier = new(zetasql_base::AllocateInArena, arena) zetasql::ASTIdentifier;
   identifier->SetIdentifier(id_string_pool->Make(new_alias));
-  ((zetasql::ASTNode *) identifier)->InitFields();
+  ((zetasql::ASTNode*) identifier)->InitFields();
 
   auto alias_node = new(zetasql_base::AllocateInArena, arena) zetasql::ASTAlias;
   alias_node->AddChild(identifier);
-  ((zetasql::ASTNode *) alias_node)->InitFields();
+  ((zetasql::ASTNode*) alias_node)->InitFields();
   return alias_node;
 }
 

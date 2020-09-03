@@ -31,7 +31,7 @@ class ZetaSqlHelperLocalServiceGrpcImpl : public ZetaSqlHelperLocalService::Serv
                         TokenizeResponse* response) override;
 
   grpc::Status ExtractFunctionRange(grpc::ServerContext* context, const ExtractFunctionRangeRequest* request,
-                                    ExtractFunctionRangeResponse *response) override;
+                                    ExtractFunctionRangeResponse* response) override;
 
   grpc::Status LocateTableRanges(grpc::ServerContext* context,
                                  const LocateTableRangesRequest* request,

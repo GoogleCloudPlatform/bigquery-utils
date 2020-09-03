@@ -117,7 +117,7 @@ TEST_F(LocalServiceTest, FixDuplicateColumnsTest) {
             "LIMIT 1000\n", response.fixed_query());
 }
 
-TEST_F(LocalServiceTest, FixColumnNotGrouped) {
+TEST_F(LocalServiceTest, FixColumnNotGroupedTest) {
   std::string query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
   std::string missing_column = "status";
   int line_number = 1;
