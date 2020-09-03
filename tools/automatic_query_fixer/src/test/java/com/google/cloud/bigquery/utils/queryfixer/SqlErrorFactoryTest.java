@@ -74,6 +74,28 @@ public class SqlErrorFactoryTest {
   }
 
   @Test
+  public void getDuplicateColumnsError() {
+    String message =
+        "Duplicate column names in the result are not supported. Found duplicate(s): status";
+    BigQueryException exception = buildException(message);
+    BigQuerySqlError sqlError = factory.getError(exception);
+    assertTrue(sqlError instanceof DuplicateColumnsError);
+    DuplicateColumnsError error = (DuplicateColumnsError) sqlError;
+    assertEquals("status", error.getDuplicate());
+  }
+
+  @Test
+  public void getColumnNotGroupedError() {
+    String message =
+        "SELECT list expression references column status which is neither grouped nor aggregated at [1:8]";
+    BigQueryException exception = buildException(message);
+    BigQuerySqlError sqlError = factory.getError(exception);
+    assertTrue(sqlError instanceof ColumnNotGroupedError);
+    ColumnNotGroupedError error = (ColumnNotGroupedError) sqlError;
+    assertEquals("status", error.getMissingColumn());
+  }
+
+  @Test
   public void errorPosition() {
     String message = "Function not found: sums; Did you mean sum? at [12:34]";
     BigQueryException exception = buildException(message);

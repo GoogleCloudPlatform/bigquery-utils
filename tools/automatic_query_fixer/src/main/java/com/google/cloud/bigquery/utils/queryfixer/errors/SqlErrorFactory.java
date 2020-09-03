@@ -30,6 +30,12 @@ public class SqlErrorFactory {
   public static final String EXPECT_KEYWORD_BUT_GOT_OTHERS_REGEX =
       "^Syntax error: Expected (.*?) but got (.*?) at (.*?)$";
 
+  public static final String DUPLICATE_COLUMNS_REGEX =
+      "^Duplicate column names in the result are not supported. Found duplicate\\(s\\): (.*?)$";
+
+  public static final String COLUMN_NOT_GROUPED_REGEX =
+      "^SELECT list expression references column \\`?(.*?)\\`? which is neither grouped nor aggregated at (.*?)$";
+
   /**
    * The method to convert {@link BigQueryException} to {@link BigQuerySqlError}. If the input
    * exception can not be resolved, a null pointer will be returned instead.
@@ -65,6 +71,14 @@ public class SqlErrorFactory {
     }
 
     if ((error = tryExpectKeywordButGotOthersError(exception)) != null) {
+      return error;
+    }
+
+    if ((error = tryDuplicateColumnsError(exception)) != null) {
+      return error;
+    }
+
+    if ((error = tryColumnNotGroupedError(exception)) != null) {
       return error;
     }
 
@@ -234,5 +248,52 @@ public class SqlErrorFactory {
       return ExpectKeywordButGotOthersError.END_OF_INPUT;
     }
     return contents.get(0);
+  }
+
+  /**
+   * Try to convert the {@link BigQueryException} to {@link DuplicateColumnsError}. If it fails, a
+   * null pointer will be returned.
+   *
+   * <p>The regex to extract information is "^Duplicate column names in the result are not
+   * supported. Found duplicate\(s\): (.*?)$", where the group is the duplicate column.
+   *
+   * @param exception BigQueryException
+   * @return DuplicateColumnsError or null
+   */
+  private DuplicateColumnsError tryDuplicateColumnsError(BigQueryException exception) {
+    List<String> contents =
+        PatternMatcher.extract(exception.getError().getMessage(), DUPLICATE_COLUMNS_REGEX);
+
+    if (contents == null) {
+      return null;
+    }
+
+    String duplicate = contents.get(0);
+    return new DuplicateColumnsError(duplicate, exception);
+  }
+
+  /**
+   * Try to convert the {@link BigQueryException} to {@link ColumnNotGroupedError}. If it fails, a
+   * null pointer will be returned.
+   *
+   * <p>The regex to extract information is "^SELECT list expression references column \`?(.*?)\`?
+   * which is neither grouped nor aggregated at (.*?)$", where the first group is the missing
+   * (ungrouped) column and the second group is the error position.
+   *
+   * @param exception BigQueryException
+   * @return ColumnNotGroupedError or null
+   */
+  private ColumnNotGroupedError tryColumnNotGroupedError(BigQueryException exception) {
+    List<String> contents =
+        PatternMatcher.extract(exception.getError().getMessage(), COLUMN_NOT_GROUPED_REGEX);
+
+    if (contents == null) {
+      return null;
+    }
+
+    String missingColumn = contents.get(0);
+    String errPosStr = contents.get(1);
+    Position errorPosition = PatternMatcher.extractPosition(errPosStr);
+    return new ColumnNotGroupedError(missingColumn, errorPosition, exception);
   }
 }
