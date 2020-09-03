@@ -58,6 +58,19 @@ cc_library(
     ],
 )
 
+java_proto_library(
+    name = "local_service_java_proto",
+    deps = [":local_service_proto"],
+)
+
+java_grpc_library(
+    name = "local_service_java_grpc",
+    srcs = [":local_service_proto"],
+    deps = [
+        ":local_service_java_proto",
+    ],
+)
+
 cc_binary(
     name = "run_server",
     srcs = ["run_server.cc"],

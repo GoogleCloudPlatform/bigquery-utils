@@ -48,6 +48,8 @@ void RunServer(const std::string &server_address) {
 
 
 int main() {
-  RunServer("localhost:50051");
+  // Docker image will listen to external connections, so localhost would fail to do it.
+  // Thus 0.0.0.0 is needed.
+  RunServer("0.0.0.0:50051");
   return 0;
 }
