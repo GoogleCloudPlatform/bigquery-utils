@@ -24,44 +24,39 @@
 namespace bigquery::utils::zetasql_helper {
 
 
-absl::Status
-FixColumnNotGrouped(absl::string_view query, absl::string_view missing_column, int line_number, int column_number,
-                    std::string* fixed_query) {
+zetasql_base::StatusOr<std::string>
+FixColumnNotGrouped(absl::string_view query, absl::string_view missing_column, int line_number, int column_number) {
 
   std::unique_ptr<zetasql::ParserOutput> parser_output;
   auto options = BigQueryOptions();
-  auto status = ParseStatement(query, options.GetParserOptions(), &parser_output);
-  if (!status.ok()) {
-    return status;
-  }
+  ZETASQL_RETURN_IF_ERROR(ParseStatement(query, options.GetParserOptions(), &parser_output));
 
-  missing_column = remove_backtick(missing_column);
+  missing_column = RemoveBacktick(missing_column);
 
   auto offset = get_offset(query, line_number, column_number);
   if (offset == -1) {
-    return absl::Status(absl::StatusCode::kInvalidArgument, "Line and/or column numbers are incorrect");
+    return absl::Status(absl::StatusCode::kInvalidArgument, "Line and/or column numbers are incorrect.");
   }
-  auto select_node = find_select_node_having_column(parser_output->statement(), offset, missing_column);
+  auto select_node = FindSelectNodeHavingColumn(parser_output->statement(), offset, missing_column);
   if (select_node == nullptr) {
-    return absl::Status(absl::StatusCode::kInvalidArgument, "Cannot locate the ungrouped column");
+    return absl::Status(absl::StatusCode::kInvalidArgument, "Cannot locate the ungrouped column.");
   }
 
-  add_column_to_group_by_clause(
-      const_cast<zetasql::ASTSelect*>(select_node),
+  AddColumnToGroupByClause(
+      const_cast<zetasql::ASTSelect *>(select_node),
       missing_column, parser_output->arena().get(),
       parser_output->id_string_pool().get()
   );
 
-  *fixed_query = Unparse(parser_output->statement());
-  return absl::OkStatus();
+  return Unparse(parser_output->statement());
 }
 
 const zetasql::ASTSelect*
-find_select_node_having_column(const zetasql::ASTStatement* statement, int column_start_offset,
-                               absl::string_view column) {
+FindSelectNodeHavingColumn(const zetasql::ASTStatement* statement, int column_start_offset,
+                           absl::string_view column) {
 
   // Find the Column node starting at the given offset
-  auto node = find_path_expression_node(*statement, column_start_offset, column);
+  auto node = FindPathExpressionNode(*statement, column_start_offset, column);
   if (node == nullptr) {
     return nullptr;
   }
@@ -78,7 +73,7 @@ find_select_node_having_column(const zetasql::ASTStatement* statement, int colum
 }
 
 const zetasql::ASTNode*
-find_path_expression_node(const zetasql::ASTNode& node, int column_start_offset, absl::string_view name) {
+FindPathExpressionNode(const zetasql::ASTNode& node, int column_start_offset, absl::string_view name) {
 
   // Setup the predicator to find the target path expression node
   auto predicator = [column_start_offset](const zetasql::ASTNode* node) {
@@ -86,14 +81,14 @@ find_path_expression_node(const zetasql::ASTNode& node, int column_start_offset,
         node->node_kind() == zetasql::ASTNodeKind::AST_PATH_EXPRESSION;
   };
 
-  auto candidate = find_node(&node, predicator);
-  if (is_path_expression(candidate, name)) {
+  auto candidate = FindNode(&node, predicator);
+  if (IsPathExpression(candidate, name)) {
     return candidate;
   }
   return nullptr;
 }
 
-bool is_path_expression(const zetasql::ASTNode* node, absl::string_view name) {
+bool IsPathExpression(const zetasql::ASTNode* node, absl::string_view name) {
   auto path_expression = dynamic_cast<const zetasql::ASTPathExpression*>(node);
   if (path_expression == nullptr) {
     return false;
@@ -103,21 +98,21 @@ bool is_path_expression(const zetasql::ASTNode* node, absl::string_view name) {
   return name == path_expression->last_name()->GetAsString();
 }
 
-void add_column_to_group_by_clause(
+void AddColumnToGroupByClause(
     zetasql::ASTSelect* select_node,
     absl::string_view column,
     zetasql_base::UnsafeArena* arena,
     zetasql::IdStringPool* id_string_pool
 ) {
 
-  auto group_by = get_or_create_group_by_node(select_node, arena);
-  auto item = new_grouping_column(column, arena, id_string_pool);
+  auto group_by = GetOrCreateGroupByNode(select_node, arena);
+  auto item = NewGroupingColumn(column, arena, id_string_pool);
 
   group_by->AddChild(item);
   ((zetasql::ASTNode*) group_by)->InitFields();
 }
 
-zetasql::ASTGroupBy* get_or_create_group_by_node(
+zetasql::ASTGroupBy* GetOrCreateGroupByNode(
     zetasql::ASTSelect* select_node,
     zetasql_base::UnsafeArena* arena) {
 
@@ -131,7 +126,7 @@ zetasql::ASTGroupBy* get_or_create_group_by_node(
   return group_by_node;
 }
 
-zetasql::ASTGroupingItem* new_grouping_column(
+zetasql::ASTGroupingItem* NewGroupingColumn(
     absl::string_view column,
     zetasql_base::UnsafeArena* arena,
     zetasql::IdStringPool* id_string_pool

@@ -38,13 +38,13 @@ absl::Status LocateTableRanges(absl::string_view query,
     }
 
     // Read the full name of a table node.
-    auto names = read_names(*table_path->path_expr());
+    auto names = ReadNames(*table_path->path_expr());
     auto full_name = absl::StrJoin(names, ".");
 
     return std::regex_match(full_name, std::regex(std::string(table_regex)));
   };
 
-  auto table_nodes = find_all_nodes(parser_output->statement(), find_table);
+  auto table_nodes = FindAllNodes(parser_output->statement(), find_table);
   for (const auto table_node : table_nodes) {
     output.push_back(table_node->GetParseLocationRange());
   }

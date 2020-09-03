@@ -29,30 +29,30 @@ namespace bigquery::utils::zetasql_helper {
 // query: incorrect SQL with the error
 // duplicate_column_name: name of the duplicate columns
 //
-// The function will assign the fixed query to the fixed_query pointer
-absl::Status FixDuplicateColumns(absl::string_view query, absl::string_view duplicate_column_name,
-                                 std::string* fixed_query);
+// The function will return the fixed query.
+zetasql_base::StatusOr<std::string>
+FixDuplicateColumns(absl::string_view query, absl::string_view duplicate_column_name);
 
 
 // Find the ASTSelectList Node having duplicate columns, whose name is the input name.
 const zetasql::ASTSelectList*
-find_select_list_with_duplicate_columns(const zetasql::ASTNode& node, absl::string_view column_name);
+FindSelectListWithDuplicateColumns(const zetasql::ASTNode& node, absl::string_view column_name);
 
 // Get the column name of an ASTSelectColumn node.
-std::string get_column_name(const zetasql::ASTSelectColumn* column_node);
+std::string GetColumnName(const zetasql::ASTSelectColumn* column_node);
 
 // Change the duplicate names to their new names by adding numeric suffix after them.
 void
-replace_duplicate_columns_of_select_list(const zetasql::ASTSelectList& select_list, absl::string_view column_name,
-                                         zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
+ReplaceDuplicateColumnsOfSelectList(const zetasql::ASTSelectList& select_list, absl::string_view column_name,
+                                    zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
 
 // Update or create an alias node of an ASTSelectColumn
-void update_alias(zetasql::ASTSelectColumn* column_node, absl::string_view new_alias,
-                  zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
+void UpdateAlias(zetasql::ASTSelectColumn* column_node, absl::string_view new_alias,
+                 zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
 
 // Create an alias node of an ASTSelectColumn
-zetasql::ASTAlias* create_alias_node(absl::string_view new_alias, zetasql_base::UnsafeArena* arena,
-                                     zetasql::IdStringPool* id_string_pool);
+zetasql::ASTAlias* CreateAliasNode(absl::string_view new_alias, zetasql_base::UnsafeArena* arena,
+                                   zetasql::IdStringPool* id_string_pool);
 
 } // bigquery::utils::zetasql_helper
 

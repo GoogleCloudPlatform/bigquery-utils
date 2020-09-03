@@ -15,7 +15,13 @@ is c++1z.
 If you hope to build the server docker image, use the following command.
 
 ```bash
-docker build . -t zetasql_helper/run_server
+docker build . -t <docker-image-name>:<version>
+```
+
+For example, the current image stored in `gcr` is built as:
+
+```bash
+docker build . -t gcr.io/sql-gravity-internship/zetasql-helper:1.0
 ```
 
 If you hope to start the standalone server without Docker, run this command:

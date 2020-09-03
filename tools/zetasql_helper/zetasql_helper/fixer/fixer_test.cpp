@@ -25,95 +25,95 @@ class FixerTest : public ::testing::Test {
 };
 
 
-TEST_F(FixerTest, FixDuplicateColumnsTest) {
-    absl::string_view query = "SELECT status, status FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
-    absl::string_view duplicate_column = "status";
-    std::string fixed_query;
+TEST_F(FixerTest, FixDuplicateColumns) {
+  absl::string_view query = "SELECT status, status FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+  absl::string_view duplicate_column = "status";
 
-    auto status = FixDuplicateColumns(query, duplicate_column, &fixed_query);
+  auto status_or_value = FixDuplicateColumns(query, duplicate_column);
+  ASSERT_TRUE(status_or_value.ok());
 
-    EXPECT_TRUE(status.ok());
-    EXPECT_EQ("SELECT\n"
-              "  status AS status_1,\n"
-              "  status AS status_2\n"
-              "FROM\n"
-              "  `bigquery-public-data.austin_311.311_request`\n"
-              "LIMIT 1000\n", fixed_query);
+  auto fixed_query = status_or_value.value();
+  EXPECT_EQ("SELECT\n"
+            "  status AS status_1,\n"
+            "  status AS status_2\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "LIMIT 1000\n", fixed_query);
 }
 
-TEST_F(FixerTest, FixColumnNotGroupedTest1) {
-    absl::string_view query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
-    absl::string_view missing_column = "status";
-    int line_number = 1;
-    int col_number = 8;
-    std::string fixed_query;
+TEST_F(FixerTest, FixColumnNotGrouped_createGroupByClause) {
+  absl::string_view query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+  absl::string_view missing_column = "status";
+  int line_number = 1;
+  int col_number = 8;
 
-    auto status = FixColumnNotGrouped(query, missing_column, line_number, col_number, &fixed_query);
+  auto status_or_value = FixColumnNotGrouped(query, missing_column, line_number, col_number);
+  ASSERT_TRUE(status_or_value.ok());
 
-    EXPECT_TRUE(status.ok());
-    EXPECT_EQ("SELECT\n"
-              "  status,\n"
-              "  max(unique_key)\n"
-              "FROM\n"
-              "  `bigquery-public-data.austin_311.311_request`\n"
-              "GROUP BY status\n"
-              "LIMIT 1000\n", fixed_query);
+  auto fixed_query = status_or_value.value();
+  EXPECT_EQ("SELECT\n"
+            "  status,\n"
+            "  max(unique_key)\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "GROUP BY status\n"
+            "LIMIT 1000\n", fixed_query);
 }
 
-TEST_F(FixerTest, FixColumnNotGroupedTest2) {
-    absl::string_view query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` group by city LIMIT 1000";
-    absl::string_view missing_column = "status";
-    int line_number = 1;
-    int col_number = 8;
-    std::string fixed_query;
+TEST_F(FixerTest, FixColumnNotGrouped_updateGroupByClause) {
+  absl::string_view query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` group by city LIMIT 1000";
+  absl::string_view missing_column = "status";
+  int line_number = 1;
+  int col_number = 8;
 
-    auto status = FixColumnNotGrouped(query, missing_column, line_number, col_number, &fixed_query);
+  auto status_or_value = FixColumnNotGrouped(query, missing_column, line_number, col_number);
+  ASSERT_TRUE(status_or_value.ok());
 
-    EXPECT_TRUE(status.ok());
-    EXPECT_EQ("SELECT\n"
-              "  status,\n"
-              "  max(unique_key)\n"
-              "FROM\n"
-              "  `bigquery-public-data.austin_311.311_request`\n"
-              "GROUP BY city, status\n"
-              "LIMIT 1000\n", fixed_query);
+  auto fixed_query = status_or_value.value();
+  EXPECT_EQ("SELECT\n"
+            "  status,\n"
+            "  max(unique_key)\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "GROUP BY city, status\n"
+            "LIMIT 1000\n", fixed_query);
 }
 
-TEST_F(FixerTest, FixColumnNotGroupedTest3) {
-    absl::string_view query = "SELECT `select`, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
-    absl::string_view missing_column = "select";
-    int line_number = 1;
-    int col_number = 8;
-    std::string fixed_query;
+TEST_F(FixerTest, FixColumnNotGrouped_columnWithKeywordName) {
+  absl::string_view query = "SELECT `select`, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+  absl::string_view missing_column = "select";
+  int line_number = 1;
+  int col_number = 8;
 
-    auto status = FixColumnNotGrouped(query, missing_column, line_number, col_number, &fixed_query);
+  auto status_or_value = FixColumnNotGrouped(query, missing_column, line_number, col_number);
+  ASSERT_TRUE(status_or_value.ok());
 
-    EXPECT_TRUE(status.ok());
-    EXPECT_EQ("SELECT\n"
-              "  `select`,\n"
-              "  max(unique_key)\n"
-              "FROM\n"
-              "  `bigquery-public-data.austin_311.311_request`\n"
-              "GROUP BY `select`\n"
-              "LIMIT 1000\n", fixed_query);
+  auto fixed_query = status_or_value.value();
+  EXPECT_EQ("SELECT\n"
+            "  `select`,\n"
+            "  max(unique_key)\n"
+            "FROM\n"
+            "  `bigquery-public-data.austin_311.311_request`\n"
+            "GROUP BY `select`\n"
+            "LIMIT 1000\n", fixed_query);
 }
 
 
 TEST_F(FixerTest, FixColumnNotGroupedTest4) {
-    absl::string_view query = "SELECT `hash`,  mod(size, 100) as bucket FROM `bigquery-public-data.crypto_bitcoin.blocks` group by bucket, mod(number, 10) LIMIT 1000 ";
-    absl::string_view missing_column = "`hash`";
-    int line_number = 1;
-    int col_number = 8;
-    std::string fixed_query;
+  absl::string_view query = "SELECT `hash`,  mod(size, 100) as bucket FROM `bigquery-public-data.crypto_bitcoin.blocks` group by bucket, mod(number, 10) LIMIT 1000 ";
+  absl::string_view missing_column = "`hash`";
+  int line_number = 1;
+  int col_number = 8;
 
-    auto status = FixColumnNotGrouped(query, missing_column, line_number, col_number, &fixed_query);
+  auto status_or_value = FixColumnNotGrouped(query, missing_column, line_number, col_number);
+  ASSERT_TRUE(status_or_value.ok());
 
-    EXPECT_TRUE(status.ok());
-    EXPECT_EQ("SELECT\n"
-              "  `hash`,\n"
-              "  mod(size, 100) AS bucket\n"
-              "FROM\n"
-              "  `bigquery-public-data.crypto_bitcoin.blocks`\n"
-              "GROUP BY bucket, mod(number, 10), `hash`\n"
-              "LIMIT 1000\n", fixed_query);
+  auto fixed_query = status_or_value.value();
+  EXPECT_EQ("SELECT\n"
+            "  `hash`,\n"
+            "  mod(size, 100) AS bucket\n"
+            "FROM\n"
+            "  `bigquery-public-data.crypto_bitcoin.blocks`\n"
+            "GROUP BY bucket, mod(number, 10), `hash`\n"
+            "LIMIT 1000\n", fixed_query);
 }

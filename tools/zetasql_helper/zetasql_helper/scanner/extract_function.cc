@@ -69,7 +69,7 @@ absl::Status ExtractFunctionRange(absl::string_view query,
         node->node_kind() == zetasql::ASTNodeKind::AST_FUNCTION_CALL;
   };
 
-  auto candidate = find_node(parser_output->statement(), predicator);
+  auto candidate = FindNode(parser_output->statement(), predicator);
   if (candidate == nullptr) {
     return absl::Status(absl::StatusCode::kInvalidArgument, "Line and/or column numbers are incorrect");
   }

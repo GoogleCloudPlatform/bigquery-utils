@@ -31,47 +31,46 @@ namespace bigquery::utils::zetasql_helper {
 // missing_column: name of the missing (ungrouped) column
 // line/column number: the starting position of the ungrouped column (1-based index)
 //
-// The function will assign the fixed query to the fixed_query pointer
-absl::Status
-FixColumnNotGrouped(absl::string_view query, absl::string_view missing_column, int line_number, int column_number,
-                    std::string* fixed_query);
+// The function will return the fixed query.
+zetasql_base::StatusOr<std::string>
+FixColumnNotGrouped(absl::string_view query, absl::string_view missing_column, int line_number, int column_number);
 
 // Find the AST_Select Node having a column node. The column node should start at the given offset
 // and has the given column name.
 const zetasql::ASTSelect*
-find_select_node_having_column(const zetasql::ASTStatement* statement, int column_start_offset,
-                               absl::string_view column);
+FindSelectNodeHavingColumn(const zetasql::ASTStatement* statement, int column_start_offset,
+                           absl::string_view column);
 
 // Check if the input AST_Node pointer points to an AST_Path_Expression node whose column name is the
 // input name.
 // The input might be null_ptr.
-bool is_path_expression(const zetasql::ASTNode* node, absl::string_view name);
+bool IsPathExpression(const zetasql::ASTNode* node, absl::string_view name);
 
 
 // Find an AST_Path_Expression node inside the given AST node. The AST_Path_Expression should have
 // the staring offset and name identical to the input values.
 // Return the AST_Path_Expression pointer if it is found. Otherwise, a null pointer will be returned.
 const zetasql::ASTNode*
-find_path_expression_node(const zetasql::ASTNode& node, int column_start_offset, absl::string_view name);
+FindPathExpressionNode(const zetasql::ASTNode& node, int column_start_offset, absl::string_view name);
 
 
 // Add a column to the group-by clause of the input AST_Select node.
 // zetasql_base::UnsafeArena and zetasql::IdStringPool are two objects required to create a new node,
 // they can be acquired from the zetasql::AnalyzerOptions.
-void add_column_to_group_by_clause(zetasql::ASTSelect* select_node, absl::string_view column,
-                                   zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
+void AddColumnToGroupByClause(zetasql::ASTSelect* select_node, absl::string_view column,
+                              zetasql_base::UnsafeArena* arena, zetasql::IdStringPool* id_string_pool);
 
 
 // Get or Create a AST_Group_By node at the given AST_Select node.
 // zetasql_base::UnsafeArena* is used to allocate space for the created node, which can be acquired from the
 // zetasql::AnalyzerOptions
-zetasql::ASTGroupBy* get_or_create_group_by_node(zetasql::ASTSelect* select_node, zetasql_base::UnsafeArena* arena);
+zetasql::ASTGroupBy* GetOrCreateGroupByNode(zetasql::ASTSelect* select_node, zetasql_base::UnsafeArena* arena);
 
 // Create a AST_Grouping_Column node..
 // zetasql_base::UnsafeArena and zetasql::IdStringPool are two objects required to create a new node,
 // they can be acquired from the zetasql::AnalyzerOptions.
-zetasql::ASTGroupingItem* new_grouping_column(absl::string_view column, zetasql_base::UnsafeArena* arena,
-                                              zetasql::IdStringPool* id_string_pool);
+zetasql::ASTGroupingItem* NewGroupingColumn(absl::string_view column, zetasql_base::UnsafeArena* arena,
+                                            zetasql::IdStringPool* id_string_pool);
 
 
 } // bigquery::utils::zetasql_helper

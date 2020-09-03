@@ -88,14 +88,13 @@ absl::Status ZetaSqlHelperLocalServiceImpl::FixColumnNotGrouped(
     const FixColumnNotGroupedRequest& request,
     FixColumnNotGroupedResponse* response) {
 
-  std::string fix_query;
-  ZETASQL_RETURN_IF_ERROR(
+  ZETASQL_ASSIGN_OR_RETURN(
+      auto fixed_query,
       ::bigquery::utils::zetasql_helper::FixColumnNotGrouped(
-          request.query(), request.missing_column(), request.line_number(), request.column_number(),
-          &fix_query
+          request.query(), request.missing_column(), request.line_number(), request.column_number()
       ));
 
-  response->set_fixed_query(std::string(fix_query));
+  response->set_fixed_query(fixed_query);
   return absl::OkStatus();
 }
 
@@ -103,10 +102,10 @@ absl::Status ZetaSqlHelperLocalServiceImpl::FixDuplicateColumns(
     const FixDuplicateColumnsRequest& request,
     FixDuplicateColumnsResponse* response) {
 
-  std::string fixed_query;
-  ZETASQL_RETURN_IF_ERROR(
+  ZETASQL_ASSIGN_OR_RETURN(
+      auto fixed_query,
       ::bigquery::utils::zetasql_helper::FixDuplicateColumns(
-          request.query(), request.duplicate_column(), &fixed_query
+          request.query(), request.duplicate_column()
       ));
 
   response->set_fixed_query(fixed_query);

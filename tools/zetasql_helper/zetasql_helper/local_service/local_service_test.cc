@@ -31,7 +31,7 @@ class LocalServiceTest : public ::testing::Test {
   ZetaSqlHelperLocalServiceGrpcImpl service_;
 };
 
-TEST_F(LocalServiceTest, TokenizeTest) {
+TEST_F(LocalServiceTest, Tokenize) {
   std::string query = "select 1 foo";
   TokenizeRequest request;
   TokenizeResponse response;
@@ -54,7 +54,7 @@ std::string range_to_string(absl::string_view query, const zetasql::ParseLocatio
   return std::string(query.substr(start, length));
 }
 
-TEST_F(LocalServiceTest, ExtractFunctionRangeTest) {
+TEST_F(LocalServiceTest, ExtractFunctionRange) {
   std::string query = "select foo.bar((select a from b), \", a, b, c\", foo.bar(1,2,3))";
   ExtractFunctionRangeRequest request;
   ExtractFunctionRangeResponse response;
@@ -73,7 +73,7 @@ TEST_F(LocalServiceTest, ExtractFunctionRangeTest) {
   EXPECT_EQ("foo.bar(1,2,3)", range_to_string(query, function_range.arguments(2)));
 }
 
-TEST_F(LocalServiceTest, LocateTableRangesTest) {
+TEST_F(LocalServiceTest, LocateTableRanges) {
   std::string query = "SELECT `特殊字符 (unicode characters)`, status FROM bigquery-public-data.`austin_311.311_request`"
                       "cross join `austin_311`.311_request\n"
                       "where status = '`bigquery-public-data.austin_311.311_request`'";
@@ -89,7 +89,7 @@ TEST_F(LocalServiceTest, LocateTableRangesTest) {
 }
 
 
-TEST_F(LocalServiceTest, GetAllKeywordsTest) {
+TEST_F(LocalServiceTest, GetAllKeywords) {
   GetAllKeywordsRequest request;
   GetAllKeywordsResponse response;
   GetService().GetAllKeywords(nullptr, &request, &response);
@@ -97,7 +97,7 @@ TEST_F(LocalServiceTest, GetAllKeywordsTest) {
   EXPECT_EQ(231, response.keywords().size());
 }
 
-TEST_F(LocalServiceTest, FixDuplicateColumnsTest) {
+TEST_F(LocalServiceTest, FixDuplicateColumns) {
   std::string query = "SELECT status, status FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
   std::string duplicate_column = "status";
 
@@ -117,7 +117,7 @@ TEST_F(LocalServiceTest, FixDuplicateColumnsTest) {
             "LIMIT 1000\n", response.fixed_query());
 }
 
-TEST_F(LocalServiceTest, FixColumnNotGroupedTest) {
+TEST_F(LocalServiceTest, FixColumnNotGrouped) {
   std::string query = "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
   std::string missing_column = "status";
   int line_number = 1;
