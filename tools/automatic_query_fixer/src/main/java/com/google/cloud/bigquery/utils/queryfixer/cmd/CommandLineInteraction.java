@@ -14,7 +14,7 @@ import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.*
 
 /**
  * A base class to implement the interaction between users and the query fixer. It has three modes:
- * Auto, User-assisted, and Suggestion (fully interactive). Each mode is represented by a subclass.
+ * Auto, User-assisting, and Suggestion (fully interactive). Each mode is represented by a subclass.
  */
 public abstract class CommandLineInteraction {
   final String outputFormat;
@@ -91,7 +91,7 @@ public abstract class CommandLineInteraction {
     FixOption option = fixResult.getOptions().get(0);
     System.out.println(String.format("Action: %s", option.getAction()));
     System.out.println();
-    System.out.println(String.format("Fixed query: %s", option.getFixedQuery()));
+    System.out.println(String.format("Fixed query:\n%s", option.getFixedQuery()));
     System.out.println("-----------------------------------\n");
   }
 
@@ -117,7 +117,7 @@ public abstract class CommandLineInteraction {
     int count = 1;
     for (FixOption option : options) {
       System.out.println(String.format("%d. Action: %s", count++, option.getAction()));
-      System.out.println(String.format("   Fixed query: %s", option.getFixedQuery()));
+      System.out.println(String.format("   Fixed query:\n%s", option.getFixedQuery()));
       System.out.println();
     }
   }

@@ -88,10 +88,10 @@ public class ZetaSqlToken implements IToken {
      * @return a ZetaSqlToken
      */
     public ZetaSqlToken create(Token token) {
-      int startIndex = translator.offsetToIndex(token.getStartCol());
+      int startIndex = translator.offsetToIndex(token.getStartByteOffset());
       Position startPosition = converter.indexToPos(startIndex);
 
-      int endIndex = translator.offsetToIndex(token.getEndCol());
+      int endIndex = translator.offsetToIndex(token.getEndByteOffset());
       // End position should be included in Token, so -1 is used here.
       Position endPosition = converter.indexToPos(endIndex - 1);
 

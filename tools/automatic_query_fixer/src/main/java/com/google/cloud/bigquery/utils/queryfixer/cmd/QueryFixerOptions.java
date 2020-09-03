@@ -1,6 +1,11 @@
 package com.google.cloud.bigquery.utils.queryfixer.cmd;
 
+import com.google.common.flogger.FluentLogger;
 import org.apache.commons.cli.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /** A class responsible for reading the program configurations/options from user input. */
 public class QueryFixerOptions {
@@ -16,18 +21,23 @@ public class QueryFixerOptions {
   public static final String JSON_OUTPUT = "json";
   public static final String NATURAL_OUTPUT = "natural";
 
+  public static final String QUERY_FILE_SHORTCUT = "q";
+  public static final String QUERY_FILE = "query-file";
+
   public static final String MODE_SHORTCUT = "m";
   public static final String MODE = "mode";
   public static final String AUTO_MODE = "auto";
   public static final String USER_ASSISTED_MODE = "user-assisted";
-  // The abbreviation of USER_ASSISTED_MODE
+  // The abbreviation of USER_ASSISTED MODE
   public static final String UA_MODE = "ua";
   public static final String SUGGESTION_MODE = "suggestion";
-  // The abbreviation of SUGGESTION_MODE
-  public static final String SG_MODE = "fo";
+  // The abbreviation of SUGGESTION MODE
+  public static final String SG_MODE = "sg";
 
   private static final Options options = createOptions();
   private final CommandLine commandLine;
+
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   QueryFixerOptions(CommandLine commandLine) {
     this.commandLine = commandLine;
@@ -78,6 +88,13 @@ public class QueryFixerOptions {
             /*hasArg=*/ true,
             /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"fo/fix-once\". Please see the README file for the detailed description.");
     options.addOption(option);
+    option =
+        new Option(
+            /*opt=*/ QUERY_FILE_SHORTCUT,
+            /*long-opt=*/ QUERY_FILE,
+            /*hasArg=*/ true,
+            /*description=*/ "The directory of the query file. If query has been provided as an argument, this will be ignored.");
+    options.addOption(option);
     return options;
   }
 
@@ -109,7 +126,17 @@ public class QueryFixerOptions {
   /** A static function to print the help menu. */
   public static void printHelpAndExit() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("-opt <value> --long-opt <value> \"query\"", options);
+    formatter.printHelp(
+        "AutomaticQueryFixer -opt <value> --long-opt <value> \"query\"\n\n"
+            + "  Introduction:\n"
+            + "  A command-line tool automatically fixing multiple common errors\n"
+            + "  of BigQuery SQL queries.\n\n"
+            + "  Sample Usages:\n"
+            + "  > AutomaticQueryFixer -m auto -p \"<your gcp project id>\" \"<your query>\"\n"
+            + "  > AutomaticQueryFixer -m sg -c \"path/to/credentials.json\" -o json -p \"<your gcp project id>\" \"<your query>\"\n"
+            + "  > AutomaticQueryFixer -m ua -o natural -p \"<your gcp project id>\" -q \"path/to/sql_file\"\n\n"
+            + "Options:\n",
+        options);
     System.exit(1);
   }
 
@@ -119,9 +146,17 @@ public class QueryFixerOptions {
    * @return query.
    */
   public String getQuery() {
-    if (commandLine.getArgList().isEmpty()) {
-      return null;
+    if (!commandLine.getArgList().isEmpty()) {
+      return commandLine.getArgList().get(0);
     }
-    return commandLine.getArgList().get(0);
+    String queryFileDirectory = commandLine.getOptionValue(QUERY_FILE);
+    try {
+      return Files.readString(Path.of(queryFileDirectory));
+    } catch (IOException e) {
+      logger.atWarning().withCause(e).log(
+          "Unable to read the query from the given file directory.");
+    }
+
+    return null;
   }
 }

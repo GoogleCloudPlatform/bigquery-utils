@@ -1,11 +1,15 @@
 package com.google.cloud.bigquery.utils.queryfixer.fixer;
 
+import com.google.bigquery.utils.zetasqlhelper.QueryLocationRange;
+import com.google.bigquery.utils.zetasqlhelper.ZetaSqlHelper;
 import com.google.cloud.bigquery.TableId;
 import com.google.cloud.bigquery.utils.queryfixer.QueryPositionConverter;
-import com.google.cloud.bigquery.utils.queryfixer.entity.*;
+import com.google.cloud.bigquery.utils.queryfixer.entity.FixOption;
+import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
+import com.google.cloud.bigquery.utils.queryfixer.entity.Position;
+import com.google.cloud.bigquery.utils.queryfixer.entity.StringView;
 import com.google.cloud.bigquery.utils.queryfixer.errors.TableNotFoundError;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
-import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
 import com.google.cloud.bigquery.utils.queryfixer.util.PatternMatcher;
 import com.google.cloud.bigquery.utils.queryfixer.util.StringUtil;
 
@@ -28,18 +32,15 @@ public class TableNotFoundFixer implements IFixer {
   private final String query;
   private final TableNotFoundError err;
   private final BigQueryService bigQueryService;
-  private final QueryTokenProcessor queryTokenProcessor;
   private final QueryPositionConverter queryPositionConverter;
 
   public TableNotFoundFixer(
       String query,
       TableNotFoundError err,
-      BigQueryService bigQueryService,
-      QueryTokenProcessor queryTokenProcessor) {
+      BigQueryService bigQueryService) {
     this.query = query;
     this.err = err;
     this.bigQueryService = bigQueryService;
-    this.queryTokenProcessor = queryTokenProcessor;
     this.queryPositionConverter = new QueryPositionConverter(query);
   }
 
@@ -51,7 +52,8 @@ public class TableNotFoundFixer implements IFixer {
             incorrectTableId.getProject(), incorrectTableId.getDataset());
 
     StringUtil.SimilarStrings similarTables =
-        StringUtil.findSimilarWords(tableNames, incorrectTableId.getTable(), /*caseSensitive=*/false);
+        StringUtil.findMostSimilarWords(
+            tableNames, incorrectTableId.getTable(), /*caseSensitive=*/ false);
 
     // This is an arbitrary standard. It requires the candidate table should share at least 50%
     // similarity as the incorrect table typo.
@@ -69,6 +71,8 @@ public class TableNotFoundFixer implements IFixer {
     if (incorrectTableView == null) {
       return FixResult.failure(query, err, "Cannot locate the incorrect table position.");
     }
+    Position errorPosition = queryPositionConverter.indexToPos(incorrectTableView.getStart());
+    this.err.setErrorPosition(errorPosition);
 
     List<FixOption> fixOptions =
         similarTables.getStrings().stream()
@@ -116,32 +120,22 @@ public class TableNotFoundFixer implements IFixer {
     if (fullTableId.getProject().equals(bigQueryService.getBigQueryOptions().getProjectId())) {
       regex =
           String.format(
-              "(`?%s`?\\.)?`?%s`?\\.`?%s`?",
+              "(%s\\.)?%s\\.%s",
               fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
     } else {
       regex =
           String.format(
-              "`?%s`?\\.`?%s`?\\.`?%s`?",
+              "%s\\.%s\\.%s",
               fullTableId.getProject(), fullTableId.getDataset(), fullTableId.getTable());
     }
 
-    List<StringView> stringViews = PatternMatcher.findAllSubstrings(query, regex);
-
-    // Iterate the substring and check if this substring is an identifier. If yes, this substring
-    // should be the incorrect table we are looking for.
-    for (StringView view : stringViews) {
-      Position position = queryPositionConverter.indexToPos(view.getStart());
-      IToken token = queryTokenProcessor.getTokenAt(query, position.getRow(), position.getColumn());
-
-      if (token.getKind() != IToken.Kind.IDENTIFIER) {
-        continue;
-      }
-
-      this.err.setErrorPosition(position);
-      return view;
+    List<QueryLocationRange> ranges = ZetaSqlHelper.locateTableRanges(query, regex);
+    if (ranges.isEmpty()) {
+      return null;
     }
-
-    return null;
+    QueryLocationRange firstTable = ranges.get(0);
+    return StringView.fromByteOffsets(
+        firstTable.getQuery(), firstTable.getStartByteOffset(), firstTable.getEndByteOffset());
   }
 
   private String replaceTable(String newTable, StringView replacedTable) {

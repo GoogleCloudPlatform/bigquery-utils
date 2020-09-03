@@ -71,7 +71,7 @@ public class ByteOffsetTranslator {
    * @param range byte offset to convert
    * @return String index
    */
-  public StringView toSubstringView(QueryLocationRange range) {
+  public StringView toStringView(QueryLocationRange range) {
     int start = offsetToIndex(range.getStartByteOffset());
     int end = offsetToIndex(range.getEndByteOffset());
     return StringView.of(query, start, end);

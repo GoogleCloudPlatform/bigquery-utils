@@ -36,6 +36,16 @@ If you would like to examine the test cases, please run the tests:
 ./gradlew test
 ```
 
+### Example Query to fix
+The project prepares a few incorrect sql to fix. Please try out with the following command:
+
+```bash
+-m ua  -p <project-id> -q "./examples/syntax_error.sql"
+-m ua  -p <project-id> -q "./examples/semantic_error1.sql"
+-m ua  -p <project-id> -q "./examples/semantic_error2.sql"
+-m ua  -p <project-id> -q "./examples/semantic_error3.sql"
+```
+
 
 ## Usage
 
