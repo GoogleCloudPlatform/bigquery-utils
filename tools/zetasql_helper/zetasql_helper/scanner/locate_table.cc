@@ -31,20 +31,20 @@ absl::Status LocateTableRanges(absl::string_view query,
   ZETASQL_RETURN_IF_ERROR(ParseStatement(query, options.GetParserOptions(), &parser_output));
 
   // Predicate to find a table whose name meets the table_rex
-  auto find_table = [table_regex](const zetasql::ASTNode *node) {
-    auto table_path = dynamic_cast<const zetasql::ASTTablePathExpression *>(node);
+  auto find_table = [table_regex](const zetasql::ASTNode* node) {
+    auto table_path = dynamic_cast<const zetasql::ASTTablePathExpression*>(node);
     if (table_path == nullptr) {
       return false;
     }
 
     // Read the full name of a table node.
-    auto names = read_names(*table_path->path_expr());
+    auto names = ReadNames(*table_path->path_expr());
     auto full_name = absl::StrJoin(names, ".");
 
     return std::regex_match(full_name, std::regex(std::string(table_regex)));
   };
 
-  auto table_nodes = find_all_nodes(parser_output->statement(), find_table);
+  auto table_nodes = FindAllNodes(parser_output->statement(), find_table);
   for (const auto table_node : table_nodes) {
     output.push_back(table_node->GetParseLocationRange());
   }

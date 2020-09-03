@@ -41,17 +41,17 @@ int get_offset(absl::string_view query, int line_number, int column_number) {
   }
 }
 
-absl::string_view remove_backtick(absl::string_view column) {
+absl::string_view RemoveBacktick(absl::string_view column) {
   column = absl::StripPrefix(column, "`");
   column = absl::StripSuffix(column, "`");
   return column;
 }
 
-std::vector<std::string> read_names(const zetasql::ASTPathExpression &path) {
+std::vector<std::string> ReadNames(const zetasql::ASTPathExpression &path) {
   std::vector<std::string> names;
   for (auto child : path.names()) {
     auto identifier = child->GetAsString();
-    auto sub_names = absl::StrSplit(remove_backtick(identifier), '.');
+    auto sub_names = absl::StrSplit(RemoveBacktick(identifier), '.');
     for (auto name : sub_names) {
       names.push_back(std::string(name));
     }
