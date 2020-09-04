@@ -7,20 +7,20 @@ import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.J
 import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.NATURAL_OUTPUT;
 
 /**
- * A class responsible for the interaction between users and the query fixer in Fix Once mode. This
- * mode only fixes one error of an input query if an error exists. Then outputs the Fix Result to
- * users. This mode is useful if a user would like to review individual fixes before the query fixer
- * corrects the next error based on the previous result.
+ * A class responsible for the interaction between users and the query fixer in Suggestion mode.
+ * This mode only fixes one error of an input query if an error exists. Then outputs the Fix Result
+ * to users. This mode is useful if a user would like to review individual fixes before the query
+ * fixer corrects the next error based on the previous result.
  *
  * <p>This mode can also be integrated with frontend to provide fix suggestion in a UI.
  */
-public class FixOnceModeInteraction extends CommandLineInteraction {
-  FixOnceModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
+public class SuggestionModeInteraction extends CommandLineInteraction {
+  SuggestionModeInteraction(String outputFormat, BigQueryOptions bigQueryOptions) {
     super(outputFormat, bigQueryOptions);
   }
 
   /**
-   * Interact with users in Fix Once mode.
+   * Interact with users in Suggestion mode.
    *
    * @param query input query.
    */
