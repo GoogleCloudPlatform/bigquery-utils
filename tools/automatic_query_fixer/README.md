@@ -5,14 +5,16 @@ of BigQuery SQL queries without changing the semantics of queries. It will outpu
 to the CLI if the query is fixed successfully. It will print the error message if it fails to fix the 
 query.
 
+## Prerequisite
+Before building the query fixer, please go to `zetasql_helper` directory at the parent directory (`tools`)
+and check if the docker image is compiled. If you don't have the ZetaSQL Helper Docker image, please follow
+the [instruction](https://github.com/GoogleCloudPlatform/bigquery-utils/tree/master/tools/zetasql_helper)
+to compile the Docker image.
 
 ## Build the Query Fixer
-Every command should be run in the current directory unless it is specified by the description.
+Every command should be run in the current directory (auto_query_fixer) unless it is specified by the description.
 
-Before building the query fixer, please go to `zetasql_helper` directory at the parent directory (`tools`)
-and check if the docker image is compiled.
-
-Then, build the query fixer:
+Build the query fixer:
 ```
 ./gradlew build
 ./gradlew installdist
@@ -28,7 +30,7 @@ or at Windows
 ./build/install/AutomaticQueryFixer/bin/AutomaticQueryFixer.bat <args>
 ```
 
-The details for `<args>` can be seen at the **Usage** section.
+The details for `<args>` can be seen at the [**Input Flag**](#Input Flag) section.
 
 If you would like to examine the test cases, please run the tests:
 ```
@@ -36,7 +38,8 @@ If you would like to examine the test cases, please run the tests:
 ```
 
 ### Example Query to fix
-The project prepares a few incorrect sql to fix. Please try out with the following command:
+The project prepares a few incorrect sql to fix. Please try out with the following command. If you 
+are using windows, replace `AutomaticQueryFixer` with `AutomaticQueryFixer.bat`.
 
 ```bash
 ./build/install/AutomaticQueryFixer/bin/AutomaticQueryFixer -m ua  -p <project-id> -q "./examples/syntax_error.sql"
@@ -82,7 +85,7 @@ Options:
 ```
 
 ### Interactive Mode
-“-m” flag can choose the mode of the query fixer. There are three modes: Auto, User-assisted, and Suggestion mode. They
+`-m` flag can choose the mode of the query fixer. There are three modes: Auto, User-assisted, and Suggestion mode. They
 decide the involvement of users. 
 
 #### Auto mode
@@ -181,7 +184,7 @@ LIMIT 10
 ```
 
 ### Output Format
-`-o` presents the output format in the program input flag. It has “natural language” and “json” format.
+`-o` represents the output format in the program input flag. It has “natural language” and “json” format.
 
 #### Natural Language format
 This is the default version, which can be explicitly turned on by `-o natural`. It prints all the fixing results 
