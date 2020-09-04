@@ -30,7 +30,7 @@ or at Windows
 ./build/install/AutomaticQueryFixer/bin/AutomaticQueryFixer.bat <args>
 ```
 
-The details for `<args>` can be seen at the [**Input Flag**](#Input Flag) section.
+The details for `<args>` can be seen at the [**Input Flag**](#Input-Flag) section.
 
 If you would like to examine the test cases, please run the tests:
 ```
