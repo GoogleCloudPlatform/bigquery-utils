@@ -20,7 +20,7 @@ public class StringUtilTest {
             "google", "GooGle", "oogle", "Googe", "Gooogle", "Gogle", "Happy", "gogle", "oGogle");
 
     StringUtil.SimilarStrings similarStrings =
-        StringUtil.findSimilarWords(dict, target, /*caseSensitive=*/ true);
+        StringUtil.findMostSimilarWords(dict, target, /*caseSensitive=*/ true);
     assertEquals(1, similarStrings.getDistance());
     assertEquals(6, similarStrings.getStrings().size());
     assertThat(

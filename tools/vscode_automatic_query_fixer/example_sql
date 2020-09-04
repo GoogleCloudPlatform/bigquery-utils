@@ -1,0 +1,1 @@
+SELECT maxs(stat) FROM `bigquery-public-data.austin_311.311_requests`

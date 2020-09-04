@@ -23,8 +23,7 @@ public class FixerFactory {
   public IFixer getFixer(String query, BigQuerySqlError error) {
 
     if (error instanceof TableNotFoundError) {
-      return new TableNotFoundFixer(
-          query, (TableNotFoundError) error, bigQueryService, queryTokenProcessor);
+      return new TableNotFoundFixer(query, (TableNotFoundError) error, bigQueryService);
     }
 
     if (error instanceof UnrecognizedColumnError) {
@@ -59,7 +58,8 @@ public class FixerFactory {
       if (ExpectKeywordButGotOthersError.END_OF_INPUT.equals(
           expectKeywordError.getExpectedKeyword())) {
 
-        return new NearbyTokenFixer(query, expectKeywordError, queryTokenProcessor);
+        return new NearbyTokenFixer(
+            query, expectKeywordError, queryTokenProcessor, bigQueryService);
       }
 
       return new ExpectKeywordButGotOthersFixer(query, expectKeywordError, queryTokenProcessor);

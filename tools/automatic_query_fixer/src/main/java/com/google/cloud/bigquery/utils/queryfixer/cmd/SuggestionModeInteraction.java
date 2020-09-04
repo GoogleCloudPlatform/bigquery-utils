@@ -32,7 +32,7 @@ public class SuggestionModeInteraction extends CommandLineInteraction {
   private void printFixResultInFoMode(FixResult fixResult) {
     switch (outputFormat) {
       case NATURAL_OUTPUT:
-        System.out.println("Input query: " + fixResult.getQuery() + "\n");
+        System.out.println("Input query:\n" + fixResult.getQuery() + "\n");
         printFixResultInCommandLine(fixResult);
         break;
       case JSON_OUTPUT:

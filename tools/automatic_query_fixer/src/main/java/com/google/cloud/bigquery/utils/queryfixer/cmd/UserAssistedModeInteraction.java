@@ -28,7 +28,7 @@ public class UserAssistedModeInteraction extends CommandLineInteraction {
     while (true) {
       List<FixResult> fixResults = queryFixer.autoFixUntilUncertainOptions(query);
 
-      System.out.println("Input query: " + query + "\n");
+      System.out.println("Input query:\n" + query + "\n");
       printFixResultsInCommandLine(fixResults);
 
       FixResult latestResult = fixResults.get(fixResults.size() - 1);

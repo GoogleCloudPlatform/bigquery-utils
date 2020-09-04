@@ -1,9 +1,13 @@
 package com.google.cloud.bigquery.utils.queryfixer.fixer;
 
+import com.google.bigquery.utils.zetasqlhelper.QueryFunctionRange;
+import com.google.bigquery.utils.zetasqlhelper.ZetaSqlHelper;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixOption;
 import com.google.cloud.bigquery.utils.queryfixer.entity.FixResult;
+import com.google.cloud.bigquery.utils.queryfixer.entity.Position;
 import com.google.cloud.bigquery.utils.queryfixer.entity.StringView;
 import com.google.cloud.bigquery.utils.queryfixer.errors.BigQuerySemanticError;
+import com.google.cloud.bigquery.utils.queryfixer.util.ByteOffsetTranslator;
 import com.google.cloud.bigquery.utils.queryfixer.util.StringUtil;
 
 import java.text.MessageFormat;
@@ -119,19 +123,37 @@ public class FunctionFixer implements IFixer {
     return fmt.format(args);
   }
 
-  // TODO: will be implemented after the ZetaSQL Helper Client is merged.
   private FunctionView findFunctionView() {
-    return null;
+    Position functionPos = err.getErrorPosition();
+    if (functionPos == null) {
+      return null;
+    }
+
+    QueryFunctionRange range =
+        ZetaSqlHelper.extractFunctionRange(query, functionPos.getRow(), functionPos.getColumn());
+    return new FunctionView(range);
   }
 
+  /**
+   * A function view containing the range information about the function body, name, and arguments.cmd
+   */
   private static class FunctionView {
     // The whole function body.
     StringView full;
     StringView name;
     List<StringView> arguments;
 
-    // TODO: will be implemented after the ZetaSQL Helper Client is merged.
-    FunctionView() {}
+    FunctionView(QueryFunctionRange queryFunctionRange) {
+      String query = queryFunctionRange.getFunction().getQuery();
+      ByteOffsetTranslator translator = ByteOffsetTranslator.of(query);
+
+      this.full = translator.toStringView(queryFunctionRange.getFunction());
+      this.name = translator.toStringView(queryFunctionRange.getName());
+      this.arguments =
+          queryFunctionRange.getArguments().stream()
+              .map(translator::toStringView)
+              .collect(Collectors.toList());
+    }
 
     @Override
     public String toString() {
