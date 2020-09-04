@@ -8,6 +8,7 @@ import io.grpc.Channel;
 public class Client {
 
     private static ZetaSqlHelperLocalServiceGrpc.ZetaSqlHelperLocalServiceBlockingStub stub;
+    // The port number can be modified using setPort method.
     private static int port = 50051;
 
     private Client() {
@@ -32,7 +33,7 @@ public class Client {
     /**
      * Set the port number to connect to the ZetaSQL Helper server. The default number is 50051.
      *
-     * @param port
+     * @param port user-defined port number
      */
     public static void setPort(int port) {
         Client.port = port;

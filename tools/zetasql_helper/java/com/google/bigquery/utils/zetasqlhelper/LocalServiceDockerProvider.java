@@ -22,10 +22,11 @@ public class LocalServiceDockerProvider implements LocalServiceProvider {
 
     private final static Integer SERVER_PORT = 50051;
     private final static String LOCAL_HOST = "localhost:";
+    // The ZetaSQL Helper image  can be modified using setImage method.
     private static String IMAGE = "gcr.io/sql-gravity-internship/zetasql-helper:1.0";
 
     private final static String RUNNING = "running";
-    // waiting time for starting server. If the server container con not start in this period,
+    // Waiting time for starting server. If the server container can not start in this period,
     // it will be considered shutdown. Unit is millisecond.
     private final static long START_SERVER_TIMEOUT = 5000;
 
@@ -97,7 +98,7 @@ public class LocalServiceDockerProvider implements LocalServiceProvider {
     @Override
     public Channel connect(final Integer port) {
         try {
-            // if the server is not active, try to start it.
+            // If the server is not active, try to start it.
             if (!isServerOn(port)) {
                 startServer(port);
             }
@@ -131,6 +132,10 @@ public class LocalServiceDockerProvider implements LocalServiceProvider {
         return false;
     }
 
+    /**
+     * Set the ZetaSQL Helper image. Please set the image before calling the RPC.
+     * @param image user-defined ZetaSQL Helper image
+     */
     public static void setImage(String image) {
         IMAGE = image;
     }
