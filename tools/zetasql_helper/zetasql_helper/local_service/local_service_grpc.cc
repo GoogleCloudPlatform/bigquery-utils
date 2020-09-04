@@ -65,10 +65,43 @@ grpc::Status ToGrpcStatus(absl::Status status) {
 namespace bigquery::utils::zetasql_helper::local_service {
 using namespace bigquery::utils::zetasql_helper;
 
-grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::Tokenize(grpc::ServerContext *context, const TokenizeRequest *request,
-                                                         TokenizeResponse *response) {
-  return ToGrpcStatus(service_.Tokenize(request, response));
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::Tokenize(grpc::ServerContext* context, const TokenizeRequest* request,
+                                                         TokenizeResponse* response) {
+  return ToGrpcStatus(service_.Tokenize(*request, response));
 }
 
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::ExtractFunctionRange(grpc::ServerContext* context,
+                                                                     const ExtractFunctionRangeRequest* request,
+                                                                     ExtractFunctionRangeResponse* response) {
+  return ToGrpcStatus(service_.ExtractFunctionRange(*request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::LocateTableRanges(grpc::ServerContext* context,
+                                                                  const LocateTableRangesRequest* request,
+                                                                  LocateTableRangesResponse* response) {
+
+  return ToGrpcStatus(service_.LocateTableRanges(*request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::GetAllKeywords(grpc::ServerContext* context,
+                                                            const GetAllKeywordsRequest* request,
+                                                            GetAllKeywordsResponse* response) {
+
+  return ToGrpcStatus(service_.GetAllKeywords(*request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::FixColumnNotGrouped(grpc::ServerContext* context,
+                                                                    const FixColumnNotGroupedRequest* request,
+                                                                    FixColumnNotGroupedResponse* response) {
+
+  return ToGrpcStatus(service_.FixColumnNotGrouped(*request, response));
+}
+
+grpc::Status ZetaSqlHelperLocalServiceGrpcImpl::FixDuplicateColumns(grpc::ServerContext* context,
+                                                                    const FixDuplicateColumnsRequest* request,
+                                                                    FixDuplicateColumnsResponse* response) {
+
+  return ToGrpcStatus(service_.FixDuplicateColumns(*request, response));
+}
 
 } // bigquery::utils::zetasql_helper::local_service

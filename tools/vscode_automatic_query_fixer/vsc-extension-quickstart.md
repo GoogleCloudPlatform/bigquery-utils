@@ -11,10 +11,15 @@
 
 ## Get up and running straight away
 
+* Make sure `npm` and `nodejs` has been installed.
+* If this is your first time to use this extension, execute `npm install`.
+* Setup the Query Fixer's backend by `node copy_binaries.js`.
 * Press `F5` to open a new window with your extension loaded.
-* Run your command from the command palette by pressing (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac) and typing `Hello World`.
+* Open a file with the SQL query to examine (An example file `example_sql` is provided).
+* Run your command from the command palette by pressing (`Ctrl+Shift+P` or `Cmd+Shift+P` on Mac) and typing `Query Fixer`.
 * Set breakpoints in your code inside `src/extension.ts` to debug your extension.
-* Find output from your extension in the debug console.
+* If the input query has error(s), a red underline will be shown. Click the red underline and then click on quick fixes, and
+you can see all the fix options.
 
 ## Make changes
 

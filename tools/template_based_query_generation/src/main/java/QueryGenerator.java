@@ -1,5 +1,6 @@
 import com.google.common.collect.ImmutableMap;
 import data.DataType;
+import data.Table;
 import graph.MarkovChain;
 import graph.Node;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -99,52 +100,64 @@ public class QueryGenerator {
     QueryRegex qr = new QueryRegex(regexQueries, user.getNumColumns());
     List<List<SkeletonPiece>> querySkeletons = qr.getQuerySkeletons();
 
-    Map<String, List<String>> dialectQueries = new HashMap<>();
+    Map<String, Map<String, List<String>>> dialectQueries = new HashMap<>();
 
     for (String dialect : user.getDialectIndicators().keySet()) {
       if (user.getDialectIndicators().get(dialect)) {
-        dialectQueries.put(dialect, new ArrayList<>());
+        Map<String, List<String>> queryType = new HashMap<>();
+        queryType.put("DQL", new ArrayList<>());
+        queryType.put("DDL", new ArrayList<>());
+        queryType.put("DML", new ArrayList<>());
+        dialectQueries.put(dialect, queryType);
       }
     }
 
     for (List<SkeletonPiece> querySkeleton : querySkeletons) {
       for (String dialect: dialectQueries.keySet()) {
-        StringBuilder realQuery = new StringBuilder();
-        for (SkeletonPiece sp : querySkeleton) {
+        StringBuilder sb = new StringBuilder();
+        for (int j = 0; j < querySkeleton.size(); j++) {
+          SkeletonPiece sp = querySkeleton.get(j);
           if (sp.getKeyword() != null) {
-            realQuery.append(keywordsMapping.getLanguageMap(sp.getKeyword()).get(dialect));
-            realQuery.append(" ");
+            sb.append(keywordsMapping.getLanguageMap(sp.getKeyword()).get(dialect));
+            sb.append(" ");
           } else if (sp.getToken() != null) {
-            realQuery.append(sp.getToken());
-            realQuery.append(" ");
-          } else {
-            realQuery.append(" (");
-            for (MutablePair<String, DataType> pair : sp.getSchemaData()) {
-              realQuery.append(pair.getLeft());
-              realQuery.append(" ");
-              realQuery.append(dataTypeMapping.get(pair.getRight()).get(dialect));
-              realQuery.append(", ");
+            sb.append(sp.getToken());
+            if (j != querySkeleton.size() - 1 && querySkeleton.get(j + 1).getToken() != null) {
+              sb.append(", ");
+            } else {
+              sb.append(" ");
             }
-            realQuery.append(" )");
+          } else {
+            sb.append("(");
+            for (MutablePair<String, DataType> pair : sp.getSchemaData()) {
+              sb.append(pair.getLeft());
+              sb.append(" ");
+              sb.append(dataTypeMapping.get(pair.getRight()).get(dialect));
+              sb.append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            sb.append(") ");
           }
         }
-        dialectQueries.get(dialect).add(realQuery.toString().trim());
+        String realQuery = sb.toString();
+        if (realQuery.substring(0, 6).equals("SELECT")) {
+          dialectQueries.get(dialect).get("DQL").add(realQuery.trim() + ";");
+        } else if (realQuery.substring(0, 6).equals("INSERT")) {
+          dialectQueries.get(dialect).get("DML").add(realQuery.trim() + ";");
+        } else {
+          dialectQueries.get(dialect).get("DDL").add(realQuery.trim() + ";");
+        }
       }
     }
-
-    for (String dialect : dialectQueries.keySet()) {
-      for (String query : dialectQueries.get(dialect)) {
-        System.out.println(query);
-      }
-    }
-
-    /*
 
     try {
-      Utils.writeDirectory(dialectQueries, dataTable);
+      Utils.writeDirectory(dialectQueries, qr.getTokenProvider().getTables());
     } catch (IOException exception){
       exception.printStackTrace();
     }
-     */
+
+    for (Table table : qr.getTokenProvider().getTables()) {
+      System.out.println(table.getName() + ": " + table.getSchema());
+    }
   }
 }

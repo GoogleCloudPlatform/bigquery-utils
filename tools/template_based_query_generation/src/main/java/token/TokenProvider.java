@@ -2,9 +2,12 @@ package token;
 
 import data.DataType;
 import data.Table;
+import parser.User;
 import parser.Utils;
 import query.SkeletonPiece;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,20 +17,26 @@ public class TokenProvider {
 
   private List<Table> tables = new ArrayList<>();
   private Table currentTable;
-  private int numTables = 3;
+  private final String filePathUser = "./src/main/resources/user_config/config.json";
+  private final User user = Utils.getUser(Paths.get(filePathUser));
+  private int numTables = user.getNumTables();
   private int initialColumns = 5;
   private Random r;
 
-  public TokenProvider(Random r) {
+  public TokenProvider(Random r) throws IOException {
     this.r = r;
     for (int i = 0; i < numTables; i++) {
-      Table newTable = new Table(Utils.getRandomString(1 + r.nextInt(20)));
+      Table newTable = new Table(Utils.getRandomString(1 + r.nextInt(20)), user.getNumRows());
       for (int j = 0; j < initialColumns; j++) {
         DataType d = DataType.getRandomDataType();
         newTable.addColumn(Utils.getRandomString(1 + r.nextInt(20)), d);
       }
       tables.add(newTable);
     }
+  }
+
+  public List<Table> getTables() {
+    return tables;
   }
 
   public SkeletonPiece tokenize(String tokenExpression, Table tableChoice) {
@@ -63,20 +72,20 @@ public class TokenProvider {
         return generateConditionExpression(dataType, this.currentTable);
       }
     } else if (tokenExpression.equals("tableName")) {
-      return generateTableNameExpression(tableChoice);
+      return generateTableNameExpression(this.currentTable);
     } else if (tokenExpression.equals("chosenTableName")) {
       return generateTableNameExpression(this.currentTable);
     } else if (tokenExpression.equals("numRows")) {
-      return generateNumRowsExpression(tableChoice);
+      return generateNumRowsExpression(this.currentTable);
     } else if (tokenExpression.equals("schemaValues")) {
       return generateSchemaValuesExpression(this.currentTable);
     }
     // else tokenExpression.equals("schemaData")
-    return generateSchemaDataExpression(tableChoice);
+    return generateSchemaDataExpression(this.currentTable);
   }
 
   public SkeletonPiece tokenize(String tokenExpression) {
-    int randomTableIndex = Utils.getRandomInteger(2);
+    int randomTableIndex = Utils.getRandomInteger(user.getNumTables() - 1);
     Table tableChoice = tables.get(randomTableIndex);
     return tokenize(tokenExpression, tableChoice);
   }
@@ -103,6 +112,7 @@ public class TokenProvider {
       sb.append("" + column.get(0));
       sb.append(",");
     }
+    sb.deleteCharAt(sb.length() - 1);
     sb.append(")");
     sp.setToken(sb.toString());
     return sp;
