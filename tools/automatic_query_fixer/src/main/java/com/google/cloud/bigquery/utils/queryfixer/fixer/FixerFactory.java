@@ -65,6 +65,14 @@ public class FixerFactory {
       return new ExpectKeywordButGotOthersFixer(query, expectKeywordError, queryTokenProcessor);
     }
 
+    if (error instanceof DuplicateColumnsError) {
+      return new DuplicateColumnsFixer(query, (DuplicateColumnsError) error);
+    }
+
+    if (error instanceof ColumnNotGroupedError) {
+      return new ColumnNotGroupedFixer(query, (ColumnNotGroupedError) error);
+    }
+
     return null;
   }
 }

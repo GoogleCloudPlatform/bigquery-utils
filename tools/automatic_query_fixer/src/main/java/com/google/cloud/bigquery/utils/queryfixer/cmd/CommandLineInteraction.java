@@ -14,7 +14,7 @@ import static com.google.cloud.bigquery.utils.queryfixer.cmd.QueryFixerOptions.*
 
 /**
  * A base class to implement the interaction between users and the query fixer. It has three modes:
- * Auto, User-assist, and Fix-once (fully interactive). Each mode is represented by a subclass.
+ * Auto, User-assisted, and Suggestion (fully interactive). Each mode is represented by a subclass.
  */
 public abstract class CommandLineInteraction {
   final String outputFormat;
@@ -50,12 +50,12 @@ public abstract class CommandLineInteraction {
     switch (mode) {
       case AUTO_MODE:
         return new AutoModeInteraction(outputFormat, bigQueryOptions);
-      case USER_ASSISTANCE_MODE:
+      case USER_ASSISTED_MODE:
       case UA_MODE:
-        return new UserAssistModeInteraction(outputFormat, bigQueryOptions);
-      case FIX_ONCE_MODE:
-      case FO_MODE:
-        return new FixOnceModeInteraction(outputFormat, bigQueryOptions);
+        return new UserAssistedModeInteraction(outputFormat, bigQueryOptions);
+      case SUGGESTION_MODE:
+      case SG_MODE:
+        return new SuggestionModeInteraction(outputFormat, bigQueryOptions);
       default:
         System.out.println("Mode (-m) is incorrect. Use --help for usage.");
         System.exit(1);

@@ -44,7 +44,7 @@ public class UnexpectedKeywordFixer implements IFixer {
     String convertedImage = String.format("`%s`", token.getImage());
     String fixedQuery = queryTokenProcessor.replaceToken(query, token, convertedImage);
 
-    String action = String.format("Change to `%s`", convertedImage);
+    String action = String.format("Change to %s", convertedImage);
     FixOption option = FixOption.of(action, fixedQuery);
 
     return FixResult.success(

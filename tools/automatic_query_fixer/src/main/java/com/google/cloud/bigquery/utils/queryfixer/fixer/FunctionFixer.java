@@ -76,7 +76,7 @@ public class FunctionFixer implements IFixer {
 
     return FixResult.success(
         query,
-        /*approach=*/ String.format("Replace the function `%s`.", functionView.name),
+        /*approach=*/ String.format("Update the function `%s`.", functionView.name),
         fixOptions,
         err,
         true);
@@ -89,7 +89,10 @@ public class FunctionFixer implements IFixer {
             query, functionView.getStart(), functionView.getEnd(), newFunction);
 
     // If the replaced function is too long, then only shows users the new function template.
-    String functionStr = newFunction.length() <= 50 ? newFunction : functionTemplate;
+    String functionStr =
+        newFunction.length() <= 80
+            ? newFunction
+            : functionTemplate + " (New function is too long and arguments are hidden)";
     return FixOption.of("Change to " + functionStr, fixedQuery);
   }
 
@@ -110,8 +113,7 @@ public class FunctionFixer implements IFixer {
 
     Object[] args =
         Stream.concat(
-                Stream.of(argumentsStr),
-                functionView.arguments.stream().map(StringView::toString))
+                Stream.of(argumentsStr), functionView.arguments.stream().map(StringView::toString))
             .toArray();
 
     return fmt.format(args);
