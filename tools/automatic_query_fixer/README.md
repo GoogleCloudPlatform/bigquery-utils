@@ -72,7 +72,7 @@ Options:
                           used.
  -m,--mode <arg>          Interactive Mode. The available mode are "auto"
                           (default), "ua/user-assistance" and
-                          "fo/fix-once". Please see the README file for
+                          "sg/suggestion". Please see the README file for
                           the detailed description.
  -o,--output <arg>        The format to output fix results. The available
                           formats are "natural" (default) and "json"
@@ -83,6 +83,21 @@ Options:
                           been provided as an argument, this will be
                           ignored.
 ```
+
+### Credential
+`-c` is used to specify the path to your Google Cloud Platform (GCP) Credentials. If you don't know to create one, 
+please click [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys). After you download your 
+GCP credentials, specify its path to the query fixer by using `-c "path/to/credentials"`.
+
+Besides service account, you could use your user account's credentials to start the query fixer. First, download the 
+[gcloud](https://cloud.google.com/sdk/install), then call this command:
+
+```bash
+gcloud auth application-default login
+```
+
+A user credentials will be created at a default directory. Then leave the `-c` flag empty, and the query fixer should
+be able to detect your user credentials and connect to the BigQuery server.
 
 ### Interactive Mode
 `-m` flag can choose the mode of the query fixer. There are three modes: Auto, User-assisted, and Suggestion mode. They
