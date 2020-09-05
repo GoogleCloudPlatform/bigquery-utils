@@ -86,7 +86,7 @@ public class QueryFixerOptions {
             /*opt=*/ MODE_SHORTCUT,
             /*long-opt=*/ MODE,
             /*hasArg=*/ true,
-            /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"fo/fix-once\". Please see the README file for the detailed description.");
+            /*description=*/ "Interactive Mode. The available mode are \"auto\" (default), \"ua/user-assistance\" and \"sg/suggestion\". Please see the README file for the detailed description.");
     options.addOption(option);
     option =
         new Option(
