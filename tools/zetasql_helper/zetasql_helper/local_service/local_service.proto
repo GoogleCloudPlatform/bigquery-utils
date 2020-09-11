@@ -39,6 +39,12 @@ service ZetaSqlHelperLocalService {
   rpc GetAllKeywords(GetAllKeywordsRequest) returns (GetAllKeywordsResponse) {
   }
 
+  rpc FixColumnNotGrouped(FixColumnNotGroupedRequest) returns (FixColumnNotGroupedResponse) {
+  }
+
+  rpc FixDuplicateColumns(FixDuplicateColumnsRequest) returns (FixDuplicateColumnsResponse) {
+  }
+
 }
 
 message TokenizeRequest {

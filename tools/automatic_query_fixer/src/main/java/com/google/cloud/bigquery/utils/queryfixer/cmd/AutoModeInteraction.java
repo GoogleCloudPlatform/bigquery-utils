@@ -78,7 +78,7 @@ public class AutoModeInteraction extends CommandLineInteraction {
   private void printFixResults(String query, List<FixResult> fixResults) {
     switch (outputFormat) {
       case NATURAL_OUTPUT:
-        System.out.println("Input query: " + query + "\n");
+        System.out.println("Input query:\n" + query + "\n");
         printFixResultsInCommandLine(fixResults);
         break;
       case JSON_OUTPUT:

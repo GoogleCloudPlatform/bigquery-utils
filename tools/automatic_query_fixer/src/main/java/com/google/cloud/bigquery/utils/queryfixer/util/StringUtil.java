@@ -1,12 +1,10 @@
 package com.google.cloud.bigquery.utils.queryfixer.util;
 
+import lombok.NonNull;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /** A utility class to provide static helper methods regarding String. */
@@ -21,7 +19,7 @@ public class StringUtil {
    * @param caseSensitive whether considering case sensitive.
    * @return a list of Strings and their edit distance to the target.
    */
-  public static SimilarStrings findSimilarWords(
+  public static SimilarStrings findMostSimilarWords(
       Collection<String> dict, String target, boolean caseSensitive) {
     List<Pair<Integer, String>> distanceWordPairs =
         dict.stream()
@@ -41,6 +39,33 @@ public class StringUtil {
             .map(Pair::getRight)
             .collect(Collectors.toList());
     return new SimilarStrings(words, minDistance);
+  }
+
+  /**
+   * Find all the similar words that are within a certain edit distance from the target string.
+   *
+   * @param dict a set of candidate words
+   * @param target target string to compare with
+   * @param maxEditDistance max edit distance to consider similarity
+   * @param caseSensitive whether considering case sensitive.
+   * @return a list of similar strings
+   */
+  public static List<String> findSimilarWords(
+      @NonNull Collection<String> dict,
+      @NonNull String target,
+      int maxEditDistance,
+      boolean caseSensitive) {
+    List<Pair<Integer, String>> distanceWordPairs =
+        dict.stream()
+            .map(word -> Pair.of(editDistance(word, target, caseSensitive), word))
+            .filter(pair -> pair.getLeft() <= maxEditDistance)
+            .collect(Collectors.toList());
+
+    if (distanceWordPairs.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return distanceWordPairs.stream().map(Pair::getRight).collect(Collectors.toList());
   }
 
   /**

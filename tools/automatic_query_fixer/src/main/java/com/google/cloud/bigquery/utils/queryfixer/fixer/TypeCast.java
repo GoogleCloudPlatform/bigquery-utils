@@ -29,8 +29,11 @@ public class TypeCast {
   public static final Table<String, String, String> castTable =
       ImmutableTable.<String, String, String>builder()
           .put(INT64, ANY, "SAFE_CAST({1} AS INT64)")
+          .put(INT64, TIMESTAMP, "UNIX_MICROS({1})")
           .put(FLOAT64, ANY, "SAFE_CAST({1} AS FLOAT64)")
+          .put(FLOAT64, TIMESTAMP, "SAFE_CAST(UNIX_MICROS({1}) AS FLOAT64)")
           .put(NUMERIC, ANY, "SAFE_CAST({1} AS NUMERIC)")
+          .put(NUMERIC, TIMESTAMP, "SAFE_CAST(UNIX_MICROS({1}) AS NUMERIC)")
           .put(BOOLEAN, ANY, "SAFE_CAST({1} AS BOOL)")
           .put(STRING, ANY, "SAFE_CAST({1} AS STRING)")
           .put(BYTES, ANY, "SAFE_CAST({1} AS BYTES)")

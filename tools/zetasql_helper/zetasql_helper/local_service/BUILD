@@ -38,6 +38,8 @@ cc_library(
         "//zetasql_helper/token",
         "//zetasql_helper/scanner:locate_table",
         "//zetasql_helper/scanner:extract_function",
+        "//zetasql_helper/fixer:fix_duplicate_columns",
+        "//zetasql_helper/fixer:fix_column_not_grouped",
         "@com_google_zetasql//zetasql/parser",
     ],
 )
@@ -53,6 +55,19 @@ cc_library(
         "@com_github_grpc_grpc//:grpc++",
         # dep regarding implementation
         ":local_service"
+    ],
+)
+
+java_proto_library(
+    name = "local_service_java_proto",
+    deps = [":local_service_proto"],
+)
+
+java_grpc_library(
+    name = "local_service_java_grpc",
+    srcs = [":local_service_proto"],
+    deps = [
+        ":local_service_java_proto",
     ],
 )
 

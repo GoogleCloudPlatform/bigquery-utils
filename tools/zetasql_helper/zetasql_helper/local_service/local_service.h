@@ -39,6 +39,12 @@ class ZetaSqlHelperLocalServiceImpl {
   absl::Status GetAllKeywords(const GetAllKeywordsRequest&request,
                               GetAllKeywordsResponse* response);
 
+  absl::Status FixColumnNotGrouped(const FixColumnNotGroupedRequest& request,
+                                   FixColumnNotGroupedResponse* response);
+
+  absl::Status FixDuplicateColumns(const FixDuplicateColumnsRequest& request,
+                                   FixDuplicateColumnsResponse* response);
+
   ZetaSqlHelperLocalServiceImpl() = default;
 };
 
