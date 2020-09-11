@@ -13,22 +13,25 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 
 /**
  * This class is where the main logic lives for the algorithm that this tool utilizes. It will
- * also be in charge of outputting the results. A new instance of QueryBreakdown is created and
- * utilized per query.
+ * also be in charge of outputting the results  in node format. A new instance of QueryBreakdown is
+ * created and utilized per query.
  *
- * Note: functions in this class are left as package private for testing purposes. The visibility
- * (public/private) will properly be set in upcoming PR's.
  */
 public class QueryBreakdown {
 
   // global fields that keeps track of the minimum unparseable component so far
   private int minimumUnparseableComp;
+
+  // currently optimal solution leaf node
   private Node solution;
 
   // the generated tree
   private final Node root;
+
+  // parser for QueryBreakdown
   private final Parser parser;
 
+  // final generated Query for the current optimal solution
   private String finalString;
 
   /**
@@ -43,15 +46,15 @@ public class QueryBreakdown {
   }
 
   /**
-   * This is the method that will run QueryBreakdown given an original query and output
-   * it to the specified output file or commandline. The provided errorLimit will stop the
-   * tool from running over a certain time.
+   * This is the method that will run QueryBreakdown given an original query and return the result
+   * in the form of a list of nodes. The provided runtimeLimit will stop the
+   * tool from running over a certain time on a query, and the replacementLimit will limit the
+   * number of replacements recommended. The locationTracker is the one for the original query.
    */
   public List<Node> run(String originalQuery, int runtimeLimit, int replacementLimit,
       LocationTracker locationTracker) {
-
-    // uses the loop function to generate and traverse the tree of possible error recoveries
-    // this will set the variable solution
+    /* uses the loop function to generate and traverse the tree of possible error recoveries.
+       This will find the optimal solution or abort when timed out */
     try {
       SimpleTimeLimiter limiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor());
       limiter.runUninterruptiblyWithTimeout(
@@ -59,7 +62,7 @@ public class QueryBreakdown {
           runtimeLimit, TimeUnit.MILLISECONDS);
     }
     catch (TimeoutException te) {
-      // abort logic
+      // abort logic: returns current solution or deletes entire query
       if (solution != null) {
         return runTermination();
       }
@@ -85,6 +88,9 @@ public class QueryBreakdown {
     return runTermination();
   }
 
+  /**
+   * Helper method for termination of the run method above
+   */
   private List<Node> runTermination() {
     List<Node> returnNodes = new ArrayList<>();
 
@@ -93,11 +99,13 @@ public class QueryBreakdown {
       return returnNodes;
     }
 
-    // write termination logic for output (tracing the node back, reconstructing path, output)
+    // gets the current solution
     Node current = solution;
 
     // we use a stack to display the results in order
     Stack<Node> stack = new Stack<>();
+
+    // traces back to get the path that led to the current solution
     while (current.getParent() != null) {
       stack.push(current);
       current = current.getParent();
@@ -119,11 +127,12 @@ public class QueryBreakdown {
    */
   private void loop(String inputQuery, int replacementLimit, Node parent, int depth,
       LocationTracker locationTracker) {
-    // termination for branch
+    // termination for branch if it is deeper than the current solution
     if (depth > minimumUnparseableComp) {
       return;
     }
     try {
+      // parses the query
       parser.parseQuery(inputQuery);
     } catch (SqlParseException e) {
       /* generates new queries through deletion and replacement */
@@ -170,9 +179,13 @@ public class QueryBreakdown {
           // updates the location tracker to reflect the replacement
           LocationTracker replacedLt = locationTracker.replace(pos.getLineNum(), pos.getColumnNum(),
               pos.getEndLineNum(), pos.getEndColumnNum(), r.getOriginal(), r.getReplacement());
+
+          // creates the node
           Node replacementNode = new Node(parent, originalStart.getX(), originalStart.getY(),
               originalEnd.getX(), originalEnd.getY(), r.getOriginal(), r.getReplacement(),
               r.getOriginal().length());
+
+          // calls the loop again
           loop(r.getQuery(), replacementLimit, replacementNode, depth + 1, replacedLt);
         }
 
@@ -200,9 +213,11 @@ public class QueryBreakdown {
    * This method implements the deletion mechanism: given the position of the component, it
    * generates a new query with that component deleted.
    */
-  static String deletion(String inputQuery, int startLine, int startColumn,
+  public static String deletion(String inputQuery, int startLine, int startColumn,
       int endLine, int endColumn) {
     StringBuilder sb = new StringBuilder(inputQuery);
+
+    // gets the component to delete
     int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     sb.delete(index[0], index[1]);
     if (startLine != endLine) {
@@ -223,10 +238,10 @@ public class QueryBreakdown {
    *
    * replacementLimit is the number of replacements we choose to have
    */
-  static ArrayList<ReplacedComponent> replacement(String inputQuery, int replacementLimit,
+  public static ArrayList<ReplacedComponent> replacement(String inputQuery, int replacementLimit,
       int startLine, int startColumn,
       int endLine, int endColumn, Collection<String> expectedTokens) {
-    // get word to replace from
+    // get component to replace from
     int[] index = returnIndex(inputQuery, startLine, startColumn, endLine, endColumn);
     String replaceFrom = inputQuery.substring(index[0], index[1]);
 
@@ -251,9 +266,10 @@ public class QueryBreakdown {
   }
 
   /**
-   * This method filters out quotations from the expected tokens
+   * This helper method filters out quotations from the expected tokens for the replacement method
+   * above
    */
-  static ArrayList<String> expectedTokensFilter(Collection<String> expectedTokens) {
+  private static ArrayList<String> expectedTokensFilter(Collection<String> expectedTokens) {
     // filter out the quotations
     ArrayList<String> filtered = new ArrayList<>();
     for (String s : expectedTokens) {
@@ -268,18 +284,20 @@ public class QueryBreakdown {
    * This helper method returns the beginning and ending index for the component of the given
    * query specified by the startLine, startColumn, and endColumn
    */
-  static int[] returnIndex(String inputQuery, int startLine, int startColumn, int endLine,
+  private static int[] returnIndex(String inputQuery, int startLine, int startColumn, int endLine,
       int endColumn) {
     int[] result = new int[2];
-    // when the exception occurs in line 1
+    // when the exception occurs in line 1 and ends in line 1
     if (startLine == 1 && endLine == 1) {
       result[0] = startColumn - 1;
       result[1] = endColumn;
     }
+    // when the exception occurs in line 1 but doesn't end in line 1
     else if (startLine == 1) {
       result[0] = startColumn - 1;
       result[1] = findNthIndexOf(inputQuery, '\n', endLine - 1) + endColumn + 1;
     }
+    // all other cases
     else {
       int position = findNthIndexOf(inputQuery, '\n', startLine - 1);
       int endPosition = findNthIndexOf(inputQuery, '\n', endLine - 1);
@@ -294,12 +312,14 @@ public class QueryBreakdown {
    * This helper method returns the index of the nth occurrence of key character in the input
    * string. Returns -1 if there is no such instance.
    */
-  static int findNthIndexOf(String string, char key, int n) {
+  private static int findNthIndexOf(String string, char key, int n) {
     int position = string.indexOf(key);
     while (n > 1) {
+      // if there is no such instance
       if (position == -1) {
         return position;
       }
+      // constantly gets the next occurence of the key
       position = string.indexOf(key, position + 1);
       n -= 1;
     }

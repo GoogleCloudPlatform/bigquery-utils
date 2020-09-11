@@ -7,11 +7,13 @@ public class Pair {
   private final int x;
   private final int y;
 
+  // constructor
   public Pair(int x, int y) {
     this.x = x;
     this.y = y;
   }
 
+  // getter methods
   public int getX() {
     return x;
   }
@@ -20,6 +22,7 @@ public class Pair {
     return y;
   }
 
+  // override equals method for better equality check between pair objects and testing/debugging
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -29,11 +32,6 @@ public class Pair {
       return false;
     }
     Pair p = (Pair) obj;
-    if (p.getX() == x && p.getY() == y) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return p.getX() == x && p.getY() == y;
   }
 }

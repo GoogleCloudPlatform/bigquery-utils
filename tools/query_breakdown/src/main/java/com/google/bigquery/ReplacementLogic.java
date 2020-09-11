@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- * This class implements all the replacement logic.
+ * This class contains the logic the tool will use to determine replacements
  */
 public class ReplacementLogic {
 
@@ -13,8 +13,10 @@ public class ReplacementLogic {
    * replaced with. Returns a list of components that it recommends. The default method of
    * choosing recommendations is through randomization.
    *
-   * We choose ArrayLists as the data structure because we want to impose a certain ordering
-   * with the recommendations: certain recommendations should be "better" than others
+   * We choose ArrayLists as the data structure because we want to potentially impose a
+   * certain ordering with the recommendations: certain recommendations could be "better" than
+   * others
+   *
    * replacementLimit is an integer that controls the number of replacement options
    */
   public static ArrayList<String> replace (String component, int replacementLimit,
@@ -24,12 +26,13 @@ public class ReplacementLogic {
     /*
      * The component field in the input arguments of this function denotes the component that the
      * tool replaces from. Therefore, we use that information to determine good replacements if any.
-     * The example code is below where we deem that A AS is a good replacement for AS in cases
-     * where :
+     * For instance, in the example code below, we deem that A AS is a good replacement for AS in
+     * cases where we have a AS just immediately following the previous WITH:
      *
      * if (component.equals("AS")) { result.add("A AS"); return result; }
      */
 
+    // returns the filtered list if the number of possible replacements is smaller than the limit
     if (options.size() <= replacementLimit) {
       for (int i = 0; i < options.size(); i++) {
         // gets rid of cases such as <QUOTED_STRING>
@@ -40,7 +43,9 @@ public class ReplacementLogic {
       return result;
     }
 
+    // field to make sure we don't have duplicates in the result
     HashSet<Integer> seen = new HashSet<>();
+
     // randomly populate result until full
     while (result.size() < replacementLimit && seen.size() < options.size()) {
       int random = randomNumber(options.size() - 1);
@@ -49,7 +54,6 @@ public class ReplacementLogic {
       }
       else if (options.get(random).charAt(0) == '<' && options.get(random).length() > 1) {
         seen.add(random);
-        continue;
       }
       else {
         result.add(options.get(random));

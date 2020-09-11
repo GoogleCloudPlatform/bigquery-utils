@@ -1,4 +1,4 @@
 {
-    "runtimeLimit": 60000,
-    "replacementLimit": 3
+  "runtimeLimit": 60000,
+  "replacementLimit": 3
 }

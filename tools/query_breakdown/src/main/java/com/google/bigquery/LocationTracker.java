@@ -6,14 +6,13 @@ import java.util.ArrayList;
  * This class tracks the original location of components in the query, thereby making sure that
  * the error locations are correctly represented. For each pair of (line, column) in the original
  * query, it is initialized in position at the (line - 1)th arraylist and
- * (column - 1)th element of the arraylist as the integer column - 1. The line and column number
+ * (column - 1)th element of the arraylist as the pair (line, column). The line and column number
  * will change throughout the course of the tool, so we store the original pair location object
  * in the arraylist.
  */
 public class LocationTracker {
-  /* we keep a double arraylist to represent the position of each character (line and column).
-     We can do this as the line number of the component will not change
-     (deletion and replacement won't change the line numbers)
+  /* we keep a double arraylist to represent the original position of each character
+  (line and column) in the queries (intermediate and final).
    */
   private ArrayList<ArrayList<Pair>> location;
 
@@ -34,7 +33,6 @@ public class LocationTracker {
   /**
    * This method interacts with the InputReader and adds a pair to the line-1th list in the
    * location field. The pair represents the position (x, y) in the original query.
-   * x and y are 1-indexed, so we adjust accordingly.
    */
   public void add(int line, int x, int y) {
     location.get(line - 1).add(new Pair(x, y));
@@ -43,7 +41,7 @@ public class LocationTracker {
   /**
    * This method interacts with the InputReader and adds a pair to the column - 1th element of the
    * line - 1th list in the location field. The pair represents the position (x, y) in the original
-   * query. x and y are 1-indexed, so we adjust accordingly.
+   * query. line and column are 1-indexed, so we adjust accordingly.
    */
   public void add(int line, int column, int x, int y) {
     location.get(line - 1).add(column - 1, new Pair(x, y));
@@ -57,7 +55,8 @@ public class LocationTracker {
   }
 
   /**
-   * This method removes an entry from location specified by (x, y) in the original query.
+   * This method removes an entry from location specified by (x, y) in the original query. x and
+   * y are 1-indexed, so we adjust accordingly.
    */
   public void remove(int x, int y) {
     if (x > 0 && x <= location.size()) {
@@ -78,7 +77,8 @@ public class LocationTracker {
   }
 
   /**
-   * This method gets the original position of the component in (x,y) of the intermediate query
+   * This method gets the original position of the component in (x,y) of the query. x and y are
+   * 1-indexed, so we adjust accordingly.
    */
   public Pair getOriginalPosition(int x, int y) {
     return location.get(x - 1).get(y - 1);
@@ -93,6 +93,7 @@ public class LocationTracker {
   public LocationTracker delete(int startLine, int startColumn, int endLine,
       int endColumn) {
     LocationTracker locationTracker = cloneTracker();
+    // same line case, just remove the corresponding locations
     if (startLine == endLine) {
       for (int i = startColumn; i < endColumn + 1; i++) {
         locationTracker.remove(startLine, startColumn);
@@ -100,12 +101,12 @@ public class LocationTracker {
     }
     else {
       /* different line case */
-      // startLine
+      // startLine: note that we add a new line character to the startline in multi-line deletion
       for (int x = startColumn; x < location.get(startLine - 1).size(); x++) {
         locationTracker.remove(startLine, startColumn);
       }
 
-      // endLine
+      // endLine: if entire endline is removed vs part of it is removed
       if (endColumn == locationTracker.getLocation().get(endLine - 1).size()) {
         locationTracker.removeLine(endLine);
       }
@@ -132,16 +133,24 @@ public class LocationTracker {
    */
   public LocationTracker replace(int startLine, int startColumn, int endLine,
       int endColumn, String replaceFrom, String replaceTo) {
+    // same line, same length replacement
     if (replaceFrom.length() == replaceTo.length() && startLine == endLine) {
       return this;
 
     }
     LocationTracker locationTracker = cloneTracker();
+
+    // position of last character of replaceFrom
     int end = (startLine == endLine) ? endColumn : location.get(startLine - 1).size();
+
+    // how much the replaceTo is longer by
     int longer = (startLine == endLine) ? replaceTo.length() - replaceFrom.length() :
         replaceTo.length() - (end - startColumn);
+
+    // how much the replaceTo is shorter by
     int shorter = (startLine == endLine) ? replaceFrom.length() - replaceTo.length() :
         end - startColumn - replaceTo.length();
+
     // if we replace the token with a longer token and need to add to the locationTracker
     if (longer > 0) {
       for (int i = end + 1; i <= end + longer; i++) {
@@ -156,6 +165,10 @@ public class LocationTracker {
         locationTracker.remove(startLine, startColumn + replaceTo.length());
       }
     }
+
+    /* multi-line replacement considerations (end line and middle line). Note that replace
+       the component only in the startLine for simplicity.
+     */
     if (startLine != endLine) {
       if (endColumn == locationTracker.getLocation().get(endLine - 1).size()) {
         locationTracker.removeLine(endLine);
@@ -177,7 +190,7 @@ public class LocationTracker {
 
   /**
    * This method produces a deep copy of the LocationTracker instance, thereby allowing a new
-   * instance to be passed during the traversal of the tree
+   * instance to be passed around during the traversal of the tree
    */
   public LocationTracker cloneTracker() {
     LocationTracker locationTracker = new LocationTracker();

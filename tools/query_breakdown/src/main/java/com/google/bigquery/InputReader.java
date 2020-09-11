@@ -9,20 +9,21 @@ import java.util.List;
 
 /**
  * This class will take care of the input handling logic, essentially parsing the input document
- * into queries and data-cleaning if needed.
+ * into multiple queries via semicolon and data-cleaning if needed.
  */
 public class InputReader {
 
   // separates the queries and instantiates a new location tracker per each query
-  private List<String> queries;
-  private List<LocationTracker> locationTrackers;
+  private final List<String> queries;
+  private final List<LocationTracker> locationTrackers;
   private int docLength;
 
   /**
    * Constructor for the class. The constructor will take in a txt file name, use BufferedReader to
    * parse the input, and return all the queries split into a string array format.
    * We also initialize a separate LocationTracker instance per query to keep track of the
-   * original location of the components.
+   * original location of the components. Finally, we keep the length of the document for 
+   * performance calculation. 
    */
   public InputReader(String filename) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filename));

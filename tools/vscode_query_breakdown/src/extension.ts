@@ -131,11 +131,10 @@ function decorate(editor: vscode.TextEditor) {
 
   vscode.window.showInformationMessage(
     'Percentage of Parseable Components: ' +
-      json[json.length - 2].performance + '%'
+      json[json.length - 2].performance +
+      '%'
   );
   vscode.window.showInformationMessage(
-    'Runtime: ' +
-    json[json.length - 1].runtime + 
-    ' seconds'
+    'Runtime: ' + json[json.length - 1].runtime + ' seconds'
   );
 }
