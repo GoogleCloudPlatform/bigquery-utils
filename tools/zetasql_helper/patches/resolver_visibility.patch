@@ -1,0 +1,11 @@
+--- zetasql/analyzer/BUILD
++++ zetasql/analyzer/BUILD
+@@ -14,7 +14,7 @@
+ # limitations under the License.
+
+ package(
+-    default_visibility = ["//:__subpackages__"],
++    default_visibility = ["//visibility:public"],
+ )
+ 
+ cc_library(

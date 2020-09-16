@@ -17,7 +17,7 @@ public class MarkovChain<E> {
    * @param nodes
    */
   public MarkovChain(HashMap<Node<E>, HashMap<Node<E>, Double>> nodes) {
-    this.nodes = new HashSet<Node<E>>();
+    this.nodes = new HashSet<>();
     this.nodes.addAll(nodes.keySet());
     for (Node<E> n : nodes.keySet()) {
       n.setNeighbors(nodes.get(n));
@@ -38,7 +38,7 @@ public class MarkovChain<E> {
    * @return list of nodes for a random walk from start node
    */
   public ArrayList<E> randomWalk(Node<E> start) {
-    ArrayList<E> walk = new ArrayList<E>();
+    ArrayList<E> walk = new ArrayList<>();
     Node<E> current = start;
     while (current.hasNextNode()) {
       walk.add(current.getObj());
