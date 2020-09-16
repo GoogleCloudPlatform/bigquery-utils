@@ -15,28 +15,29 @@
  */
 
 
-CREATE OR REPLACE FUNCTION st.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>) AS (
-    (
-    with PRELIM AS(
-        SELECT SUM(X) AS Sx, SUM(Y) AS Sy,
-        SUM(X * X) AS Sxx,
-        SUM(X * Y) AS Sxy,
-        SUM(Y * Y) AS Syy,
-        COUNT(*) AS N
-        FROM (
-            SELECT Los AS x, Charge AS Y FROM `Inpatient Confinement`
-        )
-    )
 
-
-SELECT 
-    ((Sy * Sxx) - (Sx * Sxy) / ((N * (Sxx)) - (Sx * Sx)) AS a,
-    ((N * Sxy) - (Sx * Sy))  / ((N * Sxx) - (Sx * Sx)) AS b,
-    ((N * Sxy) - (Sx * Sy))
-    / SQRT(
-        (((N * Sxx) - (Sx * Sx))
-         * ((N * Syy - (Sy * Sy))))) AS r
-    FROM
-      (
-  
-      ) sums;
+CREATE OR REPLACE FUNCTION st.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>) 
+AS ((
+     WITH results AS (
+       WITH sums AS (
+         with d as (
+              select * from unnest(data)
+         )
+         select 
+            SUM(d.X) as Sx,
+            SUM(d.Y) as Sy,
+            SUM(d.X * d.Y) as Sxy,
+            SUM(d.X * d.X) as Sxx,
+            SUM(d.Y * d.Y) as Syy,
+            COUNT(*) as N
+         from d
+       )
+       SELECT 
+        ((Sy * Sxx) - (Sx * Sxy)) / ((N * (Sxx)) - (Sx * Sx)) AS a,
+        ((N * Sxy) - (Sx * Sy))  / ((N * Sxx) - (Sx * Sx)) AS b,
+        ((N * Sxy) - (Sx * Sy))/ SQRT(
+            (((N * Sxx) - (Sx * Sx))* ((N * Syy - (Sy * Sy))))) AS r 
+        from sums
+      )
+      select STRUCT(a, b, r) from results
+));
