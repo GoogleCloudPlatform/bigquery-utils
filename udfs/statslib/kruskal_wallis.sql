@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION st.kruskal_wallis(data ARRAY<STRUCT<factor STRING, va
                 from unnest(data) AS d 
             ) #rank_data
             select     
-                SUM(r) * SUM(r) / COUNT(*) AS sumranks, COUNT(*) AS n
+                SUM(r) * (SUM(r) / COUNT(*)) AS sumranks, COUNT(*) AS n
             from rank_data
             GROUP BY f
         ) # sums

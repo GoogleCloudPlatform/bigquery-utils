@@ -5,8 +5,8 @@ if [ -f ~/.bigquery/bin/activate ]; then
    . ~/.bigquery/bin/activate
 fi
 
-if [ -f $(pwd)/key.json ]; then
-   export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/key.json"
+if [ -f key.json ]; then
+   export GOOGLE_APPLICATION_CREDENTIALS="key.json"
 fi
 
 gcloud config set project nih-bq
