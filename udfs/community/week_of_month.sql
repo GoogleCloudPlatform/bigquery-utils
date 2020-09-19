@@ -25,3 +25,4 @@ CREATE OR REPLACE FUNCTION fn.week_of_month(date_expression ANY TYPE) AS
       - EXTRACT(WEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
   )
 );
+    
