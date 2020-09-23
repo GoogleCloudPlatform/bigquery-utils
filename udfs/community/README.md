@@ -17,6 +17,7 @@ SELECT bqutil.fn.int(1.684)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
+* [getbit](#getbittarget_arg-int64-target_bit_arg-int64)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
@@ -152,6 +153,14 @@ results:
 | ["bbb"] | ["aaa","AAA"] | ["ccc"] |
 
 
+### [getbit(target_arg INT64, target_bit_arg INT64)](getbit.sql)
+Given an INTEGER value, returns the value of a bit at a specified position. The position of the bit starts from 0.
+
+```sql
+SELECT bqutil.fn.getbit(23, 2), bqutil.fn.getbit(23, 3), bqutil.fn.getbit(null, 1)
+
+1 0 NULL
+```
 
 ### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
 Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
