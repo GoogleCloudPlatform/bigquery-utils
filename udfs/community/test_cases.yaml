@@ -293,4 +293,23 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
- 
+week_number_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(0 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(1 AS INT64)
+day_occurrence_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(2 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(2 AS INT64)
