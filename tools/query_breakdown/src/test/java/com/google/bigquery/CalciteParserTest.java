@@ -2,6 +2,8 @@ package com.google.bigquery;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,12 +24,19 @@ public class CalciteParserTest {
 
   @Test
   public void parseQuerySuccess() throws SqlParseException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
     System.out.println(parser.parseQuery("SELECT a FROM A"));
+    assertEquals("(SELECT \"a\"\n" + "FROM \"A\")\n", outContent.toString());
   }
 
   @Test
   public void parseQueryMultipleLineSuccess() throws SqlParseException {
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
     System.out.println(parser.parseQuery("SELECT a FROM A; SELECT b FROM B"));
+    assertEquals("(SELECT \"a\"\n" + "FROM \"A\"), (SELECT \"b\"\n" + "FROM \"B\")\n",
+        outContent.toString());
   }
 
   @Test(expected= SqlParseException.class)
@@ -76,8 +85,6 @@ public class CalciteParserTest {
           + '\n' + "BLAH SELECT b FROM B");
     }
     catch (SqlParseException e){
-      /*System.out.println("this" + e.getPos().getLineNum() + e.getPos().getEndLineNum()
-      + e.getPos().getColumnNum() + e.getPos().getEndColumnNum()); */
       assertEquals(2, e.getPos().getLineNum());
       assertEquals(2, e.getPos().getEndLineNum());
       assertEquals(1, e.getPos().getColumnNum());

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+cat << EOF
+[
+  {
+    "status": "ERROR_FIXED",
+    "options": [
+      {
+        "description": "unique_key",
+        "fixedQuery": "SELECT unique_key FROM \`bigquery-public-data.austin_incidents.incidents_2008\` LIMIT 10"
+      }
+    ],
+    "error": "Unrecognized name: unique_keyx; Did you mean unique_key? at [1:8]",
+    "approach": "Replace the column",
+    "errorPosition": {
+      "row": 1,
+      "column": 8
+    }
+  }
+]
+EOF

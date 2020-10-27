@@ -1,45 +1,62 @@
 package parser;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Map;
 
+/**
+ * Maps features to mappings between dialects and the features' representations in those dialects
+ */
 public class KeywordsMapping {
 
   private final String filePathDDL = "./src/main/resources/dialect_config/ddl_mapping.json";
   private final String filePathDML = "./src/main/resources/dialect_config/dml_mapping.json";
   private final String filePathDQL = "./src/main/resources/dialect_config/dql_mapping.json";
 
-  private ImmutableMap<String, ImmutableList<Mapping>> mapDDL = new ImmutableMap.Builder<String, ImmutableList<Mapping>>().build();
-  private ImmutableMap<String, ImmutableList<Mapping>> mapDML = new ImmutableMap.Builder<String, ImmutableList<Mapping>>().build();
-  private ImmutableMap<String, ImmutableList<Mapping>> mapDQL = new ImmutableMap.Builder<String, ImmutableList<Mapping>>().build();
-
-  private final Keywords keywords = new Keywords();
+  private ImmutableMap<String, Map<String, String>> mapDDL = new ImmutableMap.Builder<String, Map<String, String>>().build();
+  private ImmutableMap<String, Map<String, String>> mapDML = new ImmutableMap.Builder<String, Map<String, String>>().build();
+  private ImmutableMap<String, Map<String, String>> mapDQL = new ImmutableMap.Builder<String, Map<String, String>>().build();
 
   /**
    * Constructor of keywords mapping, parsed from the config file
    */
   public KeywordsMapping() {
     try {
-      mapDDL = Utils.makeImmutableKeywordMap(Paths.get(filePathDDL), keywords.getKeywordsDDL());
-      mapDML = Utils.makeImmutableKeywordMap(Paths.get(filePathDML), keywords.getKeywordsDML());
-      mapDQL = Utils.makeImmutableKeywordMap(Paths.get(filePathDQL), keywords.getKeywordsDQL());
+      mapDDL = Utils.makeImmutableKeywordMap(Paths.get(filePathDDL));
+      mapDML = Utils.makeImmutableKeywordMap(Paths.get(filePathDML));
+      mapDQL = Utils.makeImmutableKeywordMap(Paths.get(filePathDQL));
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DDL word
+   * Fetches the appropriate DDL, DML, or DQL keyword mapping
+   *
+   * @param rawKeyword the keyword to categorize
+   * @return the dialect mappings associated with the keyword
+   */
+  public Map<String, String> getLanguageMap(String rawKeyword) {
+    if (mapDDL.containsKey(rawKeyword)) {
+      return getMappingDDL(rawKeyword);
+    } else if (mapDML.containsKey(rawKeyword)) {
+      return getMappingDML(rawKeyword);
+    } else {
+      return getMappingDQL(rawKeyword);
+    }
+  }
+
+  /**
+   * Returns the dialect map associated with a DDL feature
    *
    * @param word the DDL word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DDL set does not contain the word
    */
-  public ImmutableList<Mapping> getMappingDDL(String word) throws IllegalArgumentException {
-    if (!keywords.inKeywordsDDL(word)) {
+  private Map<String, String> getMappingDDL(String word) throws IllegalArgumentException {
+    if (!mapDDL.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DDL set");
     }
 
@@ -47,14 +64,14 @@ public class KeywordsMapping {
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DML word
+   * Returns the dialect map associated with a DML feature
    *
    * @param word the DML word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DML set does not contain the word
    */
-  public ImmutableList<Mapping> getMappingDML(String word) throws IllegalArgumentException {
-    if (!keywords.inKeywordsDML(word)) {
+  private Map<String, String> getMappingDML(String word) throws IllegalArgumentException {
+    if (!mapDML.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DML set");
     }
 
@@ -62,14 +79,14 @@ public class KeywordsMapping {
   }
 
   /**
-   * Returns the list of possible PostgreSQL, BigQuery, and Token mappings to a DQL word
+   * Returns the dialect map associated with a DQL feature
    *
    * @param word the DQL word to be translated
-   * @return the list of possible PostgreSQL, BigQuery, and Token mappings to the word
+   * @return the dialect map associated with the word
    * @throws IllegalArgumentException if the DQL set does not contain the word
    */
-  public ImmutableList<Mapping> getMappingDQL(String word) throws IllegalArgumentException {
-    if (!keywords.inKeywordsDQL(word)) {
+  private Map<String, String> getMappingDQL(String word) throws IllegalArgumentException {
+    if (!mapDQL.containsKey(word)) {
       throw new IllegalArgumentException("The word is not in the DQL set");
     }
 

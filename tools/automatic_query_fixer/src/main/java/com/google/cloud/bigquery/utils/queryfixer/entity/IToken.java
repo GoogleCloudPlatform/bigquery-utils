@@ -5,7 +5,7 @@ package com.google.cloud.bigquery.utils.queryfixer.entity;
  * */
 public interface IToken {
 
-  int getKind();
+  Kind getKind();
 
   String getImage();
 
@@ -17,4 +17,11 @@ public interface IToken {
 
   int getEndColumn();
 
+  enum Kind {
+    KEYWORD,
+    IDENTIFIER,
+    VALUE,
+    END_OF_INPUT,
+    OTHERS
+  }
 }

@@ -11,6 +11,7 @@ BigQuery.
 
 This repository is broken up into:
 
+*   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
     *   [billing](/scripts/billing) - Example queries over the GCP billing
         export
@@ -23,6 +24,7 @@ This repository is broken up into:
         *   [netezza](/udfs/migration/netezza)
         *   [oracle](/udfs/migration/oracle)
         *   [redshift](/udfs/migration/redshift)
+        *   [snowflake](/udfs/migration/snowflake)
         *   [teradata](/udfs/migration/teradata)
         *   [vertica](/udfs/migration/vertica)
 *   [Views](/views) - Views over system tables such as audit logs or the

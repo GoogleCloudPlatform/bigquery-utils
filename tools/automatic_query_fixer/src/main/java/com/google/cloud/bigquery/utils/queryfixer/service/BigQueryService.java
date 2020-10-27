@@ -1,15 +1,7 @@
 package com.google.cloud.bigquery.utils.queryfixer.service;
 
 import com.google.api.gax.paging.Page;
-import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryException;
-import com.google.cloud.bigquery.BigQueryOptions;
-import com.google.cloud.bigquery.DatasetId;
-import com.google.cloud.bigquery.Job;
-import com.google.cloud.bigquery.JobInfo;
-import com.google.cloud.bigquery.QueryJobConfiguration;
-import com.google.cloud.bigquery.Table;
-
+import com.google.cloud.bigquery.*;
 import lombok.NonNull;
 
 import java.util.List;
@@ -104,4 +96,7 @@ public class BigQueryService {
   public BigQueryOptions getBigQueryOptions() {
     return bigQuery.getOptions();
   }
+
+  //TODO: Add a validate function to check if the BigQueryOption is valid.
+  // It can be verified by sending a "select 1" to server.
 }

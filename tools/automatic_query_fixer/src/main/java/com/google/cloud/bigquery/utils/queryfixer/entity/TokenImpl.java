@@ -13,8 +13,11 @@ public class TokenImpl implements IToken {
     this.token = token;
   }
 
-  @Override public int getKind() {
-    return token.kind;
+  @Override public Kind getKind() {
+    if (token.kind == 786 || token.kind == 788) {
+      return Kind.IDENTIFIER;
+    }
+    return Kind.OTHERS;
   }
 
   @Override public String getImage() {

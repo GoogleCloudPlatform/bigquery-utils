@@ -1,24 +1,10 @@
 package com.google.cloud.bigquery.utils.queryfixer;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
-
 import com.google.api.gax.paging.Page;
-import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryError;
-import com.google.cloud.bigquery.BigQueryException;
-import com.google.cloud.bigquery.DatasetId;
-import com.google.cloud.bigquery.Field;
-import com.google.cloud.bigquery.FieldList;
-import com.google.cloud.bigquery.Job;
-import com.google.cloud.bigquery.JobInfo;
-import com.google.cloud.bigquery.JobStatistics;
-import com.google.cloud.bigquery.Schema;
-import com.google.cloud.bigquery.StandardSQLTypeName;
-import com.google.cloud.bigquery.Table;
-import com.google.cloud.bigquery.TableId;
+import com.google.cloud.bigquery.*;
 import com.google.cloud.bigquery.utils.queryfixer.service.BigQueryService;
 import com.google.common.collect.ImmutableList;
-
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

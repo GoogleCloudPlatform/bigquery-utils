@@ -1,136 +1,129 @@
 package com.google.bigquery;
 
-import com.google.cloud.bigquery.*;
 import org.junit.Test;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class QueryVerifierTest {
 
-    final String resourcesPath = "src/test/resources/";
-
     @Test
-    public void testGetTableIdFromJsonSchema() {
-        String schemaContents = Main.getContentsOfFile(resourcesPath + "schema1.json");
-        QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+    public void testCompareResultsWithNoDifferences() {
+        // First results list
+        List<QueryJobResults> firstResults = new ArrayList<QueryJobResults>();
 
-        assertEquals(tableInfos.size(), 1);
-        TableId tableId = tableInfos.get(0).getTableId();
+        Set<List<Object>> resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(1L, 1.25, "value"));
+        resultSet.add(Arrays.asList(2L, 2.25, "value"));
+        resultSet.add(Arrays.asList(3L, 3.25, "value"));
+        firstResults.add(QueryJobResults.create("", null, null, resultSet, null));
 
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "table");
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(0L));
+        resultSet.add(Arrays.asList(100L));
+        firstResults.add(QueryJobResults.create("", null, null, resultSet, null));
+
+        // Seconds results list
+        List<QueryJobResults> secondResults = new ArrayList<QueryJobResults>();
+
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(1L, 1.25, "value"));
+        resultSet.add(Arrays.asList(2L, 2.25, "value"));
+        resultSet.add(Arrays.asList(3L, 3.25, "value"));
+        secondResults.add(QueryJobResults.create("", null, null, resultSet, null));
+
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(0L));
+        resultSet.add(Arrays.asList(100L));
+        secondResults.add(QueryJobResults.create("", null, null, resultSet, null));
+
+        List<ResultDifferences> differences = QueryVerifier.compareResults(firstResults, secondResults);
+
+        assertEquals(differences.size(), 2);
+        assertTrue(differences.get(0).missingResults().isEmpty());
+        assertTrue(differences.get(0).extraResults().isEmpty());
+        assertTrue(differences.get(1).missingResults().isEmpty());
+        assertTrue(differences.get(1).extraResults().isEmpty());
     }
 
     @Test
-    public void testGetMultipleTableIdFromJsonSchema() {
-        String schemaContents = Main.getContentsOfFile(resourcesPath + "schema3.json");
-        QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+    public void testCompareResultsWithDifferences() {
+        // First results list
+        List<QueryJobResults> firstResults = new ArrayList<QueryJobResults>();
 
-        assertEquals(tableInfos.size(), 2);
-        TableId tableId;
+        Set<List<Object>> resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(1L, 1.25, "value"));
+        resultSet.add(Arrays.asList(2L, 2.25, "value"));
+        resultSet.add(Arrays.asList(3L, 2.25, "value"));
+        firstResults.add(QueryJobResults.create("", null, null, resultSet, null));
 
-        tableId = tableInfos.get(0).getTableId();
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "firstTable");
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(0L));
+        resultSet.add(Arrays.asList(100L));
+        firstResults.add(QueryJobResults.create("", null, null, resultSet, null));
 
-        tableId = tableInfos.get(1).getTableId();
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "secondTable");
+        // Seconds results list
+        List<QueryJobResults> secondResults = new ArrayList<QueryJobResults>();
+
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(1L, 1.25, 0L));
+        resultSet.add(Arrays.asList(2L, 2.251, "value"));
+        resultSet.add(Arrays.asList(3L, 3.25, "value"));
+        secondResults.add(QueryJobResults.create("", null, null, resultSet, null));
+
+        resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(100L));
+        resultSet.add(Arrays.asList(200L));
+        secondResults.add(QueryJobResults.create("", null, null, resultSet, null));
+
+        List<ResultDifferences> differences = QueryVerifier.compareResults(firstResults, secondResults);
+
+        assertEquals(differences.size(), 2);
+        assertEquals(differences.get(0).missingResults().size(), 3);
+        assertEquals(differences.get(0).extraResults().size(), 3);
+        assertEquals(differences.get(1).missingResults().size(), 1);
+        assertEquals(differences.get(1).extraResults().size(), 1);
     }
 
     @Test
-    public void testGetFieldsFromJsonSchema() {
-        String schemaContents = Main.getContentsOfFile(resourcesPath + "schema2.json");
-        QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableInfo> tableInfos = QueryVerifier.getTableInfoFromJsonSchema(schema);
+    public void testCompareResultsWithErrorResult() {
+        Set<List<Object>> resultSet = new HashSet<List<Object>>();
+        resultSet.add(null);
 
-        assertEquals(tableInfos.size(), 1);
-        FieldList fieldList = tableInfos.get(0).getDefinition().getSchema().getFields();
+        QueryJobResults queryJobResults = QueryJobResults.create("", null, "Syntax Error", resultSet, null);
 
-        assertEquals(fieldList.size(), 3);
+        List<QueryJobResults> results = new ArrayList<QueryJobResults>();
+        results.add(queryJobResults);
 
-        Field.Builder builder;
+        List<ResultDifferences> differences = QueryVerifier.compareResults(results, results);
 
-        builder = Field.newBuilder("stringField", StandardSQLTypeName.STRING);
-        builder.setMode(Field.Mode.NULLABLE);
-        assertEquals(fieldList.get(0), builder.build());
-
-        builder = Field.newBuilder("integerField", StandardSQLTypeName.INT64);
-        builder.setMode(Field.Mode.REQUIRED);
-        builder.setDescription("This field stores integers.");
-        assertEquals(fieldList.get(1), builder.build());
-
-        Field subField = Field.of("integerField", StandardSQLTypeName.INT64);
-        builder = Field.newBuilder("structField", StandardSQLTypeName.STRUCT, FieldList.of(subField));
-        builder.setMode(Field.Mode.REPEATED);
-        assertEquals(fieldList.get(2), builder.build());
+        assertEquals(differences.size(), 1);
+        assertTrue(differences.get(0).extraResults().isEmpty());
+        assertTrue(differences.get(0).missingResults().isEmpty());
     }
 
     @Test
-    public void testGetTableIdFromDdlSchema() {
-        String schemaContents = "CREATE TABLE dataset.table (stringField STRING, integerField INT64);";
-        QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(schema);
+    public void testCompareResultsWithUnknownObjects() {
+        Set<List<Object>> resultSet = new HashSet<List<Object>>();
+        resultSet.add(Arrays.asList(1L, 1, new ArrayList<>(), null));
+        List<QueryJobResults> results = quickGenerateResults(resultSet);
 
-        assertEquals(tableIds.size(), 1);
-        TableId tableId = tableIds.get(0);
+        List<ResultDifferences> differences = QueryVerifier.compareResults(results, results);
 
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "table");
+        assertEquals(differences.size(), 1);
+        assertTrue(differences.get(0).extraResults().isEmpty());
+        assertTrue(differences.get(0).missingResults().isEmpty());
     }
 
-    @Test
-    public void testGetMultipleTableIdFromDdlSchema() {
-        String schemaContents = "CREATE TABLE dataset.firstTable (stringField STRING, integerField INT64);\n" +
-                "CREATE TABLE dataset.secondTable (stringField STRING, integerField INT64);";
-        QueryVerificationSchema schema = QueryVerificationSchema.create(schemaContents, "");
-        List<TableId> tableIds = QueryVerifier.getTableIdsFromDdlSchema(schema);
+    private List<QueryJobResults> quickGenerateResults(Set<List<Object>> resultSet) {
+        QueryJobResults queryJobResults = QueryJobResults.create("", null, null, resultSet, null);
 
-        assertEquals(tableIds.size(), 2);
-        TableId tableId;
+        List<QueryJobResults> results = new ArrayList<QueryJobResults>();
+        results.add(queryJobResults);
 
-        tableId = tableIds.get(0);
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "firstTable");
-
-        tableId = tableIds.get(1);
-        assertEquals(tableId.getDataset(), "dataset");
-        assertEquals(tableId.getTable(), "secondTable");
-    }
-
-    @Test
-    public void testGetJobInfoFromQuery() {
-        String queryContents = "SELECT * FROM table";
-        QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
-        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
-
-        assertEquals(jobInfos.size(), 1);
-
-        QueryJobConfiguration queryJobConfiguration = jobInfos.get(0).getConfiguration();
-        assertEquals(queryJobConfiguration.getQuery(), "SELECT * FROM table");
-    }
-
-    @Test
-    public void testGetMultipleJobInfosFromQuery() {
-        String queryContents = "SELECT * FROM table1;\nSELECT column1 FROM table2; SELECT column2 FROM table2;";
-        QueryVerificationQuery query = QueryVerificationQuery.create(queryContents, "");
-        List<JobInfo> jobInfos = QueryVerifier.getJobInfosFromQuery(query, true);
-
-        assertEquals(jobInfos.size(), 3);
-
-        List<String> queries = jobInfos.stream().map(jobInfo -> {
-            QueryJobConfiguration queryJobConfiguration = jobInfo.getConfiguration();
-            return queryJobConfiguration.getQuery();
-        }).collect(Collectors.toList());
-
-        assertEquals(queries.get(0), "SELECT * FROM table1");
-        assertEquals(queries.get(1), "SELECT column1 FROM table2");
-        assertEquals(queries.get(2), "SELECT column2 FROM table2");
+        return results;
     }
 
 }
