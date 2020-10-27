@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1df2a0d2-71a6-4bee-9c4d-8002621413d5" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/gcs_ocn_bq_ingest/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/gcs_ocn_bq_ingest/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/gcs_ocn_bq_ingest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/gcs_ocn_bq_ingest/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/tests/test_gcs_ocn_bq_ingest_it.py" beforeDir="false" afterPath="$PROJECT_DIR$/cloud_functions/gcs_event_based_ingest/tests/test_gcs_ocn_bq_ingest_it.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
+  </component>
+  <component name="ProjectId" id="1jRPSsGF71XfUnlEkH2FdkuNhjn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1df2a0d2-71a6-4bee-9c4d-8002621413d5" name="Default Changelist" comment="" />
+      <created>1603763933393</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1603763933393</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="316" y="0" width="692" height="728" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1603764916115">
+      <screen x="0" y="0" width="1332" height="728" />
+    </state>
+    <state x="316" y="0" width="692" height="728" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1332.728@0.0.1332.728" timestamp="1603764916115" />
+  </component>
+</project>

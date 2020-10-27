@@ -71,7 +71,6 @@ def main(event: Dict, context):
 
     bucket_id, object_id = parse_notification(event)
 
-
     # Exit eagerly if not a success file.
     # TODO we can improve this with pub/sub message filtering once it supports
     # a hasSuffix filter function (we can filter on hasSuffix successfile name)
