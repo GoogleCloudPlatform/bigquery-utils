@@ -1,4 +1,4 @@
-# Copyright 2019 Google LLC
+# Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -233,3 +233,5 @@ def test_external_query(
     )
     for row in validation_query_job.result():
         assert row["count"] == sum(1 for _ in open(test_data_file))
+
+#TODO(jaketf) Add integration tests for partitioned destination table.

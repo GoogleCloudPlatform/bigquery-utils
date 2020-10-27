@@ -1,4 +1,4 @@
-# Copyright 2018 Google LLC.
+# Copyright 2020 Google LLC.
 # This software is provided as-is, without warranty or representation
 # for any use or purpose.
 # Your use of it is subject to your agreement with Google.
@@ -31,7 +31,7 @@ from google.cloud import bigquery, storage
 from google.cloud.exceptions import NotFound
 
 # 15TB per BQ load job.
-MAX_BATCH_BYTES = 15 * 10 ** 12
+DEFAULT_MAX_BATCH_BYTES = 15 * 10 ** 12
 MAX_URIS_PER_LOAD = 10 ** 4
 
 BASE_LOAD_JOB_CONFIG = {
@@ -39,8 +39,6 @@ BASE_LOAD_JOB_CONFIG = {
     "fieldDelimiter": "|",
     "writeDisposition": "WRITE_APPEND",
 }
-
-DEFAULT_BQ_LOAD_STATE_TABLE = "bigquery_loads.serverless_bq_loads"
 
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
     "sourceFormat": "PARQUET"
@@ -63,6 +61,7 @@ BASE_LOAD_JOB_CONFIG = {
 # This may not be honored if longer than cloud function timeout
 # https://cloud.google.com/functions/docs/concepts/exec#timeout
 WAIT_FOR_JOB_SECONDS = 5
+SUCCESS_FILENAME = getenv("SUCCESS_FILENAME", "_SUCCESS")
 
 
 def main(event: Dict, context):
@@ -70,26 +69,34 @@ def main(event: Dict, context):
     # https://cloud.google.com/functions/docs/env-var
     project = getenv("GCP_PROJECT")
 
-
     bucket_id, object_id = parse_notification(event)
 
-    success_filename = getenv("SUCCESS_FILENAME", "_SUCCESS")
 
     # Exit eagerly if not a success file.
     # TODO we can improve this with pub/sub message filtering once it supports
     # a hasSuffix filter function (we can filter on hasSuffix successfile name)
     #  https://cloud.google.com/pubsub/docs/filtering
-    if not object_id.endswith(f"/{success_filename}"):
-        logging.debug(f"No-op. This notification was not for a {success_filename} file.")
-        print(f"No-op. This notification was not for a {success_filename} file.")
+    if not object_id.endswith(f"/{SUCCESS_FILENAME}"):
+        logging.debug(f"No-op. This notification was not for a {SUCCESS_FILENAME} file.")
+        print(f"No-op. This notification was not for a {SUCCESS_FILENAME} file.")
         return
 
-    prefix_to_load = removesuffix(object_id, success_filename)
-    parts = object_id.split("/")
+    prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
+    parts = prefix_to_load.split("/")[:-1] 
     dataset, table = parts[0:2]
-    dest_table_ref = bigquery.TableReference.from_string(
-        f"{dataset}.{table}", default_project=project
-    )
+    partition = None
+    if len(parts) > 2:
+        partition = parts[-1]
+
+    # If the last prefix starts with $ treat it as a partition decorator.
+    if partition and partition.startswith("$"):
+        dest_table_ref = bigquery.TableReference.from_string(
+            f"{dataset}.{table}{partition}", default_project=project
+        )
+    else:
+        dest_table_ref = bigquery.TableReference.from_string(
+            f"{dataset}.{table}", default_project=project
+        )
 
     client_info = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
     gcs = storage.Client(client_info=client_info)
@@ -125,6 +132,7 @@ def external_query(gcs, bq, gsurl, query, dest_table_ref):
     an external table definition _config/external.json (otherwise will assume
     parquet external table)
     """
+    # TODO(jaketf) look in parent directories for this file to support parition subdirs.
     external_table_config = read_gcs_file_if_exists(gcs, f"{gsurl}_config/external.json")
     logging.debug("reading external table config")
     if external_table_config:
@@ -141,14 +149,17 @@ def external_query(gcs, bq, gsurl, query, dest_table_ref):
         table_definitions={"temp_ext": external_config},
         use_legacy_sql=False
     )
-    # for some reason string literal wrapped in b''
+    job_config.labels = DEFAULT_JOB_LABELS
+    # for some reason query string literal wrapped in b''
     rendered_query = str(str(query).format(
         dest_dataset=dest_table_ref.dataset_id,
         dest_table=dest_table_ref.table_id))[2:-1]
 
     job: bigquery.QueryJob = bq.query(
         rendered_query,
-        job_config=job_config)
+        job_config=job_config,
+        job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}-batch-1-of-1-",
+    )
 
     print(f"started asynchronous query job: {job.job_id}")
 
@@ -170,6 +181,7 @@ def flatten(arr: List[List[Any]]) -> List[Any]:
 def load_batches(gcs, bq, gsurl, dest_table_ref):
     batches = get_batches_for_prefix(gcs, gsurl)
     load_config = construct_load_job_config(gcs, gsurl)
+    load_config.labels = DEFAULT_JOB_LABELS
     batch_count = len(batches)
 
     for batch_num, batch in enumerate(batches):
@@ -232,13 +244,12 @@ def construct_load_job_config(
     while config_q:
         merged_config.update(config_q.pop())
     print(f"merged_config: {merged_config}")
-    return bigquery.LoadJobConfig.from_api_repr(
-        {"load": merged_config})
+    return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
 
 def get_batches_for_prefix(
     storage_client, prefix_path,
-    ignore_subprefix="_config/", ignore_file="_SUCCESS"):
+    ignore_subprefix="_config/", ignore_file=SUCCESS_FILENAME):
     """
     This function creates batches of GCS uris for a given prefix.
     This prefix could be a table prefix or a partition prefix inside a
@@ -255,6 +266,7 @@ def get_batches_for_prefix(
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
+    max_batch_size = getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES)
     batch = []
     for blob in blobs:
         # API returns root prefix also. Which should be ignored.
@@ -270,7 +282,7 @@ def get_batches_for_prefix(
             cumulative_bytes += blob.size
 
             # keep adding until we reach threshold
-            if cumulative_bytes <= MAX_BATCH_BYTES or len(batch) > MAX_URIS_PER_LOAD:
+            if cumulative_bytes <= max_batch_size or len(batch) > MAX_URIS_PER_LOAD:
                 batch.append(f"gs://{bucket_name}/{blob.name}")
             else:
                 batches.append(batch.copy())

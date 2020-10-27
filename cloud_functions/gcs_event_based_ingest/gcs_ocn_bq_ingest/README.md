@@ -57,17 +57,3 @@ From the `gcs_ocn_bq_ingest` dir simply run
 ```bash
 pytest
 ```
-
-## Limitations
-1. Cloud Functions have a 10 minute timeout. If the BQ load job takes too long
- the data will still be ingested but the function may be marked in timeout state
- rather than success and the function may not have the opportunity to produce
- all the expected logs.
-  - Most of the expected data size for this use case <50 GB per load job should
-  load comfortably with in this timeout window.
-  - a production implementation should gracefully handle the case when the BQ
-  load job takes longer than ~9 mins.
-
-
-## Future work
-1. Add system tests.

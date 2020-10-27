@@ -83,6 +83,9 @@ before they can be loaded to BigQuery. This is handled by query on an
 temporary external table over the GCS objects as a proxy for load job.
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/${BQ_TABLE_NAME}/_config/bq_transform.sql`
 
+Note, external queries will consume query slots from this project's reservation
+or count towards your on-demand billing. They will _not_ use free tie load slots.
+
 Note, that the query should select from a `temp_ext` which will be a temporary
 external table configured on the fly by the Cloud Function.
 The query must handle the logic for inserting into the destination table.
@@ -102,12 +105,74 @@ defined in:
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/${BQ_TABLE_NAME}/_config/external.json`
 If this file is missing the external table will be assumed to be `PARQUET` format.
 
-### Note on Partitions
-Partitions and incremental loads should usually use the Transformation SQL to
-define the semantics of the `INSERT / MERGE / UPDATE` into the target BQ table
-as the DML semantics are much more flexible thant the load job write dispositions.
+### Partitions
+
+#### Partition Table Decorators
+Note that if the directory immediately before the triggering successfile starts with
+a `$` it will be treated as a BigQuery Partition decorator for the destination table.
+
+This means for:
+```text
+gs://${BUCKET}/foo/bar/$20201026/_SUCCESS
+```
+will trigger a load job with a destination table of `foo.bar$20201026`
+This allows you to specify write disposition at the partition level.
+This can be helpful in reprocessing scenarios where you'd want to `WRITE_TRUNCATE`
+a partition that had some data quality issue.
+
+#### Hive Partitioning
+If your data will be uploaded to GCS from a hadoop system that uses the 
+[supported default hive partitioning](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs#supported_data_layouts)
+you can specify this in the [`hivePartitioningOptions`](https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#hivepartitioningoptions)
+key of `load.json` for that table.
+
+Any non-trivial incremental loading to partitions should usually use the
+Transformation SQL to define the `INSERT / MERGE / UPDATE / DELETE` logic into
+the target BQ table as these DML semantics are much more flexible thant the load
+job write dispositions.
 Furthermore, using external query has the added benefit of circumventing the 
-15TB load job limits and commiting large partitions atomically.
+per load job bytes limits (default 15 TB) and commiting large partitions
+atomically.
+
+## Monitoring
+Monitoring what data has been loaded by this solution should be done with the
+BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
+If more granular data is needed about a particular job id 
+
+### Job Naming Convention
+All load or external query jobs will have a job id witha  prefix following this convention:
+```python3
+job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}-{1}-of-{1}-"
+```
+
+### Job Labels
+All load or external query jobs are labelled with functional component and cloud function name.
+```python3
+DEFAULT_JOB_LABELS = {
+    "component": "event-based-gcs-ingest",
+    "cloud-function-name": getenv("FUNCTION_NAME"),
+}
+```
+
+### Example INFROMATION SCHEMA Query
+```sql
+SELECT
+   job_id,
+   job_type,
+   start_time,
+   end_time,
+   query,
+   total_bytes_processed,
+   total_slot_ms,
+   destination_table
+   state,
+   (SELECT value FROM UNNEST(labels) WHERE key = "component") as component,
+   (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name
+FROM
+   `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
+WHERE
+   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "event-based-gcs-ingest"
+```
 
 ## Triggers
 
