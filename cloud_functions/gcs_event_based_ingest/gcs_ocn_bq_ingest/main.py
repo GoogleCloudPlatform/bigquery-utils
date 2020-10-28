@@ -23,7 +23,7 @@ from pathlib import Path
 import re
 from typing import Any
 from typing import Dict, List, Optional, Tuple
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 import logging
 from time import monotonic, sleep
 
@@ -103,7 +103,8 @@ def main(event: Dict, context):
     partition = destination_details.get('partition')
     batch_id = destination_details.get('batch')
     labels = DEFAULT_JOB_LABELS
-    labels["gcs-prefix"] = gsurl
+    labels["bucket"] = bucket_id
+
     if batch_id:
         labels["batch-id"] = batch_id
 

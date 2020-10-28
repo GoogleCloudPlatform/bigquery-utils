@@ -186,7 +186,6 @@ SELECT
    state,
    (SELECT value FROM UNNEST(labels) WHERE key = "component") as component,
    (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name,
-   (SELECT value FROM UNNEST(labels) WHERE key = "gcs-prefix") as gcs_prefix,
    (SELECT value FROM UNNEST(labels) WHERE key = "batch-id") as batch_id,
 FROM
    `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
