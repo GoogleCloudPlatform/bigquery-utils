@@ -24,13 +24,12 @@ providing transparent configuration that is overridable at any level.
 - `SUCCESS_FILENAME`: Filename to trigger a load (defaults to `_SUCCESS`).
 - `DESTINATION_REGEX`:  A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
 for (defaults to `(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/`): 
-  - dataset: destintaion BigQuery Dataset
-  - table: destination BigQuery Table
-  - partition: (optional) destination BigQuery [partition decorator](https://cloud.google.com/bigquery/docs/creating-partitioned-tables#creating_an_ingestion-time_partitioned_table_when_loading_data)
+  - `dataset`: destintaion BigQuery Dataset
+  - `table`: destination BigQuery Table
+  - `partition`: (optional) destination BigQuery [partition decorator](https://cloud.google.com/bigquery/docs/creating-partitioned-tables#creating_an_ingestion-time_partitioned_table_when_loading_data)
     (For example $)
-  - batch: (optional) indicates an incremental load from an upstream system
+  - `batch`: (optional) indicates an incremental load from an upstream system (see [Handling Incremental Loads](#handling-incremental-loads))
 - `MAX_BATCH_BYTES`: Max bytes for BigQuery Load job. (default 15 TB)
-- 
 
 ## GCS Object Naming Convention
 ### Data Files
@@ -65,13 +64,13 @@ If the files contents were like this:
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/_config/load.json`:
 ```json
 {
-    "sourceFormat": "AVRO",
+    "sourceFormat": "AVRO"
 }
 ```
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/_config/load.json`:
 ```json
 {
-    "writeDisposition": "WRTITE_TRUNCATE",
+    "writeDisposition": "WRTITE_TRUNCATE"
 }
 ```
 
@@ -143,6 +142,14 @@ Furthermore, using external query has the added benefit of circumventing the
 per load job bytes limits (default 15 TB) and commiting large partitions
 atomically.
 
+## Handling Incremental Loads
+This solution introduces the concept of `batch_id` which uniquely identifies 
+a batch of data committed by an upstream system that needs to be picked up as an
+incremental load. You can again set the load job or external query configuration
+at any parent folders `_config` prefix. This allows you dictate
+"for this table any new batch should `WRITE_TRUNCATE` it's parent partition/table"
+or "for that table any new batch should `WRITE_APPEND` to it's parent partition/table".
+
 ## Monitoring
 Monitoring what data has been loaded by this solution should be done with the
 BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
@@ -160,8 +167,10 @@ All load or external query jobs are labelled with functional component and cloud
 DEFAULT_JOB_LABELS = {
     "component": "event-based-gcs-ingest",
     "cloud-function-name": getenv("FUNCTION_NAME"),
+    "gcs-prefix": gs://bucket/prefix/for/this/ingest,
 }
 ```
+If the destination regex matches a batch group, there will be a `batch-id` label.
 
 ### Example INFROMATION SCHEMA Query
 ```sql
@@ -176,7 +185,9 @@ SELECT
    destination_table
    state,
    (SELECT value FROM UNNEST(labels) WHERE key = "component") as component,
-   (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name
+   (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name,
+   (SELECT value FROM UNNEST(labels) WHERE key = "gcs-prefix") as gcs_prefix,
+   (SELECT value FROM UNNEST(labels) WHERE key = "batch-id") as batch_id,
 FROM
    `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
 WHERE

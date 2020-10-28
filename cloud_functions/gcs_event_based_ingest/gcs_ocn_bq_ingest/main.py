@@ -86,6 +86,7 @@ def main(event: Dict, context):
         return
 
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
+    gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     destination_match = dest_re.match(object_id)
     destination_details = destination_match.groupdict()
     try:
@@ -98,8 +99,9 @@ def main(event: Dict, context):
     partition = destination_details.get('partition')
     batch_id = destination_details.get('batch')
     labels = DEFAULT_JOB_LABELS
+    labels["gcs-prefix"] = gsurl
     if batch_id:
-        labels["batch_id"] = batch_id
+        labels["batch-id"] = batch_id
 
     if partition:
         dest_table_ref = bigquery.TableReference.from_string(
@@ -119,7 +121,6 @@ def main(event: Dict, context):
         client_info=client_info, default_query_job_config=default_query_config
     )
 
-    gsurl = f"gs://{bucket_id}/{prefix_to_load}"
 
     logging.debug(f"looking for {gsurl}_config/bq_transform.sql")
     print(f"looking for {gsurl}_config/bq_transform.sql")
@@ -161,7 +162,6 @@ def external_query(gcs, bq, gsurl, query, dest_table_ref):
         table_definitions={"temp_ext": external_config},
         use_legacy_sql=False
     )
-    job_config.labels = DEFAULT_JOB_LABELS
     # for some reason query string literal wrapped in b''
     rendered_query = str(str(query).format(
         dest_dataset=dest_table_ref.dataset_id,
