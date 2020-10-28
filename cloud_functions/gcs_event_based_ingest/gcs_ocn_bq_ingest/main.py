@@ -126,7 +126,7 @@ def main(event: Dict, context):
         client_info=client_info, default_query_job_config=default_query_config
     )
 
-
+    # TODO(jaketf) look in parent directories for this file to support parition subdirs.
     logging.debug(f"looking for {gsurl}_config/bq_transform.sql")
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(gcs, f"{gsurl}_config/bq_transform.sql")
@@ -150,7 +150,6 @@ def external_query(gcs, bq, gsurl, query, dest_table_ref):
     an external table definition _config/external.json (otherwise will assume
     parquet external table)
     """
-    # TODO(jaketf) look in parent directories for this file to support parition subdirs.
     external_table_config = read_gcs_file_if_exists(gcs, f"{gsurl}_config/external.json")
     logging.debug("reading external table config")
     if external_table_config:
