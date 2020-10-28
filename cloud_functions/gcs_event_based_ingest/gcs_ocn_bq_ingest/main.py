@@ -57,6 +57,10 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
+# TODO(jaketf) add unittest for this default regex with following test cases
+# dataset/table/_SUCCESS
+# dataset/table/$20201030/batch_id/_SUCCESS
+# dataset/table/batch_id/_SUCCESS
 DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/"
 
 # Will wait up to this polling for errors before exiting
@@ -221,7 +225,7 @@ def load_batches(gcs, bq, gsurl, dest_table_ref):
             sleep(1)
 
 
-# TODO(jaketf): The behavior of this function is not integration tested.
+# TODO(jaketf): Add integration test for partitioned / batched ingest
 def construct_load_job_config(
     storage_client: storage.Client, gsurl: str
 ) -> bigquery.LoadJobConfig:
