@@ -20,6 +20,7 @@ import json
 from collections import deque
 from os import getenv
 from pathlib import Path
+import re
 from typing import Any
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
@@ -56,6 +57,8 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
+DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/"
+
 # Will wait up to this polling for errors before exiting
 # This is to check if job fail quickly, not to assert the succeed
 # This may not be honored if longer than cloud function timeout
@@ -68,6 +71,8 @@ def main(event: Dict, context):
     # Set by Cloud Function Execution Environment
     # https://cloud.google.com/functions/docs/env-var
     project = getenv("GCP_PROJECT")
+    destination_regex = getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
+    dest_re = re.compile(destination_regex)
 
     bucket_id, object_id = parse_notification(event)
 
@@ -81,14 +86,22 @@ def main(event: Dict, context):
         return
 
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
-    parts = prefix_to_load.split("/")[:-1] 
-    dataset, table = parts[0:2]
-    partition = None
-    if len(parts) > 2:
-        partition = parts[-1]
+    destination_match = dest_re.match(object_id)
+    destination_details = destination_match.groupdict()
+    try:
+        dataset = destination_details['dataset']
+        table = destination_details['table']
+    except KeyError:
+        raise RuntimeError(
+            f"Object ID {object_id} did not match dataset and table in regex:"
+            f" {destination_regex}")
+    partition = destination_details.get('partition')
+    batch_id = destination_details.get('batch')
+    labels = DEFAULT_JOB_LABELS
+    if batch_id:
+        labels["batch_id"] = batch_id
 
-    # If the last prefix starts with $ treat it as a partition decorator.
-    if partition and partition.startswith("$"):
+    if partition:
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}{partition}", default_project=project
         )
@@ -101,7 +114,7 @@ def main(event: Dict, context):
     gcs = storage.Client(client_info=client_info)
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
-    default_query_config.labels = DEFAULT_JOB_LABELS
+    default_query_config.labels = labels
     bq = bigquery.Client(
         client_info=client_info, default_query_job_config=default_query_config
     )

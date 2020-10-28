@@ -22,6 +22,15 @@ providing transparent configuration that is overridable at any level.
 
 ## Environment Variables
 - `SUCCESS_FILENAME`: Filename to trigger a load (defaults to `_SUCCESS`).
+- `DESTINATION_REGEX`:  A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
+for (defaults to `(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/`): 
+  - dataset: destintaion BigQuery Dataset
+  - table: destination BigQuery Table
+  - partition: (optional) destination BigQuery [partition decorator](https://cloud.google.com/bigquery/docs/creating-partitioned-tables#creating_an_ingestion-time_partitioned_table_when_loading_data)
+    (For example $)
+  - batch: (optional) indicates an incremental load from an upstream system
+- `MAX_BATCH_BYTES`: Max bytes for BigQuery Load job. (default 15 TB)
+- 
 
 ## GCS Object Naming Convention
 ### Data Files

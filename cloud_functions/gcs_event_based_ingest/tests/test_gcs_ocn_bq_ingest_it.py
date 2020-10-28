@@ -234,4 +234,5 @@ def test_external_query(
     for row in validation_query_job.result():
         assert row["count"] == sum(1 for _ in open(test_data_file))
 
-#TODO(jaketf) Add integration tests for partitioned destination table.
+
+# TODO(jaketf) Add integration tests for partitioned destination table.
