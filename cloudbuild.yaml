@@ -17,9 +17,9 @@ steps:
 ###########################################################
 # Step 1: Deploy
 ###########################################################
-- name: gcr.io/cloud-builders/gcloud
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
   entrypoint: 'bash'
-  args: ['release/build.sh', '$BRANCH_NAME']
+  args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
 
 options:
   machineType: 'N1_HIGHCPU_8'

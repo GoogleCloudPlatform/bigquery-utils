@@ -1,0 +1,24 @@
+{
+  "featureIndicators": [
+    {
+      "feature": "DML_FEATURE_ROOT",
+      "isIncluded": true
+    },
+    {
+      "feature": "DML_INSERT",
+      "isIncluded": true
+    },
+    {
+      "feature": "DML_VALUES",
+      "isIncluded": true
+    },
+    {
+      "feature": "DML_DELETE",
+      "isIncluded": true
+    },
+    {
+      "feature": "DML_WHERE",
+      "isIncluded": true
+    }
+  ]
+}

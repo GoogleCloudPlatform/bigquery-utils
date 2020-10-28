@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.google.cloud.bigquery.utils'
+version '1.0-SNAPSHOT'
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
+application {
+    mainClassName = "com.google.cloud.bigquery.utils.queryfixer.QueryFixerMain"
+    applicationDefaultJvmArgs = ['-Dfile.encoding=UTF8']
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+
+}
+
+dependencies {
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    implementation 'org.apache.calcite.avatica:avatica-core:1.17.0'
+    implementation "org.apache.commons:commons-lang3:3.1"
+    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    compile 'com.google.cloud:google-cloud-bigquery:1.116.3'
+    // google flogger dependencies
+    compile group: 'com.google.flogger', name: 'flogger', version: '0.1'
+    compile 'com.google.flogger:flogger-system-backend:0.4'
+    // CLI flag library
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+    // local jar
+    implementation name: 'calcite-babel-1.23.0-SNAPSHOT'
+    implementation name: 'calcite-core-1.23.0-SNAPSHOT'
+    implementation name: 'calcite-linq4j-1.23.0-SNAPSHOT'
+    //dependency from local jar
+    compile 'com.google.guava:guava:23.5-jre'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+
+    // Import ZetaSQL Helper client
+    // JAVA_GRPC_VERSION is originally 1.18, but it will use io.opencensus which was overridden by bigquery library above.
+    def JAVA_GRPC_VERSION = "1.30.0"
+    implementation name: 'zetasql_helper_client'
+    implementation "io.grpc:grpc-netty-shaded:" + JAVA_GRPC_VERSION
+    implementation "io.grpc:grpc-protobuf:" + JAVA_GRPC_VERSION
+    implementation"io.grpc:grpc-stub:" + JAVA_GRPC_VERSION
+    //docker-java used by the ZetaSQL Helper client
+    compile group: 'com.github.docker-java', name: 'docker-java-core', version: '3.2.5'
+    compile group: 'com.github.docker-java', name: 'docker-java-transport-httpclient5', version: '3.2.5'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.hamcrest:hamcrest-library:2.2'
+    testCompile "org.mockito:mockito-core:2.+"
+}

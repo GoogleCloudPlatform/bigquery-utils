@@ -1,0 +1,20 @@
+{
+  "featureIndicators": [
+    {
+      "feature": "DDL_FEATURE_ROOT",
+      "isIncluded": true
+    },
+    {
+      "feature": "DDL_CREATE",
+      "isIncluded": true
+    },
+    {
+      "feature": "DDL_PARTITION",
+      "isIncluded": true
+    },
+    {
+      "feature": "DDL_CLUSTER",
+      "isIncluded": true
+    }
+  ]
+}

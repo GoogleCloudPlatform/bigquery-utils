@@ -1,0 +1,66 @@
+{
+  "dependencies": [
+    {
+      "node": "DQL_FEATURE_ROOT",
+      "neighbors": [
+        "DQL_SELECT"
+      ]
+    },
+    {
+      "node": "DQL_SELECT",
+      "neighbors": [
+        "DQL_FROM"
+      ]
+    },
+    {
+      "node": "DQL_FROM",
+      "neighbors": [
+        "DQL_WHERE",
+        "DQL_HAVING",
+        "DQL_ORDER_BY",
+        "DQL_LIMIT",
+        "DQL_OFFSET",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DQL_WHERE",
+      "neighbors": [
+        "DQL_HAVING",
+        "DQL_ORDER_BY",
+        "DQL_LIMIT",
+        "DQL_OFFSET",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DQL_HAVING",
+      "neighbors": [
+        "DQL_ORDER_BY",
+        "DQL_LIMIT",
+        "DQL_OFFSET",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DQL_ORDER_BY",
+      "neighbors": [
+        "DQL_LIMIT",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DQL_LIMIT",
+      "neighbors": [
+        "DQL_OFFSET",
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DQL_OFFSET",
+      "neighbors": [
+        "FEATURE_SINK"
+      ]
+    }
+  ]
+}
