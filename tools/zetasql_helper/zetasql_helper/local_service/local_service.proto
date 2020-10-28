@@ -1,0 +1,117 @@
+//
+// Copyright 2020 BigQuery Utils
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+syntax = "proto2";
+
+package bigquery.utils.zetasql_helper.local_service;
+
+import "zetasql/public/parse_location_range.proto";
+import "zetasql_helper/token/parse_token.proto";
+import "zetasql_helper/scanner/function_range.proto";
+
+option java_package = "com.google.bigquery.utils.zetasqlhelper";
+option java_outer_classname = "LocalService";
+
+service ZetaSqlHelperLocalService {
+
+  rpc Tokenize(TokenizeRequest) returns (TokenizeResponse) {
+  }
+
+  rpc ExtractFunctionRange(ExtractFunctionRangeRequest) returns (ExtractFunctionRangeResponse) {
+  }
+
+  rpc LocateTableRanges(LocateTableRangesRequest) returns (LocateTableRangesResponse) {
+  }
+
+  rpc GetAllKeywords(GetAllKeywordsRequest) returns (GetAllKeywordsResponse) {
+  }
+
+  rpc FixColumnNotGrouped(FixColumnNotGroupedRequest) returns (FixColumnNotGroupedResponse) {
+  }
+
+  rpc FixDuplicateColumns(FixDuplicateColumnsRequest) returns (FixDuplicateColumnsResponse) {
+  }
+
+}
+
+message TokenizeRequest {
+  optional string query = 1;
+}
+
+message TokenizeResponse {
+  repeated ParseTokenProto parse_tokens = 1;
+}
+
+message FixColumnNotGroupedRequest {
+  // The input query with "Column Not Grouped" error
+  optional string query = 1;
+  // Name of the missing column in the GROUP BY clause
+  optional string missing_column = 2;
+  // line number of the error
+  optional int32 line_number = 3;
+  // column number of the error
+  optional int32 column_number = 4;
+
+}
+
+message FixColumnNotGroupedResponse {
+  optional string fixed_query = 1;
+}
+
+message FixDuplicateColumnsRequest {
+  // The input query with "Duplicate Columns" error
+  optional string query = 1;
+  // Name of the duplicate columns
+  optional string duplicate_column = 2;
+
+}
+
+message FixDuplicateColumnsResponse {
+  optional string fixed_query = 1;
+}
+
+message ExtractFunctionRangeRequest {
+  // Query to extract the function range
+  optional string query = 1;
+  // Line number of the function starting point
+  optional int32 line_number = 2;
+  // Column number of the function starting point
+  optional int32 column_number = 3;
+
+}
+
+message ExtractFunctionRangeResponse {
+  optional FunctionRangeProto function_range = 1;
+}
+
+message LocateTableRangesRequest {
+  // Query to locate the tables meeting a regex
+  optional string query = 1;
+  // Regex to match table names
+  optional string table_regex = 2;
+
+}
+
+message LocateTableRangesResponse {
+  repeated zetasql.ParseLocationRangeProto table_ranges = 1;
+}
+
+message GetAllKeywordsRequest {
+}
+
+message GetAllKeywordsResponse {
+  repeated string keywords = 1;
+}
