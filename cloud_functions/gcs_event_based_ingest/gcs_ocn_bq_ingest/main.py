@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Background Cloud Function for loading data to BigQuery.
+"""Background Cloud Function for loading data from GCS to BigQuery.
 """
 import json
 from collections import deque
@@ -35,12 +35,6 @@ from google.cloud.exceptions import NotFound
 DEFAULT_MAX_BATCH_BYTES = 15 * 10 ** 12
 MAX_URIS_PER_LOAD = 10 ** 4
 
-BASE_LOAD_JOB_CONFIG = {
-    "sourceFormat": "CSV",
-    "fieldDelimiter": "|",
-    "writeDisposition": "WRITE_APPEND",
-}
-
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
     "sourceFormat": "PARQUET"
 }
@@ -58,10 +52,7 @@ BASE_LOAD_JOB_CONFIG = {
 }
 
 # TODO(jaketf) add unittest for this default regex with following test cases
-# dataset/table/_SUCCESS
-# dataset/table/$20201030/batch_id/_SUCCESS
-# dataset/table/batch_id/_SUCCESS
-DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/"
+DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/"
 
 # Will wait up to this polling for errors before exiting
 # This is to check if job fail quickly, not to assert the succeed
@@ -126,12 +117,14 @@ def main(event: Dict, context):
         client_info=client_info, default_query_job_config=default_query_config
     )
 
-    # TODO(jaketf) look in parent directories for this file to support parition subdirs.
+    # TODO(jaketf) look in parent directories for this file to support partition subdirs.
     logging.debug(f"looking for {gsurl}_config/bq_transform.sql")
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(gcs, f"{gsurl}_config/bq_transform.sql")
     logging.debug(f"external_query_sql = '{external_query_sql}'")
     print(f"external_query_sql = {external_query_sql}")
+    if not external_query_sql:
+        external_query_sql = look_for_transform_sql(gcs, gsurl)
     if external_query_sql:
         logging.debug("EXTERNAL QUERY")
         print("EXTERNAL QUERY")
@@ -225,6 +218,35 @@ def load_batches(gcs, bq, gsurl, dest_table_ref):
             sleep(1)
 
 
+def get_parent_config_file(storage_client, config_filename, bucket, path):
+    config_dir_name = "_config"
+    parent_path = Path(path).parent
+    config_path = parent_path / config_dir_name / config_filename
+    return read_gcs_file_if_exists(storage_client,
+                                   f"gs://{bucket}/{config_path}")
+
+
+def look_for_transform_sql(
+    storage_client: storage.Client, gsurl: str
+) -> str:
+    """look in parent directories for _config/bq_transform.sql"""
+    config_filename = "bq_transform.sql"
+    bucket_name, obj_path = _parse_gcs_url(gsurl)
+    parts = obj_path.split("/")
+
+    def _get_parent_query(path):
+        return get_parent_config_file(
+            storage_client, config_filename, bucket_name, obj_path)
+
+    config = None
+    while parts:
+        if config:
+            return config
+        config = _get_parent_query("/".join(parts))
+        parts.pop()
+    return config
+
+
 # TODO(jaketf): Add integration test for partitioned / batched ingest
 def construct_load_job_config(
     storage_client: storage.Client, gsurl: str
@@ -233,32 +255,25 @@ def construct_load_job_config(
     merge dictionaries for loadjob.json configs in parent directories.
     The configs closest to gsurl should take precedence.
     """
-    config_dir_name = "_config"
     config_filename = "load.json"
     bucket_name, obj_path = _parse_gcs_url(gsurl)
     parts = obj_path.split("/")
 
     def _get_parent_config(path):
-        parent_path = Path(path).parent
-        config_path = parent_path / config_dir_name / config_filename
-        config = read_gcs_file_if_exists(storage_client,
-                                         f"gs://{bucket_name}/{config_path}")
-        if config:
-            return json.loads(config)
-        else:
-            return config
+        return get_parent_config_file(
+            storage_client, config_filename, bucket_name, path)
 
     config_q = deque()
     config_q.append(BASE_LOAD_JOB_CONFIG)
     while parts:
         config = _get_parent_config("/".join(parts))
         if config:
-            config_q.append(config)
+            config_q.append(json.loads(config))
         parts.pop()
 
     merged_config = dict()
     while config_q:
-        merged_config.update(config_q.pop())
+        merged_config.update(config_q.popleft())
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
