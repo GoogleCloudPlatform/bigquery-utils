@@ -80,6 +80,7 @@ steps:
     - 'build-ci-image'
     - 'unit-test'
   args:
+    - '--maxfail=1'
     - '-k'
     - 'IT'
   id: 'integration-test'

@@ -154,6 +154,37 @@ def test_load_job_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
         assert row["count"] == sum(1 for _ in open(test_data_file))
 
 
+def test_duplicate_notification_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
+    """tests behavior with two notifications for the same success file."""
+    if not gcs_data.exists():
+        raise EnvironmentError("test data objects must exist")
+    test_event = {
+        "attributes": {
+            "bucketId": gcs_data.bucket.name,
+            "objectId": gcs_data.name
+        }
+    }
+    main.main(test_event, None)
+    did_second_invocation_raise = False
+    try:
+        main.main(test_event, None)
+    except RuntimeError:
+        did_second_invocation_raise = True
+    assert did_second_invocation_raise
+    sleep(3)    # Need to wait on async load job
+    validation_query_job = bq.query(f"""
+        SELECT
+            COUNT(*) as count
+        FROM
+          `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
+    """)
+
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
+    for row in validation_query_job.result():
+        assert row["count"] == sum(1 for _ in open(test_data_file))
+
+
 @pytest.fixture(scope="function")
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_truncating_load_config(request, gcs_bucket, dest_dataset,

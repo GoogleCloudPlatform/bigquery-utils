@@ -19,6 +19,7 @@
 import json
 import re
 from collections import deque
+from datetime import timedelta
 from os import getenv
 from pathlib import Path
 from time import monotonic, sleep
@@ -28,6 +29,7 @@ from urllib.parse import urlparse
 from google.api_core.client_info import ClientInfo
 from google.cloud import bigquery, storage
 from google.cloud.exceptions import NotFound
+from google.api_core.exceptions import PreconditionFailed
 
 # 15TB per BQ load job.
 DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
@@ -59,6 +61,8 @@ DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/" \
 WAIT_FOR_JOB_SECONDS = 5
 SUCCESS_FILENAME = getenv("SUCCESS_FILENAME", "_SUCCESS")
 
+CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
+
 
 def main(event: Dict, context):    # pylint: disable=unused-argument
     """entry point for background cloud function for event driven GCS to
@@ -83,6 +87,35 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
 
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
+    gcs_client = storage.Client(client_info=CLIENT_INFO)
+    bkt = gcs_client.lookup_bucket(bucket_id)
+    success_blob: storage.Blob = bkt.blob(object_id)
+    success_blob.reload()
+    success_created_unix_timestamp = success_blob.time_created.timestamp()
+
+    # Need to handle potential duplicate Pub/Sub notifications.
+    # To achieve this we will drop an empty "claimed" file that indicates
+    # an invocation of this cloud function has picked up the success file
+    # with a certain creation timestamp. This will support republishing the
+    # success file as a mechanism of re-running the ingestion while avoiding
+    # duplicate ingestion due to multiple Pub/Sub messages for a success file
+    # with the same creation time.
+    claim_blob: storage.Blob = bkt.blob(
+        f"_claimed_{success_created_unix_timestamp}")
+    try:
+        claim_blob.upload_from_string(
+            "",
+            if_generation_match=0)
+    except PreconditionFailed as err:
+        raise RuntimeError(
+            f"The prefix {gsurl} appears to already have been claimed for "
+            f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
+            f"{success_created_unix_timestamp}."
+            "This means that another invocation of this cloud function has"
+            "claimed the ingestion of this batch."
+            "This may be due to a rare duplicate delivery of the Pub/Sub "
+            "storage notification.") from err
+
     destination_match = dest_re.match(object_id)
     if not destination_match:
         raise RuntimeError(f"Object ID {object_id} did not match regex:"
@@ -110,12 +143,10 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}", default_project=project)
 
-    client_info = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
-    gcs_client = storage.Client(client_info=client_info)
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(client_info=client_info,
+    bq_client = bigquery.Client(client_info=CLIENT_INFO,
                                 default_query_job_config=default_query_config)
 
     print(f"looking for {gsurl}_config/bq_transform.sql")
