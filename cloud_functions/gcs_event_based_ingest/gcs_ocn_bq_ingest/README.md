@@ -57,3 +57,11 @@ From the `gcs_ocn_bq_ingest` dir simply run
 ```bash
 pytest
 ```
+
+## Continuous Integration
+The CI system for this function includes the following style checks as well as
+running the unit and integration tests:
+- flake8
+- pylint
+- mypy
+-

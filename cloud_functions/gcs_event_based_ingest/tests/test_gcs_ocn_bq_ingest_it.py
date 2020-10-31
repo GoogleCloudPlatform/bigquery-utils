@@ -15,8 +15,8 @@
 import json
 import logging
 import os
-import uuid
 import sys
+import uuid
 from time import sleep
 from typing import List
 
@@ -27,7 +27,6 @@ from google.cloud.exceptions import NotFound
 
 sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 from gcs_ocn_bq_ingest import main
-
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,12 +70,12 @@ def mock_env(gcs, monkeypatch):
 @pytest.fixture
 def dest_dataset(request, bq, mock_env, monkeypatch):
     random_dataset = f"test_bq_ingest_gcf_{str(uuid.uuid4())[:8].replace('-','_')}"
-    dataset = bigquery.Dataset(f"{os.getenv('GCP_PROJECT')}" f".{random_dataset}")
+    dataset = bigquery.Dataset(f"{os.getenv('GCP_PROJECT')}"
+                               f".{random_dataset}")
     dataset.location = "US"
     bq.create_dataset(dataset)
-    monkeypatch.setenv(
-        "BQ_LOAD_STATE_TABLE", f"{dataset.dataset_id}.serverless_bq_loads"
-    )
+    monkeypatch.setenv("BQ_LOAD_STATE_TABLE",
+                       f"{dataset.dataset_id}.serverless_bq_loads")
     print(f"created dataset {dataset.dataset_id}")
 
     def teardown():
@@ -89,7 +88,8 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
 @pytest.mark.usefixtures("bq", "mock_env", "dest_dataset")
 @pytest.fixture
 def dest_table(request, bq, mock_env, dest_dataset):
-    with open(os.path.join(TEST_DIR, "resources", "schema.json")) as schema_file:
+    with open(os.path.join(TEST_DIR, "resources",
+                           "schema.json")) as schema_file:
         schema = main.dict_to_bq_schema(json.load(schema_file))
 
     table = bigquery.Table(
@@ -108,16 +108,16 @@ def dest_table(request, bq, mock_env, dest_dataset):
 
 @pytest.fixture(scope="function")
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
-def gcs_data(request, gcs_bucket, dest_dataset, dest_table) -> storage.blob.Blob:
+def gcs_data(request, gcs_bucket, dest_dataset,
+             dest_table) -> storage.blob.Blob:
     data_objs = []
     for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
-        data_obj: storage.blob.Blob = gcs_bucket.blob(
-            "/".join([dest_dataset.dataset_id, dest_table.table_id, test_file])
-        )
+        data_obj: storage.blob.Blob = gcs_bucket.blob("/".join(
+            [dest_dataset.dataset_id, dest_table.table_id, test_file]))
         logging.debug(f"uploading gs://{gcs_bucket.name}/{data_obj.name}")
         data_obj.upload_from_filename(
-            os.path.join(TEST_DIR, "resources", "test-data", "nation", test_file)
-        )
+            os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                         test_file))
         data_objs.append(data_obj)
 
     def teardown():
@@ -134,72 +134,64 @@ def test_load_job_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
     test_event = {
-        "attributes": {"bucketId": gcs_data.bucket.name, "objectId": gcs_data.name}
+        "attributes": {
+            "bucketId": gcs_data.bucket.name,
+            "objectId": gcs_data.name
+        }
     }
     main.main(test_event, None)
-    sleep(3)  # Need to wait on async load job
-    validation_query_job = bq.query(
-        f"""
+    sleep(3)    # Need to wait on async load job
+    validation_query_job = bq.query(f"""
         SELECT
             COUNT(*) as count
         FROM
           `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-    """
-    )
+    """)
 
-    test_data_file = os.path.join(
-        TEST_DIR, "resources", "test-data", "nation", "part-m-00001"
-    )
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
     for row in validation_query_job.result():
         assert row["count"] == sum(1 for _ in open(test_data_file))
 
 
 @pytest.fixture(scope="function")
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
-def gcs_truncating_load_config(request, gcs_bucket, dest_dataset, dest_table
-) -> storage.blob.Blob:
-    config_obj: storage.blob.Blob = gcs_bucket.blob(
-        "/".join([
-            dest_dataset.dataset_id,
-            dest_table.table_id,
-            "_config",
-            "load.json",
-        ])
-    )
+def gcs_truncating_load_config(request, gcs_bucket, dest_dataset,
+                               dest_table) -> storage.blob.Blob:
+    config_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+        dest_dataset.dataset_id,
+        dest_table.table_id,
+        "_config",
+        "load.json",
+    ]))
     config_obj.upload_from_string(
-        json.dumps(
-            {
-                "writeDisposition": "WRITE_TRUNCATE"
-            })
-    )
+        json.dumps({"writeDisposition": "WRITE_TRUNCATE"}))
 
     def teardown():
         if config_obj.exists():
             config_obj.delete()
+
     request.addfinalizer(teardown)
     return config_obj
 
 
 @pytest.fixture(scope="function")
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
-def gcs_batched_data(request, gcs_bucket, dest_dataset, dest_table) -> List[storage.blob.Blob]:
+def gcs_batched_data(request, gcs_bucket, dest_dataset,
+                     dest_table) -> List[storage.blob.Blob]:
     """
     upload two batches of data
     """
     data_objs = []
     for batch in ["batch0", "batch1"]:
         for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
-            data_obj: storage.blob.Blob = gcs_bucket.blob(
-                "/".join([
-                    dest_dataset.dataset_id,
-                    dest_table.table_id,
-                    batch,
-                    test_file])
-            )
+            data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+                dest_dataset.dataset_id, dest_table.table_id, batch, test_file
+            ]))
             logging.debug(f"uploading gs://{gcs_bucket.name}/{data_obj.name}")
             data_obj.upload_from_filename(
-                os.path.join(TEST_DIR, "resources", "test-data", "nation", test_file)
-            )
+                os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                             test_file))
             data_objs.append(data_obj)
 
     def teardown():
@@ -211,7 +203,9 @@ def gcs_batched_data(request, gcs_bucket, dest_dataset, dest_table) -> List[stor
     return [data_objs[-1], data_objs[-4]]
 
 
-def test_load_job_truncating_batches_IT(bq, gcs_batched_data, gcs_truncating_load_config, dest_dataset, dest_table, mock_env):
+def test_load_job_truncating_batches_IT(bq, gcs_batched_data,
+                                        gcs_truncating_load_config,
+                                        dest_dataset, dest_table, mock_env):
     """
     tests two successive batches with a load.json that dictates WRITE_TRUNCATE.
 
@@ -219,32 +213,34 @@ def test_load_job_truncating_batches_IT(bq, gcs_batched_data, gcs_truncating_loa
     in the test file because we should pick up the WRITE_TRUNCATE disposition.
     """
     if not gcs_truncating_load_config.exists():
-        raise EnvironmentError("the test is not configured correctly the load.json is missing")
+        raise EnvironmentError(
+            "the test is not configured correctly the load.json is missing")
     for gcs_data in gcs_batched_data:
         if not gcs_data.exists():
             raise EnvironmentError("test data objects must exist")
         test_event = {
-            "attributes": {"bucketId": gcs_data.bucket.name, "objectId": gcs_data.name}
+            "attributes": {
+                "bucketId": gcs_data.bucket.name,
+                "objectId": gcs_data.name
+            }
         }
         main.main(test_event, None)
-        sleep(3)  # Need to wait on async load job
-        validation_query_job = bq.query(
-            f"""
+        sleep(3)    # Need to wait on async load job
+        validation_query_job = bq.query(f"""
             SELECT
                 COUNT(*) as count
             FROM
               `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-        """
-        )
+        """)
 
-        test_data_file = os.path.join(
-            TEST_DIR, "resources", "test-data", "nation", "part-m-00001"
-        )
+        test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
+                                      "nation", "part-m-00001")
         for row in validation_query_job.result():
             assert row["count"] == sum(1 for _ in open(test_data_file))
 
 
-def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset, dest_table, mock_env):
+def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset,
+                                       dest_table, mock_env):
     """
     tests two successive batches with the default load configuration.
 
@@ -252,27 +248,27 @@ def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset, dest_
     in the test file because we should pick up the default WRITE_APPEND
     disposition.
     """
-    test_data_file = os.path.join(
-        TEST_DIR, "resources", "test-data", "nation", "part-m-00001"
-    )
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
     test_count = sum(1 for _ in open(test_data_file))
     expected_counts = [test_count, 2 * test_count]
     for i, gcs_data in enumerate(gcs_batched_data):
         if not gcs_data.exists():
             raise EnvironmentError("test data objects must exist")
         test_event = {
-            "attributes": {"bucketId": gcs_data.bucket.name, "objectId": gcs_data.name}
+            "attributes": {
+                "bucketId": gcs_data.bucket.name,
+                "objectId": gcs_data.name
+            }
         }
         main.main(test_event, None)
-        sleep(3)  # Need to wait on async load job
-        validation_query_job = bq.query(
-            f"""
+        sleep(3)    # Need to wait on async load job
+        validation_query_job = bq.query(f"""
             SELECT
                 COUNT(*) as count
             FROM
               `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-        """
-        )
+        """)
 
         for row in validation_query_job.result():
             assert row["count"] == expected_counts[i]
@@ -280,35 +276,31 @@ def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset, dest_
 
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 @pytest.fixture
-def gcs_external_config_IT(
-    request, gcs_bucket, dest_dataset, dest_table
-) -> List[storage.blob.Blob]:
+def gcs_external_config(request, gcs_bucket, dest_dataset,
+                        dest_table) -> List[storage.blob.Blob]:
     config_objs = []
-    sql_obj = gcs_bucket.blob(
-        "/".join(
-            [
-                dest_dataset.dataset_id,
-                dest_table.table_id,
-                "_config",
-                "bq_transform.sql",
-            ]
-        )
-    )
+    sql_obj = gcs_bucket.blob("/".join([
+        dest_dataset.dataset_id,
+        dest_table.table_id,
+        "_config",
+        "bq_transform.sql",
+    ]))
 
     logging.debug(f"uploading gs://{gcs_bucket.name}/{sql_obj.name}")
     sql = "INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext"
     sql_obj.upload_from_string(sql)
 
-    config_obj = gcs_bucket.blob(
-        "/".join(
-            [dest_dataset.dataset_id, dest_table.table_id, "_config", "external.json"]
-        )
-    )
+    config_obj = gcs_bucket.blob("/".join([
+        dest_dataset.dataset_id, dest_table.table_id, "_config",
+        "external.json"
+    ]))
 
     with open(os.path.join(TEST_DIR, "resources", "schema.json")) as schema:
         fields = json.load(schema)
     config = {
-        "schema": {"fields": fields},
+        "schema": {
+            "fields": fields
+        },
         "csvOptions": {
             "allowJaggedRows": False,
             "allowQuotedNewlines": False,
@@ -334,9 +326,8 @@ def gcs_external_config_IT(
     return config_objs
 
 
-def test_external_query_IT(
-    bq, gcs_data, gcs_external_config, dest_dataset, dest_table, mock_env
-):
+def test_external_query_IT(bq, gcs_data, gcs_external_config, dest_dataset,
+                           dest_table, mock_env):
     """tests the basic external query ingrestion mechanics
     with bq_transform.sql and external.json
     """
@@ -346,24 +337,21 @@ def test_external_query_IT(
         raise NotFound("config objects must exist")
 
     test_event = {
-        "attributes": {"bucketId": gcs_data.bucket.name, "objectId": gcs_data.name}
+        "attributes": {
+            "bucketId": gcs_data.bucket.name,
+            "objectId": gcs_data.name
+        }
     }
     main.main(test_event, None)
-    sleep(3)  # Need to wait on async query job
-    validation_query_job = bq.query(
-        f"""
+    sleep(3)    # Need to wait on async query job
+    validation_query_job = bq.query(f"""
         SELECT
             COUNT(*) as count
         FROM
           `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-    """
-    )
+    """)
 
-    test_data_file = os.path.join(
-        TEST_DIR, "resources", "test-data", "nation", "part-m-00001"
-    )
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
     for row in validation_query_job.result():
         assert row["count"] == sum(1 for _ in open(test_data_file))
-
-
-# TODO(jaketf) Add integration tests for partitioned destination table.

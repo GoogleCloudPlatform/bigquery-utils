@@ -198,3 +198,51 @@ WHERE
 ### Pub/Sub Storage Notifications `_SUCCESS`
 1. Trigger on `_SUCCESS` File to load all other files in that directory.
 1. Trigger on non-`_SUCCESS` File will no-op
+
+## Continuous Integration
+We run the following CI checks to ensure code quality and avoid common pitfalls:
+- [yapf](https://github.com/google/yapf)
+- [flake8](https://flake8.pycqa.org/en/latest/)
+- [isort](https://pypi.org/project/isort/)
+- [mypy](https://mypy.readthedocs.io/en/stable/)
+- [pylint](https://www.pylint.org/) (only on main sources not tests)
+
+This CI process is defined in [cloudbuild.yaml](cloudbuild.yaml) and can be run
+locally with [cloud-build-local](https://cloud.google.com/cloud-build/docs/build-debug-locally)
+from this directory with:
+```bash
+cloud-build-local --config cloudbuild.yaml --dryrun=false .
+```
+
+### Optimizations / Philosophy
+This CI system uses [kaniko cache to speed up builds](https://cloud.google.com/cloud-build/docs/kaniko-cache)
+and defaults cache expiration to two weeks.
+This notably does not pin python package versions so we know if one of our
+dependencies or CI checks has been updated in a way that breaks this tool.
+It's better for us to make a conscious decision to adopt new features or adjust
+CI configs or pin older version depending on the type for failure.
+This CI should be run on all new PRs and nightly.
+
+### Just Running the Tests
+Alternatively to the local cloudbuild or using the docker container to run your
+tests, you can `pip3 install -r requirements-dev.txt` and select certain tests
+to run with [`pytest`](https://docs.pytest.org/en/stable/usage.html)
+
+Note that integration tests will spin up / tear down cloud resources that can
+incur a small cost. These resources will be spun up based on your Google Cloud SDK
+[Application Default Credentials](https://cloud.google.com/sdk/gcloud/reference/auth/application-default)
+
+#### Running All Tests
+```bash
+pytest
+```
+#### Running Unit Tests Only
+```bash
+pytest -k "not IT"
+```
+
+#### Running Integration Tests Only
+```bash
+pytest -k IT
+```
+

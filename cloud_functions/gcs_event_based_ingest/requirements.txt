@@ -1,4 +1,2 @@
-pytz==2020.1
-pytest==5.4.3
-google-cloud-bigquery==1.25.0
-google-cloud-storage==1.29.0
+google-cloud-bigquery>=2.2.0
+google-cloud-storage>=1.32.0

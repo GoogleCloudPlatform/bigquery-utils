@@ -14,8 +14,8 @@
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
 import os
-import sys
 import re
+import sys
 
 import pytest
 
@@ -25,40 +25,46 @@ from gcs_ocn_bq_ingest import main
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
 
 
-@pytest.mark.parametrize("test_input,expected", [
-    # flat
-    ("dataset/table/_SUCCESS",
-     {
-         "dataset": "dataset",
-         "table": "table",
-         "partition": None,
-         "batch": None
-     }),
-    # partitioned
-    ("dataset/table/$20201030/_SUCCESS",
-     {
-         "dataset": "dataset",
-         "table": "table",
-         "partition": "$20201030",
-         "batch": None
-     }),
-    # partitioned batched
-    ("dataset/table/$20201030/batch_id/_SUCCESS",
-     {
-         "dataset": "dataset",
-         "table": "table",
-         "partition": "$20201030",
-         "batch": "batch_id"
-     }),
-    # batched no partition
-    ("dataset/table/batch_id/_SUCCESS",
-     {
-         "dataset": "dataset",
-         "table": "table",
-         "partition": None,
-         "batch": "batch_id"
-     }),
-])
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        (
+            "dataset/table/_SUCCESS",    # flat
+            {
+                "dataset": "dataset",
+                "table": "table",
+                "partition": None,
+                "batch": None
+            }),
+        (
+            "dataset/table/$20201030/_SUCCESS",    # partitioned
+            {
+                "dataset": "dataset",
+                "table": "table",
+                "partition": "$20201030",
+                "batch": None
+            }),
+        (
+            "dataset/table/$20201030/batch_id/_SUCCESS",    # partitioned, batched
+            {
+                "dataset": "dataset",
+                "table": "table",
+                "partition": "$20201030",
+                "batch": "batch_id"
+            }),
+        (
+            "dataset/table/batch_id/_SUCCESS",    # batched (no partitioning)
+            {
+                "dataset": "dataset",
+                "table": "table",
+                "partition": None,
+                "batch": "batch_id"
+            }),
+    ])
 def test_default_destination_regex(test_input, expected):
-    """ensure our default regex handles each scenario we document"""
-    assert COMPILED_DEFAULT_DENTINATION_REGEX.match(test_input).groupdict() == expected
+    """ensure our default regex handles each scenarios we document.
+    this test is to support improving this regex in the future w/o regressing
+    for existing use cases.
+    """
+    assert COMPILED_DEFAULT_DENTINATION_REGEX.match(
+        test_input).groupdict() == expected
