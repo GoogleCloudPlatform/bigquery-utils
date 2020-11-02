@@ -19,7 +19,6 @@
 import json
 import re
 from collections import deque
-from datetime import timedelta
 from os import getenv
 from pathlib import Path
 from time import monotonic, sleep
@@ -27,9 +26,9 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from google.api_core.client_info import ClientInfo
+from google.api_core.exceptions import PreconditionFailed
 from google.cloud import bigquery, storage
 from google.cloud.exceptions import NotFound
-from google.api_core.exceptions import PreconditionFailed
 
 # 15TB per BQ load job.
 DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
@@ -90,31 +89,7 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     gcs_client = storage.Client(client_info=CLIENT_INFO)
     bkt = gcs_client.lookup_bucket(bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
-    success_blob.reload()
-    success_created_unix_timestamp = success_blob.time_created.timestamp()
-
-    # Need to handle potential duplicate Pub/Sub notifications.
-    # To achieve this we will drop an empty "claimed" file that indicates
-    # an invocation of this cloud function has picked up the success file
-    # with a certain creation timestamp. This will support republishing the
-    # success file as a mechanism of re-running the ingestion while avoiding
-    # duplicate ingestion due to multiple Pub/Sub messages for a success file
-    # with the same creation time.
-    claim_blob: storage.Blob = bkt.blob(
-        f"_claimed_{success_created_unix_timestamp}")
-    try:
-        claim_blob.upload_from_string(
-            "",
-            if_generation_match=0)
-    except PreconditionFailed as err:
-        raise RuntimeError(
-            f"The prefix {gsurl} appears to already have been claimed for "
-            f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
-            f"{success_created_unix_timestamp}."
-            "This means that another invocation of this cloud function has"
-            "claimed the ingestion of this batch."
-            "This may be due to a rare duplicate delivery of the Pub/Sub "
-            "storage notification.") from err
+    handle_duplicate_notification(bkt, success_blob, gsurl)
 
     destination_match = dest_re.match(object_id)
     if not destination_match:
@@ -163,6 +138,40 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
 
     print("LOAD_JOB")
     load_batches(gcs_client, bq_client, gsurl, dest_table_ref)
+
+
+def handle_duplicate_notification(
+    bkt: storage.Bucket,
+    success_blob: storage.Blob,
+    gsurl: str
+):
+    """
+    Need to handle potential duplicate Pub/Sub notifications.
+    To achieve this we will drop an empty "claimed" file that indicates
+    an invocation of this cloud function has picked up the success file
+    with a certain creation timestamp. This will support republishing the
+    success file as a mechanism of re-running the ingestion while avoiding
+    duplicate ingestion due to multiple Pub/Sub messages for a success file
+    with the same creation time.
+    """
+    success_blob.reload()
+    success_created_unix_timestamp = success_blob.time_created.timestamp()
+
+    claim_blob: storage.Blob = bkt.blob(
+        f"_claimed_{success_created_unix_timestamp}")
+    try:
+        claim_blob.upload_from_string(
+            "",
+            if_generation_match=0)
+    except PreconditionFailed as err:
+        raise RuntimeError(
+            f"The prefix {gsurl} appears to already have been claimed for "
+            f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
+            f"{success_created_unix_timestamp}."
+            "This means that another invocation of this cloud function has"
+            "claimed the ingestion of this batch."
+            "This may be due to a rare duplicate delivery of the Pub/Sub "
+            "storage notification.") from err
 
 
 def external_query(gcs_client, bq_client, gsurl, query, dest_table_ref):

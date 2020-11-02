@@ -206,6 +206,7 @@ We run the following CI checks to ensure code quality and avoid common pitfalls:
 - [isort](https://pypi.org/project/isort/)
 - [mypy](https://mypy.readthedocs.io/en/stable/)
 - [pylint](https://www.pylint.org/) (only on main sources not tests)
+- [hadolint](https://github.com/hadolint/hadolint) for Dockerfile.ci
 
 This CI process is defined in [cloudbuild.yaml](cloudbuild.yaml) and can be run
 locally with [cloud-build-local](https://cloud.google.com/cloud-build/docs/build-debug-locally)

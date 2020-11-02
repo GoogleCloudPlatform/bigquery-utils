@@ -16,7 +16,14 @@
 # limitations under the License.
 ---
 steps:
+- name: 'hadolint/hadolint'
+  entrypoint: '/bin/hadolint'
+  args:
+    - 'Dockerfile.ci'
+  id: 'lint-ci-docker-image'
 - name: 'gcr.io/kaniko-project/executor:latest'
+  waitFor:
+    - 'lint-ci-docker-image'
   args:
     - '--dockerfile=Dockerfile.ci'
     - '--destination=gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
@@ -71,7 +78,7 @@ steps:
     - 'flake8'
     - 'pylint-main'
     - 'mypy-main'
-    - 'mypy-test'
+    - 'mypy-tests'
   args:
     - 'tests/test_gcs_ocn_bq_ingest.py'
   id: 'unit-test'
