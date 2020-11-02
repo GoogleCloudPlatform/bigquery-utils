@@ -1,5 +1,5 @@
 FROM python:3.8-slim
-COPY requirements.txt requirements-dev.txt .
+COPY requirements.txt requirements-dev.txt ./
 RUN pip3 install -r requirements-dev.txt
 WORKDIR /ci
 COPY . /ci/
