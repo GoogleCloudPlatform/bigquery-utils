@@ -13,11 +13,10 @@
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
 import json
-import logging
 import os
 import sys
 import uuid
-from time import sleep
+from time import monotonic
 from typing import List
 
 import google.cloud.storage as storage
@@ -29,6 +28,7 @@ sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 from gcs_ocn_bq_ingest import main
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+LOAD_JOB_POLLING_TIMEOUT = 10    # seconds
 
 
 @pytest.fixture(scope="module")
@@ -48,8 +48,15 @@ def gcs() -> storage.Client:
 def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
     """GCS bucket for test artifacts"""
     bucket = gcs.create_bucket(str(uuid.uuid4()))
+    # overide default field delimiter at bucket level
+    load_config_json = {
+        "fieldDelimiter": "|",
+    }
+    load_json_blob: storage.Blob = bucket.blob("_config/load.json")
+    load_json_blob.upload_from_string(json.dumps(load_config_json))
 
     def teardown():
+        load_json_blob.delete()
         bucket.delete(force=True)
 
     request.addfinalizer(teardown)
@@ -87,7 +94,7 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
 
 @pytest.mark.usefixtures("bq", "mock_env", "dest_dataset")
 @pytest.fixture
-def dest_table(request, bq, mock_env, dest_dataset):
+def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "schema.json")) as schema_file:
         schema = main.dict_to_bq_schema(json.load(schema_file))
@@ -114,7 +121,6 @@ def gcs_data(request, gcs_bucket, dest_dataset,
     for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
         data_obj: storage.blob.Blob = gcs_bucket.blob("/".join(
             [dest_dataset.dataset_id, dest_table.table_id, test_file]))
-        logging.debug(f"uploading gs://{gcs_bucket.name}/{data_obj.name}")
         data_obj.upload_from_filename(
             os.path.join(TEST_DIR, "resources", "test-data", "nation",
                          test_file))
@@ -140,21 +146,17 @@ def test_load_job_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
         }
     }
     main.main(test_event, None)
-    sleep(3)    # Need to wait on async load job
-    validation_query_job = bq.query(f"""
-        SELECT
-            COUNT(*) as count
-        FROM
-          `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-    """)
-
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
-    for row in validation_query_job.result():
-        assert row["count"] == sum(1 for _ in open(test_data_file))
+    expected_num_rows = sum(1 for _ in open(test_data_file))
+    try:
+        bq_wait_for_rows(bq, dest_table, expected_num_rows)
+    except TimeoutError as err:
+        raise AssertionError from err
 
 
-def test_duplicate_notification_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
+def test_duplicate_notification_IT(bq, gcs_data, dest_dataset, dest_table,
+                                   mock_env):
     """tests behavior with two notifications for the same success file."""
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
@@ -171,18 +173,14 @@ def test_duplicate_notification_IT(bq, gcs_data, dest_dataset, dest_table, mock_
     except RuntimeError:
         did_second_invocation_raise = True
     assert did_second_invocation_raise
-    sleep(3)    # Need to wait on async load job
-    validation_query_job = bq.query(f"""
-        SELECT
-            COUNT(*) as count
-        FROM
-          `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-    """)
 
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
-    for row in validation_query_job.result():
-        assert row["count"] == sum(1 for _ in open(test_data_file))
+    expected_num_rows = sum(1 for _ in open(test_data_file))
+    try:
+        bq_wait_for_rows(bq, dest_table, expected_num_rows)
+    except TimeoutError as err:
+        raise AssertionError from err
 
 
 @pytest.fixture(scope="function")
@@ -219,7 +217,6 @@ def gcs_batched_data(request, gcs_bucket, dest_dataset,
             data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
                 dest_dataset.dataset_id, dest_table.table_id, batch, test_file
             ]))
-            logging.debug(f"uploading gs://{gcs_bucket.name}/{data_obj.name}")
             data_obj.upload_from_filename(
                 os.path.join(TEST_DIR, "resources", "test-data", "nation",
                              test_file))
@@ -256,18 +253,13 @@ def test_load_job_truncating_batches_IT(bq, gcs_batched_data,
             }
         }
         main.main(test_event, None)
-        sleep(3)    # Need to wait on async load job
-        validation_query_job = bq.query(f"""
-            SELECT
-                COUNT(*) as count
-            FROM
-              `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-        """)
-
         test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
                                       "nation", "part-m-00001")
-        for row in validation_query_job.result():
-            assert row["count"] == sum(1 for _ in open(test_data_file))
+        expected_num_rows = sum(1 for _ in open(test_data_file))
+        try:
+            bq_wait_for_rows(bq, dest_table, expected_num_rows)
+        except TimeoutError as err:
+            raise AssertionError from err
 
 
 def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset,
@@ -293,16 +285,10 @@ def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset,
             }
         }
         main.main(test_event, None)
-        sleep(3)    # Need to wait on async load job
-        validation_query_job = bq.query(f"""
-            SELECT
-                COUNT(*) as count
-            FROM
-              `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-        """)
-
-        for row in validation_query_job.result():
-            assert row["count"] == expected_counts[i]
+        try:
+            bq_wait_for_rows(bq, dest_table, expected_counts[i])
+        except TimeoutError as err:
+            raise AssertionError from err
 
 
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
@@ -317,7 +303,6 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
         "bq_transform.sql",
     ]))
 
-    logging.debug(f"uploading gs://{gcs_bucket.name}/{sql_obj.name}")
     sql = "INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext"
     sql_obj.upload_from_string(sql)
 
@@ -342,8 +327,6 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
         "sourceFormat": "CSV",
         "sourceUris": ["REPLACEME"],
     }
-    logging.debug(f"uploading gs://{gcs_bucket.name}/{config_obj.name}")
-    logging.debug(json.dumps(config))
     config_obj.upload_from_string(json.dumps(config))
     config_objs.append(sql_obj)
     config_objs.append(config_obj)
@@ -374,15 +357,54 @@ def test_external_query_IT(bq, gcs_data, gcs_external_config, dest_dataset,
         }
     }
     main.main(test_event, None)
-    sleep(3)    # Need to wait on async query job
-    validation_query_job = bq.query(f"""
-        SELECT
-            COUNT(*) as count
-        FROM
-          `{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.{dest_table.table_id}`
-    """)
-
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
-    for row in validation_query_job.result():
-        assert row["count"] == sum(1 for _ in open(test_data_file))
+    expected_num_rows = sum(1 for _ in open(test_data_file))
+    try:
+        bq_wait_for_rows(bq, dest_table, expected_num_rows)
+    except TimeoutError as err:
+        raise AssertionError from err
+
+
+def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
+                     expected_num_rows: int):
+    """we want test suite to be fast but not flaky so we'll poll for an expected
+    number of row for a configurable timeout"""
+    start_poll = monotonic()
+    actual_num_rows = 0
+    while monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
+        bq_table: bigquery.Table = bq_client.get_table(table)
+        actual_num_rows = bq_table.num_rows
+        if actual_num_rows == expected_num_rows:
+            return
+        if actual_num_rows > expected_num_rows:
+            raise AssertionError(
+                f"{table.project}.{table.dataset_id}.{table.table_id} has"
+                f"{actual_num_rows} rows. expected {expected_num_rows} rows.")
+    raise TimeoutError(
+        "Timed out waiting for "
+        f"{table.project}.{table.dataset_id}.{table.table_id} to"
+        f"reach {expected_num_rows} rows."
+        f"last poll returned {actual_num_rows} rows.")
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
+def partitioned_gcs_data(request, gcs_bucket, dest_dataset,
+                         dest_table) -> storage.blob.Blob:
+    data_objs = []
+    for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
+        data_obj: storage.blob.Blob = gcs_bucket.blob("/".join(
+            [dest_dataset.dataset_id, dest_table.table_id, test_file]))
+        data_obj.upload_from_filename(
+            os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                         test_file))
+        data_objs.append(data_obj)
+
+    def teardown():
+        for dobj in data_objs:
+            if dobj.exists:
+                dobj.delete()
+
+    request.addfinalizer(teardown)
+    return data_objs[-1]

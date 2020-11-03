@@ -225,9 +225,24 @@ CI configs or pin older version depending on the type for failure.
 This CI should be run on all new PRs and nightly.
 
 ### Just Running the Tests
+#### Running in Docker
+```bash
+# Build Docker image
+PROJECT_ID=$(gcloud config get-value project)
+docker build -t gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci -f Dockerfile.ci .
+# Run unit tests
+docker run --rm -it gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci -k "not IT"
+# Run integration tests
+docker run --rm -it gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci -k "IT"
+# Run all tests
+docker run --rm -it gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci
+```
+
+#### Running on your local machine
 Alternatively to the local cloudbuild or using the docker container to run your
 tests, you can `pip3 install -r requirements-dev.txt` and select certain tests
-to run with [`pytest`](https://docs.pytest.org/en/stable/usage.html)
+to run with [`pytest`](https://docs.pytest.org/en/stable/usage.html). This is
+mostly useful if you'd like to integrate with your IDE debugger.
 
 Note that integration tests will spin up / tear down cloud resources that can
 incur a small cost. These resources will be spun up based on your Google Cloud SDK

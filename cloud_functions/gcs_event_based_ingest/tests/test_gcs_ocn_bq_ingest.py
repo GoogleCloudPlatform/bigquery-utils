@@ -16,6 +16,7 @@
 import os
 import re
 import sys
+from typing import Dict, Optional
 
 import pytest
 
@@ -61,10 +62,26 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "batch": "batch_id"
             }),
     ])
-def test_default_destination_regex(test_input, expected):
+def test_default_destination_regex(test_input: str,
+                                   expected: Dict[str, Optional[str]]):
     """ensure our default regex handles each scenarios we document.
     this test is to support improving this regex in the future w/o regressing
     for existing use cases.
     """
-    assert COMPILED_DEFAULT_DENTINATION_REGEX.match(
-        test_input).groupdict() == expected
+    match = COMPILED_DEFAULT_DENTINATION_REGEX.match(test_input)
+    if match:
+        assert match.groupdict() == expected
+    else:
+        raise AssertionError(f"{COMPILED_DEFAULT_DENTINATION_REGEX}"
+                             f" did not match test case {test_input}.")
+
+
+@pytest.mark.parametrize("test_input,expected", [
+    ([], []),
+    ([[]], []),
+    ([["foo"], ["bar", "baz"]], ["foo", "bar", "baz"]),
+    ([["foo"], []], ["foo"]),
+    ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
+])
+def test_flattend2dlist(test_input, expected):
+    assert main.flatten2dlist(test_input) == expected
