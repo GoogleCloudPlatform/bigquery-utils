@@ -186,14 +186,10 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
         f"{batch_id}-"
 
 
-def external_query(  # pylint: disable=too-many-arguments
-    gcs_client: storage.Client,
-    bq_client: bigquery.Client,
-    gsurl: str,
-    query: str,
-    dest_table_ref: bigquery.TableReference,
-    job_id_prefix: str
-):
+def external_query(    # pylint: disable=too-many-arguments
+        gcs_client: storage.Client, bq_client: bigquery.Client, gsurl: str,
+        query: str, dest_table_ref: bigquery.TableReference,
+        job_id_prefix: str):
     """Load from query over external table from GCS.
 
     This hinges on a SQL query defined in GCS at _config/bq_transform.sql and
@@ -259,7 +255,7 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
             batch,
             dest_table_ref,
             job_config=load_config,
-            job_id_prefix=f"{job_id_prefix}-{batch_num}-of-{batch_count}",
+            job_id_prefix=f"{job_id_prefix}{batch_num}-of-{batch_count}-",
         )
 
         print(
