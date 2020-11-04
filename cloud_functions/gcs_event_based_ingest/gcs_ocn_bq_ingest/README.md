@@ -1,28 +1,11 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Event Driven BigQuery Ingest with External Table Query](#event-driven-bigquery-ingest-with-external-table-query)
-  - [Orchestration](#orchestration)
-  - [Ingestion Mechanics](#ingestion-mechanics)
-  - [Deployment](#deployment)
-  - [Implementation notes](#implementation-notes)
-  - [Tests](#tests)
-  - [Limitations](#limitations)
-  - [Future work](#future-work)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # Event Driven BigQuery Ingest 
 This directory defines a reusable [Background Cloud Function](https://cloud.google.com/functions/docs/writing/background)
 for ingesting any new file at a GCS prefix with a file name containing a
 timestamp to be used as the partitioning and clustering column in a partitioned
 BigQuery Table.
 
-![architecture](img/arch.png)
-
 ## Orchestration
-1. Files pulled from on-prem to gcs bucket.
+1. Files pushed to a Google Cloud Storage bucket.
 1. [Pub/Sub Notification](https://cloud.google.com/storage/docs/pubsub-notifications)
 object finalize.
 1. Cloud Function subscribes to notifications and ingests all the data into 
@@ -38,12 +21,15 @@ This way we can reuse the tested source code for the Cloud Function.
 ### Environment Variables
 To configure each deployement of the Cloud Function we will use
 [Environment Variables](https://cloud.google.com/functions/docs/env-var)
+All of these environment variables are optional for overriding the
+following default behavior.
 
-
-#### Optional
-| Variable                      | Description                           | Default                                      |
-|-------------------------------|---------------------------------------|----------------------------------------------|
-| `BQ_LOAD_STATE_TABLE` | BigQuery table to log load state to           | "bigquery_loads.serverless_bq_loads" (in same project as cloud function) |
+| Variable              | Description                           | Default                                      |
+|-----------------------|---------------------------------------|----------------------------------------------|
+| `WAIT_FOR_JOB_SECONDS`| How long to wait before deciding BQ job did not fail quickly.| `5` |
+| `SUCCESS_FILENAME`    | Filename to trigger a load of a prefix| `_SUCCESS` |
+| `DESTINATION_REGEX`   | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for `dataset`, `table`, (optional: `partition`, `batch`)
+| `MAX_BATCH_BYTES`     |  Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
 
 
 ## Implementation notes
@@ -52,16 +38,3 @@ To configure each deployement of the Cloud Function we will use
 configure Pub/Sub Notifications manually and use a Pub/Sub triggered
 Cloud Function.
 
-## Tests
-From the `gcs_ocn_bq_ingest` dir simply run
-```bash
-pytest
-```
-
-## Continuous Integration
-The CI system for this function includes the following style checks as well as
-running the unit and integration tests:
-- flake8
-- pylint
-- mypy
--

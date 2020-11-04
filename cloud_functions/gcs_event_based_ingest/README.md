@@ -1,15 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [BigQuery Serverless Ingest](#bigquery-serverless-ingest)
-  - [Tracking Table](#tracking-table)
-  - [Environment Variables](#environment-variables)
-  - [GCS Object Naming Convention](#gcs-object-naming-convention)
-  - [Triggers](#triggers)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # BigQuery Serverless Ingest
 
 Flexible service for performing  BigQuery file loads to existing tables.
@@ -19,17 +7,6 @@ BigQuery Load Jobs to many bigquery datasets / tables from a single bucket
 providing transparent configuration that is overridable at any level.
 
 ![architecture](img/bq-ingest.png)
-
-## Environment Variables
-- `SUCCESS_FILENAME`: Filename to trigger a load (defaults to `_SUCCESS`).
-- `DESTINATION_REGEX`:  A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
-for (defaults to `(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?P<partition>\$[\w\-_0-9]+)?/?(?P<batch>[\w\-_0-9]+)?/`): 
-  - `dataset`: destintaion BigQuery Dataset
-  - `table`: destination BigQuery Table
-  - `partition`: (optional) destination BigQuery [partition decorator](https://cloud.google.com/bigquery/docs/creating-partitioned-tables#creating_an_ingestion-time_partitioned_table_when_loading_data)
-    (For example $)
-  - `batch`: (optional) indicates an incremental load from an upstream system (see [Handling Incremental Loads](#handling-incremental-loads))
-- `MAX_BATCH_BYTES`: Max bytes for BigQuery Load job. (default 15 TB)
 
 ## GCS Object Naming Convention
 ### Data Files
@@ -190,7 +167,7 @@ SELECT
 FROM
    `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
 WHERE
-   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "event-based-gcs-ingest"
+   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "gcf-ingest-"
 ```
 
 ## Triggers
