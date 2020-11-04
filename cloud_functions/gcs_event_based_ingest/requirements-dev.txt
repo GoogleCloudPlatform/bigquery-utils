@@ -5,3 +5,4 @@ flake8
 isort>=5.6.4
 mypy
 pylint
+pytest-parallel

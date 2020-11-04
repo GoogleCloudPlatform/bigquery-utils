@@ -43,8 +43,8 @@ def gcs() -> storage.Client:
     return storage.Client()
 
 
-@pytest.fixture(scope="module")
 @pytest.mark.usefixtures("gcs")
+@pytest.fixture
 def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
     """GCS bucket for test artifacts"""
     bucket = gcs.create_bucket(str(uuid.uuid4()))

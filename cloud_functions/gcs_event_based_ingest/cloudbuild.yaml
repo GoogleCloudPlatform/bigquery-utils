@@ -87,6 +87,7 @@ steps:
     - 'build-ci-image'
     - 'unit-test'
   args:
+    - '--workers=50'
     - '--maxfail=1'
     - '-k'
     - 'IT'
