@@ -76,6 +76,8 @@ SUCCESS_FILENAME = getenv("SUCCESS_FILENAME", "_SUCCESS")
 
 CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
 
+DEFAULT_JOB_PREFIX = "gcf-ingest-"
+
 
 def main(event: Dict, context):    # pylint: disable=unused-argument
     """entry point for background cloud function for event driven GCS to
@@ -163,6 +165,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     gcf-ingest-<dataset_id>-<table_id>-<partition_num>-<batch_id>-
     Parts that are not inferrable from the GCS path with have a 'None'
     placeholder. This naming convention is crucial for monitoring the system.
+    Note, gcf-ingest- can be overridden with environment variable JOB_PREFIX
 
     Examples:
 
@@ -180,7 +183,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     if len(table_partition) < 2:
         # If there is no partition put a None placeholder
         table_partition.append("None")
-    return f"gcf-ingest-" \
+    return f"{getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
         f"{dest_table_ref.dataset_id}-" \
         f"{'-'.join(table_partition)}-" \
         f"{batch_id}-"

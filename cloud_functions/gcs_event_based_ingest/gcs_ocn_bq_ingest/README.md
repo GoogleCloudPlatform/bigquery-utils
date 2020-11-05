@@ -26,10 +26,11 @@ following default behavior.
 
 | Variable              | Description                           | Default                                      |
 |-----------------------|---------------------------------------|----------------------------------------------|
-| `WAIT_FOR_JOB_SECONDS`| How long to wait before deciding BQ job did not fail quickly.| `5` |
+| `WAIT_FOR_JOB_SECONDS`| How long to wait before deciding BQ job did not fail quickly| `5` |
 | `SUCCESS_FILENAME`    | Filename to trigger a load of a prefix| `_SUCCESS` |
 | `DESTINATION_REGEX`   | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for `dataset`, `table`, (optional: `partition`, `batch`)
-| `MAX_BATCH_BYTES`     |  Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
+| `MAX_BATCH_BYTES`     | Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
+| `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
 
 
 ## Implementation notes

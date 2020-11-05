@@ -239,3 +239,5 @@ pytest -k "not IT"
 pytest -k IT
 ```
 
+## Deployment
+It is suggested to deploy this cloud function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)

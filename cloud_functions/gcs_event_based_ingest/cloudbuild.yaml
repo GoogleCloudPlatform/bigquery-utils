@@ -71,6 +71,28 @@ steps:
   args:
   - 'tests/'
   id: 'mypy-tests'
+- name: 'hashicorp/terraform'
+  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - '-'
+  args:
+    - 'init'
+  id: 'terraform-init'
+- name: 'hashicorp/terraform'
+  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - 'terraform-init'
+  args:
+    - 'validate'
+  id: 'terraform-validate'
+- name: 'hashicorp/terraform'
+  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - 'terraform-validate'
+  args:
+    - 'fmt'
+    - '-check'
+  id: 'terraform-fmt'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   waitFor:
     - 'build-ci-image'
@@ -79,8 +101,10 @@ steps:
     - 'pylint-main'
     - 'mypy-main'
     - 'mypy-tests'
+    - 'terraform-fmt'
   args:
-    - 'tests/test_gcs_ocn_bq_ingest.py'
+    - '-k'
+    - 'not IT'
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   waitFor:
