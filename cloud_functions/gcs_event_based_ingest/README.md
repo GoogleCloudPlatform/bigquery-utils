@@ -231,12 +231,12 @@ pytest
 ```
 #### Running Unit Tests Only
 ```bash
-pytest -k "not IT"
+pytest -m "not IT"
 ```
 
 #### Running Integration Tests Only
 ```bash
-pytest -k IT
+pytest -m IT
 ```
 
 ## Deployment

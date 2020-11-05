@@ -103,7 +103,7 @@ steps:
     - 'mypy-tests'
     - 'terraform-fmt'
   args:
-    - '-k'
+    - '-m'
     - 'not IT'
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
@@ -113,6 +113,6 @@ steps:
   args:
     - '--workers=50'
     - '--maxfail=1'
-    - '-k'
+    - '-m'
     - 'IT'
   id: 'integration-test'

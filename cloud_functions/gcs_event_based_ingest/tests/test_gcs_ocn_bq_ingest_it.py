@@ -135,7 +135,8 @@ def gcs_data(request, gcs_bucket, dest_dataset,
     return data_objs[-1]
 
 
-def test_load_job_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
+@pytest.mark.IT
+def test_load_job(bq, gcs_data, dest_dataset, dest_table, mock_env):
     """tests basic single invocation with load job"""
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
@@ -152,7 +153,8 @@ def test_load_job_IT(bq, gcs_data, dest_dataset, dest_table, mock_env):
     bq_wait_for_rows(bq, dest_table, expected_num_rows)
 
 
-def test_duplicate_notification_IT(bq, gcs_data, dest_dataset, dest_table,
+@pytest.mark.IT
+def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
                                    mock_env):
     """tests behavior with two notifications for the same success file."""
     if not gcs_data.exists():
@@ -225,7 +227,8 @@ def gcs_batched_data(request, gcs_bucket, dest_dataset,
     return [data_objs[-1], data_objs[-4]]
 
 
-def test_load_job_truncating_batches_IT(bq, gcs_batched_data,
+@pytest.mark.IT
+def test_load_job_truncating_batches(bq, gcs_batched_data,
                                         gcs_truncating_load_config,
                                         dest_dataset, dest_table, mock_env):
     """
@@ -253,7 +256,8 @@ def test_load_job_truncating_batches_IT(bq, gcs_batched_data,
         bq_wait_for_rows(bq, dest_table, expected_num_rows)
 
 
-def test_load_job_appending_batches_IT(bq, gcs_batched_data, dest_dataset,
+@pytest.mark.IT
+def test_load_job_appending_batches(bq, gcs_batched_data, dest_dataset,
                                        dest_table, mock_env):
     """
     tests two successive batches with the default load configuration.
@@ -329,7 +333,8 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
     return config_objs
 
 
-def test_external_query_IT(bq, gcs_data, gcs_external_config, dest_dataset,
+@pytest.mark.IT
+def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
                            dest_table, mock_env):
     """tests the basic external query ingrestion mechanics
     with bq_transform.sql and external.json
@@ -405,7 +410,8 @@ def dest_partitioned_table(request, bq: bigquery.Client, mock_env,
     return table
 
 
-def test_load_job_partitioned_IT(bq, gcs_partitioned_data,
+@pytest.mark.IT
+def test_load_job_partitioned(bq, gcs_partitioned_data,
                                  gcs_truncating_load_config, dest_dataset,
                                  dest_partitioned_table, mock_env):
     """
