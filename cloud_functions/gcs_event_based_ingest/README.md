@@ -240,4 +240,25 @@ pytest -m IT
 ```
 
 ## Deployment
-It is suggested to deploy this cloud function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
+It is suggested to deploy this Cloud Function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
+
+## Alternatives
+### BQ Tail
+[bqtail](https://github.com/viant/bqtail) is a similar serverless configuration
+driven ingest to BigQuery from GCS that achieves batching based on window
+in processing time (as driven by Cloud Scheduler). BQ Tail has nice features for
+triggering Post actions (BQ queries / GCS file moves or deletes) once the data
+is ingested, and slack notifications. bqtail is well suited for use cases where
+the atomicity of event partition is not important (e.g. many distributed 
+publishers uploading logs to GCS). Due to dependency of certain features of 
+bqtail on Cloud Scheduler it cannot be used inside VPC-SC perimeters.
+This tool might be more appropriate when the publisher is authoritative on the
+atomicity of batches (e.g. an upstream  hadoop job responsible for commiting an
+event time hour's worth of data). 
+
+### BigQuery Data Transfer Service
+[Cloud Storage Transfer](https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer)
+can also be used but requires separate configurations per table and supports
+only scheduled (rather than event based) loads. This can cause issues if the
+upstream publisher of data is behind schedule. This service does not support
+external query to perform transformations upon ingest.
