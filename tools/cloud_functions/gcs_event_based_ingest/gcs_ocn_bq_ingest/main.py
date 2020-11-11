@@ -85,7 +85,6 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     # pylint: disable=too-many-locals
     # Set by Cloud Function Execution Environment
     # https://cloud.google.com/functions/docs/env-var
-    project = getenv("GCP_PROJECT")
     destination_regex = getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
     dest_re = re.compile(destination_regex)
 
@@ -103,6 +102,7 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     gcs_client = storage.Client(client_info=CLIENT_INFO)
+    project = gcs_client.project
     bkt = gcs_client.lookup_bucket(bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
     handle_duplicate_notification(bkt, success_blob, gsurl)
