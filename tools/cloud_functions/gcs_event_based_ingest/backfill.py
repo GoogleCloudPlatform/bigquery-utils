@@ -23,6 +23,7 @@ from typing import Dict, Iterator, List
 
 from google.api_core.client_info import ClientInfo
 from google.cloud import storage
+
 import gcs_ocn_bq_ingest  # pylint: disable=import-error,wrong-import-position
 
 CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
@@ -46,7 +47,7 @@ def find_blobs_with_suffix(
     bucket_name, prefix = gcs_ocn_bq_ingest.main.parse_gcs_url(prefix)  # noqa
     bucket: storage.Bucket = gcs_cli.lookup_bucket(bucket_name)
     # filter passes on scalability / laziness advantages of iterator.
-    return filter(lambda blob: blob.endswith(suffix),
+    return filter(lambda blob: blob.name.endswith(suffix),
                   bucket.list_blobs(prefix=prefix))
 
 
@@ -94,6 +95,7 @@ def main(args: Namespace):
                             "objectId": blob.name
                         }
                     },
+                    None,
                 )] = f"gs://{blob.bucket.name}/{blob.name}"
         exceptions: Dict[str, Exception] = dict()
         for future in concurrent.futures.as_completed(future_to_gsurl):
@@ -108,7 +110,7 @@ def main(args: Namespace):
                                pprint.pformat(exceptions))
 
 
-def parse_args(args: List[str]):
+def parse_args(args: List[str]) -> Namespace:
     """argument parser for backfill CLI"""
     parser = ArgumentParser(
         description="utility to backfill success file notifications.")

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""unit tests for gcs_ocn_bq_ingest"""
+"""integrtion tests for gcs_ocn_bq_ingest"""
 import json
 import os
 import uuid
