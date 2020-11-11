@@ -197,6 +197,10 @@ def test_backfill(
     dest_partitioned_table, mock_env
 ):
     """
+    This is an adapatation of test_load_job_partitioned but instead uses the
+    backfill CLI code path to execute the cloud function's main method in
+    parallel threads.
+
     Test loading separate partitions with WRITE_TRUNCATE
 
     after both load jobs the count should equal the sum of the test data in both
