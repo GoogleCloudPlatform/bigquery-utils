@@ -242,7 +242,6 @@ pytest -m IT
 ## Deployment
 It is suggested to deploy this Cloud Function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
 
-
 ## Backfill
 There are some cases where you may have data already copied to GCS according to
 the naming convention / with success files before the Object Change
