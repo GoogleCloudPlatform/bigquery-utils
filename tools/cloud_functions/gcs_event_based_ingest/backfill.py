@@ -15,6 +15,7 @@
 """
 import concurrent.futures
 import logging
+import os
 import pprint
 import sys
 from argparse import ArgumentParser, Namespace
@@ -25,6 +26,8 @@ from google.cloud import storage
 import gcs_ocn_bq_ingest  # pylint: disable=import-error,wrong-import-position
 
 CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
+
+os.environ["FUNCTION_NAME"] = "backfill-cli"
 
 
 def find_blobs_with_suffix(
