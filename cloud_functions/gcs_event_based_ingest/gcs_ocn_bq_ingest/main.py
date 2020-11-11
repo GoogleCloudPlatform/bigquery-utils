@@ -17,7 +17,7 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import json
-import re
+import regex
 from collections import deque
 from os import getenv
 from pathlib import Path
@@ -52,7 +52,8 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
-DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/" \
+DEFAULT_DESTINATION_REGEX = r"(?:(?P<project>[\w\-_0-9]+)?/)?" \
+                            r"(?P<dataset>[\w\-_0-9]+)/" \
                             r"(?P<table>[\w\-_0-9]+)/" \
                             r"?(?P<partition>\$[0-9]+)?/" \
                             r"?(?P<batch>[\w\-_0-9]+)?/"
@@ -87,7 +88,7 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     # https://cloud.google.com/functions/docs/env-var
     project = getenv("GCP_PROJECT")
     destination_regex = getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
-    dest_re = re.compile(destination_regex)
+    dest_re = regex.compile(destination_regex)
 
     bucket_id, object_id = parse_notification(event)
 
@@ -126,6 +127,9 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
 
     if batch_id:
         labels["batch-id"] = batch_id
+
+    if destination_details.get("project"):
+        dataset = f"{destination_details.get('project')}.{dataset}"
 
     if partition:
         dest_table_ref = bigquery.TableReference.from_string(

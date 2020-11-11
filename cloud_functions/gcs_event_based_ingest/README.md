@@ -15,6 +15,10 @@ like so:
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/${BQ_TABLE_NAME}/*`
 Note, the table prefix can contain multiple sub-prefixes for handling partitions
 or for configuring historical / incremental loads differently.
+### Handling Project
+By default data will be ingested to the `${BQ_DATASET}.${BQ_TABLE_NAME}` read
+from the GCS path of the success file in the project in which the cloud function
+is deployed. Optionally you can specify
 
 ### Configuration Files
 The Ingestion has many optional configuration files that should live in

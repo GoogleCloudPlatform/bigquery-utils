@@ -1,4 +1,3 @@
-# dataset/table/_SUCCESS
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +31,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
         (
             "dataset/table/_SUCCESS",    # flat
             {
+                "project": None,
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
@@ -40,6 +40,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
         (
             "dataset/table/$20201030/_SUCCESS",    # partitioned
             {
+                "project": None,
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
@@ -48,6 +49,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
         (
             "dataset/table/$20201030/batch_id/_SUCCESS",    # partitioned, batched
             {
+                "project": None,
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
@@ -56,9 +58,19 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
         (
             "dataset/table/batch_id/_SUCCESS",    # batched (no partitioning)
             {
+                "project": None,
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
+                "batch": "batch_id"
+            }),
+        (
+            "project/dataset/table/$20201030/batch_id/_SUCCESS",  # with project
+            {
+                "project": "project",
+                "dataset": "dataset",
+                "table": "table",
+                "partition": "$20201030",
                 "batch": "batch_id"
             }),
     ])
