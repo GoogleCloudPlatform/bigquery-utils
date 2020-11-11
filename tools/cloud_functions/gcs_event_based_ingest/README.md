@@ -242,6 +242,36 @@ pytest -m IT
 ## Deployment
 It is suggested to deploy this Cloud Function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
 
+
+## Backfill
+There are some cases where you may have data already copied to GCS according to
+the naming convention / with success files before the Object Change
+Notifications or Cloud Function have been set up. In these cases, you can use
+the `backfill.py` CLI utility to crawl an existing bucket searching for success
+files. The utility supports either invoking the Cloud Function main method
+locally (in concurrent threads) or publishing notifications for the success 
+files (for a deployed Cloud Function to pick up).
+
+### Usage
+```bash
+python3 -m backfill -h
+usage: backfill [-h] --gcs_path GCS_PATH [--mode {LOCAL,NOTIFICATIONS}] [--pubsub_topic PUBSUB_TOPIC] [--success_filename SUCCESS_FILENAME]
+
+utility to backfill success file notifications.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --gcs_path GCS_PATH, -p GCS_PATH
+                        GCS path (e.g. gs://bucket/prefix/to/search/)to search for existing _SUCCESS files
+  --mode {LOCAL,NOTIFICATIONS}, -m {LOCAL,NOTIFICATIONS}
+                        How to perform the backfill: LOCAL run cloud function main method locally (in concurrent threads) or NOTIFICATIONS just push notifications to Pub/Sub for a deployed
+                        version of the cloud function to pick up. Default is NOTIFICATIONS.
+  --pubsub_topic PUBSUB_TOPIC, --topic PUBSUB_TOPIC, -t PUBSUB_TOPIC
+                        Pub/Sub notifications topic to post notifications for. i.e. projects/{PROJECT_ID}/topics/{TOPIC_ID} Required if using NOTIFICATIONS mode.
+  --success_filename SUCCESS_FILENAME, -f SUCCESS_FILENAME
+                        Overide the default success filename '_SUCCESS'
+```
+
 ## Alternatives
 ### BQ Tail
 [bqtail](https://github.com/viant/bqtail) is a similar serverless configuration

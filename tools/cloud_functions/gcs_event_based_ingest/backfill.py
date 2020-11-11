@@ -15,16 +15,14 @@
 """
 import concurrent.futures
 import logging
-import os
 import pprint
 import sys
-from argparse import ArgumentParser, Namespace, ArgumentError
-from typing import Dict, Iterator, List, Optional
+from argparse import ArgumentParser, Namespace
+from typing import Dict, Iterator, List
+
 from google.api_core.client_info import ClientInfo
 from google.cloud import storage
-
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
-import gcs_ocn_bq_ingest
+import gcs_ocn_bq_ingest  # pylint: disable=import-error,wrong-import-position
 
 CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
 
@@ -42,25 +40,27 @@ def find_blobs_with_suffix(
     :param suffix: A suffix in blob name to match
     :return:  Iterable of blobs matching the suffix.
     """
-    bucket, prefix = main._parse_gcs_url(prefix)
-    bucket: storage.Bucket = gcs_cli.lookup_bucket(bucket)
+    bucket_name, prefix = gcs_ocn_bq_ingest.main.parse_gcs_url(prefix)  # noqa
+    bucket: storage.Bucket = gcs_cli.lookup_bucket(bucket_name)
     # filter passes on scalability / laziness advantages of iterator.
     return filter(lambda blob: blob.endswith(suffix),
                   bucket.list_blobs(prefix=prefix))
 
 
 def main(args: Namespace):
+    """main entry point for backfill CLI."""
     gcs_cli: storage.Client = storage.Client(client_info=CLIENT_INFO)
     ps_cli = None
     suffix = args.success_filename
     if args.mode == "NOTIFICATIONS":
         if not args.pubsub_topic:
-            raise ArgumentError("when passing mode=NOTIFICATIONS"
-                                "you must also pass pubsub_topic.")
+            raise ValueError("when passing mode=NOTIFICATIONS"
+                             "you must also pass pubsub_topic.")
         # import is here because this utility can be used without
         # google-cloud-pubsub dependency in LOCAL mode.
+        # pylint: disable=import-outside-toplevel
         from google.cloud import pubsub
-        ps_cli: Optional[pubsub.PublisherClient] = pubsub.PublisherClient()
+        ps_cli = pubsub.PublisherClient()
 
     # These are all I/O bound tasks so use Thread Pool concurrency for speed.
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -69,7 +69,7 @@ def main(args: Namespace):
             if ps_cli:
                 # kwargs are message attributes
                 # https://googleapis.dev/python/pubsub/latest/publisher/index.html#publish-a-message
-                logging.info("sending pubsub message for: "
+                logging.info("sending pubsub message for: %s",
                              f"gs://{blob.bucket.name}/{blob.name}")
                 future_to_gsurl[executor.submit(
                     ps_cli.publish,
@@ -81,7 +81,7 @@ def main(args: Namespace):
                     "gcs_ocn_bq_ingest backfill.py utility"
                 )] = f"gs://{blob.bucket.name}/{blob.name}"
             else:
-                logging.info("running  cloud function locally for: "
+                logging.info("running  cloud function locally for: %s",
                              f"gs://{blob.bucket.name}/{blob.name}")
                 future_to_gsurl[executor.submit(
                     gcs_ocn_bq_ingest.main.main,
@@ -97,8 +97,8 @@ def main(args: Namespace):
             gsurl = future_to_gsurl[future]
             try:
                 future.result()
-            except Exception as err:
-                logging.error(f"Error processing {gsurl}: {err}")
+            except Exception as err:  # pylint: disable=broad-except
+                logging.error("Error processing %s: %s", gsurl, err)
                 exceptions[gsurl] = err
         if exceptions:
             raise RuntimeError("The following errors were encountered:\n" +
@@ -106,24 +106,25 @@ def main(args: Namespace):
 
 
 def parse_args(args: List[str]):
+    """argument parser for backfill CLI"""
     parser = ArgumentParser(
         description="utility to backfill success file notifications.")
 
     parser.add_argument(
         "--gcs_path",
         "-p",
-        description="GCS path (e.g. gs://bucket/prefix/to/search/)to search for"
-        " existing _SUCCESS files",
+        help="GCS path (e.g. gs://bucket/prefix/to/search/)to search for "
+        "existing _SUCCESS files",
         required=True,
     )
 
     parser.add_argument(
         "--mode",
         "-m",
-        description="How to perform the backfill: LOCAL run cloud function main"
-        "method locally or NOTIFICATIONS just push notifications to"
-        "Pub/Sub for a deployed version of the cloud function to"
-        "pick up.",
+        help="How to perform the backfill: LOCAL run cloud function main"
+        " method locally (in concurrent threads) or NOTIFICATIONS just push"
+        " notifications to Pub/Sub for a deployed version of the cloud function"
+        " to pick up. Default is NOTIFICATIONS.",
         required=False,
         type=str.upper,
         choices=["LOCAL", "NOTIFICATIONS"],
@@ -134,8 +135,8 @@ def parse_args(args: List[str]):
         "--pubsub_topic",
         "--topic",
         "-t",
-        description="Pub/Sub notifications topic to post notifications for."
-        " i.e. projects/{PROJECT_ID}/topics/{TOPIC_ID}"
+        help="Pub/Sub notifications topic to post notifications for. "
+        "i.e. projects/{PROJECT_ID}/topics/{TOPIC_ID} "
         "Required if using NOTIFICATIONS mode.",
         required=False,
         default=None,
@@ -144,7 +145,7 @@ def parse_args(args: List[str]):
     parser.add_argument(
         "--success_filename",
         "-f",
-        description="Overide the default success filename '_SUCCESS'",
+        help="Overide the default success filename '_SUCCESS'",
         required=False,
         default="_SUCCESS",
     )

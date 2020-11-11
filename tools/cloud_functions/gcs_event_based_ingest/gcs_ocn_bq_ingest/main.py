@@ -319,7 +319,7 @@ def look_for_transform_sql(storage_client: storage.Client,
                            gsurl: str) -> Optional[str]:
     """look in parent directories for _config/bq_transform.sql"""
     config_filename = "bq_transform.sql"
-    bucket_name, obj_path = _parse_gcs_url(gsurl)
+    bucket_name, obj_path = parse_gcs_url(gsurl)
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_query(path):
@@ -342,7 +342,7 @@ def construct_load_job_config(storage_client: storage.Client,
     The configs closest to gsurl should take precedence.
     """
     config_filename = "load.json"
-    bucket_name, obj_path = _parse_gcs_url(gsurl)
+    bucket_name, obj_path = parse_gcs_url(gsurl)
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_config(path):
@@ -376,7 +376,7 @@ def get_batches_for_prefix(storage_client,
     (one batch has an array of multiple GCS uris)
     """
     batches = []
-    bucket_name, prefix_name = _parse_gcs_url(prefix_path)
+    bucket_name, prefix_name = parse_gcs_url(prefix_path)
 
     prefix_filter = f"{prefix_name}"
     bucket = storage_client.lookup_bucket(bucket_name)
@@ -451,7 +451,7 @@ def read_gcs_file(gcs: storage.Client, gsurl: str) -> str:
     Returns:
         str
     """
-    bucket_id, object_id = _parse_gcs_url(gsurl)
+    bucket_id, object_id = parse_gcs_url(gsurl)
     bucket = gcs.bucket(bucket_id)
     blob = bucket.blob(object_id)
     return blob.download_as_bytes().decode('UTF-8')
@@ -480,7 +480,7 @@ def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
     ]
 
 
-def _parse_gcs_url(gsurl: str) -> Tuple[str, str]:
+def parse_gcs_url(gsurl: str) -> Tuple[str, str]:
     """Given a Google Cloud Storage URL (gs://<bucket>/<blob>), returns a
     tuple containing the corresponding bucket and blob.
     """
