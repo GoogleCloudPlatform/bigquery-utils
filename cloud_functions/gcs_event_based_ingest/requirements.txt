@@ -1,0 +1,2 @@
+google-cloud-bigquery>=2.2.0
+google-cloud-storage>=1.32.0
