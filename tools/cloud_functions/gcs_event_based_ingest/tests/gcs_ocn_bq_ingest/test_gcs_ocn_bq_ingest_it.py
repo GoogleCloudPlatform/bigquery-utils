@@ -14,7 +14,6 @@
 """unit tests for gcs_ocn_bq_ingest"""
 import json
 import os
-import sys
 import uuid
 from time import monotonic
 from typing import List
@@ -24,10 +23,9 @@ import pytest
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 from gcs_ocn_bq_ingest import main
 
-TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 10    # seconds
 
 

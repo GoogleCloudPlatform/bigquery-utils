@@ -13,14 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
-import os
 import re
-import sys
 from typing import Dict, Optional
 
 import pytest
 
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
 from gcs_ocn_bq_ingest import main
 
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
