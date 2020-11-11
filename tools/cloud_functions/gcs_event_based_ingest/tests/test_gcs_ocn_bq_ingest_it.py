@@ -155,7 +155,7 @@ def test_load_job(bq, gcs_data, dest_dataset, dest_table, mock_env):
 
 @pytest.mark.IT
 def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
-                                   mock_env):
+                                mock_env):
     """tests behavior with two notifications for the same success file."""
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
@@ -229,8 +229,8 @@ def gcs_batched_data(request, gcs_bucket, dest_dataset,
 
 @pytest.mark.IT
 def test_load_job_truncating_batches(bq, gcs_batched_data,
-                                        gcs_truncating_load_config,
-                                        dest_dataset, dest_table, mock_env):
+                                     gcs_truncating_load_config, dest_dataset,
+                                     dest_table, mock_env):
     """
     tests two successive batches with a load.json that dictates WRITE_TRUNCATE.
 
@@ -258,7 +258,7 @@ def test_load_job_truncating_batches(bq, gcs_batched_data,
 
 @pytest.mark.IT
 def test_load_job_appending_batches(bq, gcs_batched_data, dest_dataset,
-                                       dest_table, mock_env):
+                                    dest_table, mock_env):
     """
     tests two successive batches with the default load configuration.
 
@@ -335,7 +335,7 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
 
 @pytest.mark.IT
 def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
-                           dest_table, mock_env):
+                        dest_table, mock_env):
     """tests the basic external query ingrestion mechanics
     with bq_transform.sql and external.json
     """
@@ -412,8 +412,8 @@ def dest_partitioned_table(request, bq: bigquery.Client, mock_env,
 
 @pytest.mark.IT
 def test_load_job_partitioned(bq, gcs_partitioned_data,
-                                 gcs_truncating_load_config, dest_dataset,
-                                 dest_partitioned_table, mock_env):
+                              gcs_truncating_load_config, dest_dataset,
+                              dest_partitioned_table, mock_env):
     """
     Test loading separate partitions with WRITE_TRUNCATE
 
@@ -470,6 +470,6 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
                 f"{actual_num_rows} rows. expected {expected_num_rows} rows.")
     raise AssertionError(
         f"Timed out after {LOAD_JOB_POLLING_TIMEOUT} seconds waiting for "
-        f"{table.project}.{table.dataset_id}.{table.table_id} to"
+        f"{table.project}.{table.dataset_id}.{table.table_id} to "
         f"reach {expected_num_rows} rows."
         f"last poll returned {actual_num_rows} rows.")
