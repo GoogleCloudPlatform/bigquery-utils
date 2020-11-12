@@ -258,7 +258,7 @@ locally (in concurrent threads) or publishing notifications for the success
 files (for a deployed Cloud Function to pick up).
 
 ### Usage
-```bash
+```
 python3 -m backfill -h
 usage: backfill [-h] --gcs_path GCS_PATH [--mode {LOCAL,NOTIFICATIONS}] [--pubsub_topic PUBSUB_TOPIC] [--success_filename SUCCESS_FILENAME]
 

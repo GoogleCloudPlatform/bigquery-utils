@@ -113,7 +113,8 @@ def main(args: Namespace):
 def parse_args(args: List[str]) -> Namespace:
     """argument parser for backfill CLI"""
     parser = ArgumentParser(
-        description="utility to backfill success file notifications.")
+        description="utility to backfill success file notifications "
+                    "or run the cloud function locally in concurrent threads.")
 
     parser.add_argument(
         "--gcs_path",
