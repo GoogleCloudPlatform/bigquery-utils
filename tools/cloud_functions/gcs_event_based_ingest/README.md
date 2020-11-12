@@ -16,6 +16,31 @@ like so:
 Note, the table prefix can contain multiple sub-prefixes for handling partitions
 or for configuring historical / incremental loads differently.
 
+### Naming Convention with Regex
+By Default we try to read dataset, table, partition (or yyyy/mm/dd/hh) and
+batch id using the following python regex:
+```python3
+DEFAULT_DESTINATION_REGEX = (
+    r"(?P<dataset>[\w\-_0-9]+)/"       # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"        # table name (required)
+    r"(?P<partition>\$[0-9]{1,8})?/?"  # partition decortator (optional)
+    r"(?P<yyyy>[0-9]{4})?/?"           # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"             # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"             # partition day (dd) (optional)
+    r"(?P<hh>[0-9]{2})?/?"             # partition hour (hh) (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"        # batch id (optional)
+)[0]
+```
+you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/1/)
+Otherwise you can override the regex by setting the `DESTINATION_REGEX` to
+better fit your naming convention on GCS. Your regex must include named
+capturing groups for destination `dataset`, and `table`.
+Your regex can optionally include [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for 
+- `partition` must be BigQuery Partition decorator with leading `$`
+- `yyyy`, `mm`, `dd`, `hr` partition year, month, day, and hour
+(depending on your partition granularity)
+- `batch` an optional batch id to indicate multiple uploads for this partition.
+
 ### Configuration Files
 The Ingestion has many optional configuration files that should live in
 a special `_config/` prefix at the root of the bucket and/or under the dataset

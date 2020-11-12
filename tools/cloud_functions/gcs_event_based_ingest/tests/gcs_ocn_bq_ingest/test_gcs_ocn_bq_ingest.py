@@ -32,6 +32,10 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": None
             }),
         (
@@ -40,6 +44,10 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": None
             }),
         (
@@ -48,6 +56,10 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": "batch_id"
             }),
         (
@@ -56,6 +68,22 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
+                "batch": "batch_id"
+            }),
+        (
+            "dataset/table/2020/01/02/03/batch_id/_SUCCESS",
+            {
+                "dataset": "dataset",
+                "table": "table",
+                "partition": None,
+                "yyyy": "2020",
+                "mm": "01",
+                "dd": "02",
+                "hh": "03",
                 "batch": "batch_id"
             }),
     ])

@@ -52,10 +52,15 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
-DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/" \
-                            r"(?P<table>[\w\-_0-9]+)/" \
-                            r"?(?P<partition>\$[0-9]+)?/" \
-                            r"?(?P<batch>[\w\-_0-9]+)?/"
+DEFAULT_DESTINATION_REGEX = (r"^(?P<dataset>[\w\-_0-9]+)/"
+                             r"(?P<table>[\w\-_0-9]+)/?"
+                             r"(?P<partition>\$[0-9]{2,8})?"
+                             r"(?:/?(?P<yyyy>[0-9]{4})?/?"
+                             r"(?P<mm>[0-9]{2})?/?"
+                             r"(?P<dd>[0-9]{2})?/"
+                             r"?(?P<hh>[0-9]{2})?)/?"
+                             r"(?P<batch>[\w\-_0-9]+)?/")
+
 
 # Will wait up to this polling for errors before exiting
 # This is to check if job fail quickly, not to assert it succeed.
@@ -120,6 +125,13 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
             f"Object ID {object_id} did not match dataset and table in regex:"
             f" {destination_regex}") from KeyError
     partition = destination_details.get('partition')
+    year = destination_details.get('yyyy', '')
+    month = destination_details.get('mm', '')
+    day = destination_details.get('dd', '')
+    hour = destination_details.get('hh', '')
+    part_list = (year, month, day, hour)
+    if not partition and any(part_list):
+        partition = '$' + ''.join(part_list)
     batch_id = destination_details.get('batch')
     labels = DEFAULT_JOB_LABELS
     labels["bucket"] = bucket_id
