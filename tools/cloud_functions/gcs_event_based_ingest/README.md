@@ -225,6 +225,12 @@ Note that integration tests will spin up / tear down cloud resources that can
 incur a small cost. These resources will be spun up based on your Google Cloud SDK
 [Application Default Credentials](https://cloud.google.com/sdk/gcloud/reference/auth/application-default)
 
+#### Pytest Fixtures
+All Pytest fixtures are DRY-ed up into `tests/conftest.py`
+This is mostly to share fixtures between the main integration test for the cloud function
+and the integrationt tests for the backfill CLI.
+See more info on sharing pytest fixtures in the [pytest docs](https://docs.pytest.org/en/stable/fixture.html#conftest-py-sharing-fixture-functions).
+
 #### Running All Tests
 ```bash
 pytest
