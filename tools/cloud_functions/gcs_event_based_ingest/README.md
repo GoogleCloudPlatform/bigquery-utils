@@ -21,15 +21,15 @@ By Default we try to read dataset, table, partition (or yyyy/mm/dd/hh) and
 batch id using the following python regex:
 ```python3
 DEFAULT_DESTINATION_REGEX = (
-    r"(?P<dataset>[\w\-_0-9]+)/"       # dataset (required)
-    r"(?P<table>[\w\-_0-9]+)/?"        # table name (required)
-    r"(?P<partition>\$[0-9]{1,8})?/?"  # partition decortator (optional)
-    r"(?P<yyyy>[0-9]{4})?/?"           # partition year (yyyy) (optional)
-    r"(?P<mm>[0-9]{2})?/?"             # partition month (mm) (optional)
-    r"(?P<dd>[0-9]{2})?/?"             # partition day (dd) (optional)
-    r"(?P<hh>[0-9]{2})?/?"             # partition hour (hh) (optional)
-    r"(?P<batch>[\w\-_0-9]+)?/"        # batch id (optional)
-)[0]
+    r"^(?P<dataset>[\w\-_0-9]+)/"     # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"       # table name (required)
+    r"(?P<partition>\$[0-9]{2,8})?/?" # partition decortator (optional)
+    r"(?P<yyyy>[0-9]{4})?/?"          # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"            # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"            # partition day (dd)  (optional)
+    r"(?P<hh>[0-9]{2})?/?"            # partition hour (hh) (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"       # batch id (optional)
+)
 ```
 you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/1/)
 Otherwise you can override the regex by setting the `DESTINATION_REGEX` to
