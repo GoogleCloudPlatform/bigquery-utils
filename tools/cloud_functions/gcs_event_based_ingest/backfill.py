@@ -24,7 +24,7 @@ from typing import Dict, Iterator, List
 from google.api_core.client_info import ClientInfo
 from google.cloud import storage
 
-import gcs_ocn_bq_ingest  # pylint: disable=import-error,wrong-import-position
+import gcs_ocn_bq_ingest  # pylint: disable=import-error
 
 CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
 
