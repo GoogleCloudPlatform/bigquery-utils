@@ -149,7 +149,7 @@ def parse_args(args: List[str]) -> Namespace:
     )
 
     parser.add_argument(
-        "--success_filename",
+        "--success-filename",
         "-f",
         help="Overide the default success filename '_SUCCESS'",
         required=False,
