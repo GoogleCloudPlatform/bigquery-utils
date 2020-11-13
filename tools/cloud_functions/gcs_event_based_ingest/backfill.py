@@ -44,7 +44,8 @@ def find_blobs_with_suffix(
     :param suffix: A suffix in blob name to match
     :return:  Iterable of blobs matching the suffix.
     """
-    bucket_name, prefix = gcs_ocn_bq_ingest.main.parse_gcs_url(prefix)  # noqa
+    bucket_name, prefix = gcs_ocn_bq_ingest.main.parse_gcs_url(
+        prefix)    # noqa
     bucket: storage.Bucket = gcs_cli.lookup_bucket(bucket_name)
     # filter passes on scalability / laziness advantages of iterator.
     return filter(lambda blob: blob.name.endswith(suffix),
@@ -104,7 +105,7 @@ def main(args: Namespace):
             gsurl = future_to_gsurl[future]
             try:
                 future.result()
-            except Exception as err:  # pylint: disable=broad-except
+            except Exception as err:    # pylint: disable=broad-except
                 logging.error("Error processing %s: %s", gsurl, err)
                 exceptions[gsurl] = err
         if exceptions:
@@ -116,7 +117,7 @@ def parse_args(args: List[str]) -> Namespace:
     """argument parser for backfill CLI"""
     parser = ArgumentParser(
         description="utility to backfill success file notifications "
-                    "or run the cloud function locally in concurrent threads.")
+        "or run the cloud function locally in concurrent threads.")
 
     parser.add_argument(
         "--gcs-path",
@@ -162,8 +163,8 @@ def parse_args(args: List[str]) -> Namespace:
         "--destination-regex",
         "-r",
         help="Override the default destination regex for determining BigQuery"
-             "destination based on information encoded in the GCS path of the"
-             "success file",
+        "destination based on information encoded in the GCS path of the"
+        "success file",
         required=False,
         default=None,
     )

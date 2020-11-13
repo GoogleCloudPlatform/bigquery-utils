@@ -20,16 +20,13 @@ import pytest
 from google.cloud import bigquery
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
-LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
+LOAD_JOB_POLLING_TIMEOUT = 20    # seconds
 
 
 @pytest.mark.IT
 @pytest.mark.CLI
-def test_backfill(
-    bq, gcs_partitioned_data,
-    gcs_truncating_load_config, gcs_bucket, dest_dataset,
-    dest_partitioned_table, mock_env
-):
+def test_backfill(bq, gcs_partitioned_data, gcs_truncating_load_config,
+                  gcs_bucket, dest_dataset, dest_partitioned_table, mock_env):
     """
     This is an adapatation of test_load_job_partitioned but instead uses the
     backfill CLI code path to execute the cloud function's main method in
@@ -57,12 +54,10 @@ def test_backfill(
         test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
                                       "nyc_311", part, "nyc_311.csv")
         expected_num_rows += sum(1 for _ in open(test_data_file))
-    args = backfill.parse_args(
-        [
-            f"--gcs-path=gs://{gcs_bucket.name}",
-            "--mode=LOCAL",
-        ]
-    )
+    args = backfill.parse_args([
+        f"--gcs-path=gs://{gcs_bucket.name}",
+        "--mode=LOCAL",
+    ])
     backfill.main(args)
     bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)
 

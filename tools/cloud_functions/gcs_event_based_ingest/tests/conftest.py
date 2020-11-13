@@ -25,7 +25,7 @@ from google.cloud import bigquery
 from gcs_ocn_bq_ingest import main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
-LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
+LOAD_JOB_POLLING_TIMEOUT = 10    # seconds
 
 
 @pytest.fixture(scope="module")
@@ -196,7 +196,8 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
     sql_obj.upload_from_string(sql)
 
     config_obj = gcs_bucket.blob("/".join([
-        dest_dataset.dataset_id, dest_table.table_id, "_config", "external.json"
+        dest_dataset.dataset_id, dest_table.table_id, "_config",
+        "external.json"
     ]))
 
     with open(os.path.join(TEST_DIR, "resources",
