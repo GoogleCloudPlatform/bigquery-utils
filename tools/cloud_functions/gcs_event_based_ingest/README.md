@@ -21,21 +21,31 @@ By Default we try to read dataset, table, partition (or yyyy/mm/dd/hh) and
 batch id using the following python regex:
 ```python3
 DEFAULT_DESTINATION_REGEX = (
-    r"^(?P<dataset>[\w\-_0-9]+)/"       # dataset (required)
-    r"(?P<table>[\w\-_0-9]+)/?"         # table name (required)
-    r"(?P<partition>\$[0-9]{2,10})?/?"  # partition decortator (optional)
-    r"(?P<yyyy>[0-9]{4})?/?"            # partition year (yyyy) (optional)
-    r"(?P<mm>[0-9]{2})?/?"              # partition month (mm) (optional)
-    r"(?P<dd>[0-9]{2})?/?"              # partition day (dd)  (optional)
-    r"(?P<hh>[0-9]{2})?/?"              # partition hour (hh) (optional)
-    r"(?P<batch>[\w\-_0-9]+)?/"         # batch id (optional)
+    r"^(?P<dataset>[\w\-\._0-9]+)/"  # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"      # table name (required)
+    r"(?P<partition>\$[0-9]+)?/?"    # partition decortator (optional)
+    r"(?P<yyyy>[0-9]{4})?/?"         # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"           # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"           # partition day (dd)  (optional)
+    r"(?P<hh>[0-9]{2})?/?"           # partition hour (hh) (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"      # batch id (optional)
 )
 ```
-you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/1/)
+you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/2)
 Otherwise you can override the regex by setting the `DESTINATION_REGEX` to
 better fit your naming convention on GCS. Your regex must include
 [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
 for destination `dataset`, and `table`.
+Note, that `dataset` can optionally, explicitly specify destination project
+(i.e. `gs://${BUCKET}/project_id.dataset_id/table/....`) otherwise the default
+project will be inferred from Application Default Credential (the project in
+which the Cloud Function is running, or the ADC configured in Google Cloud SDK
+if invoked locally). This is useful in scenarios where a single deployment of
+the Cloud Function is responsible for ingesting data into BigQuery tables in
+projects other than the one it is deployed in. In these cases it is crucial to
+ensure the service account that Cloud Functions is impersonating has the correct
+permissions on all destination projects.
+
 Your regex can optionally include  for 
 - `partition` must be BigQuery Partition decorator with leading `$`
 - `yyyy`, `mm`, `dd`, `hr` partition year, month, day, and hour
@@ -54,6 +64,28 @@ Then you could use [this regex](https://regex101.com/r/OLpmg4/2):
 ```text
 DESTINATION_REGEX='(?:[\w\-_0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/region=(?P<batch>[\w]+)/yyyy=(?P<yyyy>[0-9]{4})/mm=(?P<mm>[0-9]{2})/dd=(?P<dd>[0-9]{2})/hh=(?P<hh>[0-9]{2})/'
 ```
+In this case we can take advantage of a more known rigid structure so our regex 
+is simpler (no optional capturing groups, optional slashes).
+Note, we can use the `region=` string (which may have been partitioned on
+in an  upstream system such as Hive) as a batch ID because we might expect that
+an hourly partition might have mutliple directories that upload to it.
+(e.g. US, GB, etc). Because it is all named capturing groups we don't have any
+strict ordering restrictions about batch id appearing before / after partition
+information.
+
+### Dealing with Different Naming Conventions in the Same Bucket
+In most cases, it would be recommeneded to have separate buckets / deployment 
+of the Cloud Function for each naming convention as this typically means that
+the upstream systems are governed by different teams.
+
+Sometimes many upstream systems might be using different naming conventions
+when uploading to the same bucket due to organizational constraints.
+In this case you have two options:
+1. Try to write a very flexible regex that handles all of your naming conventions with lots of optional groups.
+[Regex101 is your friend!](https://regex101.com/)
+1. Create separate Pub/Sub notifications and separate deployment of the
+Cloud Function with the appropriate `DESTINATION_REGEX` environment variable for
+each GCS prefix with a different naming convention.
 
 ### Configuration Files
 The Ingestion has many optional configuration files that should live in
@@ -174,16 +206,19 @@ If more granular data is needed about a particular job id
 ### Job Naming Convention
 All load or external query jobs will have a job id witha  prefix following this convention:
 ```python3
-job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}-{1}-of-{1}-"
+job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}"
 ```
+Note, the prefix `gcf-ingest-` is configurable with the `JOB_PREFIX` environment
+variable.
 
 ### Job Labels
-All load or external query jobs are labelled with functional component and cloud function name.
+All load or external query jobs are labelled with functional component and
+cloud function name.
 ```python3
 DEFAULT_JOB_LABELS = {
     "component": "event-based-gcs-ingest",
     "cloud-function-name": getenv("FUNCTION_NAME"),
-    "gcs-prefix": gs://bucket/prefix/for/this/ingest,
+    "bucket-id": "<bucket-for-this-notification>"
 }
 ```
 If the destination regex matches a batch group, there will be a `batch-id` label.
@@ -285,7 +320,34 @@ pytest -m IT
 ```
 
 ## Deployment
-It is suggested to deploy this Cloud Function with the [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
+It is suggested to deploy this Cloud Function with the
+[accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
+
+Alternatively, you can deploy with Google Cloud SDK:
+```bash
+PROJECT_ID=your-project-id
+TOPIC_ID=test-gcs-ocn
+PUBSUB_TOPIC=projects/${PROJECT_ID/topics/${TOPIC_ID}
+
+# Create Pub/Sub Object Change Notifications
+gsutil notification create -f json -t ${PUBSUB_TOPIC} -e OBJECT_FINALIZE gs://${INGESTION_BUCKET}
+
+# Deploy Cloud Function
+gcloud functions deploy test-gcs-bq-ingest \
+  --region=us-west4 \
+  --source=gcs_ocn_bq_ingest \
+  --entrypoint=main \
+  --runtime=python38 \
+  --trigger-topic=${PUBSUB_TOPIC} \
+  --service-account=${SERVICE_ACCOUNT_EMAIL} \
+  --timeout=540 \
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+```
+
+In theory, one could set up Pub/Sub notifications from multiple GCS Buckets 
+(owned by different teams but following a common naming convention) to the same
+Pub/Sub topic so that data uploaded to any of these buckets could get
+automatically loaded to BigQuery by a single deployment of the Cloud Function.
 
 ## Backfill
 There are some cases where you may have data already copied to GCS according to

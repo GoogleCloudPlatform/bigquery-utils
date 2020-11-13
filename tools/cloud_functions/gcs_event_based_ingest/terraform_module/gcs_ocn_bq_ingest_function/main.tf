@@ -35,10 +35,11 @@ module "bucket" {
 }
 
 resource "google_storage_notification" "notification" {
-  bucket         = module.bucket.bucket
-  payload_format = "JSON_API_V1"
-  topic          = google_pubsub_topic.notification_topic.id
-  event_types    = ["OBJECT_FINALIZE"]
+  bucket             = module.bucket.bucket
+  object_name_prefix = var.input_prefix
+  payload_format     = "JSON_API_V1"
+  topic              = google_pubsub_topic.notification_topic.id
+  event_types        = ["OBJECT_FINALIZE"]
 }
 
 # Zip up source code folder

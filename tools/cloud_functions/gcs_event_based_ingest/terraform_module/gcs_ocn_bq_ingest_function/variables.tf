@@ -23,6 +23,11 @@ variable "input_bucket" {
   description = "GCS bucket to watch for new files"
 }
 
+variable "input_prefix" {
+  description = "GCS prefix to watch for new files in input_bucket"
+  default     = null
+}
+
 variable "cloudfunctions_source_bucket" {
   description = "GCS bucket to store Cloud Functions Source"
 }

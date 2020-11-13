@@ -117,7 +117,8 @@ def gcs_data(request, gcs_bucket, dest_dataset,
     data_objs = []
     for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
         data_obj: storage.blob.Blob = gcs_bucket.blob("/".join(
-            [dest_dataset.dataset_id, dest_table.table_id, test_file]))
+            [f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+             dest_table.table_id, test_file]))
         data_obj.upload_from_filename(
             os.path.join(TEST_DIR, "resources", "test-data", "nation",
                          test_file))
