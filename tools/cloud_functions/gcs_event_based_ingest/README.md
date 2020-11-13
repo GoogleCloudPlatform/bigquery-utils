@@ -16,7 +16,7 @@ like so:
 Note, the table prefix can contain multiple sub-prefixes for handling partitions
 or for configuring historical / incremental loads differently.
 
-### Naming Convention with Regex
+### Configurable Naming Convention with Regex
 By Default we try to read dataset, table, partition (or yyyy/mm/dd/hh) and
 batch id using the following python regex:
 ```python3
@@ -33,13 +33,27 @@ DEFAULT_DESTINATION_REGEX = (
 ```
 you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/1/)
 Otherwise you can override the regex by setting the `DESTINATION_REGEX` to
-better fit your naming convention on GCS. Your regex must include named
-capturing groups for destination `dataset`, and `table`.
-Your regex can optionally include [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for 
+better fit your naming convention on GCS. Your regex must include
+[Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
+for destination `dataset`, and `table`.
+Your regex can optionally include  for 
 - `partition` must be BigQuery Partition decorator with leading `$`
 - `yyyy`, `mm`, `dd`, `hr` partition year, month, day, and hour
 (depending on your partition granularity)
 - `batch` an optional batch id to indicate multiple uploads for this partition.
+
+For example, if your datafiles were laid out like this:
+```text
+gs://${BUCKET}/${SOURCE_SYSTEM}/${DATASET}/${TABLE}/region=${LOCATION}/yyyy=${YEAR}/mm=${MONTH}/dd=${DAY}/hh=${HOUR}
+```
+i.e.
+```text
+gs://my-bucket/on-prem-edw/my_product/transactions/region=US/yyyy=2020/mm=01/dd=02/hh=03/_SUCCESS
+```
+Then you could use [this regex](https://regex101.com/r/OLpmg4/2):
+```text
+DESTIONATION_REGEX='(?:[\w\-_0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/region=(?P<batch>[\w]+)/yyyy=(?P<yyyy>[0-9]{4})/mm=(?P<mm>[0-9]{2})/dd=(?P<dd>[0-9]{2})/hh=(?P<hh>[0-9]{2})/'
+```
 
 ### Configuration Files
 The Ingestion has many optional configuration files that should live in

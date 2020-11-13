@@ -56,6 +56,8 @@ def main(args: Namespace):
     gcs_cli: storage.Client = storage.Client(client_info=CLIENT_INFO)
     ps_cli = None
     suffix = args.success_filename
+    if args.destination_regex:
+        os.environ["DESTINATION_REGEX"] = args.destination_regex
     if args.mode == "NOTIFICATIONS":
         if not args.pubsub_topic:
             raise ValueError("when passing mode=NOTIFICATIONS"
@@ -151,9 +153,19 @@ def parse_args(args: List[str]) -> Namespace:
     parser.add_argument(
         "--success-filename",
         "-f",
-        help="Overide the default success filename '_SUCCESS'",
+        help="Override the default success filename '_SUCCESS'",
         required=False,
         default="_SUCCESS",
+    )
+
+    parser.add_argument(
+        "--destination-regex",
+        "-f",
+        help="Override the default destination regex for determining BigQuery"
+             "destination based on information encoded in the GCS path of the"
+             "success file",
+        required=False,
+        default=None,
     )
     return parser.parse_args(args)
 
