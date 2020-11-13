@@ -117,7 +117,7 @@ def parse_args(args: List[str]) -> Namespace:
                     "or run the cloud function locally in concurrent threads.")
 
     parser.add_argument(
-        "--gcs_path",
+        "--gcs-path",
         "-p",
         help="GCS path (e.g. gs://bucket/prefix/to/search/)to search for "
         "existing _SUCCESS files",
