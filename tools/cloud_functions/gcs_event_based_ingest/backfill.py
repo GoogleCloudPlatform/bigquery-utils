@@ -140,7 +140,7 @@ def parse_args(args: List[str]) -> Namespace:
     )
 
     parser.add_argument(
-        "--pubsub_topic",
+        "--pubsub-topic",
         "--topic",
         "-t",
         help="Pub/Sub notifications topic to post notifications for. "
@@ -160,7 +160,7 @@ def parse_args(args: List[str]) -> Namespace:
 
     parser.add_argument(
         "--destination-regex",
-        "-f",
+        "-r",
         help="Override the default destination regex for determining BigQuery"
              "destination based on information encoded in the GCS path of the"
              "success file",
