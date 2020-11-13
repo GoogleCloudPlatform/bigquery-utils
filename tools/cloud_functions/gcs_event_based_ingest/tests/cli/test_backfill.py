@@ -59,7 +59,7 @@ def test_backfill(
         expected_num_rows += sum(1 for _ in open(test_data_file))
     args = backfill.parse_args(
         [
-            f"--gcs_path=gs://{gcs_bucket.name}",
+            f"--gcs-path=gs://{gcs_bucket.name}",
             "--mode=LOCAL",
         ]
     )
