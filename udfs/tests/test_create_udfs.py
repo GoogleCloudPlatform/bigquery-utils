@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import unittest
 
 from google.api_core.exceptions import GoogleAPICallError
 from google.cloud import bigquery
-from google.cloud.bigquery import QueryJobConfig
 from google.cloud.bigquery.table import _EmptyRowIterator
 from parameterized import parameterized
 
@@ -25,33 +25,35 @@ import udf_test_utils as utils
 
 class TestCreateUDFs(unittest.TestCase):
     """
-    This class uses the parameterized python package (https://pypi.org/project/parameterized/) to programmatically
-    create multiple python test function definitions (based off `test_create_udf`). It will effectively create a
-    python test function for each UDF that it encounters as it walks through the udfs/ directory.
+    This class uses the parameterized python package
+    (https://pypi.org/project/parameterized/) to programmatically
+    create multiple python test function definitions
+    (based off `test_create_udf`). It will effectively create a python test
+    function for each UDF that it encounters as it walks
+    through the udfs/ directory.
     """
 
     @classmethod
     def setUpClass(cls):
-        cls._client = bigquery.Client()
+        cls._client = bigquery.Client(project=os.getenv('BQ_PROJECT_ID'))
 
     @parameterized.expand(utils.get_all_udf_paths())
     def test_create_udf(self, udf_path):
-        client = self._client
-        bq_test_dataset = utils.get_target_bq_dataset(udf_path)
-
-        job_config = QueryJobConfig()
-        job_config.default_dataset = (
-            f'{client.project}.{bq_test_dataset}'
-        )
         try:
-            udf_sql = utils.replace_with_test_datasets(udf_path, client.project)
-            udf_creation_result = client.query(
-                udf_sql,
-                job_config=job_config
-            ).result()
+            with open(udf_path) as udf_file:
+                udf_sql = udf_file.read()
+            # Only replace UDF datasets with a test dataset if the
+            # build was triggered by a pull request or a non-main branch
+            if (os.getenv('_PR_NUMBER') is not None or
+                    os.getenv('BRANCH_NAME') != 'master'):
+                udf_sql = utils.replace_with_test_datasets(
+                    self._client.project, udf_sql)
+
+            udf_creation_result = self._client.query(udf_sql).result()
+
             self.assertIsInstance(udf_creation_result, _EmptyRowIterator)
-        except GoogleAPICallError as e:
-            self.fail(e.message)
+        except GoogleAPICallError as error:
+            self.fail(error.message)
 
 
 if __name__ == '__main__':

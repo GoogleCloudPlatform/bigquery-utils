@@ -14,12 +14,59 @@
 #
 
 steps:
-###########################################################
-# Step 1: Deploy
-###########################################################
+  ############################################################
+  # Fetches master branch from GitHub and then hard "resets"
+  # to the _PR_NUMBER which triggered this build. This enables
+  # build.sh to build only what's changed relative to the
+  # master branch by checking the output of "git diff".
+  ############################################################
+- name: gcr.io/cloud-builders/git
+  entrypoint: bash
+  args:
+    - '-c'
+    - |
+      # Only compare with master branch if this build has been triggered
+      # by either a non-master branch on origin repo or a pull request.
+      if [[ ! "${BRANCH_NAME}" = "master" || -n "${_PR_NUMBER}" ]]; then
+        git init
+        git config user.email "builder@bigquery-utils.repo"
+        git config user.name "builder"
+        printf "Adding repo %s as a remote" "${_REPO_URL}"
+        git remote remove origin # Removing necessary when testing locally
+        git remote add origin "${_REPO_URL}"
+        git fetch origin master
+
+        # Fetch the pull request which triggered this build and then
+        # hard reset to it. The build.sh script can then call "git diff"
+        # to figure out what to build based on what's changed.
+        if [[ ! "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
+          printf "Fetching and --hard resetting to (%s) branch from origin repo." "${BRANCH_NAME}"
+          git fetch origin "${BRANCH_NAME}"
+          git reset --hard origin/"${BRANCH_NAME}"
+        elif [[ -n "${_PR_NUMBER}" ]]; then
+          printf "Fetching and --hard resetting to the merge commit of pull request #%s which triggered this build." "${_PR_NUMBER}"
+          git fetch origin +refs/pull/"${_PR_NUMBER}"/merge:refs/remotes/origin/pr/"${_PR_NUMBER}"
+          git reset --hard origin/pr/"${_PR_NUMBER}"
+        fi
+      fi
+
+  ###########################################################
+  # Build and deploy
+  # (only deploy if triggered by a commit to master branch)
+  ###########################################################
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  entrypoint: 'bash'
-  args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
+  entrypoint: bash
+  args:
+    - release/build.sh
+  env:
+    - BRANCH_NAME=${BRANCH_NAME}
+    - SHORT_SHA=${SHORT_SHA}
+    - _JS_BUCKET=${_JS_BUCKET}
+    - _PR_NUMBER=${_PR_NUMBER}
+
+substitutions:
+  _JS_BUCKET: gs://bqutil-lib/test_bq_js_libs/${SHORT_SHA} # default value
+  _REPO_URL:  https://github.com/GoogleCloudPlatform/bigquery-utils.git # default value
 
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: N1_HIGHCPU_8

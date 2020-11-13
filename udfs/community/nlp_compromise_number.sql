@@ -20,4 +20,4 @@ LANGUAGE js AS """
   return nlp(str).values(0).toNumber().out()
 """
 OPTIONS (
-  library="gs://fh-bigquery/js/compromise.min.11.14.0.js");
+  library="${JS_BUCKET}/compromise-v11.14.0.min.js");
