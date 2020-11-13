@@ -252,6 +252,7 @@ def generate_webpack_configs():
             js_main_entrypoint = npm_package_json.get('main')
             js_dependency_files = npm_package_json.get('files')
             js_lib_name = npm_package_json.get('name')
+            js_lib_version = npm_package_json.get('version')
             if js_main_entrypoint is not None:
                 js_main_entrypoint_path = npm_package_config_path.parent / Path(
                     js_main_entrypoint)
@@ -261,6 +262,7 @@ def generate_webpack_configs():
         webpack_config_file_path = Path(
             f'{npm_package_config_path.parent.name}-webpack.config.js')
         minimize_js = True if js_lib_name not in NO_MINIFY_JS_LIBS else False
+        js_lib_file_extension = ".min.js" if minimize_js else ".js"
         with open(webpack_config_file_path, 'w') as webpack_config:
             webpack_config.write(
                 f'var path = require("path");\n'
@@ -268,7 +270,7 @@ def generate_webpack_configs():
                 f'    entry: "./{js_main_entrypoint_path}",\n'
                 f'    output: {{\n'
                 f'        path: path.resolve(__dirname, "js_builds"),\n'
-                f'        filename: "{webpack_config_file_path.name}",\n'
+                f'        filename: "{js_lib_name}-v{js_lib_version}{js_lib_file_extension}",\n'
                 f'        library: "{js_lib_name}",\n'
                 f'        libraryTarget: "var",\n'
                 f'    }},\n'

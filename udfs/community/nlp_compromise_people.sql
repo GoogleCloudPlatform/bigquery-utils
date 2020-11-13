@@ -20,4 +20,4 @@ LANGUAGE js AS """
   return nlp(str).people().out('topk').map(x=>x.normal)
 """
 OPTIONS (
-  library="${JS_BUCKET}/compromise-v11.14.0.min.js");
+  library="${JS_BUCKET}/compromise-v11.14.3.min.js");
