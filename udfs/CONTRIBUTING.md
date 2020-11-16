@@ -75,13 +75,14 @@ expected.
     *   `gcloud auth login`
     *   `gcloud config set project YOUR_PROJECT_ID`
 
-1.  Test your UDF by invoking the `run.sh` script and passing the name of the
-    UDF in lower caps as an argument.
+1.  Test your UDF by invoking the `run.sh` script and passing the pytest 
+    [`-k` argument](https://docs.pytest.org/en/stable/example/markers.html#using-k-expr-to-select-tests-based-on-their-name)
+    followed by the name of your UDF in lower case.
 
-    *   `bash tests/run.sh url_parse`
+    *   `bash tests/run.sh -k url_parse`
         *   Note: If your UDF name exists in multiple directories, you can add
             the UDF's parent directory as a prefix \
-            `bash tests/run.sh community_url_parse`
+            `bash tests/run.sh -k community_url_parse`
 
 1.  Run all tests by invoking the `run.sh` script with no arguments
 

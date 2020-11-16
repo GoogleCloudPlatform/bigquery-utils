@@ -14,24 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [[ $1 == "--pip_install_before_run" ]]; then
-  python3 -m pip install -r tests/requirements.txt
-  python3 tests/udf_test_utils.py --create_test_datasets
-  python3 -m pytest --workers 100 tests/create_udf_signatures.py
-  python3 -m pytest --workers 100 tests/test_create_udfs.py
-  python3 -m pytest --workers 100 tests/test_run_udfs.py
-  python3 tests/udf_test_utils.py --delete_test_datasets
-elif [[ $# == 1 ]]; then
-  python3 tests/udf_test_utils.py --create_test_datasets
-  python3 -m pytest --workers 100 tests/create_udf_signatures.py -k $1
-  python3 -m pytest --workers 100 tests/test_create_udfs.py -k $1
-  python3 -m pytest --workers 100 tests/test_run_udfs.py -k $1
-  python3 tests/udf_test_utils.py --delete_test_datasets
-else
-  python3 tests/udf_test_utils.py --create_test_datasets
-  python3 -m pytest --workers 100 tests/create_udf_signatures.py
-  python3 -m pytest --workers 100 tests/test_create_udfs.py
-  python3 -m pytest --workers 100 tests/test_run_udfs.py
-  python3 tests/udf_test_utils.py --delete_test_datasets
-fi
-
+export SHORT_SHA=local_test
+python3 tests/udf_test_utils.py --create_test_datasets
+python3 -m pytest --workers 100 tests/create_udf_signatures.py "$@"
+python3 -m pytest --workers 100 tests/test_create_udfs.py "$@"
+python3 -m pytest --workers 100 tests/test_run_udfs.py "$@"
+python3 tests/udf_test_utils.py --delete_test_datasets

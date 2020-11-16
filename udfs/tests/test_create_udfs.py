@@ -48,7 +48,9 @@ class TestCreateUDFs(unittest.TestCase):
                     os.getenv('BRANCH_NAME') != 'master'):
                 udf_sql = utils.replace_with_test_datasets(
                     self._client.project, udf_sql)
-
+                if udf_sql is None:
+                    self.fail(f'Unable to replace SQL DDL with testing dataset '
+                              f'for UDF: {udf_path}')
             udf_creation_result = self._client.query(udf_sql).result()
 
             self.assertIsInstance(udf_creation_result, _EmptyRowIterator)
