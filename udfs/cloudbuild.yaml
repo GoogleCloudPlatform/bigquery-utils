@@ -94,7 +94,9 @@ steps:
   entrypoint: pytest
   args:
     - --workers
-    - '100'
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
     - tests/create_udf_signatures.py
   env:
     - SHORT_SHA=${SHORT_SHA}
@@ -110,7 +112,9 @@ steps:
   entrypoint: pytest
   args:
     - --workers
-    - '100'
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
     - tests/test_create_udfs.py
   env:
     - SHORT_SHA=${SHORT_SHA}
@@ -126,7 +130,9 @@ steps:
   entrypoint: pytest
   args:
     - --workers
-    - '100'
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
     - tests/test_run_udfs.py
   env:
     - SHORT_SHA=${SHORT_SHA}
@@ -150,4 +156,4 @@ steps:
     - run_udf_unit_tests
 
 options:
-  machineType: N1_HIGHCPU_8
+  machineType: N1_HIGHCPU_32
