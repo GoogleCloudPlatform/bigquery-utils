@@ -285,7 +285,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='Utils Class to support testing BigQuery UDFs')
     parser.add_argument(
-        ' --create-prod-datasets',
+        '--create-prod-datasets',
         help='Create prod datasets used for UDF function testing.',
         action='store_true')
     parser.add_argument(
