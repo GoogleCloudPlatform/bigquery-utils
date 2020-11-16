@@ -293,4 +293,39 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
- 
+nlp_compromise_number:
+  - test:
+    input: CAST('one hundred fifty seven' AS STRING)
+    expected_output: CAST(157 AS NUMERIC)
+  - test:
+    input: CAST('three point 5' AS STRING)
+    expected_output: CAST(3.5 AS NUMERIC)
+  - test:
+    input: CAST('2 hundred' AS STRING)
+    expected_output: CAST(200 AS NUMERIC)
+  - test:
+    input: CAST('minus 8' AS STRING)
+    expected_output: CAST(-8 AS NUMERIC)
+  - test:
+    input: CAST('5 million 3 hundred 25 point zero 1' AS STRING)
+    expected_output: CAST(5000325.01 AS NUMERIC)
+nlp_compromise_people:
+  # Below tests taken from https://github.com/spencermountain/compromise/blob/master/tests/people.test.js
+  - test:
+    input: CAST('Mary is in the boat. Nancy is in the boat. Fred is in the boat. Jack is too.' AS STRING)
+    expected_output: CAST(['mary', 'nancy', 'fred', 'jack'] AS ARRAY<STRING>)
+  - test:
+    input: CAST('jean jacket. jean Slkje' AS STRING)
+    expected_output: CAST(['jean slkje'] AS ARRAY<STRING>)
+  - test:
+    input: CAST('The Bill was passed by James MacCarthur' AS STRING)
+    expected_output: CAST(['james maccarthur'] AS ARRAY<STRING>)
+  - test:
+    input: CAST('Rod MacDonald bought a Rod' AS STRING)
+    expected_output: CAST(['rod macdonald'] AS ARRAY<STRING>)
+  - test:
+    input: CAST("Matt 'the doctor' Smith lasted three seasons." AS STRING)
+    expected_output: CAST(["matt the doctor smith"] AS ARRAY<STRING>)
+  - test:
+    input: CAST("Randal Kieth Orton and Dwayne 'the rock' Johnson had a really funny fight." AS STRING)
+    expected_output: CAST(['randal kieth orton', 'dwayne the rock johnson'] AS ARRAY<STRING>)
