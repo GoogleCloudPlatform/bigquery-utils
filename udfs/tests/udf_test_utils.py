@@ -285,24 +285,24 @@ def main():
     parser = argparse.ArgumentParser(
         description='Utils Class to support testing BigQuery UDFs')
     parser.add_argument(
-        '--create_prod_datasets',
+        ' --create-prod-datasets',
         help='Create prod datasets used for UDF function testing.',
         action='store_true')
     parser.add_argument(
-        '--create_test_datasets',
+        '--create-test-datasets',
         help='Create test datasets used for UDF function testing.',
         action='store_true')
     parser.add_argument(
-        '--delete_test_datasets',
+        '--delete-test-datasets',
         help='Delete test datasets used for UDF function testing.',
         action='store_true')
     parser.add_argument(
-        '--generate_js_libs_package_json',
+        '--generate-js-libs-package-json',
         help='Generate package.json file necessary for building '
         'javascript libs for BigQuery UDFs',
         action='store_true')
     parser.add_argument(
-        '--generate_webpack_configs',
+        '--generate-webpack-configs',
         help='Generate webpack config files necessary for building '
         'javascript libs for BigQuery UDFs',
         action='store_true')

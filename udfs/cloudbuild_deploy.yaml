@@ -23,7 +23,7 @@ steps:
   entrypoint: python3
   args:
     - tests/udf_test_utils.py
-    - --generate_js_libs_package_json
+    - --generate-js-libs-package-json
   ###########################################################
   # Install npm packages based off the package.json file
   # created in the previous step.
@@ -43,7 +43,7 @@ steps:
   entrypoint: python3
   args:
     - tests/udf_test_utils.py
-    - --generate_webpack_configs
+    - --generate-webpack-configs
   waitFor:
     - install_npm_packages
     - generate_js_libs_package_json
@@ -80,7 +80,7 @@ steps:
   entrypoint: python3
   args:
     - tests/udf_test_utils.py
-    - --create_prod_datasets
+    -  --create-prod-datasets
   env:
     - BQ_PROJECT_ID=${PROJECT_ID}
   ###########################################################
