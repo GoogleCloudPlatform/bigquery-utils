@@ -27,7 +27,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
     "test_input,expected",
     [
         (
-            "dataset/table/_SUCCESS",    # flat
+            "dataset/table/_SUCCESS",  # flat
             {
                 "dataset": "dataset",
                 "table": "table",
@@ -39,7 +39,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "batch": None
             }),
         (
-            "dataset/table/$20201030/_SUCCESS",    # partitioned
+            "dataset/table/$20201030/_SUCCESS",  # partitioned
             {
                 "dataset": "dataset",
                 "table": "table",
@@ -51,7 +51,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "batch": None
             }),
         (
-            "dataset/table/$20201030/batch_id/_SUCCESS",    # partitioned, batched
+            "dataset/table/$20201030/batch_id/_SUCCESS",  # partitioned, batched
             {
                 "dataset": "dataset",
                 "table": "table",
@@ -63,7 +63,7 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
                 "batch": "batch_id"
             }),
         (
-            "dataset/table/batch_id/_SUCCESS",    # batched (no partitioning)
+            "dataset/table/batch_id/_SUCCESS",  # batched (no partitioning)
             {
                 "dataset": "dataset",
                 "table": "table",

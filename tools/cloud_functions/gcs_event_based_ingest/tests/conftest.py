@@ -25,7 +25,7 @@ from google.cloud import bigquery
 from gcs_ocn_bq_ingest import main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
-LOAD_JOB_POLLING_TIMEOUT = 10    # seconds
+LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
 
 
 @pytest.fixture(scope="module")
@@ -116,9 +116,10 @@ def gcs_data(request, gcs_bucket, dest_dataset,
              dest_table) -> storage.blob.Blob:
     data_objs = []
     for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
-        data_obj: storage.blob.Blob = gcs_bucket.blob("/".join(
-            [f"{dest_dataset.project}.{dest_dataset.dataset_id}",
-             dest_table.table_id, test_file]))
+        data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+            f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+            dest_table.table_id, test_file
+        ]))
         data_obj.upload_from_filename(
             os.path.join(TEST_DIR, "resources", "test-data", "nation",
                          test_file))

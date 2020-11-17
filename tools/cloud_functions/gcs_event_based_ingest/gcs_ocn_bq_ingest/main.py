@@ -23,8 +23,8 @@ from os import getenv
 from pathlib import Path
 from time import monotonic, sleep
 from typing import Any, Deque, Dict, List, Optional, Tuple
-from urllib.parse import urlparse
 
+from cachetools import TTLCache, cached
 from google.api_core.client_info import ClientInfo
 from google.api_core.exceptions import PreconditionFailed
 from google.cloud import bigquery, storage
@@ -87,7 +87,7 @@ CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
 DEFAULT_JOB_PREFIX = "gcf-ingest-"
 
 
-def main(event: Dict, context):    # pylint: disable=unused-argument
+def main(event: Dict, context):  # pylint: disable=unused-argument
     """entry point for background cloud function for event driven GCS to
     BigQuery ingest."""
     # pylint: disable=too-many-locals
@@ -111,7 +111,7 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     gcs_client = storage.Client(client_info=CLIENT_INFO)
     project = gcs_client.project
-    bkt = gcs_client.lookup_bucket(bucket_id)
+    bkt = get_bucket_or_raise(gcs_client, bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
     handle_duplicate_notification(bkt, success_blob, gsurl)
 
@@ -202,7 +202,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
         f"{batch_id}-"
 
 
-def external_query(    # pylint: disable=too-many-arguments
+def external_query(  # pylint: disable=too-many-arguments
         gcs_client: storage.Client, bq_client: bigquery.Client, gsurl: str,
         query: str, dest_table_ref: bigquery.TableReference,
         job_id_prefix: str):
@@ -332,7 +332,9 @@ def look_for_transform_sql(storage_client: storage.Client,
                            gsurl: str) -> Optional[str]:
     """look in parent directories for _config/bq_transform.sql"""
     config_filename = "bq_transform.sql"
-    bucket_name, obj_path = parse_gcs_url(gsurl)
+    blob: storage.Blob = storage.Blob.from_string(gsurl)
+    bucket_name = blob.bucket.name
+    obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_query(path):
@@ -355,7 +357,9 @@ def construct_load_job_config(storage_client: storage.Client,
     The configs closest to gsurl should take precedence.
     """
     config_filename = "load.json"
-    bucket_name, obj_path = parse_gcs_url(gsurl)
+    blob: storage.Blob = storage.Blob.from_string(gsurl)
+    bucket_name = blob.bucket.name
+    obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_config(path):
@@ -377,8 +381,8 @@ def construct_load_job_config(storage_client: storage.Client,
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
 
-def get_batches_for_prefix(storage_client,
-                           prefix_path,
+def get_batches_for_prefix(gcs_client: storage.Client,
+                           prefix_path: str,
                            ignore_subprefix="_config/",
                            ignore_file=SUCCESS_FILENAME) -> List[List[str]]:
     """
@@ -389,10 +393,12 @@ def get_batches_for_prefix(storage_client,
     (one batch has an array of multiple GCS uris)
     """
     batches = []
-    bucket_name, prefix_name = parse_gcs_url(prefix_path)
+    blob: storage.Blob = storage.Blob.from_string(prefix_path)
+    bucket_name = blob.bucket.name
+    prefix_name = blob.name
 
     prefix_filter = f"{prefix_name}"
-    bucket = storage_client.lookup_bucket(bucket_name)
+    bucket = get_bucket_or_raise(gcs_client, bucket_name)
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
@@ -405,7 +411,7 @@ def get_batches_for_prefix(storage_client,
         if (blob.name
                 not in {f"{prefix_name}/", f"{prefix_name}/{ignore_file}"}
                 or blob.name.startswith(f"{prefix_name}/{ignore_subprefix}")):
-            if blob.size == 0:    # ignore empty files
+            if blob.size == 0:  # ignore empty files
                 print(f"ignoring empty file: gs://{bucket}/{blob.name}")
                 continue
             cumulative_bytes += blob.size
@@ -449,12 +455,12 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
         KeyError if the input notification does not contain the expected
         attributes.
     """
-    if {"bucket", "name", } <= notification.keys():
+    if notification.get("kind") == "storage#object":
         # notification is GCS Object reosource from Cloud Functions trigger
         # https://cloud.google.com/storage/docs/json_api/v1/objects#resource
         return notification["bucket"], notification["name"]
     if notification.get("attributes"):
-        # notification is pubsub message.
+        # notification is Pub/Sub message.
         try:
             attributes = notification["attributes"]
             return attributes["bucketId"], attributes["objectId"]
@@ -473,29 +479,50 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
         "https://cloud.google.com/functions/docs/tutorials/storage")
 
 
-def read_gcs_file(gcs: storage.Client, gsurl: str) -> str:
+# cache lookups against GCS API for 1 second as buckets / objects have update
+# limit of once per second and we might do several of the same lookup during
+# the functions lifetime. This should improve performance by eliminating
+# unnecessary API calls. The lookups on bucket and objects in this function
+# should not be changing during the function's lifetime as this would lead to
+# non-deterministic results with or without this cache.
+# https://cloud.google.com/storage/quotas
+@cached(TTLCache(maxsize=1024, ttl=1))
+def read_gcs_file(gcs_client: storage.Client, gsurl: str) -> str:
     """
     Read a GCS object as a string
 
     Args:
-        gcs:  GCS client
+        gcs_client:  GCS client
         gsurl: GCS URI for object to read in gs://bucket/path/to/object format
     Returns:
         str
     """
-    bucket_id, object_id = parse_gcs_url(gsurl)
-    bucket = gcs.bucket(bucket_id)
-    blob = bucket.blob(object_id)
-    return blob.download_as_bytes().decode('UTF-8')
+    blob = storage.Blob.from_string(gsurl)
+    return blob.download_as_bytes(client=gcs_client).decode('UTF-8')
 
 
-def read_gcs_file_if_exists(gcs: storage.Client, gsurl: str) -> Optional[str]:
+def read_gcs_file_if_exists(gcs_client: storage.Client,
+                            gsurl: str) -> Optional[str]:
     """return string of gcs object contents or None if the object does not exist
     """
     try:
-        return read_gcs_file(gcs, gsurl)
+        return read_gcs_file(gcs_client, gsurl)
     except NotFound:
         return None
+
+
+# Cache bucket lookups (see reasoning in comment above)
+@cached(TTLCache(maxsize=1024, ttl=1))
+def get_bucket_or_raise(
+    gcs_client: storage.Client,
+    bucket_id: str,
+) -> storage.Bucket:
+    """get storage.Bucket object by bucket_id string if exists or raise
+    google.cloud.exceptions.NotFound."""
+    bkt: Optional[storage.Bucket] = gcs_client.lookup_bucket(bucket_id)
+    if bkt:
+        return bkt
+    raise NotFound(f"google cloud storage bucket: gs://{bucket_id} not found.")
 
 
 def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
@@ -510,24 +537,6 @@ def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
             mode=x.get("mode") if x.get("mode") else default_mode)
         for x in schema
     ]
-
-
-def parse_gcs_url(gsurl: str) -> Tuple[str, str]:
-    """Given a Google Cloud Storage URL (gs://<bucket>/<blob>), returns a
-    tuple containing the corresponding bucket and blob.
-    """
-
-    parsed_url = urlparse(gsurl)
-    if not parsed_url.netloc:
-        raise ValueError("Please provide a bucket name")
-    if parsed_url.scheme.lower() != "gs":
-        raise ValueError(f"Schema must be to 'gs://'"
-                         f"Current schema: '{parsed_url.scheme}://'")
-
-    bucket = parsed_url.netloc
-    # Remove leading '/' but NOT trailing one
-    blob = parsed_url.path.lstrip("/")
-    return bucket, blob
 
 
 # To be added to built in str in python 3.9

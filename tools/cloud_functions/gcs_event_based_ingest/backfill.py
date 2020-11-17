@@ -32,30 +32,30 @@ os.environ["FUNCTION_NAME"] = "backfill-cli"
 
 
 def find_blobs_with_suffix(
-    gcs_cli: storage.Client,
+    gcs_client: storage.Client,
     prefix: str,
     suffix: str = "_SUCCESS",
 ) -> Iterator[storage.Blob]:
     """
     Find GCS blobs with a given suffix.
 
-    :param gcs_cli:  storage.Client
+    :param gcs_client:  storage.Client
     :param prefix: A GCS prefix to search i.e. gs://bucket/prefix/to/search
     :param suffix: A suffix in blob name to match
     :return:  Iterable of blobs matching the suffix.
     """
-    bucket_name, prefix = gcs_ocn_bq_ingest.main.parse_gcs_url(
-        prefix)    # noqa
-    bucket: storage.Bucket = gcs_cli.lookup_bucket(bucket_name)
+    prefix_blob: storage.Blob = storage.Blob.from_string(prefix)
     # filter passes on scalability / laziness advantages of iterator.
-    return filter(lambda blob: blob.name.endswith(suffix),
-                  bucket.list_blobs(prefix=prefix))
+    return filter(
+        lambda blob: blob.name.endswith(suffix),
+        prefix_blob.bucket.list_blobs(client=gcs_client,
+                                      prefix=prefix_blob.name))
 
 
 def main(args: Namespace):
     """main entry point for backfill CLI."""
-    gcs_cli: storage.Client = storage.Client(client_info=CLIENT_INFO)
-    ps_cli = None
+    gcs_client: storage.Client = storage.Client(client_info=CLIENT_INFO)
+    pubsub_client = None
     suffix = args.success_filename
     if args.destination_regex:
         os.environ["DESTINATION_REGEX"] = args.destination_regex
@@ -67,21 +67,21 @@ def main(args: Namespace):
         # google-cloud-pubsub dependency in LOCAL mode.
         # pylint: disable=import-outside-toplevel
         from google.cloud import pubsub
-        ps_cli = pubsub.PublisherClient()
+        pubsub_client = pubsub.PublisherClient()
 
     # These are all I/O bound tasks so use Thread Pool concurrency for speed.
     with concurrent.futures.ThreadPoolExecutor() as executor:
         future_to_gsurl = {}
-        for blob in find_blobs_with_suffix(gcs_cli, args.gcs_path, suffix):
-            if ps_cli:
+        for blob in find_blobs_with_suffix(gcs_client, args.gcs_path, suffix):
+            if pubsub_client:
                 # kwargs are message attributes
                 # https://googleapis.dev/python/pubsub/latest/publisher/index.html#publish-a-message
                 logging.info("sending pubsub message for: %s",
                              f"gs://{blob.bucket.name}/{blob.name}")
                 future_to_gsurl[executor.submit(
-                    ps_cli.publish,
+                    pubsub_client.publish,
                     args.pubsub_topic,
-                    b'',    # cloud function ignores message body
+                    b'',  # cloud function ignores message body
                     bucketId=blob.bucket.name,
                     objectId=blob.name,
                     _metaInfo="this message was submitted with "
@@ -105,7 +105,7 @@ def main(args: Namespace):
             gsurl = future_to_gsurl[future]
             try:
                 future.result()
-            except Exception as err:    # pylint: disable=broad-except
+            except Exception as err:  # pylint: disable=broad-except
                 logging.error("Error processing %s: %s", gsurl, err)
                 exceptions[gsurl] = err
         if exceptions:

@@ -20,7 +20,7 @@ import pytest
 from google.cloud import bigquery
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
-LOAD_JOB_POLLING_TIMEOUT = 20    # seconds
+LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 
 
 @pytest.mark.IT

@@ -22,7 +22,7 @@ from google.cloud.exceptions import NotFound
 from gcs_ocn_bq_ingest import main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
-LOAD_JOB_POLLING_TIMEOUT = 10    # seconds
+LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
 
 
 @pytest.mark.IT
@@ -55,8 +55,9 @@ def test_gcf_event_schema(bq, gcs_data, dest_dataset, dest_table, mock_env):
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
     test_event = {
+        "kind": "storage#object",
         "bucket": gcs_data.bucket.name,
-        "name": gcs_data.name
+        "name": gcs_data.name,
     }
     main.main(test_event, None)
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
