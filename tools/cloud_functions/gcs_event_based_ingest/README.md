@@ -74,7 +74,7 @@ strict ordering restrictions about batch id appearing before / after partition
 information.
 
 ### Dealing with Different Naming Conventions in the Same Bucket
-In most cases, it would be recommeneded to have separate buckets / deployment 
+In most cases, it would be recommended to have separate buckets / deployment 
 of the Cloud Function for each naming convention as this typically means that
 the upstream systems are governed by different teams.
 
