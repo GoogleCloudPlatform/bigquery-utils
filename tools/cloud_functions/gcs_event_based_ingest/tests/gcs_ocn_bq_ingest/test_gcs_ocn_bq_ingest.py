@@ -18,9 +18,10 @@ from typing import Dict, Optional
 
 import pytest
 
-from gcs_ocn_bq_ingest import main
+import gcs_ocn_bq_ingest.main
 
-COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
+COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
+    gcs_ocn_bq_ingest.main.DEFAULT_DESTINATION_REGEX)
 
 
 @pytest.mark.parametrize(
@@ -107,4 +108,4 @@ def test_default_destination_regex(test_input: str,
     ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
 ])
 def test_flattend2dlist(test_input, expected):
-    assert main.flatten2dlist(test_input) == expected
+    assert gcs_ocn_bq_ingest.main.flatten2dlist(test_input) == expected

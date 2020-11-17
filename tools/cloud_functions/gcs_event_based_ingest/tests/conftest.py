@@ -14,15 +14,14 @@
 """Integration tests for gcs_ocn_bq_ingest"""
 import json
 import os
+import time
 import uuid
-from time import monotonic
 from typing import List
 
-import google.cloud.storage as storage
 import pytest
-from google.cloud import bigquery
+from google.cloud import bigquery, storage
 
-from gcs_ocn_bq_ingest import main
+import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
@@ -94,7 +93,8 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
 def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "nation_schema.json")) as schema_file:
-        schema = main.dict_to_bq_schema(json.load(schema_file))
+        schema = gcs_ocn_bq_ingest.main.dict_to_bq_schema(
+            json.load(schema_file))
 
     table = bigquery.Table(
         f"{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.cf_test_nation",
@@ -198,8 +198,7 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
     sql_obj.upload_from_string(sql)
 
     config_obj = gcs_bucket.blob("/".join([
-        dest_dataset.dataset_id, dest_table.table_id, "_config",
-        "external.json"
+        dest_dataset.dataset_id, dest_table.table_id, "_config", "external.json"
     ]))
 
     with open(os.path.join(TEST_DIR, "resources",
@@ -295,9 +294,9 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
   flaky.
   """
 
-    start_poll = monotonic()
+    start_poll = time.monotonic()
     actual_num_rows = 0
-    while monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
+    while time.monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
         bq_table: bigquery.Table = bq_client.get_table(table)
         actual_num_rows = bq_table.num_rows
         if actual_num_rows == expected_num_rows:

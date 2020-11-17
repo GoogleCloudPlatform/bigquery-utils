@@ -13,13 +13,13 @@
 # limitations under the License.
 """integration tests for gcs_ocn_bq_ingest"""
 import os
-from time import monotonic
+import time
 
+import google.cloud.exceptions
 import pytest
 from google.cloud import bigquery
-from google.cloud.exceptions import NotFound
 
-from gcs_ocn_bq_ingest import main
+import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
@@ -36,7 +36,7 @@ def test_load_job(bq, gcs_data, dest_dataset, dest_table, mock_env):
             "objectId": gcs_data.name
         }
     }
-    main.main(test_event, None)
+    gcs_ocn_bq_ingest.main.main(test_event, None)
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
     expected_num_rows = sum(1 for _ in open(test_data_file))
@@ -59,7 +59,7 @@ def test_gcf_event_schema(bq, gcs_data, dest_dataset, dest_table, mock_env):
         "bucket": gcs_data.bucket.name,
         "name": gcs_data.name,
     }
-    main.main(test_event, None)
+    gcs_ocn_bq_ingest.main.main(test_event, None)
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
     expected_num_rows = sum(1 for _ in open(test_data_file))
@@ -78,10 +78,10 @@ def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
             "objectId": gcs_data.name
         }
     }
-    main.main(test_event, None)
+    gcs_ocn_bq_ingest.main.main(test_event, None)
     did_second_invocation_raise = False
     try:
-        main.main(test_event, None)
+        gcs_ocn_bq_ingest.main.main(test_event, None)
     except RuntimeError:
         did_second_invocation_raise = True
     assert did_second_invocation_raise
@@ -114,7 +114,7 @@ def test_load_job_truncating_batches(bq, gcs_batched_data,
                 "objectId": gcs_data.name
             }
         }
-        main.main(test_event, None)
+        gcs_ocn_bq_ingest.main.main(test_event, None)
         test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
                                       "nation", "part-m-00001")
         expected_num_rows = sum(1 for _ in open(test_data_file))
@@ -144,7 +144,7 @@ def test_load_job_appending_batches(bq, gcs_batched_data, dest_dataset,
                 "objectId": gcs_data.name
             }
         }
-        main.main(test_event, None)
+        gcs_ocn_bq_ingest.main.main(test_event, None)
         bq_wait_for_rows(bq, dest_table, expected_counts[i])
 
 
@@ -155,9 +155,9 @@ def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
     with bq_transform.sql and external.json
     """
     if not gcs_data.exists():
-        raise NotFound("test data objects must exist")
+        raise google.cloud.exceptions.NotFound("test data objects must exist")
     if not all((blob.exists() for blob in gcs_external_config)):
-        raise NotFound("config objects must exist")
+        raise google.cloud.exceptions.NotFound("config objects must exist")
 
     test_event = {
         "attributes": {
@@ -165,7 +165,7 @@ def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
             "objectId": gcs_data.name
         }
     }
-    main.main(test_event, None)
+    gcs_ocn_bq_ingest.main.main(test_event, None)
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
     expected_num_rows = sum(1 for _ in open(test_data_file))
@@ -197,7 +197,7 @@ def test_load_job_partitioned(bq, gcs_partitioned_data,
                 "objectId": gcs_data.name
             }
         }
-        main.main(test_event, None)
+        gcs_ocn_bq_ingest.main.main(test_event, None)
     expected_num_rows = 0
     for part in [
             "$2017041101",
@@ -219,9 +219,9 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
     flaky.
     """
 
-    start_poll = monotonic()
+    start_poll = time.monotonic()
     actual_num_rows = 0
-    while monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
+    while time.monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
         bq_table: bigquery.Table = bq_client.get_table(table)
         actual_num_rows = bq_table.num_rows
         if actual_num_rows == expected_num_rows:

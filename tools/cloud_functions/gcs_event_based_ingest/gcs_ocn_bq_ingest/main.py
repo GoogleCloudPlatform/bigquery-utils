@@ -16,19 +16,19 @@
 # limitations under the License.
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
+import collections
 import json
+import os
+import pathlib
 import re
-from collections import deque
-from os import getenv
-from pathlib import Path
-from time import monotonic, sleep
+import time
 from typing import Any, Deque, Dict, List, Optional, Tuple
 
-from cachetools import TTLCache, cached
-from google.api_core.client_info import ClientInfo
-from google.api_core.exceptions import PreconditionFailed
+import cachetools
+import google.api_core.client_info
+import google.api_core.exceptions as api_core_exceptions
+import google.cloud.exceptions as cloud_exceptions
 from google.cloud import bigquery, storage
-from google.cloud.exceptions import NotFound
 
 # https://cloud.google.com/bigquery/quotas#load_jobs
 # 15TB per BQ load job (soft limit).
@@ -42,7 +42,7 @@ DEFAULT_EXTERNAL_TABLE_DEFINITION = {
 
 DEFAULT_JOB_LABELS = {
     "component": "event-based-gcs-ingest",
-    "cloud-function-name": getenv("FUNCTION_NAME"),
+    "cloud-function-name": os.getenv("FUNCTION_NAME"),
 }
 
 BASE_LOAD_JOB_CONFIG = {
@@ -72,7 +72,7 @@ DEFAULT_DESTINATION_REGEX = (
 # One might consider lowering this to 1-2 seconds to lower the
 # upper bound of expected execution time to stay within the free tier.
 # https://cloud.google.com/functions/pricing#free_tier
-WAIT_FOR_JOB_SECONDS = int(getenv("WAIT_FOR_JOB_SECONDS", "5"))
+WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "5"))
 
 # Use caution when lowering the job polling rate.
 # Keep in mind that many concurrent executions of this cloud function should not
@@ -80,9 +80,10 @@ WAIT_FOR_JOB_SECONDS = int(getenv("WAIT_FOR_JOB_SECONDS", "5"))
 # https://cloud.google.com/bigquery/quotas#all_api_requests
 JOB_POLL_INTERVAL_SECONDS = 1
 
-SUCCESS_FILENAME = getenv("SUCCESS_FILENAME", "_SUCCESS")
+SUCCESS_FILENAME = os.getenv("SUCCESS_FILENAME", "_SUCCESS")
 
-CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
+CLIENT_INFO = google.api_core.client_info.ClientInfo(
+    user_agent="google-pso-tool/bq-severless-loader")
 
 DEFAULT_JOB_PREFIX = "gcf-ingest-"
 
@@ -93,7 +94,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     # pylint: disable=too-many-locals
     # Set by Cloud Function Execution Environment
     # https://cloud.google.com/functions/docs/env-var
-    destination_regex = getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
+    destination_regex = os.getenv("DESTINATION_REGEX",
+                                  DEFAULT_DESTINATION_REGEX)
     dest_re = re.compile(destination_regex)
 
     bucket_id, object_id = parse_notification(event)
@@ -128,8 +130,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
             f"Object ID {object_id} did not match dataset and table in regex:"
             f" {destination_regex}") from KeyError
     partition = destination_details.get('partition')
-    year, month, day, hour = (destination_details.get(key, "")
-                              for key in ('yyyy', 'mm', 'dd', 'hh'))
+    year, month, day, hour = (
+        destination_details.get(key, "") for key in ('yyyy', 'mm', 'dd', 'hh'))
     part_list = (year, month, day, hour)
     if not partition and any(part_list):
         partition = '$' + ''.join(part_list)
@@ -196,7 +198,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     if len(table_partition) < 2:
         # If there is no partition put a None placeholder
         table_partition.append("None")
-    return f"{getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
+    return f"{os.getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
         f"{dest_table_ref.dataset_id}-" \
         f"{'-'.join(table_partition)}-" \
         f"{batch_id}-"
@@ -241,14 +243,14 @@ def external_query(  # pylint: disable=too-many-arguments
 
     print(f"started asynchronous query job: {job.job_id}")
 
-    start_poll_for_errors = monotonic()
+    start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
             raise RuntimeError(
                 f"query job {job.job_id} failed quickly: {job.errors}")
-        sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
 def flatten2dlist(arr: List[List[Any]]) -> List[Any]:
@@ -274,21 +276,20 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
             job_id_prefix=f"{job_id_prefix}{batch_num}-of-{batch_count}-",
         )
 
-        print(
-            f"started asyncronous bigquery load job with id: {job.job_id} for"
-            f" {gsurl}")
+        print(f"started asyncronous bigquery load job with id: {job.job_id} for"
+              f" {gsurl}")
         jobs.append(job)
 
-    start_poll_for_errors = monotonic()
+    start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         # Check if job failed quickly
         for job in jobs:
             job.reload()
             if job.errors:
                 raise RuntimeError(
                     f"load job {job.job_id} failed quickly: {job.errors}")
-        sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
 def handle_duplicate_notification(bkt: storage.Bucket,
@@ -309,7 +310,7 @@ def handle_duplicate_notification(bkt: storage.Bucket,
         f"_claimed_{success_created_unix_timestamp}")
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
-    except PreconditionFailed as err:
+    except api_core_exceptions.PreconditionFailed as err:
         raise RuntimeError(
             f"The prefix {gsurl} appears to already have been claimed for "
             f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
@@ -322,7 +323,7 @@ def handle_duplicate_notification(bkt: storage.Bucket,
 
 def _get_parent_config_file(storage_client, config_filename, bucket, path):
     config_dir_name = "_config"
-    parent_path = Path(path).parent
+    parent_path = pathlib.Path(path).parent
     config_path = parent_path / config_dir_name / config_filename
     return read_gcs_file_if_exists(storage_client,
                                    f"gs://{bucket}/{config_path}")
@@ -366,7 +367,7 @@ def construct_load_job_config(storage_client: storage.Client,
         return _get_parent_config_file(storage_client, config_filename,
                                        bucket_name, path)
 
-    config_q: Deque[Dict[str, Any]] = deque()
+    config_q: Deque[Dict[str, Any]] = collections.deque()
     config_q.append(BASE_LOAD_JOB_CONFIG)
     while parts:
         config = _get_parent_config("/".join(parts))
@@ -402,7 +403,7 @@ def get_batches_for_prefix(gcs_client: storage.Client,
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
-    max_batch_size = int(getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES))
+    max_batch_size = int(os.getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES))
     batch: List[str] = []
     for blob in blobs:
         # API returns root prefix also. Which should be ignored.
@@ -486,7 +487,7 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
 # should not be changing during the function's lifetime as this would lead to
 # non-deterministic results with or without this cache.
 # https://cloud.google.com/storage/quotas
-@cached(TTLCache(maxsize=1024, ttl=1))
+@cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
 def read_gcs_file(gcs_client: storage.Client, gsurl: str) -> str:
     """
     Read a GCS object as a string
@@ -507,12 +508,12 @@ def read_gcs_file_if_exists(gcs_client: storage.Client,
     """
     try:
         return read_gcs_file(gcs_client, gsurl)
-    except NotFound:
+    except cloud_exceptions.NotFound:
         return None
 
 
 # Cache bucket lookups (see reasoning in comment above)
-@cached(TTLCache(maxsize=1024, ttl=1))
+@cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
 def get_bucket_or_raise(
     gcs_client: storage.Client,
     bucket_id: str,
@@ -522,7 +523,8 @@ def get_bucket_or_raise(
     bkt: Optional[storage.Bucket] = gcs_client.lookup_bucket(bucket_id)
     if bkt:
         return bkt
-    raise NotFound(f"google cloud storage bucket: gs://{bucket_id} not found.")
+    raise cloud_exceptions.NotFound(
+        f"google cloud storage bucket: gs://{bucket_id} not found.")
 
 
 def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:

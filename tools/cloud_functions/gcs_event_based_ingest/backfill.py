@@ -13,20 +13,21 @@
 # limitations under the License.
 """ Command Line utility for backfilling gcs_ocn_bq_ingest cloud function
 """
+import argparse
 import concurrent.futures
 import logging
 import os
 import pprint
 import sys
-from argparse import ArgumentParser, Namespace
 from typing import Dict, Iterator, List
 
-from google.api_core.client_info import ClientInfo
+import google.api_core.client_info
 from google.cloud import storage
 
-import gcs_ocn_bq_ingest  # pylint: disable=import-error
+import gcs_ocn_bq_ingest.main  # pylint: disable=import-error
 
-CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
+CLIENT_INFO = google.api_core.client_info.ClientInfo(
+    user_agent="google-pso-tool/bq-severless-loader-cli")
 
 os.environ["FUNCTION_NAME"] = "backfill-cli"
 
@@ -52,7 +53,7 @@ def find_blobs_with_suffix(
                                       prefix=prefix_blob.name))
 
 
-def main(args: Namespace):
+def main(args: argparse.Namespace):
     """main entry point for backfill CLI."""
     gcs_client: storage.Client = storage.Client(client_info=CLIENT_INFO)
     pubsub_client = None
@@ -113,9 +114,9 @@ def main(args: Namespace):
                                pprint.pformat(exceptions))
 
 
-def parse_args(args: List[str]) -> Namespace:
+def parse_args(args: List[str]) -> argparse.Namespace:
     """argument parser for backfill CLI"""
-    parser = ArgumentParser(
+    parser = argparse.ArgumentParser(
         description="utility to backfill success file notifications "
         "or run the cloud function locally in concurrent threads.")
 

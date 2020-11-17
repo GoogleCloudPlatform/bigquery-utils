@@ -13,7 +13,7 @@
 # limitations under the License.
 """integrtion tests for gcs_ocn_bq_ingest"""
 import os
-from time import monotonic
+import time
 
 import backfill
 import pytest
@@ -72,9 +72,9 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
   flaky.
   """
 
-    start_poll = monotonic()
+    start_poll = time.monotonic()
     actual_num_rows = 0
-    while monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
+    while time.monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
         bq_table: bigquery.Table = bq_client.get_table(table)
         actual_num_rows = bq_table.num_rows
         if actual_num_rows == expected_num_rows:
