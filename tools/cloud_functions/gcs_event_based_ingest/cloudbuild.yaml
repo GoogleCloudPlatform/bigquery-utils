@@ -103,7 +103,6 @@ steps:
     - 'mypy-tests'
     - 'terraform-fmt'
   args:
-    - '--workers=auto'
     - '-m'
     - 'not IT'
   id: 'unit-test'
@@ -112,7 +111,6 @@ steps:
     - 'build-ci-image'
     - 'unit-test'
   args:
-    - '--workers=auto'
     - '--maxfail=1'
     - '-m'
     - 'IT'
