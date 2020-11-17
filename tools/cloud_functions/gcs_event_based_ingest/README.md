@@ -68,13 +68,13 @@ In this case we can take advantage of a more known rigid structure so our regex
 is simpler (no optional capturing groups, optional slashes).
 Note, we can use the `region=` string (which may have been partitioned on
 in an  upstream system such as Hive) as a batch ID because we might expect that
-an hourly partition might have mutliple directories that upload to it.
+an hourly partition might have multiple directories that upload to it.
 (e.g. US, GB, etc). Because it is all named capturing groups we don't have any
 strict ordering restrictions about batch id appearing before / after partition
 information.
 
 ### Dealing with Different Naming Conventions in the Same Bucket
-In most cases, it would be recommeneded to have separate buckets / deployment 
+In most cases, it would be recommended to have separate buckets / deployment 
 of the Cloud Function for each naming convention as this typically means that
 the upstream systems are governed by different teams.
 
@@ -204,7 +204,7 @@ BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/
 If more granular data is needed about a particular job id 
 
 ### Job Naming Convention
-All load or external query jobs will have a job id witha  prefix following this convention:
+All load or external query jobs will have a job id with a  prefix following this convention:
 ```python3
 job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}"
 ```
@@ -309,7 +309,7 @@ incur a small cost. These resources will be spun up based on your Google Cloud S
 #### Pytest Fixtures
 All Pytest fixtures are DRY-ed up into `tests/conftest.py`
 This is mostly to share fixtures between the main integration test for the cloud function
-and the integrationt tests for the backfill CLI.
+and the integration tests for the backfill CLI.
 See more info on sharing pytest fixtures in the [pytest docs](https://docs.pytest.org/en/stable/fixture.html#conftest-py-sharing-fixture-functions).
 
 #### Running All Tests
@@ -404,7 +404,7 @@ optional arguments:
   --success-filename SUCCESS_FILENAME, -f SUCCESS_FILENAME
                         Override the default success filename '_SUCCESS'
   --destination-regex DESTINATION_REGEX, -r DESTINATION_REGEX
-                        Override the default destination regex for determining BigQuerydestination based on information encoded in the GCS path of thesuccess file
+                        Override the default destination regex for determining BigQuery destination based on information encoded in the GCS path of the success file
 ```
 
 ## Alternatives
