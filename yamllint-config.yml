@@ -11,13 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This software is provided as-is,
+# without warranty or representation for any use or purpose.
+# Your use of it is subject to your agreement with Google.
 
-terraform {
-  required_version = ">= 0.12"
+---
+extends: default
 
-  required_providers {
-    google   = ">= 3.38.0"
-    archive  = "~> 2.0.0"
-    template = "~> 2.2.0"
-  }
-}
+rules:
+  line-length:
+    max: 110

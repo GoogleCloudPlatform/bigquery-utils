@@ -23,4 +23,3 @@ def test_add_queries():
 
     new_log.log_queries(test_queries, "mock-url")
     assert(len(new_log.batch_data) == 3)
-

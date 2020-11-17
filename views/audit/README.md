@@ -125,4 +125,3 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
     jobChange.jobStats.startTime
   LIMIT 100
   ```
-

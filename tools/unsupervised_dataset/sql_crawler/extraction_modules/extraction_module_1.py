@@ -19,5 +19,3 @@ class ExtractionModule1:
         for block in code_blocks:
             queries += [block.contents[0]]
         return queries
-
-
