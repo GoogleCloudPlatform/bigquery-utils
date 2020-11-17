@@ -142,4 +142,3 @@ TEST_F(LocalServiceTest, FixColumnNotGrouped) {
             "LIMIT 1000\n", response.fixed_query());
 }
 }
-

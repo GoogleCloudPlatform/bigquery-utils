@@ -15,7 +15,7 @@
  */
 
 CREATE OR REPLACE FUNCTION fn.freq_table(arr ANY TYPE) AS ((
-  SELECT 
+  SELECT
     STRUCT(x as value, COUNT(1) as freq) as entry
   FROM UNNEST(arr) AS x
   GROUP BY x

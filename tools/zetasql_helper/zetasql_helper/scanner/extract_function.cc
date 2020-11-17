@@ -84,4 +84,3 @@ absl::Status ExtractFunctionRange(absl::string_view query,
 }
 
 }
-

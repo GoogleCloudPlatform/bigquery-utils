@@ -59,7 +59,7 @@ public class User {
   public void setNumRows(int numRows) {
     this.numRows = numRows;
   }
-  
+
   public int getNumQueries() {
     return numQueries;
   }

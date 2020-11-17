@@ -17,7 +17,7 @@
 CREATE OR REPLACE FUNCTION fn.translate(
   expression STRING,
   characters_to_replace STRING,
-  characters_to_substitute STRING) 
+  characters_to_substitute STRING)
 AS (
   IF(
       LENGTH(characters_to_replace) < LENGTH(characters_to_substitute)
@@ -25,8 +25,8 @@ AS (
       expression,
       (
         SELECT
-          STRING_AGG( 
-           	  IFNULL( 
+          STRING_AGG(
+           	  IFNULL(
            	      (
                     SELECT
                       ARRAY_CONCAT([c], SPLIT(characters_to_substitute, ''))
@@ -38,9 +38,9 @@ AS (
                             WHERE k = c
                           ))]
                   ),
-                  ''), 
+                  ''),
            	  '' ORDER BY o1)
         FROM UNNEST(SPLIT(expression, '')) AS c
         WITH OFFSET o1
-      )) 
+      ))
 );

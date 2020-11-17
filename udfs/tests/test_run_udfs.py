@@ -15,11 +15,10 @@
 import unittest
 from pathlib import Path
 
+import udf_test_utils as utils
 from google.api_core.exceptions import GoogleAPICallError
 from google.cloud import bigquery
 from parameterized import parameterized
-
-import udf_test_utils as utils
 
 
 class TestRunUDFs(unittest.TestCase):

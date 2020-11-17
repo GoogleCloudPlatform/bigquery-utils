@@ -92,7 +92,7 @@ class ConfidenceRater {
         var count = 0
         for ((index, token) in tokenize(query.literal).withIndex()) {
             var localCount = if (token.toUpperCase() in keywords) 1 else 0
-            
+
             // give more points for keywords found at the start of the query
             if (index == 0 && localCount > 0) {
                 localCount++

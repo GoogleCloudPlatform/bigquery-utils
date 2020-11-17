@@ -199,7 +199,7 @@ WITH jobChangeEvent AS (
       '$.jobChange.job.jobConfig.tableCopyConfig.sourceTables'),
       '["'),'"]') ,'","') AS tableCopySourceTables,
     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-      '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated') 
+      '$.jobChange.job.jobConfig.tableCopyConfig.sourceTablesTruncated')
       AS BOOL) AS tableCopyConfigSourceTablesTruncated,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.tableCopyConfig.destinationTable') AS tableCopyConfigDestinationTable,

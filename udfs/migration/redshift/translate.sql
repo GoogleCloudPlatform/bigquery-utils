@@ -17,7 +17,7 @@
 CREATE OR REPLACE FUNCTION rs.translate(
   expression STRING,
   characters_to_replace STRING,
-  characters_to_substitute STRING) 
+  characters_to_substitute STRING)
 AS (
   bqutil.fn.translate(expression, characters_to_replace, characters_to_substitute)
 );

@@ -15,15 +15,15 @@
  */
 
 -- factorial:
--- Computes the factorial of its input. The input argument must be an integer expression in the range of 0 to 27. 
--- Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake. 
+-- Computes the factorial of its input. The input argument must be an integer expression in the range of 0 to 27.
+-- Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake.
 -- Input:
 -- integer_expr: INT64
 -- Output: NUMERIC
 CREATE OR REPLACE FUNCTION sf.factorial(integer_expr INT64) AS (
   (
-    SELECT 
-      ARRAY<NUMERIC>[ 
+    SELECT
+      ARRAY<NUMERIC>[
         1.0,
         1.0,
         2.0,
@@ -51,6 +51,6 @@ CREATE OR REPLACE FUNCTION sf.factorial(integer_expr INT64) AS (
         620448401733239439360000.0,
         15511210043330985984000000.0,
         403291461126605635584000000.0,
-        10888869450418352160768000000.0][OFFSET(integer_expr)] 
+        10888869450418352160768000000.0][OFFSET(integer_expr)]
   )
 );

@@ -11,5 +11,5 @@ FROM `bqutil.billing.billing_dashboard_export`
 LEFT JOIN UNNEST(labels) AS labels
 WHERE
   labels.key = 'environment'
-  AND labels.value IS NOT NULL 
+  AND labels.value IS NOT NULL
 GROUP BY environment

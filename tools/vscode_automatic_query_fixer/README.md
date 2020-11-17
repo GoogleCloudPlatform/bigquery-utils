@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Automatic Query Fixer VS Code Extension](#automatic-query-fixer-vs-code-extension)
+  - [Features](#features)
+  - [Requirements](#requirements)
+  - [Quick Setup and Run](#quick-setup-and-run)
+  - [Extension Settings](#extension-settings)
+  - [Release Notes](#release-notes)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Automatic Query Fixer VS Code Extension
 
 Displays errors found by Auto Fixer and suggestions on how to fix them.

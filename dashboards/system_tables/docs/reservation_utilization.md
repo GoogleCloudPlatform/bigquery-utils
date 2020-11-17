@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Reservation Utilization Report](#reservation-utilization-report)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Reservation Utilization Report
 The Reservation Utilization Report gives an overview of an organization’s current assignments and reservation utilization in the last 7 and 30 days.
 

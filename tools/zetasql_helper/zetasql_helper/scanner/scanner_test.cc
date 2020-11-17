@@ -75,4 +75,3 @@ TEST_F(LocationTest, ExtractFunction) {
   EXPECT_EQ("10232", range_to_string(query, output->arguments[0]));
 
 }
-

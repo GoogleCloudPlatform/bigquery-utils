@@ -113,4 +113,3 @@ absl::Status ZetaSqlHelperLocalServiceImpl::FixDuplicateColumns(
 }
 
 }//bigquery::utils::zetasql_helper::local_service
-

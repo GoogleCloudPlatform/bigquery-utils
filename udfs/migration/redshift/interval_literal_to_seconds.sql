@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION rs.interval_literal_to_seconds(interval_literal STRING) 
-AS ( 
-  /* For intervals in Redshift, there are 360 days in a year. */ 
+CREATE OR REPLACE FUNCTION rs.interval_literal_to_seconds(interval_literal STRING)
+AS (
+  /* For intervals in Redshift, there are 360 days in a year. */
   (
     SELECT
       SUM(
@@ -29,13 +29,13 @@ AS (
             WHEN unit IN ('years', 'year') THEN num * 60 * 60 * 24 * 360
             ELSE num
             END)
-    FROM 
+    FROM
       (
         SELECT
           CAST(REGEXP_EXTRACT(value, r'^[0-9]*\.?[0-9]+') AS numeric) num,
           SUBSTR(value, LENGTH(REGEXP_EXTRACT(value, r'^[0-9]*\.?[0-9]+')) + 1) unit
         FROM
-          UNNEST(SPLIT(REPLACE(interval_literal, ' ', ''), ',')) value 
+          UNNEST(SPLIT(REPLACE(interval_literal, ' ', ''), ',')) value
       )
-  ) 
+  )
 );

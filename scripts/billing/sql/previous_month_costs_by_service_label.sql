@@ -10,7 +10,7 @@ SELECT
   labels.value AS label_value,
   service.description AS description,
   SUM(cost) AS costs,
-  ROUND(SUM(credits.amount), 2) AS credits 
+  ROUND(SUM(credits.amount), 2) AS credits
 FROM `bqutil.billing.billing_dashboard_export`
 LEFT JOIN UNNEST(labels) AS labels
 LEFT JOIN UNNEST(credits) AS credits

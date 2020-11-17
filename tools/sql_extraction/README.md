@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [SQL Extraction](#sql-extraction)
+  - [Usage](#usage)
+  - [Building](#building)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # SQL Extraction
 
 ![SQL Extraction](https://github.com/GoogleCloudPlatform/bigquery-utils/workflows/SQL%20Extraction/badge.svg)

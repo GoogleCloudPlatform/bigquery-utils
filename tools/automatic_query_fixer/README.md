@@ -1,8 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [AutomaticQueryFixer](#automaticqueryfixer)
+  - [Prerequisite](#prerequisite)
+  - [Build the Query Fixer](#build-the-query-fixer)
+  - [Run the Query Fixer](#run-the-query-fixer)
+  - [Input Flag](#input-flag)
+  - [Project Structure](#project-structure)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # AutomaticQueryFixer
 
 This directory contains a command-line application that can automatically fix multiple common errors
-of BigQuery SQL queries without changing the semantics of queries. It will output the fixed query 
-to the CLI if the query is fixed successfully. It will print the error message if it fails to fix the 
+of BigQuery SQL queries without changing the semantics of queries. It will output the fixed query
+to the CLI if the query is fixed successfully. It will print the error message if it fails to fix the
 query.
 
 ## Prerequisite
@@ -38,7 +51,7 @@ If you would like to examine the test cases, please run the tests:
 ```
 
 ### Example Query to fix
-The project prepares a few incorrect sql to fix. Please try out with the following command. If you 
+The project prepares a few incorrect sql to fix. Please try out with the following command. If you
 are using windows, replace `AutomaticQueryFixer` with `AutomaticQueryFixer.bat`.
 
 ```bash
@@ -85,11 +98,11 @@ Options:
 ```
 
 ### Credential
-`-c` is used to specify the path to your Google Cloud Platform (GCP) Credentials. If you don't know to create one, 
-please click [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys). After you download your 
+`-c` is used to specify the path to your Google Cloud Platform (GCP) Credentials. If you don't know to create one,
+please click [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys). After you download your
 GCP credentials, specify its path to the query fixer by using `-c "path/to/credentials"`.
 
-Besides service account, you could use your user account's credentials to start the query fixer. First, download the 
+Besides service account, you could use your user account's credentials to start the query fixer. First, download the
 [gcloud](https://cloud.google.com/sdk/install), then call this command:
 
 ```bash
@@ -101,12 +114,12 @@ be able to detect your user credentials and connect to the BigQuery server.
 
 ### Interactive Mode
 `-m` flag can choose the mode of the query fixer. There are three modes: Auto, User-assisted, and Suggestion mode. They
-decide the involvement of users. 
+decide the involvement of users.
 
 #### Auto mode
-It is activated by `-m auto`. Auto mode means no interaction. It continually tries to fix every error in a query 
-until the query is correct or unable to be fixed. If an error can be fixed in multiple ways, then the first method 
-will be selected. In this mode, the query fixer takes the input query and outputs the final fix results 
+It is activated by `-m auto`. Auto mode means no interaction. It continually tries to fix every error in a query
+until the query is correct or unable to be fixed. If an error can be fixed in multiple ways, then the first method
+will be selected. In this mode, the query fixer takes the input query and outputs the final fix results
 without interacting with users during the fix process.
 
 Here is an example of Auto Mode:
@@ -145,9 +158,9 @@ The input query is valid. No errors to fix.
 ```
 
 #### User-assisted mode
-It is activated by `-m ua`. It does not interact with users until it needs an instruction from the users. 
-It continually fixes errors in a query until the query is correct or unable to be fixed. However, If an error 
-can be fixed in multiple ways, then the program will request users to choose one of the fix options 
+It is activated by `-m ua`. It does not interact with users until it needs an instruction from the users.
+It continually fixes errors in a query until the query is correct or unable to be fixed. However, If an error
+can be fixed in multiple ways, then the program will request users to choose one of the fix options
 by entering their number.
 
 Here is an example that asks a user to choose one option:
@@ -174,9 +187,9 @@ Enter the option you use to fix the query:
 ```
 
 #### Suggestion mode
-It is activated by `-m sg`. This mode only fixes one error of an input query if an error exists. 
-Then outputs all the Fix Result to users. This mode is useful if a user would like to review individual 
-fixes before the query fixer corrects the next error based on the previous result. This mode can also be 
+It is activated by `-m sg`. This mode only fixes one error of an input query if an error exists.
+Then outputs all the Fix Result to users. This mode is useful if a user would like to review individual
+fixes before the query fixer corrects the next error based on the previous result. This mode can also be
 integrated with frontend to provide fixing suggestions in a UI.
 
 Here is an example of the suggestion mode:
@@ -202,11 +215,11 @@ LIMIT 10
 `-o` represents the output format in the program input flag. It has “natural language” and “json” format.
 
 #### Natural Language format
-This is the default version, which can be explicitly turned on by `-o natural`. It prints all the fixing results 
+This is the default version, which can be explicitly turned on by `-o natural`. It prints all the fixing results
 in natural language.  It is primarily used to interact with users when they use the query fixer directly.
 
 #### JSON format
-This mode can be turned on by `-o json`.This format is allowed when the query fixer is in Auto or Suggestion mode. 
+This mode can be turned on by `-o json`.This format is allowed when the query fixer is in Auto or Suggestion mode.
 It prints out all the fixing results in JSON format. Here is an example:
 
 ```json
@@ -230,7 +243,7 @@ It prints out all the fixing results in JSON format. Here is an example:
 }
 ```
 
-Suggestion mode will output a single Structure while Auto mode will output a list of structure. 
+Suggestion mode will output a single Structure while Auto mode will output a list of structure.
 Each structure represents one fixing result.
 
 ## Project Structure
@@ -294,16 +307,16 @@ Suppose we are `src/main/java.com.google.cloud.bigquery.utils.queryfixer` direct
 
 * Define the error class of the BigQuery error you would like to fix, Please refer to other
  error classes in `errors` directory.
- 
+
 * Define the parsing logic (information extraction) of your error class in `errors/SqlErrorFactory`.
 The `getError` method in this factory converts a `BigQueryException` to the instance of an error class.
 
-* Define the corresponding `Fixer` class in `fixer` directory. Please refer to other fixer classes in 
+* Define the corresponding `Fixer` class in `fixer` directory. Please refer to other fixer classes in
 this directory.
 
 * Implement the `fix` method of your fixer class.
 
-* Implement the logic to get a fixer from an BigQuery error in `fixer/FixerFactory` class. It should be 
+* Implement the logic to get a fixer from an BigQuery error in `fixer/FixerFactory` class. It should be
 implemented inside `getFixer` method.
 
 * Write the unit tests like other fixers.

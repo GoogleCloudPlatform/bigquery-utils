@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [BigQuery Serverless Ingest](#bigquery-serverless-ingest)
+  - [GCS Object Naming Convention](#gcs-object-naming-convention)
+  - [Handling Incremental Loads](#handling-incremental-loads)
+  - [Monitoring](#monitoring)
+  - [Triggers](#triggers)
+  - [Continuous Integration](#continuous-integration)
+  - [Deployment](#deployment)
+  - [Alternatives](#alternatives)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # BigQuery Serverless Ingest
 
 Flexible service for performing  BigQuery file loads to existing tables.
@@ -106,7 +121,7 @@ This can be helpful in reprocessing scenarios where you'd want to `WRITE_TRUNCAT
 a partition that had some data quality issue.
 
 #### Hive Partitioning
-If your data will be uploaded to GCS from a hadoop system that uses the 
+If your data will be uploaded to GCS from a hadoop system that uses the
 [supported default hive partitioning](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs#supported_data_layouts)
 you can specify this in the [`hivePartitioningOptions`](https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#hivepartitioningoptions)
 key of `load.json` for that table.
@@ -115,12 +130,12 @@ Any non-trivial incremental loading to partitions should usually use the
 Transformation SQL to define the `INSERT / MERGE / UPDATE / DELETE` logic into
 the target BQ table as these DML semantics are much more flexible thant the load
 job write dispositions.
-Furthermore, using external query has the added benefit of circumventing the 
+Furthermore, using external query has the added benefit of circumventing the
 per load job bytes limits (default 15 TB) and commiting large partitions
 atomically.
 
 ## Handling Incremental Loads
-This solution introduces the concept of `batch_id` which uniquely identifies 
+This solution introduces the concept of `batch_id` which uniquely identifies
 a batch of data committed by an upstream system that needs to be picked up as an
 incremental load. You can again set the load job or external query configuration
 at any parent folders `_config` prefix. This allows you dictate
@@ -130,7 +145,7 @@ or "for that table any new batch should `WRITE_APPEND` to it's parent partition/
 ## Monitoring
 Monitoring what data has been loaded by this solution should be done with the
 BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
-If more granular data is needed about a particular job id 
+If more granular data is needed about a particular job id
 
 ### Job Naming Convention
 All load or external query jobs will have a job id witha  prefix following this convention:
@@ -249,12 +264,12 @@ driven ingest to BigQuery from GCS that achieves batching based on window
 in processing time (as driven by Cloud Scheduler). BQ Tail has nice features for
 triggering Post actions (BQ queries / GCS file moves or deletes) once the data
 is ingested, and slack notifications. bqtail is well suited for use cases where
-the atomicity of event partition is not important (e.g. many distributed 
-publishers uploading logs to GCS). Due to dependency of certain features of 
+the atomicity of event partition is not important (e.g. many distributed
+publishers uploading logs to GCS). Due to dependency of certain features of
 bqtail on Cloud Scheduler it cannot be used inside VPC-SC perimeters.
 This tool might be more appropriate when the publisher is authoritative on the
 atomicity of batches (e.g. an upstream  hadoop job responsible for commiting an
-event time hour's worth of data). 
+event time hour's worth of data).
 
 ### BigQuery Data Transfer Service
 [Cloud Storage Transfer](https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer)

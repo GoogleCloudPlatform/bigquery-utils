@@ -1,8 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Billing Analytics - BigQuery SQL Examples](#billing-analytics---bigquery-sql-examples)
+  - [Example Queries](#example-queries)
+  - [Useful Links](#useful-links)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Billing Analytics - BigQuery SQL Examples
 
 In addition to the Billing product available within the GCP Console, you may want to export billing data to BigQuery for custom analytics.  Below are some example queries to help get you started using the standard data export format.  See the [links below](#useful-links) to learn more about GCP billing datasets including how to export your own billing data for analysis.
 
-The example SQL snippets below reference a sample billing export available as a public dataset in BigQuery (**`bqutil.billing.billing_dashboard_export`**).  You will need to replace references to this table with your own project and dataset. 
+The example SQL snippets below reference a sample billing export available as a public dataset in BigQuery (**`bqutil.billing.billing_dashboard_export`**).  You will need to replace references to this table with your own project and dataset.
 
 ## Example Queries
 

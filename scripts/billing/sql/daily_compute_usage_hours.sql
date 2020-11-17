@@ -3,7 +3,7 @@ Query returns compute usage hours by sku and component on a daily basis
 */
 
 SELECT
-  FORMAT_DATETIME('%Y%m%d', DATETIME(usage_end_time)) AS date_ymd, 
+  FORMAT_DATETIME('%Y%m%d', DATETIME(usage_end_time)) AS date_ymd,
   sku.id AS sku_id,
   sku.description AS component,
   SUM(usage.amount) AS component_usage,

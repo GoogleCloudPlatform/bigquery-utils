@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [SQL Template Generation](#sql-template-generation)
+  - [Organization](#organization)
+  - [Building with Maven](#building-with-maven)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # SQL Template Generation
 
 This directory contains the SQL template-based generation project.

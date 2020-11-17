@@ -11,7 +11,7 @@ CREATE OR REPLACE PROCEDURE bqutil.procedure.GetNextIds (id_count INT64, OUT nex
 BEGIN
   DECLARE id_start INT64 DEFAULT (SELECT COUNT(*) FROM bqutil.procedure.Ids);
   SET next_ids = GENERATE_ARRAY(id_start, id_start + id_count);
- 
+
   MERGE bqutil.procedure.Ids
   USING UNNEST(next_ids) AS new_id
   ON id = new_id

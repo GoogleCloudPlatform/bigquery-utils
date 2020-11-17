@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Example Output](#example-output)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Example Output
 The resulting table will include costs from all GCE SKUs. SKUs to which CUD or SUD have been applied will show both the credit $ amount and the usage amount offset by the credit. This is the schema of the output table, along with an example value.
 

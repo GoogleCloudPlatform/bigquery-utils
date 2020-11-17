@@ -150,6 +150,3 @@ zetasql::ASTGroupingItem* NewGroupingColumn(
 }
 
 } //bigquery::utils::zetasql_helper
-
-
-

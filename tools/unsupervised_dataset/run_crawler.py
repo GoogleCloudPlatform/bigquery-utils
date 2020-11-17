@@ -1,9 +1,11 @@
 """ Script to initialize the SQL crawler on a website of the user's choice """
 
-import sys
 import argparse
 import logging
+import sys
+
 from sql_crawler import crawler
+
 
 def start_crawler():
     """ Parses command-line args and starts the crawler.

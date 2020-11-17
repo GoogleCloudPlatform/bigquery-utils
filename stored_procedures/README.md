@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Stored Procedures](#stored-procedures)
+  - [Stored Procedures](#stored-procedures-1)
+  - [Documentation](#documentation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Stored Procedures
 
 This directory contains [scripting](https://cloud.google.com/bigquery/docs/reference/standard-sql/scripting)

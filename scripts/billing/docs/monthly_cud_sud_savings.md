@@ -1,6 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Example Output](#example-output)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Example Output
-*NOTE: The CUD savings calculated by this query is relative to list price without SUDs. 
-This query does NOT consider the amount of SUDs that you may have earned on your usage, 
+*NOTE: The CUD savings calculated by this query is relative to list price without SUDs.
+This query does NOT consider the amount of SUDs that you may have earned on your usage,
 if you had not purchased CUDs.*
 
 | Invoice month | Usage costs | Commitment costs | CUD credits | Net CUD savings | SUD credits |

@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [SQL Crawler](#sql-crawler)
+  - [Usage](#usage)
+- [SQL Classifier](#sql-classifier)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # SQL Crawler
 
 This directory contains the code to run a universal, unsupervised SQL web crawler. The user provides a starting target URL from which to begin crawling, and has the option to set the maximum depth or size of the crawler.

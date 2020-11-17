@@ -14,21 +14,18 @@
 
 import argparse
 import glob
-
 import os
-from pathlib import Path
 import re
-
-from yaml import load
-from yaml import SafeLoader
+from pathlib import Path
 
 from google.cloud import bigquery
+from yaml import SafeLoader, load
 
 BIGQUERY_TEST_DATASET_MAPPINGS = {
     'netezza': 'nz_test',
     'oracle': 'or_test',
     'redshift': 'rs_test',
-    'snowflake': 'sf_test',    
+    'snowflake': 'sf_test',
     'teradata': 'td_test',
     'vertica': 've_test',
     'community': 'fn_test',

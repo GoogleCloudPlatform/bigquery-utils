@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [BigQuery System Tables Reports](#bigquery-system-tables-reports)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # BigQuery System Tables Reports
 This view illustrates how users can leverage BigQuery's [`INFORMATION_SCHEMA` metadata tables](https://cloud.google.com/bigquery/docs/information-schema-intro) to understand their organization's slot and reservation utilization, job execution, and job errors. Users can use this dashboard and its underlying queries as-is, or use them as a starting point for more complex queries and/or visualizations.
 
@@ -46,8 +54,8 @@ Update the data source to reference your project's `INFORMATION_SCHEMA` tables a
 `region-{region_name}`.INFORMATION_SCHEMA.{table}
 ```
 
-where `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.  
-&nbsp;  
+where `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.
+&nbsp;
 
 If you are using a billing project that is **different** from the administration project, update the data source as follows:
 
@@ -55,13 +63,13 @@ If you are using a billing project that is **different** from the administration
 `{project_id}`.`region-{region_name}`.INFORMATION_SCHEMA.{table}
 ```
 
-where `{project_id}` is the project id of the billing project and `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.  
-&nbsp;  
+where `{project_id}` is the project id of the billing project and `{region_name}` is the name of the region or multi-region where your commitments and reservations are located.
+&nbsp;
 
 When copying the Reservation Utilization data sources, you must also do the following:
 1. Replace all instances `"admin-project:US."` with `"{project_id}:{location}."`, where `{project_id}` is the project id of your administration project and `{location}` is the GCP region or multi-region where they are located.
 2. Replace all instances of `TIMESTAMP("2020-07-15 23:59:59.000 UTC")` with `CURRENT_TIMESTAMP()`.
-&nbsp;  
+&nbsp;
 
 Once all modifications are complete and a Billing Project is specified, click "Reconnect".
 

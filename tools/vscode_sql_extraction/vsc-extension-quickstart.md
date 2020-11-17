@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Welcome to your VS Code Extension](#welcome-to-your-vs-code-extension)
+  - [What's in the folder](#whats-in-the-folder)
+  - [Get up and running straight away](#get-up-and-running-straight-away)
+  - [Make changes](#make-changes)
+  - [Explore the API](#explore-the-api)
+  - [Run tests](#run-tests)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Welcome to your VS Code Extension
 
 ## What's in the folder

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Copyright 2019 Google LLC
+# TODO: This license is not consistent with license used in the project.
+#       Delete the inconsistent license and above line and rerun pre-commit to insert a good license.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,4 +36,3 @@ else
   python3 -m pytest --workers 100 udfs/tests/test_run_udfs.py
   python3 udfs/tests/udf_test_utils.py --delete_test_datasets
 fi
-

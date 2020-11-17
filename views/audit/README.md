@@ -11,23 +11,23 @@ A common pattern in data warehousing for tracking results of DML statements is t
 1.  Define a BigQuery log sink using any of the following methods:
     *   [gcloud command](https://cloud.google.com/bigquery/docs/reference/auditlogs#defining_a_bigquery_log_sink_using_gcloud)
         ```
-        gcloud alpha logging sinks create my-example-sink \ 
+        gcloud alpha logging sinks create my-example-sink \
         bigquery.googleapis.com/projects/my-project-id/datasets/auditlog_dataset \
-        --log-filter='protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobChange.job.jobConfig.queryConfig.statementType="SCRIPT" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason="QUERY")' \ 
+        --log-filter='protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobChange.job.jobConfig.queryConfig.statementType="SCRIPT" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason="QUERY")' \
         --use-partitioned-tables
-        ``` 
-        Note: gcloud **alpha** is needed in order to use the parameter `--use-partitioned-tables` 
+        ```
+        Note: gcloud **alpha** is needed in order to use the parameter `--use-partitioned-tables`
     *   [Cloud Console Logs Viewer](https://cloud.google.com/logging/docs/export/configure_export_v2#dest-create)
         Use this advanced filter:
         #### protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.BigQueryAuditMetadata" AND ( (protoPayload.metadata.jobChange.job.jobConfig.queryConfig.statementType="SCRIPT" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE" ) OR ( protoPayload.metadata.jobChange.job.jobStats.parentJobName!="" AND protoPayload.metadata.jobChange.job.jobStatus.jobState="DONE") OR protoPayload.metadata.tableDataChange.reason!="" OR protoPayload.metadata.tableDataRead.reason!=""  OR protoPayload.metadata.tableDeletion.reason!="" )
         *   [Partitioning](https://cloud.google.com/logging/docs/export/bigquery#partition-tables)
             is not required, but it is strongly recommended to select it for your BigQuery destination
-            
-    Note: You can create a log sink at the folder, billing account, or organization level using an 
+
+    Note: You can create a log sink at the folder, billing account, or organization level using an
     [aggregated sink](https://cloud.google.com/logging/docs/export/aggregated_sinks#creating_an_aggregated_sink).
 1.  The BigQuery audit log tables will be created in your dataset sink destination once you run a BigQuery job post sink creation.
 1.  To use the [big_query_elt_script_logging.sql](/views/audit/big_query_elt_script_logging.sql) view, simply change
-    all occurrences of `project_id.dataset_id` to your own project id and dataset name you used when creating the logging sink. 
+    all occurrences of `project_id.dataset_id` to your own project id and dataset name you used when creating the logging sink.
     Run the following sed command with your own project and dataset IDs to perform this replacement:
     *   `sed
         's/project_id.dataset_id/YOUR_PROJECT_ID.YOUR_DATASET_ID/'
@@ -35,15 +35,15 @@ A common pattern in data warehousing for tracking results of DML statements is t
 1.  Execute the [big_query_elt_script_logging.sql](/views/audit/big_query_elt_script_logging.sql) SQL in your BigQuery console or command line to
     create your view. Once created, you can do further analysis in BigQuery by querying the view, or
     you can connect it to a BI tool such as DataStudio to build dashboards.
-    
+
 #### Usage Examples
-In the following examples, change all occurrences of `project_id.dataset_id` to your own values. 
+In the following examples, change all occurrences of `project_id.dataset_id` to your own values.
 
 * Run the following query to see the 100 most recent BigQuery scripting statements. The results are ordered with the most recent script statement first, and then further ordering is applied using the script's job id and statement start time.
-  
-  
-  ```  
-  SELECT 
+
+
+  ```
+  SELECT
     COALESCE(parentJobId, jobId) AS common_script_job_id,
     jobChange.jobConfig.queryConfig.query,
     jobChange.jobConfig.queryConfig.destinationTable,
@@ -56,25 +56,25 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
     tableDataChange.deletedRowsCount,
     tableDataChange.insertedRowsCount,
   FROM
-    project_id.dataset_id.bq_script_logs 
-  WHERE 
+    project_id.dataset_id.bq_script_logs
+  WHERE
     hasJobChangeEvent
     AND (
       jobChange.jobStats.parentJobName IS NOT NULL
       OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT'
     )
-  ORDER BY 
+  ORDER BY
     eventTimestamp DESC,
     common_script_job_id,
     jobChange.jobStats.startTime
   LIMIT 100
-   
+
   ```
 
-* Run the following query to see the 100 most recent BigQuery scripting statements that modify table data. The results are ordered with the most recent script statement first, and then further ordering is applied using the statement's job id and statement start time. 
+* Run the following query to see the 100 most recent BigQuery scripting statements that modify table data. The results are ordered with the most recent script statement first, and then further ordering is applied using the statement's job id and statement start time.
 
-```  
-  SELECT 
+```
+  SELECT
     parentJobId,
     jobId,
     jobChange.jobConfig.queryConfig.query,
@@ -86,12 +86,12 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
     jobChange.jobStats.endTime,
     jobRuntimeMs,
   FROM
-    project_id.dataset_id.bq_script_logs 
-  WHERE 
+    project_id.dataset_id.bq_script_logs
+  WHERE
     hasJobChangeEvent
-    AND hasTableDataChangeEvent 
+    AND hasTableDataChangeEvent
     AND jobChange.jobStats.parentJobName IS NOT NULL
-  ORDER BY 
+  ORDER BY
     eventTimestamp DESC,
     jobId,
     jobChange.jobStats.startTime
@@ -101,7 +101,7 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
 * Run the following query to see the 100 most recent BigQuery scripting statements which use slot reservations. The results are ordered with the most recent script statement first, and then further ordering is applied using the script's job id and statement start time.
 
   ```
-  SELECT 
+  SELECT
     COALESCE(parentJobId, jobId) AS common_script_job_id,
     jobChange.jobStats.reservationUsage.name,
     jobChange.jobStats.reservationUsage.slotMs,
@@ -111,18 +111,18 @@ In the following examples, change all occurrences of `project_id.dataset_id` to 
     jobChange.jobStats.startTime,
     jobChange.jobStats.endTime,
     jobRuntimeMs,
-  FROM 
-    project_id.dataset_id.bq_script_logs 
-  WHERE 
-    hasJobChangeEvent 
+  FROM
+    project_id.dataset_id.bq_script_logs
+  WHERE
+    hasJobChangeEvent
     AND (
-      (jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL) 
-      OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT' 
+      (jobChange.jobStats.parentJobName IS NOT NULL AND jobChange.jobStats.reservationUsage.slotMs IS NOT NULL)
+      OR jobChange.jobConfig.queryConfig.statementType = 'SCRIPT'
     )
-  ORDER BY 
+  ORDER BY
     eventTimestamp DESC,
     common_script_job_id,
     jobChange.jobStats.startTime
   LIMIT 100
   ```
-  
+

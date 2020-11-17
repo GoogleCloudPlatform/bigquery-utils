@@ -1,6 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [ZetaSQL Helper for BigQuery Utils](#zetasql-helper-for-bigquery-utils)
+  - [Prerequisite](#prerequisite)
+  - [Build the C++ server and its image.](#build-the-c-server-and-its-image)
+  - [Build java client](#build-java-client)
+  - [What functions does it provide and how do I add my own?](#what-functions-does-it-provide-and-how-do-i-add-my-own)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # ZetaSQL Helper for BigQuery Utils
 
-This directory contains both the server and client of ZetaSQL Helper. Its server imports ZetaSQL as 
+This directory contains both the server and client of ZetaSQL Helper. Its server imports ZetaSQL as
 dependency and implements helper functions on top of it. The server and client communicate through RPC
 service (gRPC). The server can be put into a Docker image, so it is OS independent.
 
@@ -44,7 +56,7 @@ bazel build //java/com/google/bigquery/utils/zetasqlhelper:zetasql_helper_client
 
 The built jar exists in `./bazel-bin/java/com/google/bigquery/utils/zetasqlhelper/zetasql_helper_client.jar`.
 
-Copy the jar to your project. The client jar needs to be used with external dependencies. 
+Copy the jar to your project. The client jar needs to be used with external dependencies.
 Here is how to use it in Gradle:
 
 ```groovy
@@ -74,8 +86,8 @@ QueryFunctionRange range =
         ZetaSqlHelper.extractFunctionRange(query, row, column);
 ```
 
-You don't have to set up any connections to a server because the client will automatically check if a docker image 
-has started. If not, the client will pull the image, run it, and expose the port 50051. 
+You don't have to set up any connections to a server because the client will automatically check if a docker image
+has started. If not, the client will pull the image, run it, and expose the port 50051.
 
 Of course you could manually specify the docker image and the connection port like this:
 
@@ -94,8 +106,8 @@ If not, please switch to a user or a group with enough permission.
 
 ## What functions does it provide and how do I add my own?
 Please go to `zetasql_helper/local_service/local_service_rgrpc.h` to check all the RPC functions. Also you
-could check their client caller in `java/com/google/bigquery/utils/zetasqlhelper/ZetaSqlHelper.java`. 
+could check their client caller in `java/com/google/bigquery/utils/zetasqlhelper/ZetaSqlHelper.java`.
 
-If you would like to develop your own RPC functions inside, please first add your RPC definition inside 
+If you would like to develop your own RPC functions inside, please first add your RPC definition inside
 `local_service.proto` at `zetasql_helper/local_service`. Then implement these methods in both the server
 and client mentioned above.

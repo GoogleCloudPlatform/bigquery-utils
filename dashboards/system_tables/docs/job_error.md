@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Job Error Report](#job-error-report)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Job Error Report
 The Job Error Report provides an overview of the types of errors encountered by jobs in the organization.
 

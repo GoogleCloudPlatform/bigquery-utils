@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Daily Utilization Report](#daily-utilization-report)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Daily Utilization Report
 The Daily Utilization Report gives an overview of an organization’s daily slot utilization measured in slot days.
 

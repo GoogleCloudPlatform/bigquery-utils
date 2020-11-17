@@ -1,8 +1,8 @@
 import queue
+
 import requests
-from sql_crawler import cq_node
-from sql_crawler import extractor
-from sql_crawler import crawler_log
+from sql_crawler import cq_node, crawler_log, extractor
+
 
 class Crawler(object):
     """ Contains the functions and logic to run and coordinate the crawling

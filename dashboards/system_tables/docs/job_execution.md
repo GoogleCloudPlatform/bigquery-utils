@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Job Execution Report](#job-execution-report)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Job Execution Report
 The Job Execution Report provides a per-job breakdown of slot utilization among other job statistics. The purpose of this report is to allow users to drill down into individual jobs or understand trends in a specific group of jobs.
 

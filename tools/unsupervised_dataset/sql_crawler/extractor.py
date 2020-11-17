@@ -4,9 +4,10 @@
     This file contains functions to extract links or queries when given an HTML
     response. It also dynamically extracts links based on the URL of the response.
 """
-import urllib
-import bs4
 import re
+import urllib
+
+import bs4
 import sql_crawler.extraction_modules.generic_extraction_module as generic_extraction
 import sql_crawler.extraction_modules.google_extraction_module as google_extraction
 

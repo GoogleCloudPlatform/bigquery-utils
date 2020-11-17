@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [BigQuery Utils](#bigquery-utils)
+  - [Getting Started](#getting-started)
+  - [Public UDFs](#public-udfs)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Disclaimer](#disclaimer)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # BigQuery Utils
 
 BigQuery is a serverless, highly-scalable, and cost-effective cloud data

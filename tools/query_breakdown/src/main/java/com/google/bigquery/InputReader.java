@@ -22,8 +22,8 @@ public class InputReader {
    * Constructor for the class. The constructor will take in a txt file name, use BufferedReader to
    * parse the input, and return all the queries split into a string array format.
    * We also initialize a separate LocationTracker instance per query to keep track of the
-   * original location of the components. Finally, we keep the length of the document for 
-   * performance calculation. 
+   * original location of the components. Finally, we keep the length of the document for
+   * performance calculation.
    */
   public InputReader(String filename) throws IOException {
     BufferedReader reader = new BufferedReader(new FileReader(filename));

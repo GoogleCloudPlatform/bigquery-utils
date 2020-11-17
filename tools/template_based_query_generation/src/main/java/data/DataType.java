@@ -81,4 +81,3 @@ public enum DataType {
   }
 
 }
-

@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [How to Contribute](#how-to-contribute)
+  - [Contributing UDFs (User Defined Functions)](#contributing-udfs-user-defined-functions)
+  - [Contributor License Agreement](#contributor-license-agreement)
+  - [Code reviews](#code-reviews)
+  - [Community Guidelines](#community-guidelines)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # How to Contribute
 
 We'd love to accept your patches and contributions to this project. There are

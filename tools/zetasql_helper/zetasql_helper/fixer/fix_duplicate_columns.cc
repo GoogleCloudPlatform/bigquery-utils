@@ -156,4 +156,3 @@ zetasql::ASTAlias* CreateAliasNode(
 }
 
 } // bigquery::utils::zetasql_helper
-

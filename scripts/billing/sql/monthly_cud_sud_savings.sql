@@ -6,7 +6,7 @@
 -- This query calculates the monthly amount of savings from Committed Use Discounts (CUD)
 -- and Sustained Use Discounts (SUD).
 
-WITH 
+WITH
   gce_data AS
   (
     SELECT *

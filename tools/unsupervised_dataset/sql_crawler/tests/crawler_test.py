@@ -1,6 +1,7 @@
 """ Test Crawler functionality """
 import sql_crawler.crawler as crawler
 
+
 # Test that crawler does not break on invalid HTML request
 def test_invalid_request():
     new_crawler = crawler.Crawler(["test-url"], max_size=10)

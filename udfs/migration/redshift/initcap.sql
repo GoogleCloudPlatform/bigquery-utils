@@ -17,9 +17,9 @@
 CREATE OR REPLACE FUNCTION rs.initcap(string_expr STRING) AS (
   (
     SELECT
-      CASE 
+      CASE
         WHEN string_expr = '' THEN ''
-        ELSE 
+        ELSE
           STRING_AGG(
             CONCAT(
               UPPER(SUBSTR(word, 1, 1)),

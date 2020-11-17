@@ -1,13 +1,15 @@
-import datetime
 import csv
-import os
+import datetime
 import logging
+import os
 import pathlib
+
 from sql_crawler import cloud_integration
+
 
 class CrawlerLog(object):
     """ Logs the status of the SQL crawler, including websites and queries.
-        
+
         The CrawlerLog keeps track of which websites were explored, how many
         queries were found, and creates a CSV with all the queries. It also
         logs any errors encountered. The log is saved into Logs subdirectory
@@ -43,7 +45,7 @@ class CrawlerLog(object):
             self.csv_file = open(self.query_name, "a")
             self.queries = csv.writer(self.csv_file)
             self.queries.writerow(["Query", "URL"])
-        
+
         self.save_to_gcs = False
         self.save_to_bq = False
         self.batch_data = []
@@ -102,7 +104,7 @@ class CrawlerLog(object):
     def parse_location_arg(self, location):
         """ Validates and splits location argument for cloud upload
         into two parts. Should be formatted as project_id.dataset.
-        
+
         Args:
             location: String with name of project ID and dataset.
 
@@ -117,7 +119,7 @@ class CrawlerLog(object):
 
     def set_gcs(self, location):
         """ Sets variables for uploading data to Google Cloud Storage.
- 
+
         Args:
             location: String with name of project ID and bucket name,
             separated by a period.
@@ -126,10 +128,10 @@ class CrawlerLog(object):
         self.gcs_project, self.gcs_bucket = self.parse_location_arg(location)
         if self.gcs_project and self.gcs_bucket:
             self.save_to_gcs = True
-        
+
     def set_bq(self, location):
         """ Sets variables for uploading data to Google BigQuery.
-            
+
         Args:
             location: String with name of project ID and dataset name,
             separated by a period.
@@ -151,7 +153,7 @@ class CrawlerLog(object):
         """
 
         logging.info("Finished crawling.")
-        
+
         # Flush remaining queries and close file
         self.flush_data(self.batch_data)
         if not self.stream:

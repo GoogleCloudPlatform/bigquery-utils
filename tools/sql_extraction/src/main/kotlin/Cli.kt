@@ -36,7 +36,7 @@ private class Cli(
         printHelpOnEmptyArgs = true,
         help = """
     Command line application to extract raw SQL query strings and their usage within code.
-    
+
     Sample Usages:
     ```
     > sql_extraction path/to/file.java

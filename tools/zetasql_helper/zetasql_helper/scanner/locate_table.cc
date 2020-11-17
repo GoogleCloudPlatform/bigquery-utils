@@ -53,5 +53,3 @@ absl::Status LocateTableRanges(absl::string_view query,
 }
 
 }
-
-

@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Cloud Function: Event Driven BigQuery Ingest](#cloud-function-event-driven-bigquery-ingest)
+  - [Requirements](#requirements)
+  - [Providers](#providers)
+  - [Inputs](#inputs)
+  - [Outputs](#outputs)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Cloud Function: Event Driven BigQuery Ingest
 Terraform module for deploying the Google Cloud Function
 for event based ingest of GCS data to BigQuery described [here](../README.md).
@@ -43,4 +55,3 @@ No requirements.
 |------|-------------|
 | cloud-function | instance of cloud function deployed by this module. |
 | storage-notification | n/a |
-

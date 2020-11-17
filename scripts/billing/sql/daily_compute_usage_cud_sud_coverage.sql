@@ -32,12 +32,12 @@ WITH
   -- separately on each usage line because some line items have CUD credit but no associated
   -- usage. We would not otherwise be able to calculate a unit price for these line items.
   prices AS (
-    SELECT  
+    SELECT
       usage_date,
       sku.id AS sku_id,
       location.region AS region,
       -- calculate unit price per sku for each day. Catch line items with 0 usage to avoid divide by zero.
-      -- using 1 assumes that there are no relevant (CUD related) skus with cost but 0 usage, 
+      -- using 1 assumes that there are no relevant (CUD related) skus with cost but 0 usage,
       -- which is correct for current billing data
       IF(SUM(usage.amount) = 0, 0, SUM(cost) / SUM(usage.amount)) AS unit_price
     FROM usage_data, UNNEST(credits) AS cred
@@ -76,10 +76,10 @@ WITH
         cred.name,
         IF (
           prices.unit_price = 0 OR lower(cred.name) NOT LIKE "committed%",
-          0, 
+          0,
           CASE
             -- Divide credit $ amount by unit price to calculate amount of usage offset by credit
-            WHEN LOWER(usage.unit) LIKE "seconds" THEN -1 * SUM(cred.amount) / prices.unit_price      
+            WHEN LOWER(usage.unit) LIKE "seconds" THEN -1 * SUM(cred.amount) / prices.unit_price
             WHEN LOWER(usage.unit) = "byte-seconds" THEN -1 * SUM(cred.amount) / prices.unit_price
             ELSE NULL
           END
@@ -87,7 +87,7 @@ WITH
         IF (LOWER(cred.name) LIKE "committed%", SUM(cred.amount), 0) AS cud_cost,
         IF (
           prices.unit_price = 0 OR LOWER(cred.name) NOT LIKE "sustained%",
-          0, 
+          0,
           CASE
             -- Divide credit $ amount by unit price to calculate amount of usage offset by credit
             WHEN LOWER(usage.unit) LIKE "seconds" THEN -1 * SUM(cred.amount) / prices.unit_price
@@ -99,7 +99,7 @@ WITH
       FROM usage_data AS u, UNNEST(credits) AS cred
       LEFT JOIN UNNEST(system_labels) AS system_labels
         ON system_labels.key = "compute.googleapis.com/machine_spec"
-      INNER JOIN prices 
+      INNER JOIN prices
         ON u.sku.id = prices.sku_id
         AND u.location.region = prices.region
         AND u.usage_date = prices.usage_date
@@ -109,7 +109,7 @@ WITH
     GROUP BY 1,2,3,4,5,6
   ),
 
-  -- Temporary table containing usage amount and usage cost 
+  -- Temporary table containing usage amount and usage cost
   -- before credit based discounts (e.g. CUD, SUD).
   cost_data AS
   (
@@ -148,7 +148,7 @@ SELECT
   SUM(SUD_covered_usage) AS SUD_covered_usage,
   SUM(SUD_cost) AS SUD_cost
 FROM cost_data a
-FULL OUTER JOIN credit_data b 
+FULL OUTER JOIN credit_data b
   ON a.usage_date = b.usage_date
   AND a.region = b.region
   AND a.sku_id = b.sku_id

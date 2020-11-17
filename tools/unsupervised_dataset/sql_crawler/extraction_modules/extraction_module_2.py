@@ -1,5 +1,6 @@
-from bs4 import BeautifulSoup
 import re
+
+from bs4 import BeautifulSoup
 
 REGEX_SEARCH = r"(?:SELECT|WITH|CREATE|ALTER|DROP|INSERT|UPDATE|EXECUTE|CALL|USING|COPY|ABORT|ANALYZE|CANCEL|CLOSE|COMMENT|COMMIT|DECLARE|DELETE|END|FETCH|GRANT|INSERT|LOCK|PREPARE|REFRESH|RESET|REVOKE|ROLLBACK|SET|SHOW|TRUNCATE|UNLOAD|VACUUM) (?:(?!;|[.:]\s).)*;"
 REGEX_COMMENT = r"--.*"
@@ -11,7 +12,7 @@ class ExtractionModule2:
 
         Args:
             html: HTML response which contains HTML text
-            
+
         Returns
             A list of queries in the form of strings.
         """

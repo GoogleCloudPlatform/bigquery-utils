@@ -20,10 +20,10 @@ CREATE OR REPLACE FUNCTION td.decode3(
   s3 ANY TYPE, r3 ANY TYPE,
   def ANY TYPE) AS
 ((
-  CASE 
+  CASE
     WHEN expr = s1 OR (expr IS NULL AND s1 IS NULL) THEN r1
     WHEN expr = s2 OR (expr IS NULL AND s2 IS NULL) THEN r2
     WHEN expr = s3 OR (expr IS NULL AND s3 IS NULL) THEN r3
     ELSE def
-  END 
+  END
 ))

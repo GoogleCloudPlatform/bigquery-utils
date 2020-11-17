@@ -5,6 +5,7 @@ and return a message denoting success or error.
 
 from google.cloud import bigquery, storage
 
+
 def create_bigquery_table(project_id, dataset_id, table_id):
     """ Creates a table in Google BigQuery
 
