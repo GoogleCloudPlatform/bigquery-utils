@@ -68,7 +68,7 @@ In this case we can take advantage of a more known rigid structure so our regex
 is simpler (no optional capturing groups, optional slashes).
 Note, we can use the `region=` string (which may have been partitioned on
 in an  upstream system such as Hive) as a batch ID because we might expect that
-an hourly partition might have mutliple directories that upload to it.
+an hourly partition might have multiple directories that upload to it.
 (e.g. US, GB, etc). Because it is all named capturing groups we don't have any
 strict ordering restrictions about batch id appearing before / after partition
 information.
