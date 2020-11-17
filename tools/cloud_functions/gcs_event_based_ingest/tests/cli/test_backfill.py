@@ -28,7 +28,7 @@ LOAD_JOB_POLLING_TIMEOUT = 20    # seconds
 def test_backfill(bq, gcs_partitioned_data, gcs_truncating_load_config,
                   gcs_bucket, dest_dataset, dest_partitioned_table, mock_env):
     """
-    This is an adapatation of test_load_job_partitioned but instead uses the
+    This is an adaptation of test_load_job_partitioned but instead uses the
     backfill CLI code path to execute the cloud function's main method in
     parallel threads.
 
