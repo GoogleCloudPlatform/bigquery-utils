@@ -245,8 +245,15 @@ WHERE
 ```
 
 ## Triggers
-
-### Pub/Sub Storage Notifications `_SUCCESS`
+GCS Object Finalize triggers can communicate with Cloud Functions directly or
+via Pub/Sub topic. This function supports both reading bucket / object id from
+the Pub/Sub attributes or the Cloud Functions event schema. Pub/Sub triggers
+offer some additional features as opposed to Cloud Functions direct including
+filtering notifications to a prefix within a bucket (rather than bucket wide)
+and controlling message retention period for the Pub/Sub topic.
+More info can be found here:
+[Pub/Sub Storage Notification](https://cloud.google.com/storage/docs/pubsub-notifications)
+[Cloud Functions direct trigger](https://cloud.google.com/functions/docs/tutorials/storage)
 1. Trigger on `_SUCCESS` File to load all other files in that directory.
 1. Trigger on non-`_SUCCESS` File will no-op
 
@@ -323,7 +330,10 @@ pytest -m IT
 It is suggested to deploy this Cloud Function with the
 [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
 
+### Google Cloud SDK 
 Alternatively, you can deploy with Google Cloud SDK:
+
+#### Pub/Sub Notifications
 ```bash
 PROJECT_ID=your-project-id
 TOPIC_ID=test-gcs-ocn
@@ -339,6 +349,23 @@ gcloud functions deploy test-gcs-bq-ingest \
   --entrypoint=main \
   --runtime=python38 \
   --trigger-topic=${PUBSUB_TOPIC} \
+  --service-account=${SERVICE_ACCOUNT_EMAIL} \
+  --timeout=540 \
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+```
+
+#### Cloud Functions Events
+```bash
+PROJECT_ID=your-project-id
+
+# Deploy Cloud Function
+gcloud functions deploy test-gcs-bq-ingest \
+  --region=us-west4 \
+  --source=gcs_ocn_bq_ingest \
+  --entrypoint=main \
+  --runtime=python38 \
+  --trigger-resource ${INGESTION_BUCKET} \
+  --trigger-event google.storage.object.finalize
   --service-account=${SERVICE_ACCOUNT_EMAIL} \
   --timeout=540 \
   --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'

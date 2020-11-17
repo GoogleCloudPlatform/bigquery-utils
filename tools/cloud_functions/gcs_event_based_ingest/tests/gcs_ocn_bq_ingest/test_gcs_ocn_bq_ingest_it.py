@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""integrtion tests for gcs_ocn_bq_ingest"""
+"""integration tests for gcs_ocn_bq_ingest"""
 import os
 from time import monotonic
 
@@ -35,6 +35,28 @@ def test_load_job(bq, gcs_data, dest_dataset, dest_table, mock_env):
             "bucketId": gcs_data.bucket.name,
             "objectId": gcs_data.name
         }
+    }
+    main.main(test_event, None)
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
+    expected_num_rows = sum(1 for _ in open(test_data_file))
+    bq_wait_for_rows(bq, dest_table, expected_num_rows)
+
+
+@pytest.mark.IT
+def test_gcf_event_schema(bq, gcs_data, dest_dataset, dest_table, mock_env):
+    """tests compatibility to Cloud Functions Background Function posting the
+    storage object schema
+    https://cloud.google.com/storage/docs/json_api/v1/objects#resource
+    directly based on object finalize.
+
+    https://cloud.google.com/functions/docs/tutorials/storage#functions_tutorial_helloworld_storage-python
+    """
+    if not gcs_data.exists():
+        raise EnvironmentError("test data objects must exist")
+    test_event = {
+        "bucket": gcs_data.bucket.name,
+        "name": gcs_data.name
     }
     main.main(test_event, None)
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",

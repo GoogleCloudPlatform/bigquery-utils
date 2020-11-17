@@ -439,19 +439,38 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
     Args:
         notification(dict): Pub/Sub Storage Notification
         https://cloud.google.com/storage/docs/pubsub-notifications
+        Or Cloud Functions direct trigger
+        https://cloud.google.com/functions/docs/tutorials/storage
+        with notification schema
+        https://cloud.google.com/storage/docs/json_api/v1/objects#resource
     Returns:
         tuple of bucketId and objectId attributes
     Raises:
         KeyError if the input notification does not contain the expected
         attributes.
     """
-    try:
-        attributes = notification["attributes"]
-        return attributes["bucketId"], attributes["objectId"]
-    except KeyError:
-        raise RuntimeError(
-            "Issue with payload, did not contain expected attributes"
-            f"'bucketId' and 'objectId': {notification}") from KeyError
+    if {"bucket", "name", } <= notification.keys():
+        # notification is GCS Object reosource from Cloud Functions trigger
+        # https://cloud.google.com/storage/docs/json_api/v1/objects#resource
+        return notification["bucket"], notification["name"]
+    if notification.get("attributes"):
+        # notification is pubsub message.
+        try:
+            attributes = notification["attributes"]
+            return attributes["bucketId"], attributes["objectId"]
+        except KeyError:
+            raise RuntimeError(
+                "Issue with Pub/Sub message, did not contain expected"
+                f"attributes: 'bucketId' and 'objectId': {notification}"
+            ) from KeyError
+    raise RuntimeError(
+        "Cloud Function recieved unexpected trigger:\n"
+        f"{notification}\n"
+        "This function only supports direct Cloud Functions"
+        "Background Triggers or Pub/Sub storage notificaitons"
+        "as described in the following links:\n"
+        "https://cloud.google.com/storage/docs/pubsub-notifications\n"
+        "https://cloud.google.com/functions/docs/tutorials/storage")
 
 
 def read_gcs_file(gcs: storage.Client, gsurl: str) -> str:

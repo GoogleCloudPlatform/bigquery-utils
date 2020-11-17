@@ -16,7 +16,3 @@ output "cloud-function" {
   value       = google_cloudfunctions_function.gcs_to_bq
 }
 
-output "storage-notification" {
-  value = google_pubsub_topic.notification_topic.id
-}
-

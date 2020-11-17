@@ -39,6 +39,7 @@ documented [here](../gcs_ocn_bq_ingest_function/README.md)
 | project\_id | GCP Project ID | `any` | n/a | yes |
 | region | GCP region in which to deploy cloud function | `string` | `"us-central1"` | no |
 | success\_filename | Filename to trigger a load of a prefix | `string` | `""` | no |
+| use\_pubsub\_notifications | Setting this to true will use Pub/Sub notifications By default we will use Cloud Functions Event direct notifications. See https://cloud.google.com/storage/docs/pubsub-notifications. | `bool` | `false` | no |
 | wait\_for\_job\_seconds | How long to wait before deciding BQ job did not fail quickly | `string` | `""` | no |
 
 ## Outputs
@@ -46,7 +47,4 @@ documented [here](../gcs_ocn_bq_ingest_function/README.md)
 | Name | Description |
 |------|-------------|
 | cloud-function | instance of cloud function deployed by this module. |
-| storage-notification | n/a |
-
-
 

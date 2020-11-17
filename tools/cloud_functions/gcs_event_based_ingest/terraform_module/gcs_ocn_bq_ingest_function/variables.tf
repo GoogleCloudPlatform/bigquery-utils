@@ -68,3 +68,9 @@ variable "function_source_folder" {
   default     = "../gcs_event_based_ingest/gcs_ocn_bq_ingest/"
 }
 
+variable "use_pubsub_notifications" {
+  description = "Setting this to true will use Pub/Sub notifications By default we will use Cloud Functions Event direct notifications. See https://cloud.google.com/storage/docs/pubsub-notifications."
+  type        = bool
+  default     = false
+}
+
