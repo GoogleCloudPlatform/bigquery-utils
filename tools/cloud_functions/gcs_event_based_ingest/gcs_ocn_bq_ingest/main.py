@@ -113,7 +113,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     gcs_client = storage.Client(client_info=CLIENT_INFO)
     project = gcs_client.project
-    bkt = get_bucket_or_raise(gcs_client, bucket_id)
+    bkt = cached_get_bucket(gcs_client, bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
     handle_duplicate_notification(bkt, success_blob, gsurl)
 
@@ -399,7 +399,7 @@ def get_batches_for_prefix(gcs_client: storage.Client,
     prefix_name = blob.name
 
     prefix_filter = f"{prefix_name}"
-    bucket = get_bucket_or_raise(gcs_client, bucket_name)
+    bucket = cached_get_bucket(gcs_client, bucket_name)
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
@@ -514,17 +514,13 @@ def read_gcs_file_if_exists(gcs_client: storage.Client,
 
 # Cache bucket lookups (see reasoning in comment above)
 @cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
-def get_bucket_or_raise(
+def cached_get_bucket(
     gcs_client: storage.Client,
     bucket_id: str,
 ) -> storage.Bucket:
     """get storage.Bucket object by bucket_id string if exists or raise
     google.cloud.exceptions.NotFound."""
-    bkt: Optional[storage.Bucket] = gcs_client.lookup_bucket(bucket_id)
-    if bkt:
-        return bkt
-    raise google.cloud.exceptions.NotFound(
-        f"google cloud storage bucket: gs://{bucket_id} not found.")
+    return gcs_client.get_bucket(bucket_id)
 
 
 def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
