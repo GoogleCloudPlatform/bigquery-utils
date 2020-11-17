@@ -26,8 +26,8 @@ from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import cachetools
 import google.api_core.client_info
-import google.api_core.exceptions as api_core_exceptions
-import google.cloud.exceptions as cloud_exceptions
+import google.api_core.exceptions
+import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
 # https://cloud.google.com/bigquery/quotas#load_jobs
@@ -310,7 +310,7 @@ def handle_duplicate_notification(bkt: storage.Bucket,
         f"_claimed_{success_created_unix_timestamp}")
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
-    except api_core_exceptions.PreconditionFailed as err:
+    except google.api_core.exceptions.PreconditionFailed as err:
         raise RuntimeError(
             f"The prefix {gsurl} appears to already have been claimed for "
             f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
@@ -508,7 +508,7 @@ def read_gcs_file_if_exists(gcs_client: storage.Client,
     """
     try:
         return read_gcs_file(gcs_client, gsurl)
-    except cloud_exceptions.NotFound:
+    except google.cloud.exceptions.NotFound:
         return None
 
 
@@ -523,7 +523,7 @@ def get_bucket_or_raise(
     bkt: Optional[storage.Bucket] = gcs_client.lookup_bucket(bucket_id)
     if bkt:
         return bkt
-    raise cloud_exceptions.NotFound(
+    raise google.cloud.exceptions.NotFound(
         f"google cloud storage bucket: gs://{bucket_id} not found.")
 
 
