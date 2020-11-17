@@ -404,7 +404,7 @@ optional arguments:
   --success-filename SUCCESS_FILENAME, -f SUCCESS_FILENAME
                         Override the default success filename '_SUCCESS'
   --destination-regex DESTINATION_REGEX, -r DESTINATION_REGEX
-                        Override the default destination regex for determining BigQuerydestination based on information encoded in the GCS path of thesuccess file
+                        Override the default destination regex for determining BigQuery destination based on information encoded in the GCS path of the success file
 ```
 
 ## Alternatives
