@@ -204,7 +204,7 @@ BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/
 If more granular data is needed about a particular job id 
 
 ### Job Naming Convention
-All load or external query jobs will have a job id witha  prefix following this convention:
+All load or external query jobs will have a job id with a  prefix following this convention:
 ```python3
 job_id_prefix=f"gcf-ingest-{dest_table_ref.dataset_id}-{dest_table_ref.table_id}"
 ```
