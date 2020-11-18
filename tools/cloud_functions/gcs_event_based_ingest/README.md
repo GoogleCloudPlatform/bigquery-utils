@@ -268,9 +268,9 @@ We run the following CI checks to ensure code quality and avoid common pitfalls:
 
 This CI process is defined in [cloudbuild.yaml](cloudbuild.yaml) and can be run
 locally with [cloud-build-local](https://cloud.google.com/cloud-build/docs/build-debug-locally)
-from this directory with:
+from the root of the repo with:
 ```bash
-cloud-build-local --config cloudbuild.yaml --dryrun=false .
+cloud-build-local --config=tools/cloud_functions/gcs_event_based_ingest/cloudbuild.yaml --dryrun=false .
 ```
 
 ### Optimizations / Philosophy
