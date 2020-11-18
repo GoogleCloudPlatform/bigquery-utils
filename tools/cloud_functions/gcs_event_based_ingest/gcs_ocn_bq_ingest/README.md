@@ -1,4 +1,4 @@
-# Event Driven BigQuery Ingest 
+# Event Driven BigQuery Ingest
 This directory defines a reusable [Background Cloud Function](https://cloud.google.com/functions/docs/writing/background)
 for ingesting any new file at a GCS prefix with a file name containing a
 timestamp to be used as the partitioning and clustering column in a partitioned
@@ -8,7 +8,7 @@ BigQuery Table.
 1. Files pushed to a Google Cloud Storage bucket.
 1. [Pub/Sub Notification](https://cloud.google.com/storage/docs/pubsub-notifications)
 object finalize.
-1. Cloud Function subscribes to notifications and ingests all the data into 
+1. Cloud Function subscribes to notifications and ingests all the data into
 BigQuery a directory once a `_SUCCESS` file arrives.
 
 

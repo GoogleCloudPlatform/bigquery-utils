@@ -46,7 +46,7 @@ projects other than the one it is deployed in. In these cases it is crucial to
 ensure the service account that Cloud Functions is impersonating has the correct
 permissions on all destination projects.
 
-Your regex can optionally include  for 
+Your regex can optionally include  for
 - `partition` must be BigQuery Partition decorator with leading `$`
 - `yyyy`, `mm`, `dd`, `hr` partition year, month, day, and hour
 (depending on your partition granularity)
@@ -64,7 +64,7 @@ Then you could use [this regex](https://regex101.com/r/OLpmg4/2):
 ```text
 DESTINATION_REGEX='(?:[\w\-_0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/region=(?P<batch>[\w]+)/yyyy=(?P<yyyy>[0-9]{4})/mm=(?P<mm>[0-9]{2})/dd=(?P<dd>[0-9]{2})/hh=(?P<hh>[0-9]{2})/'
 ```
-In this case we can take advantage of a more known rigid structure so our regex 
+In this case we can take advantage of a more known rigid structure so our regex
 is simpler (no optional capturing groups, optional slashes).
 Note, we can use the `region=` string (which may have been partitioned on
 in an  upstream system such as Hive) as a batch ID because we might expect that
@@ -74,7 +74,7 @@ strict ordering restrictions about batch id appearing before / after partition
 information.
 
 ### Dealing with Different Naming Conventions in the Same Bucket
-In most cases, it would be recommended to have separate buckets / deployment 
+In most cases, it would be recommended to have separate buckets / deployment
 of the Cloud Function for each naming convention as this typically means that
 the upstream systems are governed by different teams.
 
@@ -177,7 +177,7 @@ This can be helpful in reprocessing scenarios where you'd want to `WRITE_TRUNCAT
 a partition that had some data quality issue.
 
 #### Hive Partitioning
-If your data will be uploaded to GCS from a hadoop system that uses the 
+If your data will be uploaded to GCS from a hadoop system that uses the
 [supported default hive partitioning](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs#supported_data_layouts)
 you can specify this in the [`hivePartitioningOptions`](https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#hivepartitioningoptions)
 key of `load.json` for that table.
@@ -186,12 +186,12 @@ Any non-trivial incremental loading to partitions should usually use the
 Transformation SQL to define the `INSERT / MERGE / UPDATE / DELETE` logic into
 the target BQ table as these DML semantics are much more flexible thant the load
 job write dispositions.
-Furthermore, using external query has the added benefit of circumventing the 
+Furthermore, using external query has the added benefit of circumventing the
 per load job bytes limits (default 15 TB) and commiting large partitions
 atomically.
 
 ## Handling Incremental Loads
-This solution introduces the concept of `batch_id` which uniquely identifies 
+This solution introduces the concept of `batch_id` which uniquely identifies
 a batch of data committed by an upstream system that needs to be picked up as an
 incremental load. You can again set the load job or external query configuration
 at any parent folders `_config` prefix. This allows you dictate
@@ -201,7 +201,7 @@ or "for that table any new batch should `WRITE_APPEND` to it's parent partition/
 ## Monitoring
 Monitoring what data has been loaded by this solution should be done with the
 BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
-If more granular data is needed about a particular job id 
+If more granular data is needed about a particular job id
 
 ### Job Naming Convention
 All load or external query jobs will have a job id with a  prefix following this convention:
@@ -330,7 +330,7 @@ pytest -m IT
 It is suggested to deploy this Cloud Function with the
 [accompanying terraform module](terraform_module/gcs_ocn_bq_ingest_function/README.md)
 
-### Google Cloud SDK 
+### Google Cloud SDK
 Alternatively, you can deploy with Google Cloud SDK:
 
 #### Pub/Sub Notifications
@@ -371,7 +371,7 @@ gcloud functions deploy test-gcs-bq-ingest \
   --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
 ```
 
-In theory, one could set up Pub/Sub notifications from multiple GCS Buckets 
+In theory, one could set up Pub/Sub notifications from multiple GCS Buckets
 (owned by different teams but following a common naming convention) to the same
 Pub/Sub topic so that data uploaded to any of these buckets could get
 automatically loaded to BigQuery by a single deployment of the Cloud Function.
@@ -382,7 +382,7 @@ the naming convention / with success files before the Object Change
 Notifications or Cloud Function have been set up. In these cases, you can use
 the `backfill.py` CLI utility to crawl an existing bucket searching for success
 files. The utility supports either invoking the Cloud Function main method
-locally (in concurrent threads) or publishing notifications for the success 
+locally (in concurrent threads) or publishing notifications for the success
 files (for a deployed Cloud Function to pick up).
 
 ### Usage
@@ -414,12 +414,12 @@ driven ingest to BigQuery from GCS that achieves batching based on window
 in processing time (as driven by Cloud Scheduler). BQ Tail has nice features for
 triggering Post actions (BQ queries / GCS file moves or deletes) once the data
 is ingested, and slack notifications. bqtail is well suited for use cases where
-the atomicity of event partition is not important (e.g. many distributed 
-publishers uploading logs to GCS). Due to dependency of certain features of 
+the atomicity of event partition is not important (e.g. many distributed
+publishers uploading logs to GCS). Due to dependency of certain features of
 bqtail on Cloud Scheduler it cannot be used inside VPC-SC perimeters.
 This tool might be more appropriate when the publisher is authoritative on the
 atomicity of batches (e.g. an upstream  hadoop job responsible for commiting an
-event time hour's worth of data). 
+event time hour's worth of data).
 
 ### BigQuery Data Transfer Service
 [Cloud Storage Transfer](https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer)
