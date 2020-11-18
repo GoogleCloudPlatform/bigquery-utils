@@ -28,7 +28,8 @@ import cachetools
 import google.api_core.client_info
 import google.api_core.exceptions
 import google.cloud.exceptions
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from google.cloud import storage
 
 # https://cloud.google.com/bigquery/quotas#load_jobs
 # 15TB per BQ load job (soft limit).

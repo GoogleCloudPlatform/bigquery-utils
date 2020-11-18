@@ -19,7 +19,8 @@ import uuid
 from typing import List
 
 import pytest
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from google.cloud import storage
 
 import gcs_ocn_bq_ingest.main
 
