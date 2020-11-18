@@ -17,6 +17,7 @@ data "google_storage_project_service_account" "gcs_account" {
 }
 
 resource "google_pubsub_topic" "notification_topic" {
+  count   = var.use_pubsub_notifications ? 1 : 0
   project = var.project_id
   name    = "${var.app_id}-ocn-notifications"
 }
@@ -35,10 +36,12 @@ module "bucket" {
 }
 
 resource "google_storage_notification" "notification" {
-  bucket         = module.bucket.bucket
-  payload_format = "JSON_API_V1"
-  topic          = google_pubsub_topic.notification_topic.id
-  event_types    = ["OBJECT_FINALIZE"]
+  count              = var.use_pubsub_notifications ? 1 : 0
+  bucket             = module.bucket.bucket
+  object_name_prefix = var.input_prefix
+  payload_format     = "JSON_API_V1"
+  topic              = google_pubsub_topic.notification_topic[0].id
+  event_types        = ["OBJECT_FINALIZE"]
 }
 
 # Zip up source code folder
@@ -73,8 +76,8 @@ resource "google_cloudfunctions_function" "gcs_to_bq" {
     JOB_PREFIX           = var.job_prefix
   }
   event_trigger {
-    event_type = "providers/cloud.pubsub/eventTypes/topic.publish"
-    resource   = google_pubsub_topic.notification_topic.id
+    event_type = var.use_pubsub_notifications ? "providers/cloud.pubsub/eventTypes/topic.publish" : "google.storage.object.finalize"
+    resource   = var.use_pubsub_notifications ? google_pubsub_topic.notification_topic[0].id : module.bucket.name
   }
 }
 
@@ -92,14 +95,16 @@ module "data_ingester_service_account" {
 # Allow the GCS service account to publish notification for new objects to the
 # notification topic.
 resource "google_pubsub_topic_iam_binding" "gcs_publisher" {
-  topic   = google_pubsub_topic.notification_topic.id
+  count   = var.use_pubsub_notifications ? 1 : 0
+  topic   = google_pubsub_topic.notification_topic[0].id
   role    = "roles/pubsub.publisher"
   members = ["serviceAccount:${data.google_storage_project_service_account.gcs_account.email_address}"]
 }
 
 # Allow the Cloud Functions SA to subscribe to the notification topic
 resource "google_pubsub_topic_iam_binding" "cf_subscriber" {
-  topic   = google_pubsub_topic.notification_topic.id
+  count   = var.use_pubsub_notifications ? 1 : 0
+  topic   = google_pubsub_topic.notification_topic[0].id
   role    = "roles/pubsub.subscriber"
   members = [module.data_ingester_service_account.iam_email]
 }

@@ -23,6 +23,11 @@ variable "input_bucket" {
   description = "GCS bucket to watch for new files"
 }
 
+variable "input_prefix" {
+  description = "GCS prefix to watch for new files in input_bucket"
+  default     = null
+}
+
 variable "cloudfunctions_source_bucket" {
   description = "GCS bucket to store Cloud Functions Source"
 }
@@ -61,5 +66,11 @@ variable "region" {
 variable "function_source_folder" {
   description = "Path to Cloud Function source"
   default     = "../gcs_event_based_ingest/gcs_ocn_bq_ingest/"
+}
+
+variable "use_pubsub_notifications" {
+  description = "Setting this to true will use Pub/Sub notifications By default we will use Cloud Functions Event direct notifications. See https://cloud.google.com/storage/docs/pubsub-notifications."
+  type        = bool
+  default     = false
 }
 

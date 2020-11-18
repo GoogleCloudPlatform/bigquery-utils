@@ -1,4 +1,4 @@
-# BigQuery Cloud Functions 
+# BigQuery Cloud Functions
 This directory holds reusable Google Cloud Functions for
 common BigQuery use cases.
 

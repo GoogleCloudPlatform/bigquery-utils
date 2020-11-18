@@ -16,19 +16,19 @@
 # limitations under the License.
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
+import collections
 import json
+import os
+import pathlib
 import re
-from collections import deque
-from os import getenv
-from pathlib import Path
-from time import monotonic, sleep
+import time
 from typing import Any, Deque, Dict, List, Optional, Tuple
-from urllib.parse import urlparse
 
-from google.api_core.client_info import ClientInfo
-from google.api_core.exceptions import PreconditionFailed
+import cachetools
+import google.api_core.client_info
+import google.api_core.exceptions
+import google.cloud.exceptions
 from google.cloud import bigquery, storage
-from google.cloud.exceptions import NotFound
 
 # https://cloud.google.com/bigquery/quotas#load_jobs
 # 15TB per BQ load job (soft limit).
@@ -42,7 +42,7 @@ DEFAULT_EXTERNAL_TABLE_DEFINITION = {
 
 DEFAULT_JOB_LABELS = {
     "component": "event-based-gcs-ingest",
-    "cloud-function-name": getenv("FUNCTION_NAME"),
+    "cloud-function-name": os.getenv("FUNCTION_NAME"),
 }
 
 BASE_LOAD_JOB_CONFIG = {
@@ -52,10 +52,18 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
-DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/" \
-                            r"(?P<table>[\w\-_0-9]+)/" \
-                            r"?(?P<partition>\$[0-9]+)?/" \
-                            r"?(?P<batch>[\w\-_0-9]+)?/"
+# yapf: disable
+DEFAULT_DESTINATION_REGEX = (
+    r"^(?P<dataset>[\w\-\._0-9]+)/"  # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"      # table name (required)
+    r"(?P<partition>\$[0-9]+)?/?"    # partition decorator (optional)
+    r"(?P<yyyy>[0-9]{4})?/?"         # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"           # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"           # partition day (dd)  (optional)
+    r"(?P<hh>[0-9]{2})?/?"           # partition hour (hh) (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"      # batch id (optional)
+)
+# yapf: enable
 
 # Will wait up to this polling for errors before exiting
 # This is to check if job fail quickly, not to assert it succeed.
@@ -64,7 +72,7 @@ DEFAULT_DESTINATION_REGEX = r"(?P<dataset>[\w\-_0-9]+)/" \
 # One might consider lowering this to 1-2 seconds to lower the
 # upper bound of expected execution time to stay within the free tier.
 # https://cloud.google.com/functions/pricing#free_tier
-WAIT_FOR_JOB_SECONDS = int(getenv("WAIT_FOR_JOB_SECONDS", "5"))
+WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "5"))
 
 # Use caution when lowering the job polling rate.
 # Keep in mind that many concurrent executions of this cloud function should not
@@ -72,21 +80,22 @@ WAIT_FOR_JOB_SECONDS = int(getenv("WAIT_FOR_JOB_SECONDS", "5"))
 # https://cloud.google.com/bigquery/quotas#all_api_requests
 JOB_POLL_INTERVAL_SECONDS = 1
 
-SUCCESS_FILENAME = getenv("SUCCESS_FILENAME", "_SUCCESS")
+SUCCESS_FILENAME = os.getenv("SUCCESS_FILENAME", "_SUCCESS")
 
-CLIENT_INFO = ClientInfo(user_agent="google-pso-tool/bq-severless-loader")
+CLIENT_INFO = google.api_core.client_info.ClientInfo(
+    user_agent="google-pso-tool/bq-severless-loader")
 
 DEFAULT_JOB_PREFIX = "gcf-ingest-"
 
 
-def main(event: Dict, context):    # pylint: disable=unused-argument
+def main(event: Dict, context):  # pylint: disable=unused-argument
     """entry point for background cloud function for event driven GCS to
     BigQuery ingest."""
     # pylint: disable=too-many-locals
     # Set by Cloud Function Execution Environment
     # https://cloud.google.com/functions/docs/env-var
-    project = getenv("GCP_PROJECT")
-    destination_regex = getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
+    destination_regex = os.getenv("DESTINATION_REGEX",
+                                  DEFAULT_DESTINATION_REGEX)
     dest_re = re.compile(destination_regex)
 
     bucket_id, object_id = parse_notification(event)
@@ -103,7 +112,8 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     gcs_client = storage.Client(client_info=CLIENT_INFO)
-    bkt = gcs_client.lookup_bucket(bucket_id)
+    project = gcs_client.project
+    bkt = cached_get_bucket(gcs_client, bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
     handle_duplicate_notification(bkt, success_blob, gsurl)
 
@@ -120,6 +130,11 @@ def main(event: Dict, context):    # pylint: disable=unused-argument
             f"Object ID {object_id} did not match dataset and table in regex:"
             f" {destination_regex}") from KeyError
     partition = destination_details.get('partition')
+    year, month, day, hour = (
+        destination_details.get(key, "") for key in ('yyyy', 'mm', 'dd', 'hh'))
+    part_list = (year, month, day, hour)
+    if not partition and any(part_list):
+        partition = '$' + ''.join(part_list)
     batch_id = destination_details.get('batch')
     labels = DEFAULT_JOB_LABELS
     labels["bucket"] = bucket_id
@@ -183,13 +198,13 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     if len(table_partition) < 2:
         # If there is no partition put a None placeholder
         table_partition.append("None")
-    return f"{getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
+    return f"{os.getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
         f"{dest_table_ref.dataset_id}-" \
         f"{'-'.join(table_partition)}-" \
         f"{batch_id}-"
 
 
-def external_query(    # pylint: disable=too-many-arguments
+def external_query(  # pylint: disable=too-many-arguments
         gcs_client: storage.Client, bq_client: bigquery.Client, gsurl: str,
         query: str, dest_table_ref: bigquery.TableReference,
         job_id_prefix: str):
@@ -228,14 +243,14 @@ def external_query(    # pylint: disable=too-many-arguments
 
     print(f"started asynchronous query job: {job.job_id}")
 
-    start_poll_for_errors = monotonic()
+    start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
             raise RuntimeError(
                 f"query job {job.job_id} failed quickly: {job.errors}")
-        sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
 def flatten2dlist(arr: List[List[Any]]) -> List[Any]:
@@ -261,21 +276,20 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
             job_id_prefix=f"{job_id_prefix}{batch_num}-of-{batch_count}-",
         )
 
-        print(
-            f"started asyncronous bigquery load job with id: {job.job_id} for"
-            f" {gsurl}")
+        print(f"started asyncronous bigquery load job with id: {job.job_id} for"
+              f" {gsurl}")
         jobs.append(job)
 
-    start_poll_for_errors = monotonic()
+    start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         # Check if job failed quickly
         for job in jobs:
             job.reload()
             if job.errors:
                 raise RuntimeError(
                     f"load job {job.job_id} failed quickly: {job.errors}")
-        sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
 def handle_duplicate_notification(bkt: storage.Bucket,
@@ -296,7 +310,7 @@ def handle_duplicate_notification(bkt: storage.Bucket,
         f"_claimed_{success_created_unix_timestamp}")
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
-    except PreconditionFailed as err:
+    except google.api_core.exceptions.PreconditionFailed as err:
         raise RuntimeError(
             f"The prefix {gsurl} appears to already have been claimed for "
             f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
@@ -309,7 +323,7 @@ def handle_duplicate_notification(bkt: storage.Bucket,
 
 def _get_parent_config_file(storage_client, config_filename, bucket, path):
     config_dir_name = "_config"
-    parent_path = Path(path).parent
+    parent_path = pathlib.Path(path).parent
     config_path = parent_path / config_dir_name / config_filename
     return read_gcs_file_if_exists(storage_client,
                                    f"gs://{bucket}/{config_path}")
@@ -319,7 +333,9 @@ def look_for_transform_sql(storage_client: storage.Client,
                            gsurl: str) -> Optional[str]:
     """look in parent directories for _config/bq_transform.sql"""
     config_filename = "bq_transform.sql"
-    bucket_name, obj_path = _parse_gcs_url(gsurl)
+    blob: storage.Blob = storage.Blob.from_string(gsurl)
+    bucket_name = blob.bucket.name
+    obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_query(path):
@@ -342,14 +358,16 @@ def construct_load_job_config(storage_client: storage.Client,
     The configs closest to gsurl should take precedence.
     """
     config_filename = "load.json"
-    bucket_name, obj_path = _parse_gcs_url(gsurl)
+    blob: storage.Blob = storage.Blob.from_string(gsurl)
+    bucket_name = blob.bucket.name
+    obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
     def _get_parent_config(path):
         return _get_parent_config_file(storage_client, config_filename,
                                        bucket_name, path)
 
-    config_q: Deque[Dict[str, Any]] = deque()
+    config_q: Deque[Dict[str, Any]] = collections.deque()
     config_q.append(BASE_LOAD_JOB_CONFIG)
     while parts:
         config = _get_parent_config("/".join(parts))
@@ -364,8 +382,8 @@ def construct_load_job_config(storage_client: storage.Client,
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
 
-def get_batches_for_prefix(storage_client,
-                           prefix_path,
+def get_batches_for_prefix(gcs_client: storage.Client,
+                           prefix_path: str,
                            ignore_subprefix="_config/",
                            ignore_file=SUCCESS_FILENAME) -> List[List[str]]:
     """
@@ -376,14 +394,16 @@ def get_batches_for_prefix(storage_client,
     (one batch has an array of multiple GCS uris)
     """
     batches = []
-    bucket_name, prefix_name = _parse_gcs_url(prefix_path)
+    blob: storage.Blob = storage.Blob.from_string(prefix_path)
+    bucket_name = blob.bucket.name
+    prefix_name = blob.name
 
     prefix_filter = f"{prefix_name}"
-    bucket = storage_client.lookup_bucket(bucket_name)
+    bucket = cached_get_bucket(gcs_client, bucket_name)
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
-    max_batch_size = int(getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES))
+    max_batch_size = int(os.getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES))
     batch: List[str] = []
     for blob in blobs:
         # API returns root prefix also. Which should be ignored.
@@ -392,7 +412,7 @@ def get_batches_for_prefix(storage_client,
         if (blob.name
                 not in {f"{prefix_name}/", f"{prefix_name}/{ignore_file}"}
                 or blob.name.startswith(f"{prefix_name}/{ignore_subprefix}")):
-            if blob.size == 0:    # ignore empty files
+            if blob.size == 0:  # ignore empty files
                 print(f"ignoring empty file: gs://{bucket}/{blob.name}")
                 continue
             cumulative_bytes += blob.size
@@ -426,44 +446,81 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
     Args:
         notification(dict): Pub/Sub Storage Notification
         https://cloud.google.com/storage/docs/pubsub-notifications
+        Or Cloud Functions direct trigger
+        https://cloud.google.com/functions/docs/tutorials/storage
+        with notification schema
+        https://cloud.google.com/storage/docs/json_api/v1/objects#resource
     Returns:
         tuple of bucketId and objectId attributes
     Raises:
         KeyError if the input notification does not contain the expected
         attributes.
     """
-    try:
-        attributes = notification["attributes"]
-        return attributes["bucketId"], attributes["objectId"]
-    except KeyError:
-        raise RuntimeError(
-            "Issue with payload, did not contain expected attributes"
-            f"'bucketId' and 'objectId': {notification}") from KeyError
+    if notification.get("kind") == "storage#object":
+        # notification is GCS Object reosource from Cloud Functions trigger
+        # https://cloud.google.com/storage/docs/json_api/v1/objects#resource
+        return notification["bucket"], notification["name"]
+    if notification.get("attributes"):
+        # notification is Pub/Sub message.
+        try:
+            attributes = notification["attributes"]
+            return attributes["bucketId"], attributes["objectId"]
+        except KeyError:
+            raise RuntimeError(
+                "Issue with Pub/Sub message, did not contain expected"
+                f"attributes: 'bucketId' and 'objectId': {notification}"
+            ) from KeyError
+    raise RuntimeError(
+        "Cloud Function recieved unexpected trigger:\n"
+        f"{notification}\n"
+        "This function only supports direct Cloud Functions"
+        "Background Triggers or Pub/Sub storage notificaitons"
+        "as described in the following links:\n"
+        "https://cloud.google.com/storage/docs/pubsub-notifications\n"
+        "https://cloud.google.com/functions/docs/tutorials/storage")
 
 
-def read_gcs_file(gcs: storage.Client, gsurl: str) -> str:
+# cache lookups against GCS API for 1 second as buckets / objects have update
+# limit of once per second and we might do several of the same lookup during
+# the functions lifetime. This should improve performance by eliminating
+# unnecessary API calls. The lookups on bucket and objects in this function
+# should not be changing during the function's lifetime as this would lead to
+# non-deterministic results with or without this cache.
+# https://cloud.google.com/storage/quotas
+@cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
+def read_gcs_file(gcs_client: storage.Client, gsurl: str) -> str:
     """
     Read a GCS object as a string
 
     Args:
-        gcs:  GCS client
+        gcs_client:  GCS client
         gsurl: GCS URI for object to read in gs://bucket/path/to/object format
     Returns:
         str
     """
-    bucket_id, object_id = _parse_gcs_url(gsurl)
-    bucket = gcs.bucket(bucket_id)
-    blob = bucket.blob(object_id)
-    return blob.download_as_bytes().decode('UTF-8')
+    blob = storage.Blob.from_string(gsurl)
+    return blob.download_as_bytes(client=gcs_client).decode('UTF-8')
 
 
-def read_gcs_file_if_exists(gcs: storage.Client, gsurl: str) -> Optional[str]:
+def read_gcs_file_if_exists(gcs_client: storage.Client,
+                            gsurl: str) -> Optional[str]:
     """return string of gcs object contents or None if the object does not exist
     """
     try:
-        return read_gcs_file(gcs, gsurl)
-    except NotFound:
+        return read_gcs_file(gcs_client, gsurl)
+    except google.cloud.exceptions.NotFound:
         return None
+
+
+# Cache bucket lookups (see reasoning in comment above)
+@cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
+def cached_get_bucket(
+    gcs_client: storage.Client,
+    bucket_id: str,
+) -> storage.Bucket:
+    """get storage.Bucket object by bucket_id string if exists or raise
+    google.cloud.exceptions.NotFound."""
+    return gcs_client.get_bucket(bucket_id)
 
 
 def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
@@ -478,24 +535,6 @@ def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
             mode=x.get("mode") if x.get("mode") else default_mode)
         for x in schema
     ]
-
-
-def _parse_gcs_url(gsurl: str) -> Tuple[str, str]:
-    """Given a Google Cloud Storage URL (gs://<bucket>/<blob>), returns a
-    tuple containing the corresponding bucket and blob.
-    """
-
-    parsed_url = urlparse(gsurl)
-    if not parsed_url.netloc:
-        raise ValueError("Please provide a bucket name")
-    if parsed_url.scheme.lower() != "gs":
-        raise ValueError(f"Schema must be to 'gs://'"
-                         f"Current schema: '{parsed_url.scheme}://'")
-
-    bucket = parsed_url.netloc
-    # Remove leading '/' but NOT trailing one
-    blob = parsed_url.path.lstrip("/")
-    return bucket, blob
 
 
 # To be added to built in str in python 3.9

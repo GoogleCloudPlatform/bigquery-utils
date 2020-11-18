@@ -17,19 +17,23 @@
 ---
 steps:
 - name: 'hadolint/hadolint'
+  dir: '${_BUILD_DIR}'
   entrypoint: '/bin/hadolint'
   args:
     - 'Dockerfile.ci'
   id: 'lint-ci-docker-image'
 - name: 'gcr.io/kaniko-project/executor:latest'
+  dir: '${_BUILD_DIR}'
   waitFor:
     - 'lint-ci-docker-image'
   args:
     - '--dockerfile=Dockerfile.ci'
     - '--destination=gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
     - '--cache=true'
+    - '--context=dir:///workspace/${_BUILD_DIR}'
   id: 'build-ci-image'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'isort'
   waitFor:
   - 'build-ci-image'
@@ -38,11 +42,13 @@ steps:
     - '.'
   id: 'isort'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'flake8'
   waitFor:
   - 'build-ci-image'
   id: 'flake8'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'yapf'
   waitFor:
     - 'build-ci-image'
@@ -51,6 +57,7 @@ steps:
     - '.'
   id: 'yapf'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'pylint'
   waitFor:
   - 'build-ci-image'
@@ -58,6 +65,7 @@ steps:
     - 'gcs_ocn_bq_ingest/'
   id: 'pylint-main'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'mypy'
   waitFor:
   - 'build-ci-image'
@@ -65,6 +73,7 @@ steps:
     - 'gcs_ocn_bq_ingest/'
   id: 'mypy-main'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   entrypoint: 'mypy'
   waitFor:
   - 'build-ci-image'
@@ -72,21 +81,21 @@ steps:
   - 'tests/'
   id: 'mypy-tests'
 - name: 'hashicorp/terraform'
-  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
   waitFor:
     - '-'
   args:
     - 'init'
   id: 'terraform-init'
 - name: 'hashicorp/terraform'
-  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
   waitFor:
     - 'terraform-init'
   args:
     - 'validate'
   id: 'terraform-validate'
 - name: 'hashicorp/terraform'
-  dir: 'terraform_module/gcs_ocn_bq_ingest_function'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
   waitFor:
     - 'terraform-validate'
   args:
@@ -94,6 +103,7 @@ steps:
     - '-check'
   id: 'terraform-fmt'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   waitFor:
     - 'build-ci-image'
     - 'isort'
@@ -107,12 +117,16 @@ steps:
     - 'not IT'
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
   waitFor:
     - 'build-ci-image'
     - 'unit-test'
   args:
-    - '--workers=50'
     - '--maxfail=1'
     - '-m'
     - 'IT'
   id: 'integration-test'
+options:
+  machineType: 'N1_HIGHCPU_8'
+substitutions:
+  '_BUILD_DIR': 'tools/cloud_functions/gcs_event_based_ingest'
