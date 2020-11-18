@@ -3,6 +3,8 @@
 **Table of Contents**
 
 - [How to Contribute](#how-to-contribute)
+- [Developement Environment Setup](#developement-environment-setup)
+  - [Pre-commit](#pre-commit)
   - [Contributing UDFs (User Defined Functions)](#contributing-udfs-user-defined-functions)
   - [Contributor License Agreement](#contributor-license-agreement)
   - [Code reviews](#code-reviews)
