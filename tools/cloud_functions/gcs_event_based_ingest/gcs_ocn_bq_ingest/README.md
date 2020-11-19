@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Event Driven BigQuery Ingest](#event-driven-bigquery-ingest)
+  - [Orchestration](#orchestration)
+  - [Deployment](#deployment)
+  - [Implementation notes](#implementation-notes)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Event Driven BigQuery Ingest
 This directory defines a reusable [Background Cloud Function](https://cloud.google.com/functions/docs/writing/background)
 for ingesting any new file at a GCS prefix with a file name containing a
@@ -38,4 +49,3 @@ following default behavior.
 (rather than every object in the bucket), we chose to use manually
 configure Pub/Sub Notifications manually and use a Pub/Sub triggered
 Cloud Function.
-

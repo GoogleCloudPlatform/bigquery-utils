@@ -16,9 +16,11 @@
 import re
 from typing import Dict, Optional
 
+import gcs_ocn_bq_ingest.main
 import pytest
 
-import gcs_ocn_bq_ingest.main
+# pylint gets confused by pytest fixtures
+# pylint: disable=unused-argument
 
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
     gcs_ocn_bq_ingest.main.DEFAULT_DESTINATION_REGEX)

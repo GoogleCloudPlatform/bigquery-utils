@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [BigQuery Serverless Ingest](#bigquery-serverless-ingest)
+  - [GCS Object Naming Convention](#gcs-object-naming-convention)
+  - [Handling Incremental Loads](#handling-incremental-loads)
+  - [Monitoring](#monitoring)
+  - [Triggers](#triggers)
+  - [Continuous Integration](#continuous-integration)
+  - [Deployment](#deployment)
+  - [Backfill](#backfill)
+  - [Alternatives](#alternatives)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # BigQuery Serverless Ingest
 
 Flexible service for performing  BigQuery file loads to existing tables.
