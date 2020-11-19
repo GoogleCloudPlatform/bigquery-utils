@@ -1,0 +1,172 @@
+# Copyright 2020 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
+# This software is provided as-is,
+# without warranty or representation for any use or purpose.
+# Your use of it is subject to your agreement with Google.
+
+---
+default_stages: [commit, push]
+default_language_version:
+  python: python3.8
+minimum_pre_commit_version: "1.20.0"
+include: ^tools/cloud_functions/
+exclude: \.terraform/|^tools/
+repos:
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.9
+    hooks:
+      - id: forbid-tabs
+        exclude: Makefile$
+      - id: insert-license
+        name: Add license for all terraform files
+        files: \.tf$|\.hcl$|\.tfvars$
+        exclude: ^\.github/.*$|backend.tf
+        args:
+          - --comment-style
+          - "|#|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+      - id: insert-license
+        name: Add license for all shell files
+        exclude: ^\.github/.*$
+        files: \.sh$|\.sh.tmpl$|\.bash$|\.bats$
+        args:
+          - --comment-style
+          - "|#|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+      - id: insert-license
+        name: Add license for all python files
+        exclude: ^\.github/.*$|
+        types: [python]
+        args:
+          - --comment-style
+          - "|#|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+      - id: insert-license
+        name: Add license for all java files
+        exclude: ^\.github/.*$|
+        types: [java]
+        args:
+          - --comment-style
+          - "|//|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+      - id: insert-license
+        name: Add license for all golang files
+        exclude: ^\.github/.*$|
+        types: [go]
+        args:
+          - --comment-style
+          - "|//|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+      - id: insert-license
+        name: Add license for all yaml files
+        exclude: ^\.github/.*$
+        files: \.yaml$|\.yml$
+        args:
+          - --comment-style
+          - "|#|"
+          - --license-filepath
+          - license-templates/LICENSE.txt
+          - --fuzzy-match-generates-todo
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: check-executables-have-shebangs
+      - id: trailing-whitespace
+      - id: fix-encoding-pragma
+        args:
+          - --remove
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: terraform-fmt
+      - id: terraform-validate
+      - id: tflint
+  - repo: git://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.31.0
+    hooks:
+      - id: terraform_docs
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.6.0
+    hooks:
+      - id: python-no-log-warn
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.24.2
+    hooks:
+      - id: yamllint
+        name: Check yaml files with yamllint
+        entry: yamllint -c yamllint-config.yml
+        types: [yaml]
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.5.3
+    hooks:
+      - id: isort
+        name: Run isort to sort imports
+        types: [python]
+        exclude: ^.tox/.*$|^venv/.*$
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        additional_dependencies: ['flake8-colors==0.1.6']
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.782
+    hooks:
+      - id: mypy
+  - repo: local
+    hooks:
+      - id: pylint
+        name: Run pylint
+        entry: pylint
+        language: python
+        files: \.py$
+      - id: hadolint
+        name: Hadolint
+        description: Haskell-based Docker image linter
+        language: docker_image
+        files: Dockerfile*
+        entry: --entrypoint /bin/hadolint hadolint/hadolint:latest -
+      - id: shellcheck
+        name: Check Shell scripts syntax correctness
+        language: docker_image
+        entry: koalaman/shellcheck:stable -x -a
+        files: .*\.sh
+  - repo: https://github.com/thlorenz/doctoc.git
+    rev: v1.4.0
+    hooks:
+      - id: doctoc
+        name: Add TOC for md files
+        files: \.md$
+        args:
+          - "--maxlevel"
+          - "2"
+          - "--title"
+          - "**Table of Contents**"
