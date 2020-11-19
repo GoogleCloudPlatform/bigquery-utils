@@ -3,14 +3,14 @@
 # for any use or purpose.
 # Your use of it is subject to your agreement with Google.
 
-# Licensed under the Apache License, Version 2.0 (the 'License');
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS IS' BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -123,19 +123,19 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                            f" {destination_regex}")
     destination_details = destination_match.groupdict()
     try:
-        dataset = destination_details['dataset']
-        table = destination_details['table']
+        dataset = destination_details["dataset"]
+        table = destination_details["table"]
     except KeyError:
         raise RuntimeError(
             f"Object ID {object_id} did not match dataset and table in regex:"
             f" {destination_regex}") from KeyError
-    partition = destination_details.get('partition')
+    partition = destination_details.get("partition")
     year, month, day, hour = (
-        destination_details.get(key, "") for key in ('yyyy', 'mm', 'dd', 'hh'))
+        destination_details.get(key, "") for key in ("yyyy", "mm", "dd", "hh"))
     part_list = (year, month, day, hour)
     if not partition and any(part_list):
-        partition = '$' + ''.join(part_list)
-    batch_id = destination_details.get('batch')
+        partition = "$" + "".join(part_list)
+    batch_id = destination_details.get("batch")
     labels = DEFAULT_JOB_LABELS
     labels["bucket"] = bucket_id
 
@@ -178,7 +178,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     """Create job id prefix with a consistent naming convention.
     The naming conventions is as follows:
     gcf-ingest-<dataset_id>-<table_id>-<partition_num>-<batch_id>-
-    Parts that are not inferrable from the GCS path with have a 'None'
+    Parts that are not inferrable from the GCS path with have a "None"
     placeholder. This naming convention is crucial for monitoring the system.
     Note, gcf-ingest- can be overridden with environment variable JOB_PREFIX
 
@@ -484,7 +484,7 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
 # limit of once per second and we might do several of the same lookup during
 # the functions lifetime. This should improve performance by eliminating
 # unnecessary API calls. The lookups on bucket and objects in this function
-# should not be changing during the function's lifetime as this would lead to
+# should not be changing during the function"s lifetime as this would lead to
 # non-deterministic results with or without this cache.
 # https://cloud.google.com/storage/quotas
 @cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
@@ -499,7 +499,7 @@ def read_gcs_file(gcs_client: storage.Client, gsurl: str) -> str:
         str
     """
     blob = storage.Blob.from_string(gsurl)
-    return blob.download_as_bytes(client=gcs_client).decode('UTF-8')
+    return blob.download_as_bytes(client=gcs_client).decode("UTF-8")
 
 
 def read_gcs_file_if_exists(gcs_client: storage.Client,
@@ -541,7 +541,7 @@ def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
 # https://www.python.org/dev/peps/pep-0616/
 def removesuffix(in_str: str, suffix: str) -> str:
     """removes suffix from a string."""
-    # suffix='' should not call self[:-0].
+    # suffix="" should not call self[:-0].
     if suffix and in_str.endswith(suffix):
         return in_str[:-len(suffix)]
     return in_str[:]

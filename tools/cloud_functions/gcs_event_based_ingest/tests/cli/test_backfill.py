@@ -22,6 +22,8 @@ from google.cloud import bigquery
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 
+# pylint gets confused by pytest fixtures
+# pylint: disable=unused-argument
 
 @pytest.mark.IT
 @pytest.mark.CLI

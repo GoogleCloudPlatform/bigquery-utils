@@ -6,6 +6,7 @@ flake8>=3.8.3
 isort>=5.6.4
 mypy
 pylint
+pylint-pytest
 pytest-parallel
 astroid>=2.4.2
 flake8-colors>=0.1.6
