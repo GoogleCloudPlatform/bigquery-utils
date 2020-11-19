@@ -49,4 +49,3 @@ following default behavior.
 (rather than every object in the bucket), we chose to use manually
 configure Pub/Sub Notifications manually and use a Pub/Sub triggered
 Cloud Function.
-

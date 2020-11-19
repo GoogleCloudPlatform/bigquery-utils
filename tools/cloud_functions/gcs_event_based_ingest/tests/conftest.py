@@ -18,10 +18,9 @@ import time
 import uuid
 from typing import List
 
+import gcs_ocn_bq_ingest.main
 import pytest
 from google.cloud import bigquery, storage
-
-import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds

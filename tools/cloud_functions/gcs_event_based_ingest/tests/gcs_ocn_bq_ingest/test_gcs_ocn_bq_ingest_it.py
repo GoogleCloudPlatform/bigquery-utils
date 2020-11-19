@@ -15,11 +15,10 @@
 import os
 import time
 
+import gcs_ocn_bq_ingest.main
 import google.cloud.exceptions
 import pytest
 from google.cloud import bigquery
-
-import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds

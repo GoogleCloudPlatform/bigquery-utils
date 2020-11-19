@@ -21,10 +21,9 @@ import pprint
 import sys
 from typing import Dict, Iterator, List
 
+import gcs_ocn_bq_ingest.main  # pylint: disable=import-error
 import google.api_core.client_info
 from google.cloud import storage
-
-import gcs_ocn_bq_ingest.main  # pylint: disable=import-error
 
 CLIENT_INFO = google.api_core.client_info.ClientInfo(
     user_agent="google-pso-tool/bq-severless-loader-cli")
