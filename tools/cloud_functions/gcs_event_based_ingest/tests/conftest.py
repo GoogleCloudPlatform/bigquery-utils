@@ -18,10 +18,12 @@ import time
 import uuid
 from typing import List
 
+import gcs_ocn_bq_ingest.main
 import pytest
 from google.cloud import bigquery, storage
 
-import gcs_ocn_bq_ingest.main
+# pylint gets confused by pytest fixtures
+# pylint: disable=unused-argument,redefined-outer-name
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
@@ -72,7 +74,8 @@ def mock_env(gcs, monkeypatch):
 @pytest.mark.usefixtures("bq", "mock_env")
 @pytest.fixture
 def dest_dataset(request, bq, mock_env, monkeypatch):
-    random_dataset = f"test_bq_ingest_gcf_{str(uuid.uuid4())[:8].replace('-','_')}"
+    random_dataset = ("test_bq_ingest_gcf_"
+                      f"{str(uuid.uuid4())[:8].replace('-','_')}")
     dataset = bigquery.Dataset(f"{os.getenv('GCP_PROJECT')}"
                                f".{random_dataset}")
     dataset.location = "US"
@@ -97,7 +100,8 @@ def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
             json.load(schema_file))
 
     table = bigquery.Table(
-        f"{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.cf_test_nation",
+        f"{os.environ.get('GCP_PROJECT')}."
+        f"{dest_dataset.dataset_id}.cf_test_nation",
         schema=schema,
     )
 

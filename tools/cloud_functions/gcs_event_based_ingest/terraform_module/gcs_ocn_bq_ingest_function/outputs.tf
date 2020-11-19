@@ -1,4 +1,6 @@
 # Copyright 2020 Google LLC
+# TODO: This license is not consistent with license used in the project.
+#       Delete the inconsistent license and above line and rerun pre-commit to insert a good license.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,8 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 output "cloud-function" {
   description = "instance of cloud function deployed by this module."
   value       = google_cloudfunctions_function.gcs_to_bq
 }
 
+output "storage-notification" {
+  value = google_pubsub_topic.notification_topic.id
+}

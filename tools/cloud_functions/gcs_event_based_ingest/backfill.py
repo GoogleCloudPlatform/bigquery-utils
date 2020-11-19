@@ -21,10 +21,9 @@ import pprint
 import sys
 from typing import Dict, Iterator, List
 
+import gcs_ocn_bq_ingest.main  # pylint: disable=import-error
 import google.api_core.client_info
 from google.cloud import storage
-
-import gcs_ocn_bq_ingest.main  # pylint: disable=import-error
 
 CLIENT_INFO = google.api_core.client_info.ClientInfo(
     user_agent="google-pso-tool/bq-severless-loader-cli")
@@ -82,7 +81,7 @@ def main(args: argparse.Namespace):
                 future_to_gsurl[executor.submit(
                     pubsub_client.publish,
                     args.pubsub_topic,
-                    b'',  # cloud function ignores message body
+                    b"",  # cloud function ignores message body
                     bucketId=blob.bucket.name,
                     objectId=blob.name,
                     _metaInfo="this message was submitted with "
@@ -101,7 +100,7 @@ def main(args: argparse.Namespace):
                     },
                     None,
                 )] = f"gs://{blob.bucket.name}/{blob.name}"
-        exceptions: Dict[str, Exception] = dict()
+        exceptions: Dict[str, Exception] = {}
         for future in concurrent.futures.as_completed(future_to_gsurl):
             gsurl = future_to_gsurl[future]
             try:
