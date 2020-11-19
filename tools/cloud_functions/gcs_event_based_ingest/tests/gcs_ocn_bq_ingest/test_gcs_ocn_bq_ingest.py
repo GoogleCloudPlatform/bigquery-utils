@@ -13,54 +13,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
-import os
 import re
-import sys
 from typing import Dict, Optional
 
 import pytest
 
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
-from gcs_ocn_bq_ingest import main
+import gcs_ocn_bq_ingest.main
 
-COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(main.DEFAULT_DESTINATION_REGEX)
+COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
+    gcs_ocn_bq_ingest.main.DEFAULT_DESTINATION_REGEX)
 
 
 @pytest.mark.parametrize(
     "test_input,expected",
     [
         (
-            "dataset/table/_SUCCESS",    # flat
+            "dataset/table/_SUCCESS",  # flat
             {
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": None
             }),
         (
-            "dataset/table/$20201030/_SUCCESS",    # partitioned
+            "dataset/table/$20201030/_SUCCESS",  # partitioned
             {
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": None
             }),
         (
-            "dataset/table/$20201030/batch_id/_SUCCESS",    # partitioned, batched
+            "dataset/table/$20201030/batch_id/_SUCCESS",  # partitioned, batched
             {
                 "dataset": "dataset",
                 "table": "table",
                 "partition": "$20201030",
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": "batch_id"
             }),
         (
-            "dataset/table/batch_id/_SUCCESS",    # batched (no partitioning)
+            "dataset/table/batch_id/_SUCCESS",  # batched (no partitioning)
             {
                 "dataset": "dataset",
                 "table": "table",
                 "partition": None,
+                "yyyy": None,
+                "mm": None,
+                "dd": None,
+                "hh": None,
                 "batch": "batch_id"
             }),
+        ("dataset/table/2020/01/02/03/batch_id/_SUCCESS", {
+            "dataset": "dataset",
+            "table": "table",
+            "partition": None,
+            "yyyy": "2020",
+            "mm": "01",
+            "dd": "02",
+            "hh": "03",
+            "batch": "batch_id"
+        }),
     ])
 def test_default_destination_regex(test_input: str,
                                    expected: Dict[str, Optional[str]]):
@@ -84,4 +108,4 @@ def test_default_destination_regex(test_input: str,
     ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
 ])
 def test_flattend2dlist(test_input, expected):
-    assert main.flatten2dlist(test_input) == expected
+    assert gcs_ocn_bq_ingest.main.flatten2dlist(test_input) == expected
