@@ -85,8 +85,6 @@ SUCCESS_FILENAME = os.getenv("SUCCESS_FILENAME", "_SUCCESS")
 CLIENT_INFO = google.api_core.client_info.ClientInfo(
     user_agent="google-pso-tool/bq-severless-loader")
 
-RESTRICTED_SUB_DOMAIN = "restricted.googleapis.com"
-
 DEFAULT_JOB_PREFIX = "gcf-ingest-"
 
 
