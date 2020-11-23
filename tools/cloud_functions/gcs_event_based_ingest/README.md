@@ -106,7 +106,7 @@ If the files contents were like this:
 {
     "sourceFormat": "CSV",
     "writeDisposition": "WRITE_APPEND",
-    "schemaUpdateOptions": ["ALLOW_FILED_RELAXATION"]
+    "schemaUpdateOptions": ["ALLOW_FIELD_RELAXATION"]
 }
 ```
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/_config/load.json`:
