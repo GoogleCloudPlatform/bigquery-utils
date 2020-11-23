@@ -75,7 +75,8 @@ variable "use_pubsub_notifications" {
 }
 
 variable "bigquery_project_ids" {
-  description = "Additional project IDs to grant bigquery Admin / Job user for the data ingester account"
+  description = "Additional project IDs to grant bigquery Admin for the data ingester account"
   type        = list(string)
   default     = []
 }
+
