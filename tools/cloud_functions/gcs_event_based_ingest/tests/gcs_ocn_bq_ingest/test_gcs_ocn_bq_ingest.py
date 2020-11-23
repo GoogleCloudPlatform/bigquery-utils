@@ -85,6 +85,16 @@ COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
             "hh": "03",
             "batch": "batch_id"
         }),
+        ("project.dataset/table/2020/01/02/03/batch_id/_SUCCESS", {
+            "dataset": "project.dataset",
+            "table": "table",
+            "partition": None,
+            "yyyy": "2020",
+            "mm": "01",
+            "dd": "02",
+            "hh": "03",
+            "batch": "batch_id"
+        }),
     ])
 def test_default_destination_regex(test_input: str,
                                    expected: Dict[str, Optional[str]]):
