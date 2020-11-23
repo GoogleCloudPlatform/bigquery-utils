@@ -36,7 +36,6 @@ module "bucket" {
 }
 
 resource "google_storage_notification" "notification" {
-  depends_on         = [google_pubsub_topic_iam_binding.gcs_publisher]
   count              = var.use_pubsub_notifications ? 1 : 0
   bucket             = module.bucket.bucket
   object_name_prefix = var.input_prefix
@@ -89,16 +88,24 @@ module "data_ingester_service_account" {
   names      = [var.data_ingester_sa, ]
   project_roles = [
     "${var.project_id}=>roles/bigquery.jobUser",
+    "${var.project_id}=>roles/bigquery.dataEditor",
   ]
 }
 
-# Grant the ingester service account permissions to mutate data in
-# target project(s)
+# Grant the ingester service account permissions to run load jobs and mutate
+# data in the target project
+resource "google_project_iam_binding" "ingester_bq_job_user" {
+  for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
+  project  = each.key
+  members  = [module.data_ingester_service_account.iam_email]
+  role     = "roles/bigquery.jobUser"
+}
+
 resource "google_project_iam_binding" "ingester_bq_admin" {
   for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
   project  = each.key
   members  = [module.data_ingester_service_account.iam_email]
-  role     = "roles/bigquery.dataEditor"
+  role     = "roles/bigquery.admin"
 }
 
 # Allow the GCS service account to publish notification for new objects to the

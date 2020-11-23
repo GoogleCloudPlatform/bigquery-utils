@@ -6,6 +6,7 @@ for event based ingest of GCS data to BigQuery described [here](../README.md).
 Note that by default all environment variables for the cloud function
 will be empty deferring to the defaults implemented in the function and
 documented [here](../gcs_ocn_bq_ingest_function/README.md)
+
 ## Requirements
 
 | Name | Version |
@@ -27,7 +28,7 @@ documented [here](../gcs_ocn_bq_ingest_function/README.md)
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | app\_id | Application Name | `any` | n/a | yes |
-| bigquery\_project\_ids | Additional project IDs to grant bigquery Admin / Job user for the data ingester account | `list(string)` | `[]` | no |
+| bigquery\_project\_ids | Project IDs to grant bigquery Admin / Job user for the data ingester account | `list(string)` | `[]` | no |
 | cloudfunctions\_source\_bucket | GCS bucket to store Cloud Functions Source | `any` | n/a | yes |
 | data\_ingester\_sa | Service Account Email responsible for ingesting data to BigQuery | `any` | n/a | yes |
 | destination\_regex | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for destination `dataset`, `table`, (optional: `partition`, `batch`) | `string` | `""` | no |
