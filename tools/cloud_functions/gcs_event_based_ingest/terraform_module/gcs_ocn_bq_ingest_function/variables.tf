@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 variable "project_id" {
-  description = "GCP Project ID"
+  description = "GCP Project ID containing cloud function, and input bucket"
 }
 
 variable "app_id" {
@@ -74,3 +74,8 @@ variable "use_pubsub_notifications" {
   default     = false
 }
 
+variable "bigquery_project_ids" {
+  description = "Additional project IDs to grant bigquery Admin / Job user for the data ingester account"
+  type        = list(string)
+  default     = []
+}

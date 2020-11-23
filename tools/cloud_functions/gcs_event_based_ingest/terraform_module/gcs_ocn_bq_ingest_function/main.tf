@@ -92,6 +92,22 @@ module "data_ingester_service_account" {
   ]
 }
 
+# Grant the ingester service account permissions to run load jobs and mutate
+# data in the target project
+resource "google_project_iam_binding" "ingester_bq_job_user" {
+  for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
+  project  = each.key
+  members  = [module.data_ingester_service_account.iam_email]
+  role     = "roles/bigquery.jobUser"
+}
+
+resource "google_project_iam_binding" "ingester_bq_admin" {
+  for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
+  project  = each.key
+  members  = [module.data_ingester_service_account.iam_email]
+  role     = "roles/bigquery.admin"
+}
+
 # Allow the GCS service account to publish notification for new objects to the
 # notification topic.
 resource "google_pubsub_topic_iam_binding" "gcs_publisher" {

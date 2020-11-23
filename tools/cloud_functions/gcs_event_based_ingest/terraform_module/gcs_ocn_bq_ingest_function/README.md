@@ -28,6 +28,7 @@ documented [here](../gcs_ocn_bq_ingest_function/README.md)
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | app\_id | Application Name | `any` | n/a | yes |
+| bigquery\_project\_ids | Project IDs to grant bigquery Admin / Job user for the data ingester account | `list(string)` | `[]` | no |
 | cloudfunctions\_source\_bucket | GCS bucket to store Cloud Functions Source | `any` | n/a | yes |
 | data\_ingester\_sa | Service Account Email responsible for ingesting data to BigQuery | `any` | n/a | yes |
 | destination\_regex | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for destination `dataset`, `table`, (optional: `partition`, `batch`) | `string` | `""` | no |
@@ -36,7 +37,7 @@ documented [here](../gcs_ocn_bq_ingest_function/README.md)
 | input\_prefix | GCS prefix to watch for new files in input\_bucket | `any` | `null` | no |
 | job\_prefix | Prefix for BigQuery Job IDs | `string` | `""` | no |
 | max\_batch\_bytes | Max bytes for BigQuery Load job | `string` | `""` | no |
-| project\_id | GCP Project ID | `any` | n/a | yes |
+| project\_id | GCP Project ID containing cloud function, and input bucket | `any` | n/a | yes |
 | region | GCP region in which to deploy cloud function | `string` | `"us-central1"` | no |
 | success\_filename | Filename to trigger a load of a prefix | `string` | `""` | no |
 | use\_pubsub\_notifications | Setting this to true will use Pub/Sub notifications By default we will use Cloud Functions Event direct notifications. See https://cloud.google.com/storage/docs/pubsub-notifications. | `bool` | `false` | no |
