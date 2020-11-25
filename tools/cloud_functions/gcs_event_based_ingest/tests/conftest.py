@@ -138,8 +138,6 @@ def gcs_data(request, gcs_bucket, dest_dataset,
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_data_under_sub_dirs(request, gcs_bucket, dest_dataset,
                             dest_table) -> storage.blob.Blob:
-    """test that config files in parents are discovered when a success file
-    is uploaded in a child directory."""
     data_objs = []
     for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
         data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([

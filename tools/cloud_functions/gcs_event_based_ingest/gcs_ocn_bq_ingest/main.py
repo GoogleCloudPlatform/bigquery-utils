@@ -357,7 +357,7 @@ def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
     obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
-    def _get_parent_query(path):
+    def _get_parent_config(path):
         return _get_parent_config_file(storage_client, config_filename,
                                        bucket_name, path)
 
@@ -365,7 +365,7 @@ def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
     while parts:
         if config:
             return config
-        config = _get_parent_query("/".join(parts))
+        config = _get_parent_config("/".join(parts))
         parts.pop()
     return config
 
