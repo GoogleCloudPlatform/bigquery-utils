@@ -152,8 +152,9 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(client_info=CLIENT_INFO,
-                                default_query_job_config=default_query_config)
+    bq_client = bigquery.Client(
+        client_info=CLIENT_INFO,
+        default_query_job_config=default_query_config)
 
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
@@ -307,7 +308,10 @@ def handle_duplicate_notification(bkt: storage.Bucket,
     success_created_unix_timestamp = success_blob.time_created.timestamp()
 
     claim_blob: storage.Blob = bkt.blob(
-        f"_claimed_{success_created_unix_timestamp}")
+        success_blob.name.replace(
+            SUCCESS_FILENAME,
+            f"_claimed_{success_created_unix_timestamp}")
+    )
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
     except google.api_core.exceptions.PreconditionFailed as err:
