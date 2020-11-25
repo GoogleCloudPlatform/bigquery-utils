@@ -254,7 +254,7 @@ def external_query(  # pylint: disable=too-many-arguments
                 # BQ gives confusing warning about missing dataset if the
                 # external query refers to the wrong external table name.
                 # In this case we can give the end user a little more context.
-                if err.get("message", "").contains("missing dataset"):
+                if "missing dataset" in err.get("message", ""):
                     raise RuntimeError(
                         "External queries must select from the external table "
                         "named 'temp_ext'. This error may be due to specifying"
