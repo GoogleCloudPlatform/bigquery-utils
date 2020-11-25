@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
---divides a timestamp into a [tumble window](https://cloud.google.com/dataflow/docs/reference/sql/streaming-extensions#tumble)
---specified in seconds 
-CREATE OR REPLACE FUNCTION fn.ts_tumble(val TIMESTAMP, tumble_seconds INT64)
+-- ts_tumble:
+-- Input:
+-- input_ts: timestamp to be divided into a [tumble window](https://cloud.google.com/dataflow/docs/reference/sql/streaming-extensions#tumble)
+-- tumble_seconds: size of the tumble window in seconds
+-- Output: the starting TIMESTAMP of the tumble winow the input_ts belongs to
+CREATE OR REPLACE FUNCTION fn.ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)
+RETURNS TIMESTAMP
 AS (
- timestamp_seconds(div(unix_seconds(val), tumble_seconds) *  tumble_seconds))
+  IF (
+    tumble_seconds > 0, 
+    TIMESTAMP_SECONDS(DIV(UNIX_SECONDS(input_ts), tumble_seconds) * tumble_seconds), 
+    NULL
+  )
 );

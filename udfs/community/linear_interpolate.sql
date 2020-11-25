@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE function fn.linear_interpolate(
-    pos INT64, prev STRUCT<x INT64,y FLOAT64>, next STRUCT<x INT64,y FLOAT64>)
-AS (
-CASE
-  WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN null
-  ELSE
-  --y = m * x + b
-  (next.y - prev.y)/(next.x - prev.x) * (pos - prev.x) + prev.y
-END
+-- linear_interpolate:
+-- Input:
+-- pos: the position on x axis for the independent variable
+-- prev: the x,y coordinate of the preceding value
+-- next: the x,y coordinate of the following value
+-- Output: the interpolated y value
+CREATE OR REPLACE FUNCTION fn.linear_interpolate(pos INT64, prev STRUCT<x INT64,y FLOAT64>, next STRUCT<x INT64,y FLOAT64>) 
+RETURNS FLOAT64 AS (
+  CASE
+    WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN NULL
+    ELSE
+      (next.y - prev.y) / (next.x - prev.x) * (pos - prev.x) + prev.y
+  END
 );

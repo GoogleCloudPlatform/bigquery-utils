@@ -47,18 +47,21 @@
 * FROM tbl
 */
 
-CREATE OR REPLACE FUNCTION fn.ts_lin_interpolate(
-        pos TIMESTAMP,
-        prev STRUCT<x TIMESTAMP, y FLOAT64>,
-        next STRUCT<x TIMESTAMP, y FLOAT64>)
-AS (
- CASE
-    WHEN pos IS NULL OR prev IS NULL or next IS NULL THEN null
+-- ts_linear_interpolate:
+-- Input:
+-- pos: the independent variable of a linear interpolation, represented as a TIMESTAMP
+-- prev: the x,y coordinate of the preceding value, where the x-coordinate is a TIMESTAMP
+-- next: the x,y coordinate of the following value, where the x-coordinate is a TIMESTAMP
+-- Output: the interpolated y value
+CREATE OR REPLACE FUNCTION fn.ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)
+RETURNS FLOAT64 AS (
+  CASE
+    WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN NULL
     ELSE
-        bqutil.fn.linear_interpolate(
-            unix_seconds(pos),
-            STRUCT(unix_seconds(prev.x) AS x, prev.y AS y),
-            STRUCT(unix_seconds(next.x) AS x, next.y AS y)
-        )
- END
+      bqutil.fn.linear_interpolate(
+          UNIX_SECONDS(pos),
+          STRUCT(UNIX_SECONDS(prev.x) AS x, prev.y AS y),
+          STRUCT(UNIX_SECONDS(next.x) AS x, next.y AS y)
+      )
+  END
 );
