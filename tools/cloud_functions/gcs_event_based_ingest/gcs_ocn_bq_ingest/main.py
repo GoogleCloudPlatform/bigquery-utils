@@ -17,6 +17,8 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import collections
+import collections.abc
+import copy
 import json
 import os
 import pathlib
@@ -152,9 +154,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(
-        client_info=CLIENT_INFO,
-        default_query_job_config=default_query_config)
+    bq_client = bigquery.Client(client_info=CLIENT_INFO,
+                                default_query_job_config=default_query_config)
 
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
@@ -308,10 +309,8 @@ def handle_duplicate_notification(bkt: storage.Bucket,
     success_created_unix_timestamp = success_blob.time_created.timestamp()
 
     claim_blob: storage.Blob = bkt.blob(
-        success_blob.name.replace(
-            SUCCESS_FILENAME,
-            f"_claimed_{success_created_unix_timestamp}")
-    )
+        success_blob.name.replace(SUCCESS_FILENAME,
+                                  f"_claimed_{success_created_unix_timestamp}"))
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
     except google.api_core.exceptions.PreconditionFailed as err:
@@ -379,9 +378,9 @@ def construct_load_job_config(storage_client: storage.Client,
             config_q.append(json.loads(config))
         parts.pop()
 
-    merged_config = dict()
+    merged_config: Dict = {}
     while config_q:
-        merged_config.update(config_q.popleft())
+        recursive_update(merged_config, config_q.popleft(), in_place=True)
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
@@ -549,3 +548,29 @@ def removesuffix(in_str: str, suffix: str) -> str:
     if suffix and in_str.endswith(suffix):
         return in_str[:-len(suffix)]
     return in_str[:]
+
+
+def recursive_update(
+    original: Dict,
+    update: Dict,
+    in_place: bool = False
+):
+    """
+    return a recursively updated dictionary.
+
+    Note, lists will be completely overwritten by value in update if there is a
+    conflict.
+
+    original: (dict) the base dictionary
+    update:  (dict) the dictionary of updates to apply on original
+    in_place: (bool) if true then original will be mutated in place else a new
+        dictionary as a result of the update will be returned.
+    """
+    out = original if in_place else copy.deepcopy(original)
+
+    for key, value in update.items():
+        if isinstance(value, dict):
+            out[key] = recursive_update(out.get(key, {}), value)
+        else:
+            out[key] = value
+    return out
