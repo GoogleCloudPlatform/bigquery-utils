@@ -190,7 +190,12 @@ public class FixerTest {
   }
 
   @Test
-  public void fixExpectKeywordButGotOthers_useNearbyTokenFixer1() {
+  public void fixExpectKeywordButGotOthers_useNearbyTokenFixer_fixFrom() {
+    String expectedKeyword =
+        "SELECT status FROM `bigquery-public-data.austin_311.311_request` LIMIT 10";
+    mockDryRunQuery_noError(
+        expectedKeyword, "Syntax error: Expected end of input but got X at [1:1]");
+
     String query = "SELECT status FORM `bigquery-public-data.austin_311.311_request` LIMIT 10";
     String message =
         "Syntax error: Expected end of input but got identifier `bigquery-public-data.austin_311.311_request` at [1:20]";
@@ -201,19 +206,18 @@ public class FixerTest {
 
     FixResult result = fixer.fix();
     assertEquals(1, result.getOptions().size());
-    assertEquals(
-            "FORM => FROM",
-            result.getOptions().get(0).getAction());
-    assertEquals(
-        "SELECT status FROM `bigquery-public-data.austin_311.311_request` LIMIT 10",
-        result.getOptions().get(0).getFixedQuery());
+    assertEquals(expectedKeyword, result.getOptions().get(0).getFixedQuery());
 
     assertEquals(1, result.getErrorPosition().getRow());
     assertEquals(20, result.getErrorPosition().getColumn());
   }
 
   @Test
-  public void fixExpectKeywordButGotOthers_useNearbyTokenFixer2() {
+  public void fixExpectKeywordButGotOthers_useNearbyTokenFixer_fixSelect() {
+    String expectedKeyword = "SELECT status FROM `bigquery-public-data.austin_311.311_request`";
+    mockDryRunQuery_noError(
+        expectedKeyword, "Syntax error: Expected end of input but got X at [1:1]");
+
     String query = "SELCT status FROM `bigquery-public-data.austin_311.311_request`";
     String message = "Syntax error: Expected end of input but got identifier \"SELCT\" at [1:1]";
     BigQuerySqlError error = buildError(message);
@@ -223,12 +227,7 @@ public class FixerTest {
 
     FixResult result = fixer.fix();
     assertEquals(1, result.getOptions().size());
-    assertEquals(
-            "SELCT => SELECT",
-            result.getOptions().get(0).getAction());
-    assertEquals(
-        "SELECT status FROM `bigquery-public-data.austin_311.311_request`",
-        result.getOptions().get(0).getFixedQuery());
+    assertEquals(expectedKeyword, result.getOptions().get(0).getFixedQuery());
 
     assertEquals(1, result.getErrorPosition().getRow());
     assertEquals(1, result.getErrorPosition().getColumn());
@@ -236,8 +235,12 @@ public class FixerTest {
 
   @Test
   public void fixExpectKeywordButGotOthers_useNearbyTokenFixer_fail() {
-    String query = "Select status FROM `bigquery-public-data.austin_311.311_request` status != NULL";
+    mockDryRunQuery_noError("", "Syntax error: Expected end of input but got X at [1:1]");
+
+    String query =
+        "Select status FROM `bigquery-public-data.austin_311.311_request` status != NULL";
     String message = "Syntax error: Expected end of input but got \"!=\" at [1:73]";
+
     BigQuerySqlError error = buildError(message);
 
     IFixer fixer = fixerFactory.getFixer(query, error);
@@ -289,6 +292,227 @@ public class FixerTest {
     assertEquals(72, result.getErrorPosition().getColumn());
   }
 
+  @Test
+  public void fixDuplicateColumnsError1() {
+    String query = "SELECT status, status FROM `bigquery-public-data.austin_311.311_request`";
+    String message =
+        "Duplicate column names in the result are not supported. Found duplicate(s): status";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof DuplicateColumnsFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT\n"
+            + "  status AS status_1,\n"
+            + "  status AS status_2\n"
+            + "FROM\n"
+            + "  `bigquery-public-data.austin_311.311_request`\n",
+        result.getOptions().get(0).getFixedQuery());
+  }
+
+  @Test
+  public void fixDuplicateColumns2() {
+    String query =
+        "SELECT status, a.status, b.status, concat(a.status, \"_suffix\") as status "
+            + "FROM `bigquery-public-data.austin_311.311_request` a "
+            + "inner join `bigquery-public-data.austin_311.311_request` b "
+            + "on a.city = b.city LIMIT 1000";
+    String message =
+        "Duplicate column names in the result are not supported. Found duplicate(s): status";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof DuplicateColumnsFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT\n"
+            + "  status AS status_1,\n"
+            + "  a.status AS status_2,\n"
+            + "  b.status AS status_3,\n"
+            + "  concat(a.status, \"_suffix\") AS status_4\n"
+            + "FROM\n"
+            + "  `bigquery-public-data.austin_311.311_request` AS a\n"
+            + "  INNER JOIN\n"
+            + "  `bigquery-public-data.austin_311.311_request` AS b\n"
+            + "  ON a.city = b.city\n"
+            + "LIMIT 1000\n",
+        result.getOptions().get(0).getFixedQuery());
+  }
+
+  @Test
+  public void fixColumnNotGrouped_createGroupByClause() {
+    String query =
+        "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` LIMIT 1000";
+    String message =
+        "SELECT list expression references column status which is neither grouped nor aggregated at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof ColumnNotGroupedFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT\n"
+            + "  status,\n"
+            + "  max(unique_key)\n"
+            + "FROM\n"
+            + "  `bigquery-public-data.austin_311.311_request`\n"
+            + "GROUP BY status\n"
+            + "LIMIT 1000\n",
+        result.getOptions().get(0).getFixedQuery());
+  }
+
+  @Test
+  public void fixColumnNotGrouped_updateGroupByClause() {
+    String query =
+        "SELECT status, max(unique_key) FROM `bigquery-public-data.austin_311.311_request` group by city LIMIT 1000";
+    String message =
+        "SELECT list expression references column status which is neither grouped nor aggregated at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof ColumnNotGroupedFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT\n"
+            + "  status,\n"
+            + "  max(unique_key)\n"
+            + "FROM\n"
+            + "  `bigquery-public-data.austin_311.311_request`\n"
+            + "GROUP BY city, status\n"
+            + "LIMIT 1000\n",
+        result.getOptions().get(0).getFixedQuery());
+  }
+
+  @Test
+  public void fixColumnNotGrouped_withKeywordLikeColumn() {
+    String query =
+        "SELECT `hash`,  mod(size, 100) as bucket FROM `bigquery-public-data.crypto_bitcoin.blocks` group by bucket, mod(number, 10) LIMIT 1000 ";
+    String message =
+        "SELECT list expression references column `hash` which is neither grouped nor aggregated at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof ColumnNotGroupedFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT\n"
+            + "  `hash`,\n"
+            + "  mod(size, 100) AS bucket\n"
+            + "FROM\n"
+            + "  `bigquery-public-data.crypto_bitcoin.blocks`\n"
+            + "GROUP BY bucket, mod(number, 10), `hash`\n"
+            + "LIMIT 1000\n",
+        result.getOptions().get(0).getFixedQuery());
+  }
+
+  @Test
+  public void noMatchingSignatureTest_legacyTypeCast_toString() {
+    String query = "SELECT string(safe_cast(\"\" as bytes))";
+    String message =
+        "No matching signature for function STRING for argument types: BYTES. Supported signature: STRING(TIMESTAMP, [STRING]) at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof NoMatchingSignatureFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT SAFE_CAST(safe_cast(\"\" as bytes) AS STRING)",
+        result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void noMatchingSignatureTest_legacyTypecast_intToTimestamp() {
+    String query = "SELECT timestamp(1000)";
+    String message =
+        "No matching signature for function TIMESTAMP for argument types: INT64. Supported signatures: TIMESTAMP(STRING, [STRING]); TIMESTAMP(DATE, [STRING]); TIMESTAMP(DATETIME, [STRING]) at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof NoMatchingSignatureFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals("SELECT TIMESTAMP_MICROS(1000)", result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void noMatchingSignatureTest_intToDatetime() {
+    String query = "SELECT datetime(1000)";
+    String message =
+        "No matching signature for function DATETIME for argument types: INT64. Supported signatures: DATETIME(INT64, INT64, INT64, INT64, INT64, INT64); DATETIME(DATE, TIME); DATETIME(TIMESTAMP, [STRING]); DATETIME(DATE) at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof NoMatchingSignatureFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT DATETIME(TIMESTAMP_MICROS(1000))", result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void noMatchingSignatureTest_ifNull() {
+    String query = "SELECT IFNUll(1, \"23\")";
+    String message =
+        "No matching signature for function IFNULL for argument types: INT64, STRING. Supported signature: IFNULL(ANY, ANY) at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof NoMatchingSignatureFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(1, result.getOptions().size());
+    assertEquals(
+        "SELECT IFNULL(1, SAFE_CAST(\"23\" AS INT64))", result.getOptions().get(0).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
+  @Test
+  public void noMatchingSignatureTest_typeNotMatched() {
+    String query = "select length(123)";
+    String message =
+        "No matching signature for function LENGTH for argument types: INT64. Supported signatures: LENGTH(STRING); LENGTH(BYTES) at [1:8]";
+    BigQuerySqlError error = buildError(message);
+
+    IFixer fixer = fixerFactory.getFixer(query, error);
+    assertTrue(fixer instanceof NoMatchingSignatureFixer);
+
+    FixResult result = fixer.fix();
+    assertEquals(2, result.getOptions().size());
+    assertEquals(
+        "select LENGTH(SAFE_CAST(123 AS STRING))", result.getOptions().get(0).getFixedQuery());
+    assertEquals(
+        "select LENGTH(SAFE_CAST(123 AS BYTES))", result.getOptions().get(1).getFixedQuery());
+
+    assertEquals(1, result.getErrorPosition().getRow());
+    assertEquals(8, result.getErrorPosition().getColumn());
+  }
+
   private String fullMockTable(String table) {
     return "bigquery-public-data.mock." + table;
   }
@@ -310,5 +534,17 @@ public class FixerTest {
 
   private String convertToAction(String identifier) {
     return String.format("Change to `%s`", identifier);
+  }
+
+  private void mockDryRunQuery_noError(String query, String defaultErrorForOthers) {
+    when(bigQueryServiceMock.catchExceptionFromDryRun(any(String.class)))
+        .thenReturn(buildException(defaultErrorForOthers));
+
+    when(bigQueryServiceMock.catchExceptionFromDryRun(query)).thenReturn(null);
+  }
+
+  private BigQueryException buildException(String message) {
+    BigQueryError bigQueryError = new BigQueryError("", "", message);
+    return new BigQueryException(400, message, bigQueryError);
   }
 }

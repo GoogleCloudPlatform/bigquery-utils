@@ -22,23 +22,27 @@ export class AutoFixerActionProvider implements vscode.CodeActionProvider {
 
     const diagnostics: vscode.Diagnostic[] = [];
     fixes.forEach(fix => {
-      if (!fix.error || !fix.errorPosition) {
+      if (!fix.error) {
         return;
       }
       hasErrors = true;
 
       let msg = fix.error!;
       if (fix.approach) {
-        msg += ' ' + fix.approach!;
+        msg += '\nSuggestion: ' + fix.approach!;
       }
 
       // highlight the immediate token
-      const range = openEditor.document.getWordRangeAtPosition(
-        new vscode.Position(
-          fix.errorPosition.row - 1,
-          fix.errorPosition.column - 1
-        )
-      )!;
+      const regex = new RegExp('[^(\\s|\\t|\\n)]*');
+      const range = fix.errorPosition
+        ? openEditor.document.getWordRangeAtPosition(
+            new vscode.Position(
+              fix.errorPosition.row - 1,
+              fix.errorPosition.column - 1
+            ),
+            regex
+          )!
+        : new vscode.Range(0, 0, 0, 0);
 
       diagnostics.push(
         new vscode.Diagnostic(range, msg, vscode.DiagnosticSeverity.Error)
@@ -81,25 +85,13 @@ export class AutoFixerActionProvider implements vscode.CodeActionProvider {
     }
 
     return this.fixes
-      .filter(
-        fix =>
-          // for all errors contained in the given range with code fixes
-          fix.options &&
-          fix.errorPosition &&
-          range.contains(
-            new vscode.Position(
-              fix.errorPosition.row - 1,
-              fix.errorPosition.column - 1
-            )
-          )
-      )
       .map(fix =>
         // create an action to replace the query with the fix
         fix.options!.map(option => {
           const workspaceEdit = new vscode.WorkspaceEdit();
           workspaceEdit.replace(this.uri!, this.range!, option.fixedQuery);
           const action = new vscode.CodeAction(
-            `${option.description}. Replace query with ${option.fixedQuery}`,
+            `${option.action}`,
             vscode.CodeActionKind.QuickFix
           );
           action.diagnostics = this.diagnosticCollection

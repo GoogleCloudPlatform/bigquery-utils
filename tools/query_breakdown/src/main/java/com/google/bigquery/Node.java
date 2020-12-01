@@ -1,6 +1,5 @@
 package com.google.bigquery;
 
-import java.util.ArrayList;
 import org.json.simple.JSONObject;
 
 /**
@@ -10,8 +9,6 @@ import org.json.simple.JSONObject;
 public class Node {
 
   // ensures tree structure
-
-  private ArrayList<Node> children;
   private Node parent;
 
   // ensures that we know which location the error occurs in
@@ -66,7 +63,7 @@ public class Node {
   }
 
   /**
-   * Override toString method for better debugging
+   * Override toString method for outputting results and better debugging
    */
   @Override
   public String toString() {
@@ -82,6 +79,9 @@ public class Node {
     }
   }
 
+  /**
+   * Returns a JSON Object representation of the node for integration
+   */
   public JSONObject toJSON() {
     JSONObject errorPosition = new JSONObject();
     errorPosition.put("startLine", startLine);
@@ -116,33 +116,7 @@ public class Node {
     return parent;
   }
 
-  public int getStartLine() {
-    return startLine;
+  public int getUnparseableCount() {
+    return unparseableCount;
   }
-
-  public int getStartColumn() {
-    return startColumn;
-  }
-
-  public int getEndLine() {
-    return endLine;
-  }
-
-  public int getEndColumn() {
-    return endColumn;
-  }
-
-  public String getReplaceFrom() {
-    return replaceFrom;
-  }
-
-  public String getReplaceTo() {
-    return replaceTo;
-  }
-
-  public String getErrorHandlingType() {
-    return type.toString();
-  }
-
-  public int getUnparseableCount() { return unparseableCount; }
 }

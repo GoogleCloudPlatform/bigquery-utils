@@ -6,10 +6,12 @@ plugins {
 group 'com.google.cloud.bigquery.utils'
 version '1.0-SNAPSHOT'
 
-
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
 
 application {
     mainClassName = "com.google.cloud.bigquery.utils.queryfixer.QueryFixerMain"
+    applicationDefaultJvmArgs = ['-Dfile.encoding=UTF8']
 }
 
 repositories {
@@ -42,6 +44,17 @@ dependencies {
     compile 'com.google.guava:guava:23.5-jre'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile 'org.slf4j:slf4j-simple:1.7.25'
+
+    // Import ZetaSQL Helper client
+    // JAVA_GRPC_VERSION is originally 1.18, but it will use io.opencensus which was overridden by bigquery library above.
+    def JAVA_GRPC_VERSION = "1.30.0"
+    implementation name: 'zetasql_helper_client'
+    implementation "io.grpc:grpc-netty-shaded:" + JAVA_GRPC_VERSION
+    implementation "io.grpc:grpc-protobuf:" + JAVA_GRPC_VERSION
+    implementation"io.grpc:grpc-stub:" + JAVA_GRPC_VERSION
+    //docker-java used by the ZetaSQL Helper client
+    compile group: 'com.github.docker-java', name: 'docker-java-core', version: '3.2.5'
+    compile group: 'com.github.docker-java', name: 'docker-java-transport-httpclient5', version: '3.2.5'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

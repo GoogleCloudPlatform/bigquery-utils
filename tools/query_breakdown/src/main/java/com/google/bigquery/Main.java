@@ -39,8 +39,10 @@ import org.json.simple.JSONObject;
  */
 public class Main {
   public static void main(String[] args) {
-    // deals with logger errors from calcite parser
+    // deals with slf4j logger errors from calcite parser
     Logger.getRootLogger().setLevel(Level.OFF);
+
+    // starts the timer for runtime measurement
     long start = System.nanoTime();
 
     String inputFile = null;
@@ -54,6 +56,7 @@ public class Main {
       exit(1);
     }
 
+    // sets the variables accordingly from the flag arguments
     if (cl.hasOption("i")) {
       inputFile = cl.getOptionValue("i");
     }
@@ -77,15 +80,13 @@ public class Main {
       exit(1);
     }
 
-    /* this is where we feed in the original queries to QueryBreakdown, which will find
-       all the unparseable components of the query.
-     */
     if (ir.getLocationTrackers().size() != ir.getQueries().size()) {
       System.out.println("there was an error in input parsing: wrong number of queries and "
           + "location trackers");
       exit(1);
     }
 
+    // we initialize a file to output to
     FileWriter writer = null;
     try {
       String absPath = new File("").getAbsolutePath();
@@ -98,9 +99,16 @@ public class Main {
       exit(1);
     }
 
-    // runs the tool on multiple queries
+    /* this is where we feed in each of the original queries to QueryBreakdown, which will find
+       all the unparseable components of the query. We then get the results and add them to the
+       endResult list. We also output the results in the txt file created before.
+     */
+
+    // gets queries and locationTrackers initialized by the InputReader
     List<String> queries = ir.getQueries();
     List<LocationTracker> locationTrackers = ir.getLocationTrackers();
+
+    // contains all the nodes to output as results
     List<Node> endResult = new ArrayList<>();
     for (int i = 0; i < queries.size(); i++) {
       QueryBreakdown qb = new QueryBreakdown(new CalciteParser());
@@ -131,10 +139,12 @@ public class Main {
       exit(1);
     }
 
+    // keeps track of total characters of unparesable components for performance analysis
     int totalUnparseable = 0;
 
-    // outputs the results
+    // outputs the results accordingly as json or user-readable format
     if (jsonOutput) {
+      // all queries paresable
       if (endResult.isEmpty()) {
         System.out.println("[]");
         return;
@@ -165,6 +175,8 @@ public class Main {
         System.out.println("The entire query can be parsed without error");
         return;
       }
+
+      // print out results
       for (Node node: endResult) {
         System.out.println(node.toString());
         totalUnparseable += node.getUnparseableCount();
@@ -180,7 +192,9 @@ public class Main {
       float runtimeSeconds = TimeUnit.NANOSECONDS.toSeconds(end - start);
       System.out.println("Runtime: " + runtimeSeconds + " seconds");
     }
-    exit(0);
+
+    // to deal with a bug where program does not terminate in CLI without explicit exit call
+    System.exit(0);
   }
 
   /**

@@ -26,13 +26,13 @@ A common pattern in data warehousing for tracking results of DML statements is t
     Note: You can create a log sink at the folder, billing account, or organization level using an 
     [aggregated sink](https://cloud.google.com/logging/docs/export/aggregated_sinks#creating_an_aggregated_sink).
 1.  The BigQuery audit log tables will be created in your dataset sink destination once you run a BigQuery job post sink creation.
-1.  To use the [big_query_elt_audit_log_v2.sql](/views/audit/big_query_elt_audit_log_v2.sql) view, simply change
+1.  To use the [big_query_elt_script_logging.sql](/views/audit/big_query_elt_script_logging.sql) view, simply change
     all occurrences of `project_id.dataset_id` to your own project id and dataset name you used when creating the logging sink. 
     Run the following sed command with your own project and dataset IDs to perform this replacement:
     *   `sed
         's/project_id.dataset_id/YOUR_PROJECT_ID.YOUR_DATASET_ID/'
         big_query_elt_audit_log_v2.sql`
-1.  Execute the [big_query_elt_audit_log_v2.sql](/views/audit/big_query_elt_audit_log_v2.sql) SQL in your BigQuery console or command line to
+1.  Execute the [big_query_elt_script_logging.sql](/views/audit/big_query_elt_script_logging.sql) SQL in your BigQuery console or command line to
     create your view. Once created, you can do further analysis in BigQuery by querying the view, or
     you can connect it to a BI tool such as DataStudio to build dashboards.
     

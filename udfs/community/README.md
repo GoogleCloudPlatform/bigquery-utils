@@ -21,6 +21,7 @@ SELECT bqutil.fn.int(1.684)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
 * [last_day](#lastdaydt-date)
+* [linear_interpolate](#linear_interpolate)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -30,6 +31,9 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [ts_gen_keyed_timestamps](#ts_gen_keyed_timestamps)
+* [ts_linear_interpolate](#ts_linear_interpolate)
+* [ts_tumble](#ts_tumble)
 * [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
@@ -230,6 +234,22 @@ results:
 | 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
+### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sql)
+Interpolate the current positions value from the preceding and folllowing coordinates
+
+```sql
+SELECT 
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(10 AS x, 10.0 AS y)),
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(20 AS x, 10.0 AS y))
+```
+
+results:
+
+| f0_ | f1_ |
+|-----|-----|
+| 2.0 | 1.0 |
+
+
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
 
@@ -343,6 +363,53 @@ SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
 most tin
 ```
+
+### [ts_gen_keyed_timestamps(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts TIMESTAMP](ts_gen_keyed_timestamps.sql)
+Generate a timestamp array associated with each key
+
+```sql
+SELECT *
+FROM 
+  UNNEST(bqutil.fn.ts_gen_keyed_timestamps(['abc', 'def'], 60, TIMESTAMP '2020-01-01 00:30:00', TIMESTAMP '2020-01-01 00:31:00))
+```
+
+| series_key | tumble_val
+|------------|-------------------------|
+| abc        | 2020-01-01 00:30:00 UTC |
+| def        | 2020-01-01 00:30:00 UTC |
+| abc        | 2020-01-01 00:31:00 UTC |
+| def        | 2020-01-01 00:31:00 UTC |
+  
+
+### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT(x TIMESTAMP, y FLOAT6), next STRUCT(x TIMESTAMP, y FLOAT64))](ts_linear_interpolation.sql)
+Interpolate the positions value using timestamp seconds as the x-axis
+
+```sql
+select bqutil.fn.ts_linear_interpolate(
+  TIMESTAMP '2020-01-01 00:30:00', 
+  STRUCT(TIMESTAMP '2020-01-01 00:29:00' AS x, 1.0 AS y),
+  STRUCT(TIMESTAMP '2020-01-01 00:31:00' AS x, 3.0 AS y)
+)
+```
+
+| f0_ |
+|-----|
+| 2.0 |
+
+
+### [ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)](ts_tumble.sql)
+Calculate the [tumbling window](https://cloud.google.com/dataflow/docs/concepts/streaming-pipelines#tumbling-windows) the input_ts belongs in
+
+```sql
+SELECT
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 900) AS min_15,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 600) AS min_10,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 60) As min_1
+```
+
+| min_15                  | min_10                  |                         |       
+|-------------------------|-------------------------|-------------------------|
+| 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
 
 ### [typeof(input ANY TYPE)](typeof.sql)

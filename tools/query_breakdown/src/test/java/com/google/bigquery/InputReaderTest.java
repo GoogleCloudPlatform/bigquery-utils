@@ -22,8 +22,8 @@ public class InputReaderTest {
     String absPath = new File("").getAbsolutePath();
     InputReader ir = new InputReader(absPath +
         "/src/test/java/com/google/bigquery/InputTestFiles/multipleLines.txt");
-    assertEquals("SELECT a FROM A;", ir.getQueries().get(0));
-    assertEquals("\n\nSELECT b FROM B;", ir.getQueries().get(1));
+    assertEquals("SELECT a FROM A", ir.getQueries().get(0));
+    assertEquals("\n\nSELECT b FROM B", ir.getQueries().get(1));
     assertEquals(2, ir.getQueries().size());
     assertEquals(2, ir.getLocationTrackers().size());
   }
@@ -34,7 +34,7 @@ public class InputReaderTest {
     InputReader ir = new InputReader(absPath +
         "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleLinesNoSemicolon.txt");
-    assertEquals("SELECT a FROM A;", ir.getQueries().get(0));
+    assertEquals("SELECT a FROM A", ir.getQueries().get(0));
     assertEquals("\n\nSELECT b FROM B", ir.getQueries().get(1));
     assertEquals(2, ir.getQueries().size());
     assertEquals(2, ir.getLocationTrackers().size());
@@ -46,7 +46,7 @@ public class InputReaderTest {
     InputReader ir = new InputReader(absPath +
         "/src/test/java/com/google/bigquery"
         + "/InputTestFiles/multipleLineQuery.txt");
-    assertEquals("SELECT a\nFROM A\nWHERE A = 3;", ir.getQueries().get(0));
+    assertEquals("SELECT a\nFROM A\nWHERE A = 3", ir.getQueries().get(0));
     assertEquals(" SELECT b FROM B", ir.getQueries().get(1));
     assertEquals(2, ir.getQueries().size());
     assertEquals(2, ir.getLocationTrackers().size());
