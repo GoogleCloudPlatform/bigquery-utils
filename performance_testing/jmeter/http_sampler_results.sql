@@ -15,7 +15,6 @@
  */
 
 SELECT
---   labels[OFFSET(1)].value AS query_id,
   SPLIT(labels[OFFSET(1)].value, '_')[OFFSET(0)] AS complexity,
   COUNT(1)
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
@@ -28,6 +27,6 @@ WHERE
     FROM UNNEST(labels) AS labels
     WHERE
       labels.key = 'run_id'
-      AND labels.value = 'http_test_1'
+      AND labels.value = 'jmeter_http_test'
   )
 GROUP BY 1

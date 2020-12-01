@@ -39,6 +39,6 @@ apache-jmeter-5.3/bin/jmeter -n \
 -Jmedium_num_users=3 \
 -Jcomplex_num_users=1 \
 -Jnum_loops=-1 \
--Jrun_id=jmeter_test_label \
+-Jrun_id=jmeter_http_test \
 -Jthread_duration=10 \
 -Jramp_time=0;

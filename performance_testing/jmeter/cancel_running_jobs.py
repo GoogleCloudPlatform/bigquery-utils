@@ -18,7 +18,6 @@ from google.cloud import bigquery
 
 def cancel_jobs(client):
     for job in client.list_jobs(all_users=True, state_filter="RUNNING"):
-        # print(f'Cancelling Job: {job.job_id}')
         client.cancel_job(job.job_id, location='us')
 
 

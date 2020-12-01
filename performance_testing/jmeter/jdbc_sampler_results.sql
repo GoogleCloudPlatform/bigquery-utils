@@ -23,5 +23,5 @@ FROM
 WHERE
   DATE(creation_time) = CURRENT_DATE()  -- Partitioning column
   AND project_id = 'YOUR_PROJECT'       -- Clustering column
-  AND SPLIT(TRIM(SPLIT(query, '*/')[OFFSET(0)],'/*'))[OFFSET(0)] = 'jdbc_test_1'
+  AND SPLIT(TRIM(SPLIT(query, '*/')[OFFSET(0)],'/*'))[OFFSET(0)] = 'jmeter_jdbc_test'
 GROUP BY 1
