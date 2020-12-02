@@ -37,8 +37,10 @@ better fit your naming convention on GCS. Your regex must include
 [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
 for destination `dataset`, and `table`.
 Note, that `dataset` can optionally, explicitly specify destination project
-(i.e. `gs://${BUCKET}/project_id.dataset_id/table/....`) otherwise the default
-project will be inferred from Application Default Credential (the project in
+(i.e. `gs://${BUCKET}/project_id.dataset_id/table/....`) alternatively,
+one can set the `BQ_PROJECT` environment variable to set to override the
+default target project for datasets at the function level. The default behavior is to 
+infer the project from Application Default Credential (the project in
 which the Cloud Function is running, or the ADC configured in Google Cloud SDK
 if invoked locally). This is useful in scenarios where a single deployment of
 the Cloud Function is responsible for ingesting data into BigQuery tables in

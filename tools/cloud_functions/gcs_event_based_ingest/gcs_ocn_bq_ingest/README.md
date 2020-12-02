@@ -31,6 +31,7 @@ following default behavior.
 | `DESTINATION_REGEX`   | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for `dataset`, `table`, (optional: `partition` or `yyyy`, `mm`, `dd`, `hh`, `batch`)
 | `MAX_BATCH_BYTES`     | Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
 | `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
+| `BQ_PROJECT`          | Default BQ project to use if not specified in dataset capturing group | Project where Cloud Function is deployed |
 
 
 ## Implementation notes

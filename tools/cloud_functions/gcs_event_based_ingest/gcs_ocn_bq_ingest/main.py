@@ -117,7 +117,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
     gcs_client = storage.Client(client_info=CLIENT_INFO)
-    project = gcs_client.project
+    project = os.getenv("BQ_PROJECT", gcs_client.project)
     bkt = cached_get_bucket(gcs_client, bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
     handle_duplicate_notification(bkt, success_blob, gsurl)
