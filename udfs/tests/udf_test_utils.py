@@ -137,7 +137,8 @@ def replace_with_null_body(udf_path):
     match = pattern.search(udf_sql)
     if match:
         udf_signature = match[1].replace('LANGUAGE js', '')
-        udf_null_body = f'CREATE OR REPLACE FUNCTION {udf_signature} AS (NULL)'
+        udf_null_body = (f'CREATE FUNCTION IF NOT EXISTS {udf_signature}'
+                         f' AS (NULL)')
         return udf_null_body
     else:
         return None
