@@ -137,7 +137,7 @@ override them at whatever level is appropriate as new cases come up.
 For CSV loads the `fieldDelimiter` in load.json to external.json should be
 specified as a unicode character _not_ a hexidecimal character as hexidecimal
 characters will confuse python's `json.load` function.
-For example ctrl-P should be specified as:
+For example [ctrl-P](https://en.wikipedia.org/wiki/Data_Link_Escape) should be specified as:
 ```json
 {
     "fieldDelimiter": "\u0010"
