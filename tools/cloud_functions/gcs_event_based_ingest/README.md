@@ -135,6 +135,17 @@ The result of merging these would be:
 This configuration system gives us the ability to DRY up common defaults but
 override them at whatever level is appropriate as new cases come up.
 
+### Note on Delimiters: Use Unicode
+For CSV loads the `fieldDelimiter` in load.json to external.json should be
+specified as a unicode character _not_ a hexidecimal character as hexidecimal
+characters will confuse python's `json.load` function.
+For example ctrl-P should be specified as:
+```json
+{
+    "fieldDelimiter": "\u0010"
+}
+```
+
 #### Transformation SQL
 In some cases we may need to perform transformations on the files in GCS
 before they can be loaded to BigQuery. This is handled by query on an
