@@ -39,7 +39,10 @@ DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
 MAX_SOURCE_URIS_PER_LOAD = 10**4
 
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
-    "sourceFormat": "CSV",
+    # The default must be a self describing data format
+    # because autodetecting CSV /JSON schemas is likely to not match
+    # expectations / assumptions of the transformation query.
+    "sourceFormat": "PARQUET",
 }
 
 DEFAULT_JOB_LABELS = {
@@ -157,14 +160,15 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     bq_client = bigquery.Client(client_info=CLIENT_INFO,
                                 default_query_job_config=default_query_config)
 
-    print(f"looking for {gsurl}_config/bq_transform.sql")
+    print("looking for bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/bq_transform.sql")
-    print(f"external_query_sql = {external_query_sql}")
     if not external_query_sql:
-        external_query_sql = look_for_transform_sql(gcs_client, gsurl)
+        external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
+                                                        "bq_transform.sql")
     if external_query_sql:
         print("EXTERNAL QUERY")
+        print(f"found external query:\n{external_query_sql}")
         external_query(gcs_client, bq_client, gsurl, external_query_sql,
                        dest_table_ref,
                        create_job_id_prefix(dest_table_ref, batch_id))
@@ -218,15 +222,19 @@ def external_query(  # pylint: disable=too-many-arguments
     """
     external_table_config = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/external.json")
+    if not external_table_config:
+        external_table_config = look_for_config_in_parents(
+            gcs_client, gsurl, "external.json")
     if external_table_config:
         external_table_def = json.loads(external_table_config)
     else:
         print(f"Falling back to default CSV external table."
-              f" {gsurl}/_config/external.json not found.")
+              f" {gsurl}_config/external.json not found.")
         external_table_def = DEFAULT_EXTERNAL_TABLE_DEFINITION
 
     external_table_def["sourceUris"] = flatten2dlist(
         get_batches_for_prefix(gcs_client, gsurl))
+    print(f"external table def = {json.dumps(external_table_config, indent=2)}")
     external_config = bigquery.ExternalConfig.from_api_repr(external_table_def)
     job_config = bigquery.QueryJobConfig(
         table_definitions={"temp_ext": external_config}, use_legacy_sql=False)
@@ -332,16 +340,15 @@ def _get_parent_config_file(storage_client, config_filename, bucket, path):
                                    f"gs://{bucket}/{config_path}")
 
 
-def look_for_transform_sql(storage_client: storage.Client,
-                           gsurl: str) -> Optional[str]:
-    """look in parent directories for _config/bq_transform.sql"""
-    config_filename = "bq_transform.sql"
+def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
+                               config_filename: str) -> Optional[str]:
+    """look in parent directories for _config/config_filename"""
     blob: storage.Blob = storage.Blob.from_string(gsurl)
     bucket_name = blob.bucket.name
     obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
-    def _get_parent_query(path):
+    def _get_parent_config(path):
         return _get_parent_config_file(storage_client, config_filename,
                                        bucket_name, path)
 
@@ -349,7 +356,7 @@ def look_for_transform_sql(storage_client: storage.Client,
     while parts:
         if config:
             return config
-        config = _get_parent_query("/".join(parts))
+        config = _get_parent_config("/".join(parts))
         parts.pop()
     return config
 
