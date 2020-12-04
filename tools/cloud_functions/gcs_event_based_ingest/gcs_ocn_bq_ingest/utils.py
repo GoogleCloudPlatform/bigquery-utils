@@ -23,53 +23,23 @@ import json
 import os
 import pathlib
 import time
-from typing import Any, Deque, Dict, List, Optional, Tuple
+import uuid
+from typing import Any, Deque, Dict, List, Optional, Tuple, Union
 
 import cachetools
+import google.api_core
 import google.api_core.client_info
 import google.api_core.exceptions
 import google.cloud.exceptions
+# pylint in cloud build is being flaky about this import discovery.
 from google.cloud import bigquery, storage
 
-# pylint in cloud build is being flaky about this import discovery.
-from . import constants  # pylint: disable=no-name-in-module
-
-
-def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
-                         batch_id: Optional[str]):
-    """Create job id prefix with a consistent naming convention.
-    The naming conventions is as follows:
-    gcf-ingest-<dataset_id>-<table_id>-<partition_num>-<batch_id>-
-    Parts that are not inferrable from the GCS path with have a 'None'
-    placeholder. This naming convention is crucial for monitoring the system.
-    Note, gcf-ingest- can be overridden with environment variable JOB_PREFIX
-
-    Examples:
-
-    Non-partitioned Non batched tables:
-      - gs://${BUCKET}/tpch/lineitem/_SUCCESS
-      - gcf-ingest-tpch-lineitem-None-None-
-    Non-partitioned batched tables:
-      - gs://${BUCKET}/tpch/lineitem/batch000/_SUCCESS
-      - gcf-ingest-tpch-lineitem-None-batch000-
-    Partitioned Batched tables:
-      - gs://${BUCKET}/tpch/lineitem/$20201031/batch000/_SUCCESS
-      - gcf-ingest-tpch-lineitem-20201031-batch000-
-    """
-    table_partition = dest_table_ref.table_id.split("$")
-    if len(table_partition) < 2:
-        # If there is no partition put a None placeholder
-        table_partition.append("None")
-    return f"{os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)}" \
-        f"{dest_table_ref.dataset_id}-" \
-        f"{'-'.join(table_partition)}-" \
-        f"{batch_id}-"
+from . import constants, exceptions  # pylint: disable=no-name-in-module
 
 
 def external_query(  # pylint: disable=too-many-arguments
         gcs_client: storage.Client, bq_client: bigquery.Client, gsurl: str,
-        query: str, dest_table_ref: bigquery.TableReference,
-        job_id_prefix: str):
+        query: str, dest_table_ref: bigquery.TableReference, job_id: str):
     """Load from query over external table from GCS.
 
     This hinges on a SQL query defined in GCS at _config/bq_transform.sql and
@@ -104,7 +74,7 @@ def external_query(  # pylint: disable=too-many-arguments
     job: bigquery.QueryJob = bq_client.query(
         rendered_query,
         job_config=job_config,
-        job_id_prefix=job_id_prefix,
+        job_id=job_id,
     )
 
     print(f"started asynchronous query job: {job.job_id}")
@@ -115,7 +85,7 @@ def external_query(  # pylint: disable=too-many-arguments
     ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
-            raise RuntimeError(
+            raise exceptions.BigQueryJobFailure(
                 f"query job {job.job_id} failed quickly: {job.errors}")
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
@@ -125,23 +95,18 @@ def flatten2dlist(arr: List[List[Any]]) -> List[Any]:
     return [j for i in arr for j in i]
 
 
-def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
+def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id):
     """orchestrate 1 or more load jobs based on number of URIs and total byte
     size of objects at gsurl"""
     batches = get_batches_for_prefix(gcs_client, gsurl)
     load_config = construct_load_job_config(gcs_client, gsurl)
     load_config.labels = constants.DEFAULT_JOB_LABELS
-    batch_count = len(batches)
 
     jobs: List[bigquery.LoadJob] = []
-    for batch_num, batch in enumerate(batches):
+    for batch in batches:
         print(load_config.to_api_repr())
         job: bigquery.LoadJob = bq_client.load_table_from_uri(
-            batch,
-            dest_table_ref,
-            job_config=load_config,
-            job_id_prefix=f"{job_id_prefix}{batch_num}-of-{batch_count}-",
-        )
+            batch, dest_table_ref, job_config=load_config, job_id=job_id)
 
         print(f"started asyncronous bigquery load job with id: {job.job_id} for"
               f" {gsurl}")
@@ -155,39 +120,9 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
         for job in jobs:
             job.reload()
             if job.errors:
-                raise RuntimeError(
+                raise exceptions.BigQueryJobFailure(
                     f"load job {job.job_id} failed quickly: {job.errors}")
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
-
-
-def handle_duplicate_notification(bkt: storage.Bucket,
-                                  success_blob: storage.Blob, gsurl: str):
-    """
-    Need to handle potential duplicate Pub/Sub notifications.
-    To achieve this we will drop an empty "claimed" file that indicates
-    an invocation of this cloud function has picked up the success file
-    with a certain creation timestamp. This will support republishing the
-    success file as a mechanism of re-running the ingestion while avoiding
-    duplicate ingestion due to multiple Pub/Sub messages for a success file
-    with the same creation time.
-    """
-    success_blob.reload()
-    success_created_unix_timestamp = success_blob.time_created.timestamp()
-
-    claim_blob: storage.Blob = bkt.blob(
-        success_blob.name.replace(constants.SUCCESS_FILENAME,
-                                  f"_claimed_{success_created_unix_timestamp}"))
-    try:
-        claim_blob.upload_from_string("", if_generation_match=0)
-    except google.api_core.exceptions.PreconditionFailed as err:
-        raise RuntimeError(
-            f"The prefix {gsurl} appears to already have been claimed for "
-            f"{gsurl}{constants.SUCCESS_FILENAME} with created timestamp"
-            f"{success_created_unix_timestamp}."
-            "This means that another invocation of this cloud function has"
-            "claimed the ingestion of this batch."
-            "This may be due to a rare duplicate delivery of the Pub/Sub "
-            "storage notification.") from err
 
 
 def _get_parent_config_file(storage_client, config_filename, bucket, path):
@@ -307,7 +242,8 @@ def get_batches_for_prefix(
     elif len(batches) == 1:
         print("using single load job.")
     else:
-        raise RuntimeError("No files to load!")
+        raise google.api_core.exceptions.NotFound(
+            f"No files to load at gs://{bucket_name}/{prefix_path}!")
     return batches
 
 
@@ -336,12 +272,12 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
             attributes = notification["attributes"]
             return attributes["bucketId"], attributes["objectId"]
         except KeyError:
-            raise RuntimeError(
+            raise exceptions.UnexpectedTriggerException(
                 "Issue with Pub/Sub message, did not contain expected"
                 f"attributes: 'bucketId' and 'objectId': {notification}"
             ) from KeyError
-    raise RuntimeError(
-        "Cloud Function recieved unexpected trigger:\n"
+    raise exceptions.UnexpectedTriggerException(
+        "Cloud Function received unexpected trigger:\n"
         f"{notification}\n"
         "This function only supports direct Cloud Functions"
         "Background Triggers or Pub/Sub storage notificaitons"
@@ -409,6 +345,13 @@ def dict_to_bq_schema(schema: List[Dict]) -> List[bigquery.SchemaField]:
 
 # To be added to built in str in python 3.9
 # https://www.python.org/dev/peps/pep-0616/
+def removeprefix(in_str: str, prefix: str) -> str:
+    """remove string prefix"""
+    if in_str.startswith(prefix):
+        return in_str[len(prefix):]
+    return in_str[:]
+
+
 def removesuffix(in_str: str, suffix: str) -> str:
     """removes suffix from a string."""
     # suffix='' should not call self[:-0].
@@ -437,3 +380,316 @@ def recursive_update(original: Dict, update: Dict, in_place: bool = False):
         else:
             out[key] = value
     return out
+
+
+def handle_duplicate_notification(blob_to_claim: storage.Blob):
+    """
+    Need to handle potential duplicate Pub/Sub notifications.
+    To achieve this we will drop an empty "claimed" file that indicates
+    an invocation of this cloud function has picked up the success file
+    with a certain creation timestamp. This will support republishing the
+    success file as a mechanism of re-running the ingestion while avoiding
+    duplicate ingestion due to multiple Pub/Sub messages for a success file
+    with the same creation time.
+    """
+    blob_to_claim.reload()
+    created_unix_timestamp = blob_to_claim.time_created.timestamp()
+
+    basename = os.path.basename(blob_to_claim.name)
+    claim_blob: storage.Blob = blob_to_claim.bucket.blob(
+        blob_to_claim.name.replace(
+            basename, f"_claimed_{basename}_created_at_"
+            f"{created_unix_timestamp}"))
+    try:
+        claim_blob.upload_from_string("", if_generation_match=0)
+    except google.api_core.exceptions.PreconditionFailed as err:
+        raise exceptions.DuplicateNotificationException(
+            f"gs://{blob_to_claim.bucket.name}/{blob_to_claim.name} appears"
+            "to already have been claimed for created timestamp: "
+            f"{created_unix_timestamp}."
+            "This means that another invocation of this cloud function has "
+            "claimed the work to be one for this file. "
+            "This may be due to a rare duplicate delivery of the Pub/Sub "
+            "storage notification.") from err
+
+
+def get_table_prefix(object_id: str) -> str:
+    """Find the table prefix for a object_id based on the destination regex.
+    Args:
+        object_id: str object ID to parse
+    Returns:
+        str: table prefix
+    """
+    match = constants.DESTINATION_REGEX.match(object_id)
+    if not match:
+        raise exceptions.DestinationRegexMatchException(
+            f"could not determine table prefix for object id: {object_id}"
+            "because it did not contain a match for destination_regex: "
+            f"{constants.DESTINATION_REGEX.pattern}")
+    table_group_index = match.re.groupindex.get("table")
+    if table_group_index:
+        table_level_index = match.regs[table_group_index][1]
+        return object_id[:table_level_index]
+    raise exceptions.DestinationRegexMatchException(
+        f"could not determine table prefix for object id: {object_id}"
+        "because it did not contain a match for the table capturing group "
+        f"in destination regex: {constants.DESTINATION_REGEX.pattern}")
+
+
+def get_next_backlog_item(
+    gcs_client: storage.Client,
+    bkt: storage.Bucket,
+    table_prefix: str,
+) -> Optional[storage.Blob]:
+    """
+    Get next blob in the backlog if the backlog is not empty.
+
+    Args:
+        gcs_client: storage.Client
+        bkt: storage.Bucket that this cloud functions is ingesting data for.
+        table_prefix: the prefix for the table whose backlog should be checked.
+
+    Retruns:
+        storage.Blob: pointer to a SUCCESS file in the backlog
+    """
+    backlog_blobs = gcs_client.list_blobs(bkt,
+                                          prefix=f"{table_prefix}/_backlog/")
+    # Backlog items will be lexciographically sorted
+    # https://cloud.google.com/storage/docs/json_api/v1/objects/list
+    for blob in backlog_blobs:
+        return blob  # Return first item in iterator
+    return None
+
+
+def remove_oldest_backlog_item(
+    gcs_client: storage.Client,
+    bkt: storage.Bucket,
+    table_prefix: str,
+) -> bool:
+    """
+    Remove the oldes pointer in the backlog if the backlog is not empty.
+
+    Args:
+        gcs_client: storage.Client
+        bkt: storage.Bucket that this cloud functions is ingesting data for.
+        table_prefix: the prefix for the table whose backlog should be checked.
+
+    Returns:
+        bool: True if we removed the oldest blob. False if the backlog was
+        empty.
+    """
+    backlog_blobs = gcs_client.list_blobs(bkt,
+                                          prefix=f"{table_prefix}/_backlog/")
+    # Backlog items will be lexciographically sorted
+    # https://cloud.google.com/storage/docs/json_api/v1/objects/list
+    blob: storage.Blob
+    for blob in backlog_blobs:
+        blob.delete()
+        return True  # Return after deleteing first blob in the iterator
+    return False
+
+
+def wait_on_bq_job_id(bq_client: bigquery.Client,
+                      job_id: str,
+                      polling_timeout: int,
+                      polling_interval: int = 1) -> bool:
+    """"
+    Wait for a BigQuery Job ID to complete.
+
+    Args:
+        bq_client: bigquery.Client
+        job_id: str the BQ job ID to wait on
+        polling_timeout: int number of seconds to poll this job ID
+        polling_interval: frequency to query the job state during polling
+    Returns:
+        bool: if the job ID has finished successfully. True if DONE without
+        errors, False if RUNNING or PENDING
+    Raises:
+        exceptions.BigQueryJobFailure if the job failed.
+        google.api_core.exceptions.NotFound if the job id cannot be found.
+    """
+    start_poll = time.monotonic()
+    while time.monotonic() - start_poll < (polling_timeout - polling_interval):
+        job: Union[bigquery.LoadJob,
+                   bigquery.QueryJob] = bq_client.get_job(job_id)
+        if job.state == "DONE":
+            if job.errors:
+                raise exceptions.BigQueryJobFailure(
+                    f"BigQuery Job {job.job_id} failed during backfill with the"
+                    f"following errors: {job.errors}")
+            return True
+        if job.state in {"RUNNING", "PENDING"}:
+            print(f"waiting on BigQuery Job {job.job_id}")
+            time.sleep(polling_interval)
+    return False
+
+
+def wait_on_gcs_blob(gcs_client: storage.Client,
+                     wait_blob: storage.Blob,
+                     polling_timeout: int,
+                     polling_interval: int = 1) -> bool:
+    """"
+    Wait for a GCS Object to exists.
+
+    Args:
+        gcs_client: storage.Client
+        wait_blob: storage.Bllob the GCS to wait on.
+        polling_timeout: int number of seconds to poll this job ID
+        polling_interval: frequency to query the job state during polling
+    Returns:
+        bool: if the job ID has finished successfully. True if DONE without
+        errors, False if RUNNING or PENDING
+    Raises:
+        exceptions.BigQueryJobFailure if the job failed.
+        google.api_core.exceptions.NotFound if the job id cannot be found.
+    """
+    start_poll = time.monotonic()
+    while time.monotonic() - start_poll < (polling_timeout - polling_interval):
+        if wait_blob.exists(client=gcs_client):
+            return True
+        print(
+            f"waiting on GCS file gs://{wait_blob.bucket.name}/{wait_blob.name}"
+        )
+        time.sleep(polling_interval)
+    return False
+
+
+def gcs_path_to_table_ref_and_batch(
+        object_id) -> Tuple[bigquery.TableReference, Optional[str]]:
+    """extract bigquery table reference and batch id from gcs object id"""
+
+    destination_match = constants.DESTINATION_REGEX.match(object_id)
+    if not destination_match:
+        raise RuntimeError(f"Object ID {object_id} did not match regex:"
+                           f" {constants.DESTINATION_REGEX.pattern}")
+    destination_details = destination_match.groupdict()
+    try:
+        dataset = destination_details['dataset']
+        table = destination_details['table']
+    except KeyError:
+        raise exceptions.DestinationRegexMatchException(
+            f"Object ID {object_id} did not match dataset and table in regex:"
+            f" {constants.DESTINATION_REGEX.pattern}") from KeyError
+    partition = destination_details.get('partition')
+    year, month, day, hour = (
+        destination_details.get(key, "") for key in ('yyyy', 'mm', 'dd', 'hh'))
+    part_list = (year, month, day, hour)
+    if not partition and any(part_list):
+        partition = '$' + ''.join(part_list)
+    batch_id = destination_details.get('batch')
+    labels = constants.DEFAULT_JOB_LABELS
+
+    if batch_id:
+        labels["batch-id"] = batch_id
+
+    if partition:
+
+        dest_table_ref = bigquery.TableReference.from_string(
+            f"{dataset}.{table}{partition}",
+            default_project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
+    else:
+        dest_table_ref = bigquery.TableReference.from_string(
+            f"{dataset}.{table}",
+            default_project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
+    return dest_table_ref, batch_id
+
+
+def create_job_id(dest_table_ref: bigquery.TableReference,
+                  batch_id: Optional[str]):
+    """Create job id prefix with a consistent naming convention.
+    The naming conventions is as follows:
+    gcf-ingest-<dataset_id>-<table_id>-<partition_num>-<batch_id>-
+    Parts that are not inferrable from the GCS path with have a 'None'
+    placeholder. This naming convention is crucial for monitoring the system.
+    Note, gcf-ingest- can be overridden with environment variable JOB_PREFIX
+
+    Examples:
+
+    Non-partitioned Non batched tables:
+      - gs://${BUCKET}/tpch/lineitem/_SUCCESS
+      - gcf-ingest-tpch-lineitem-None-None-
+    Non-partitioned batched tables:
+      - gs://${BUCKET}/tpch/lineitem/batch000/_SUCCESS
+      - gcf-ingest-tpch-lineitem-None-batch000-
+    Partitioned Batched tables:
+      - gs://${BUCKET}/tpch/lineitem/$20201031/batch000/_SUCCESS
+      - gcf-ingest-tpch-lineitem-20201031-batch000-
+    """
+    table_partition = dest_table_ref.table_id.split("$")
+    if len(table_partition) < 2:
+        # If there is no partition put a None placeholder
+        table_partition.append("None")
+    return f"{os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)}" \
+           f"{dest_table_ref.dataset_id}-" \
+           f"{'-'.join(table_partition)}-" \
+           f"{batch_id}-{uuid.uuid4()}"
+
+
+def handle_bq_lock(gcs_client: storage.Client, lock_blob: storage.Blob,
+                   next_job_id: Optional[str]):
+    """Reclaim the lock blob for the new job id (in-place) or delete the lock
+    blob if next_job_id is None."""
+    try:
+        if next_job_id:
+            if lock_blob.exists():
+                lock_blob.upload_from_string(
+                    next_job_id,
+                    if_generation_match=lock_blob.generation,
+                    client=gcs_client)
+            else:  # This happens when submitting the first job in the backlog
+                lock_blob.upload_from_string(next_job_id,
+                                             if_generation_match=0,
+                                             client=gcs_client)
+        else:
+            print("releasing lock at: "
+                  f"gs://{lock_blob.bucket.name}/{lock_blob.name}")
+            lock_blob.delete(
+                if_generation_match=lock_blob.generation,
+                client=gcs_client,
+            )
+    except google.api_core.exceptions.PreconditionFailed as err:
+        raise exceptions.BacklogException(
+            f"The lock at gs://{lock_blob.bucket.name}/{lock_blob.name}"
+            f"was changed by another process.") from err
+
+
+def apply(
+    gcs_client: storage.Client,
+    bq_client: bigquery.Client,
+    success_blob: storage.Blob,
+    lock_blob: Optional[storage.Blob],
+    job_id: str,
+):
+    """
+    Apply an incremental batch to the target BigQuery table via an asynchronous
+    load job or external query.
+
+    Args:
+        gcs_client: storage.Client
+        bq_client: bigquery.Client
+        success_blob: storage.Blob the success file whose batch should be
+            applied.
+        lock_blob: storage.Blob
+        job_id: str
+    """
+    bkt = success_blob.bucket
+    if lock_blob is not None:
+        handle_bq_lock(gcs_client, lock_blob, job_id)
+    dest_table_ref, _ = gcs_path_to_table_ref_and_batch(success_blob.name)
+    gsurl = removesuffix(f"gs://{bkt.name}/{success_blob.name}",
+                         constants.SUCCESS_FILENAME)
+    print("looking for bq_transform.sql")
+    external_query_sql = read_gcs_file_if_exists(
+        gcs_client, f"{gsurl}_config/bq_transform.sql")
+    if not external_query_sql:
+        external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
+                                                        "bq_transform.sql")
+    if external_query_sql:
+        print("EXTERNAL QUERY")
+        print(f"found external query:\n{external_query_sql}")
+        external_query(gcs_client, bq_client, gsurl, external_query_sql,
+                       dest_table_ref, job_id)
+        return
+
+    print("LOAD_JOB")
+    load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id)

@@ -32,6 +32,7 @@ following default behavior.
 | `MAX_BATCH_BYTES`     | Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
 | `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
 | `BQ_PROJECT`          | Default BQ project to use if not specified in dataset capturing group | Project where Cloud Function is deployed |
+| `ORDERED_PER_TABLE`   | Force jobs to be executed sequentially (rather than parallel) based on the backlog. This is the same as having an `ORDERME` file in every config directory | `False` | 
 
 
 ## Implementation notes

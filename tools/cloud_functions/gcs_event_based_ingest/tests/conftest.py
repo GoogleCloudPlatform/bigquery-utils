@@ -18,9 +18,11 @@ import time
 import uuid
 from typing import List
 
+import google.api_core.exceptions
 import pytest
-from google.cloud import bigquery, storage
+from google.cloud import bigquery, error_reporting, storage
 
+import gcs_ocn_bq_ingest.ordering
 import gcs_ocn_bq_ingest.utils
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
@@ -39,7 +41,12 @@ def gcs() -> storage.Client:
     return storage.Client()
 
 
-@pytest.mark.usefixtures("gcs")
+@pytest.fixture(scope="module")
+def error() -> error_reporting.Client:
+    """GCS Client"""
+    return error_reporting.Client()
+
+
 @pytest.fixture
 def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
     """GCS bucket for test artifacts"""
@@ -60,16 +67,15 @@ def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
     return bucket
 
 
-@pytest.mark.usefixtures("gcs_bucket")
 @pytest.fixture
 def mock_env(gcs, monkeypatch):
     """environment variable mocks"""
     # Infer project from ADC of gcs client.
     monkeypatch.setenv("GCP_PROJECT", gcs.project)
     monkeypatch.setenv("FUNCTION_NAME", "integration-test")
+    monkeypatch.setenv("FUNCTION_TIMEOUT_SEC", "120")
 
 
-@pytest.mark.usefixtures("bq", "mock_env")
 @pytest.fixture
 def dest_dataset(request, bq, mock_env, monkeypatch):
     random_dataset = f"test_bq_ingest_gcf_{str(uuid.uuid4())[:8].replace('-','_')}"
@@ -88,7 +94,6 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
     return dataset
 
 
-@pytest.mark.usefixtures("bq", "mock_env", "dest_dataset")
 @pytest.fixture
 def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
@@ -111,7 +116,6 @@ def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_data(request, gcs_bucket, dest_dataset,
              dest_table) -> storage.blob.Blob:
     data_objs = []
@@ -135,7 +139,6 @@ def gcs_data(request, gcs_bucket, dest_dataset,
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_data_under_sub_dirs(request, gcs_bucket, dest_dataset,
                             dest_table) -> storage.blob.Blob:
     data_objs = []
@@ -151,7 +154,7 @@ def gcs_data_under_sub_dirs(request, gcs_bucket, dest_dataset,
 
     def teardown():
         for do in data_objs:
-            if do.exists:
+            if do.exists():
                 do.delete()
 
     request.addfinalizer(teardown)
@@ -159,7 +162,6 @@ def gcs_data_under_sub_dirs(request, gcs_bucket, dest_dataset,
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_truncating_load_config(request, gcs_bucket, dest_dataset,
                                dest_table) -> storage.blob.Blob:
     config_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
@@ -180,7 +182,6 @@ def gcs_truncating_load_config(request, gcs_bucket, dest_dataset,
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_batched_data(request, gcs_bucket, dest_dataset,
                      dest_table) -> List[storage.blob.Blob]:
     """
@@ -199,14 +200,13 @@ def gcs_batched_data(request, gcs_bucket, dest_dataset,
 
     def teardown():
         for do in data_objs:
-            if do.exists:
+            if do.exists():
                 do.delete()
 
     request.addfinalizer(teardown)
     return [data_objs[-1], data_objs[-4]]
 
 
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 @pytest.fixture
 def gcs_external_config(request, gcs_bucket, dest_dataset,
                         dest_table) -> List[storage.blob.Blob]:
@@ -249,7 +249,7 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
 
     def teardown():
         for do in config_objs:
-            if do.exists:
+            if do.exists():
                 do.delete()
 
     request.addfinalizer(teardown)
@@ -257,7 +257,6 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_parttioned_table")
 def gcs_partitioned_data(request, gcs_bucket, dest_dataset,
                          dest_partitioned_table) -> List[storage.blob.Blob]:
     data_objs = []
@@ -274,7 +273,8 @@ def gcs_partitioned_data(request, gcs_bucket, dest_dataset,
 
     def teardown():
         for dobj in data_objs:
-            if dobj.exists:
+            # we expect some backfill files to be removed by the cloud function.
+            if dobj.exists():
                 dobj.delete()
 
     request.addfinalizer(teardown)
@@ -282,7 +282,6 @@ def gcs_partitioned_data(request, gcs_bucket, dest_dataset,
 
 
 @pytest.fixture(scope="function")
-@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def dest_partitioned_table(request, bq: bigquery.Client, mock_env,
                            dest_dataset) -> bigquery.Table:
     public_table: bigquery.Table = bq.get_table(
@@ -335,3 +334,140 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
         f"{table.project}.{table.dataset_id}.{table.table_id} to "
         f"reach {expected_num_rows} rows."
         f"last poll returned {actual_num_rows} rows.")
+
+
+@pytest.fixture
+def dest_ordered_update_table(request, bq, mock_env,
+                              dest_dataset) -> bigquery.Table:
+    with open(os.path.join(TEST_DIR, "resources",
+                           "ordering_schema.json")) as schema_file:
+        schema = gcs_ocn_bq_ingest.utils.dict_to_bq_schema(
+            json.load(schema_file))
+
+    table = bigquery.Table(
+        f"{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}"
+        ".cf_test_ordering",
+        schema=schema,
+    )
+
+    table: bigquery.Table = bq.create_table(table)
+    # Our test query only updates so we need to populate the first row.
+    bq.load_table_from_json([{"id": 1, "alpha_update": ""}], table)
+
+    def teardown():
+        bq.delete_table(table, not_found_ok=True)
+
+    request.addfinalizer(teardown)
+    return table
+
+
+@pytest.fixture(scope="function")
+def gcs_ordered_update_data(
+        request, gcs_bucket, dest_dataset,
+        dest_ordered_update_table) -> List[storage.blob.Blob]:
+    data_objs = []
+    chunks = {
+        "00",
+        "01",
+        "02",
+    }
+    for chunk in chunks:
+        for test_file in ["data.csv", "_SUCCESS"]:
+            data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+                f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+                dest_ordered_update_table.table_id, chunk, test_file
+            ]))
+            data_obj.upload_from_filename(
+                os.path.join(TEST_DIR, "resources", "test-data", "ordering",
+                             chunk, test_file))
+            data_objs.append(data_obj)
+
+    def teardown():
+        for dobj in data_objs:
+            if dobj.exists():
+                dobj.delete()
+
+    request.addfinalizer(teardown)
+    return list(filter(lambda do: do.name.endswith("_SUCCESS"), data_objs))
+
+
+@pytest.fixture(scope="function")
+def gcs_backlog(request, gcs, gcs_bucket,
+                gcs_ordered_update_data) -> List[storage.blob.Blob]:
+    data_objs = []
+
+    for success_blob in gcs_ordered_update_data:
+        gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, success_blob)
+        backlog_blob = gcs_ocn_bq_ingest.ordering.success_blob_to_backlog_blob(
+            success_blob)
+        backlog_blob.upload_from_string("")
+        data_objs.append(backlog_blob)
+
+    def teardown():
+        for dobj in data_objs:
+            if dobj.exists():
+                dobj.delete()
+
+    request.addfinalizer(teardown)
+    return list(filter(lambda do: do.name.endswith("_SUCCESS"), data_objs))
+
+
+@pytest.fixture
+def gcs_external_update_config(request, gcs_bucket, dest_dataset,
+                               dest_ordered_update_table) -> storage.Blob:
+    config_objs = []
+    sql_obj = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_ordered_update_table.table_id,
+        "_config",
+        "bq_transform.sql",
+    ]))
+
+    sql = """
+    UPDATE {dest_dataset}.{dest_table} dest
+    SET alpha_update = CONCAT(dest.alpha_update, src.alpha_update)
+    FROM temp_ext src
+    WHERE dest.id = src.id
+    """
+    sql_obj.upload_from_string(sql)
+
+    config_obj = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_ordered_update_table.table_id, "_config", "external.json"
+    ]))
+
+    with open(os.path.join(TEST_DIR, "resources",
+                           "ordering_schema.json")) as schema:
+        fields = json.load(schema)
+    config = {
+        "schema": {
+            "fields": fields
+        },
+        "csvOptions": {
+            "allowJaggedRows": False,
+            "allowQuotedNewlines": False,
+            "encoding": "UTF-8",
+            "fieldDelimiter": "|",
+            "skipLeadingRows": 0,
+        },
+        "sourceFormat": "CSV",
+        "sourceUris": ["REPLACEME"],
+    }
+    config_obj.upload_from_string(json.dumps(config))
+    backfill_blob = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_ordered_update_table.table_id,
+        gcs_ocn_bq_ingest.constants.BACKFILL_FILENAME
+    ]))
+    backfill_blob.upload_from_string("")
+    config_objs.append(sql_obj)
+    config_objs.append(config_obj)
+    config_objs.append(backfill_blob)
+
+    def teardown():
+        for do in config_objs:
+            if do.exists():
+                do.delete()
+
+    request.addfinalizer(teardown)
+    return backfill_blob

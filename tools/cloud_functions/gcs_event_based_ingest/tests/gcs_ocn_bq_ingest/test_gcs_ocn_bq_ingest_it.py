@@ -14,6 +14,7 @@
 """integration tests for gcs_ocn_bq_ingest"""
 import os
 import time
+import unittest.mock
 
 import google.cloud.exceptions
 import pytest
@@ -22,7 +23,7 @@ from google.cloud import bigquery
 import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
-LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
+LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 
 
 @pytest.mark.IT
@@ -67,8 +68,8 @@ def test_gcf_event_schema(bq, gcs_data, dest_dataset, dest_table, mock_env):
 
 
 @pytest.mark.IT
-def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
-                                mock_env):
+def test_duplicate_success_notification(bq, gcs_data, dest_dataset, dest_table,
+                                        mock_env):
     """tests behavior with two notifications for the same success file."""
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
@@ -79,12 +80,11 @@ def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
         }
     }
     gcs_ocn_bq_ingest.main.main(test_event, None)
-    did_second_invocation_raise = False
-    try:
+    with unittest.mock.patch.object(google.cloud.error_reporting.Client,
+                                    "report_exception") as mock_method:
         gcs_ocn_bq_ingest.main.main(test_event, None)
-    except RuntimeError:
-        did_second_invocation_raise = True
-    assert did_second_invocation_raise
+
+    mock_method.assert_called_once()
 
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
