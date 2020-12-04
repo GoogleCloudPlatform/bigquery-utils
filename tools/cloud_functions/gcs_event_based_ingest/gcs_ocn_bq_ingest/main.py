@@ -17,97 +17,133 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import os
-import re
+import time
 from typing import Dict
 
-from google.cloud import bigquery, storage
-
 # pylint in cloud build is being flaky about this import discovery.
-from . import constants, utils  # pylint: disable=no-name-in-module
+# pylint: disable=no-name-in-module
+from google.cloud import bigquery, error_reporting, storage
+
+from . import constants, exceptions, ordering, utils
+# Reuse GCP Clients across function invocations using globbals
+# https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
+# pylint: disable=global-statement
+from .utils import apply
+
+ERROR_REPORTING_CLIENT = None
+
+BQ_CLIENT = None
+
+GCS_CLIENT = None
 
 
 def main(event: Dict, context):  # pylint: disable=unused-argument
     """entry point for background cloud function for event driven GCS to
     BigQuery ingest."""
-    # pylint: disable=too-many-locals
-    # Set by Cloud Function Execution Environment
-    # https://cloud.google.com/functions/docs/env-var
-    destination_regex = os.getenv("DESTINATION_REGEX",
-                                  constants.DEFAULT_DESTINATION_REGEX)
-    dest_re = re.compile(destination_regex)
-
-    bucket_id, object_id = utils.parse_notification(event)
-
-    # Exit eagerly if not a success file.
-    # we can improve this with pub/sub message filtering once it supports
-    # a hasSuffix filter function (we can filter on hasSuffix successfile name)
-    #  https://cloud.google.com/pubsub/docs/filtering
-    if not object_id.endswith(f"/{constants.SUCCESS_FILENAME}"):
-        print(
-            f"No-op. This notification was not for a {constants.SUCCESS_FILENAME} file."
-        )
-        return
-
-    prefix_to_load = utils.removesuffix(object_id, constants.SUCCESS_FILENAME)
-    gsurl = f"gs://{bucket_id}/{prefix_to_load}"
-    gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
-    project = os.getenv("BQ_PROJECT", gcs_client.project)
-    bkt = utils.cached_get_bucket(gcs_client, bucket_id)
-    success_blob: storage.Blob = bkt.blob(object_id)
-    utils.handle_duplicate_notification(bkt, success_blob, gsurl)
-
-    destination_match = dest_re.match(object_id)
-    if not destination_match:
-        raise RuntimeError(f"Object ID {object_id} did not match regex:"
-                           f" {destination_regex}")
-    destination_details = destination_match.groupdict()
     try:
-        dataset = destination_details['dataset']
-        table = destination_details['table']
-    except KeyError:
-        raise RuntimeError(
-            f"Object ID {object_id} did not match dataset and table in regex:"
-            f" {destination_regex}") from KeyError
-    partition = destination_details.get('partition')
-    year, month, day, hour = (
-        destination_details.get(key, "") for key in ('yyyy', 'mm', 'dd', 'hh'))
-    part_list = (year, month, day, hour)
-    if not partition and any(part_list):
-        partition = '$' + ''.join(part_list)
-    batch_id = destination_details.get('batch')
-    labels = constants.DEFAULT_JOB_LABELS
-    labels["bucket"] = bucket_id
+        function_start_time = time.monotonic()
+        # pylint: disable=too-many-locals
 
-    if batch_id:
-        labels["batch-id"] = batch_id
+        bucket_id, object_id = utils.parse_notification(event)
 
-    if partition:
-        dest_table_ref = bigquery.TableReference.from_string(
-            f"{dataset}.{table}{partition}", default_project=project)
-    else:
-        dest_table_ref = bigquery.TableReference.from_string(
-            f"{dataset}.{table}", default_project=project)
+        basename_object_id = os.path.basename(object_id)
 
-    default_query_config = bigquery.QueryJobConfig()
-    default_query_config.use_legacy_sql = False
-    default_query_config.labels = labels
-    bq_client = bigquery.Client(client_info=constants.CLIENT_INFO,
-                                default_query_job_config=default_query_config)
+        # Exit eagerly if this is not a file to take action on.
+        if basename_object_id not in constants.ACTION_FILENAMES:
+            action_filenames = constants.ACTION_FILENAMES
+            if constants.START_BACKFILL_FILENAME is None:
+                action_filenames.remove(None)
+            print(f"No-op. This notification was not for a"
+                  f"{action_filenames} file.")
+            return
 
-    print("looking for bq_transform.sql")
-    external_query_sql = utils.read_gcs_file_if_exists(
-        gcs_client, f"{gsurl}_config/bq_transform.sql")
-    if not external_query_sql:
-        external_query_sql = utils.look_for_config_in_parents(
-            gcs_client, gsurl, "bq_transform.sql")
-    if external_query_sql:
-        print("EXTERNAL QUERY")
-        print(f"found external query:\n{external_query_sql}")
-        utils.external_query(
-            gcs_client, bq_client, gsurl, external_query_sql, dest_table_ref,
-            utils.create_job_id_prefix(dest_table_ref, batch_id))
-        return
+        # Ignore success files in the backlog directory
+        if (basename_object_id == constants.SUCCESS_FILENAME
+                and "/_backlog/" in object_id):
+            print(f"No-op. This notification was for "
+                  f"gs://{bucket_id}/{object_id} a"
+                  f"{constants.SUCCESS_FILENAME} in a"
+                  "/_backlog/ directory.")
+            return
 
-    print("LOAD_JOB")
-    utils.load_batches(gcs_client, bq_client, gsurl, dest_table_ref,
-                       utils.create_job_id_prefix(dest_table_ref, batch_id))
+        gcs_client = lazy_gcs_client()
+        bq_client = lazy_bq_client()
+        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(object_id)
+
+        enforce_ordering = (constants.ORDER_ALL_JOBS
+                            or utils.look_for_config_in_parents(
+                                gcs_client, f"gs://{bucket_id}/{object_id}",
+                                "ORDERME") is not None)
+
+        bkt: storage.Bucket = utils.cached_get_bucket(gcs_client, bucket_id)
+        event_blob: storage.Blob = bkt.blob(object_id)
+
+        if enforce_ordering:
+            if (constants.START_BACKFILL_FILENAME and basename_object_id
+                    == constants.START_BACKFILL_FILENAME):
+                # This will be the first backfill file.
+                ordering.start_backfill_subscriber_if_not_running(
+                    gcs_client, bkt, utils.get_table_prefix(object_id))
+                return
+            if basename_object_id == constants.SUCCESS_FILENAME:
+                ordering.backlog_publisher(gcs_client, event_blob)
+            elif basename_object_id == constants.BACKFILL_FILENAME:
+                ordering.backlog_subscriber(gcs_client, bq_client,
+                                            lazy_error_reporting_client(),
+                                            event_blob, function_start_time)
+        else:  # Default behavior submit job as soon as success file lands.
+            bkt = utils.cached_get_bucket(gcs_client, bucket_id)
+            success_blob: storage.Blob = bkt.blob(object_id)
+            utils.handle_duplicate_notification(success_blob)
+            apply(
+                gcs_client,
+                bq_client,
+                success_blob,
+                None,  # None lock blob as there is no serialization required.
+                utils.create_job_id(table_ref, batch))
+    # Unexpected exceptions will actually raise which may cause a cold restart.
+    except tuple(exceptions.EXCEPTIONS_TO_REPORT):
+        # We do this because we know these errors do not require a cold restart
+        # of the cloud function.
+        lazy_error_reporting_client().report_exception()
+
+
+def lazy_error_reporting_client() -> error_reporting.Client:
+    """
+    Return a error reporting client that may be shared between cloud function
+    invocations.
+
+    https://cloud.google.com/functions/docs/monitoring/error-reporting
+    """
+    global ERROR_REPORTING_CLIENT
+    if not ERROR_REPORTING_CLIENT:
+        ERROR_REPORTING_CLIENT = error_reporting.Client(
+            client_info=constants.CLIENT_INFO)
+    return ERROR_REPORTING_CLIENT
+
+
+def lazy_bq_client() -> bigquery.Client:
+    """
+    Return a BigQuery Client that may be shared between cloud function
+    invocations.
+    """
+    global BQ_CLIENT
+    if not BQ_CLIENT:
+        default_query_config = bigquery.QueryJobConfig()
+        default_query_config.use_legacy_sql = False
+        default_query_config.labels = constants.DEFAULT_JOB_LABELS
+        BQ_CLIENT = bigquery.Client(
+            client_info=constants.CLIENT_INFO,
+            default_query_job_config=default_query_config)
+    return BQ_CLIENT
+
+
+def lazy_gcs_client() -> storage.Client:
+    """
+    Return a BigQuery Client that may be shared between cloud function
+    invocations.
+    """
+    global GCS_CLIENT
+    if not GCS_CLIENT:
+        GCS_CLIENT = storage.Client(client_info=constants.CLIENT_INFO)
+    return GCS_CLIENT

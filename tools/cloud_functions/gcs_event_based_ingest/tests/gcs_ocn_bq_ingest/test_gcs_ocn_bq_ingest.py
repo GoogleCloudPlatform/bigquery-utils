@@ -192,3 +192,27 @@ def test_flattend2dlist(test_input, expected):
 def test_recursive_update(original, update, expected):
     assert gcs_ocn_bq_ingest.utils.recursive_update(original,
                                                     update) == expected
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        (
+            "dataset/table/_SUCCESS",  # flat
+            "dataset/table"),
+        (
+            "dataset/table/$20201030/_SUCCESS",  # partitioned
+            "dataset/table"),
+        (
+            "dataset/table/$20201030/batch_id/_SUCCESS",  # partitioned, batched
+            "dataset/table"),
+        (
+            "dataset/table/batch_id/_SUCCESS",  # batched (no partitioning)
+            "dataset/table"),
+        ("dataset/table/2020/01/02/03/batch_id/_SUCCESS", "dataset/table"),
+        ("project.dataset/table/2020/01/02/03/batch_id/_SUCCESS",
+         "project.dataset/table"),
+        ("dataset/table/_backlog/_BACKFILL", "dataset/table"),
+    ])
+def test_get_table_prefix(test_input, expected):
+    assert gcs_ocn_bq_ingest.utils.get_table_prefix(test_input) == expected

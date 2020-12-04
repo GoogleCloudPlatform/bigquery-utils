@@ -1,0 +1,10 @@
+[
+  {
+    "name": "id",
+    "type": "INT64"
+  },
+  {
+    "name": "alpha_update",
+    "type": "STRING"
+  }
+]
