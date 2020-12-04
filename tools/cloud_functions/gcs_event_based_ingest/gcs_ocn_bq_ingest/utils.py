@@ -31,50 +31,7 @@ import google.api_core.exceptions
 import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
-# Will wait up to this polling for errors before exiting
-# This is to check if job fail quickly, not to assert it succeed.
-# This may not be honored if longer than cloud function timeout.
-# https://cloud.google.com/functions/docs/concepts/exec#timeout
-# One might consider lowering this to 1-2 seconds to lower the
-# upper bound of expected execution time to stay within the free tier.
-# https://cloud.google.com/functions/pricing#free_tier
-WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "5"))
-
-DEFAULT_EXTERNAL_TABLE_DEFINITION = {
-    # The default must be a self describing data format
-    # because autodetecting CSV /JSON schemas is likely to not match
-    # expectations / assumptions of the transformation query.
-    "sourceFormat": "PARQUET",
-}
-
-# Use caution when lowering the job polling rate.
-# Keep in mind that many concurrent executions of this cloud function should not
-# violate the 300 concurrent requests or 100 request per second.
-# https://cloud.google.com/bigquery/quotas#all_api_requests
-JOB_POLL_INTERVAL_SECONDS = 1
-
-DEFAULT_JOB_LABELS = {
-    "component": "event-based-gcs-ingest",
-    "cloud-function-name": os.getenv("FUNCTION_NAME"),
-}
-
-BASE_LOAD_JOB_CONFIG = {
-    "sourceFormat": "CSV",
-    "fieldDelimiter": ",",
-    "writeDisposition": "WRITE_APPEND",
-    "labels": DEFAULT_JOB_LABELS,
-}
-
-# https://cloud.google.com/bigquery/quotas#load_jobs
-# 15TB per BQ load job (soft limit).
-DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
-
-# 10,000 GCS URIs per BQ load job.
-MAX_SOURCE_URIS_PER_LOAD = 10**4
-
-SUCCESS_FILENAME = os.getenv("SUCCESS_FILENAME", "_SUCCESS")
-
-DEFAULT_JOB_PREFIX = "gcf-ingest-"
+from . import constants
 
 
 def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
@@ -102,7 +59,7 @@ def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
     if len(table_partition) < 2:
         # If there is no partition put a None placeholder
         table_partition.append("None")
-    return f"{os.getenv('JOB_PREFIX', DEFAULT_JOB_PREFIX)}" \
+    return f"{os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)}" \
         f"{dest_table_ref.dataset_id}-" \
         f"{'-'.join(table_partition)}-" \
         f"{batch_id}-"
@@ -128,7 +85,7 @@ def external_query(  # pylint: disable=too-many-arguments
     else:
         print(f"Falling back to default CSV external table."
               f" {gsurl}_config/external.json not found.")
-        external_table_def = DEFAULT_EXTERNAL_TABLE_DEFINITION
+        external_table_def = constants.DEFAULT_EXTERNAL_TABLE_DEFINITION
 
     external_table_def["sourceUris"] = flatten2dlist(
         get_batches_for_prefix(gcs_client, gsurl))
@@ -153,12 +110,13 @@ def external_query(  # pylint: disable=too-many-arguments
 
     start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic(
+    ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
             raise RuntimeError(
                 f"query job {job.job_id} failed quickly: {job.errors}")
-        time.sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
 def flatten2dlist(arr: List[List[Any]]) -> List[Any]:
@@ -171,7 +129,7 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
     size of objects at gsurl"""
     batches = get_batches_for_prefix(gcs_client, gsurl)
     load_config = construct_load_job_config(gcs_client, gsurl)
-    load_config.labels = DEFAULT_JOB_LABELS
+    load_config.labels = constants.DEFAULT_JOB_LABELS
     batch_count = len(batches)
 
     jobs: List[bigquery.LoadJob] = []
@@ -190,14 +148,15 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id_prefix):
 
     start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
-    while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
+    while time.monotonic(
+    ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
         # Check if job failed quickly
         for job in jobs:
             job.reload()
             if job.errors:
                 raise RuntimeError(
                     f"load job {job.job_id} failed quickly: {job.errors}")
-        time.sleep(JOB_POLL_INTERVAL_SECONDS)
+        time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
 def handle_duplicate_notification(bkt: storage.Bucket,
@@ -215,14 +174,14 @@ def handle_duplicate_notification(bkt: storage.Bucket,
     success_created_unix_timestamp = success_blob.time_created.timestamp()
 
     claim_blob: storage.Blob = bkt.blob(
-        success_blob.name.replace(SUCCESS_FILENAME,
+        success_blob.name.replace(constants.SUCCESS_FILENAME,
                                   f"_claimed_{success_created_unix_timestamp}"))
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
     except google.api_core.exceptions.PreconditionFailed as err:
         raise RuntimeError(
             f"The prefix {gsurl} appears to already have been claimed for "
-            f"{gsurl}{SUCCESS_FILENAME} with created timestamp"
+            f"{gsurl}{constants.SUCCESS_FILENAME} with created timestamp"
             f"{success_created_unix_timestamp}."
             "This means that another invocation of this cloud function has"
             "claimed the ingestion of this batch."
@@ -276,7 +235,7 @@ def construct_load_job_config(storage_client: storage.Client,
                                        bucket_name, path)
 
     config_q: Deque[Dict[str, Any]] = collections.deque()
-    config_q.append(BASE_LOAD_JOB_CONFIG)
+    config_q.append(constants.BASE_LOAD_JOB_CONFIG)
     while parts:
         config = _get_parent_config("/".join(parts))
         if config:
@@ -290,10 +249,11 @@ def construct_load_job_config(storage_client: storage.Client,
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
 
-def get_batches_for_prefix(gcs_client: storage.Client,
-                           prefix_path: str,
-                           ignore_subprefix="_config/",
-                           ignore_file=SUCCESS_FILENAME) -> List[List[str]]:
+def get_batches_for_prefix(
+        gcs_client: storage.Client,
+        prefix_path: str,
+        ignore_subprefix="_config/",
+        ignore_file=constants.SUCCESS_FILENAME) -> List[List[str]]:
     """
     This function creates batches of GCS uris for a given prefix.
     This prefix could be a table prefix or a partition prefix inside a
@@ -311,7 +271,8 @@ def get_batches_for_prefix(gcs_client: storage.Client,
     blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
 
     cumulative_bytes = 0
-    max_batch_size = int(os.getenv("MAX_BATCH_BYTES", DEFAULT_MAX_BATCH_BYTES))
+    max_batch_size = int(
+        os.getenv("MAX_BATCH_BYTES", constants.DEFAULT_MAX_BATCH_BYTES))
     batch: List[str] = []
     for blob in blobs:
         # API returns root prefix also. Which should be ignored.
@@ -327,7 +288,7 @@ def get_batches_for_prefix(gcs_client: storage.Client,
 
             # keep adding until we reach threshold
             if cumulative_bytes <= max_batch_size or len(
-                    batch) > MAX_SOURCE_URIS_PER_LOAD:
+                    batch) > constants.MAX_SOURCE_URIS_PER_LOAD:
                 batch.append(f"gs://{bucket_name}/{blob.name}")
             else:
                 batches.append(batch.copy())

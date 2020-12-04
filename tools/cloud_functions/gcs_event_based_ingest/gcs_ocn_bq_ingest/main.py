@@ -20,31 +20,9 @@ import os
 import re
 from typing import Dict
 
-import google.api_core.client_info
-import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
-from .utils import (DEFAULT_JOB_LABELS, SUCCESS_FILENAME, cached_get_bucket,
-                    create_job_id_prefix, external_query,
-                    handle_duplicate_notification, load_batches,
-                    look_for_config_in_parents, parse_notification,
-                    read_gcs_file_if_exists, removesuffix)
-
-# yapf: disable
-DEFAULT_DESTINATION_REGEX = (
-    r"^(?P<dataset>[\w\-\._0-9]+)/"  # dataset (required)
-    r"(?P<table>[\w\-_0-9]+)/?"      # table name (required)
-    r"(?P<partition>\$[0-9]+)?/?"    # partition decorator (optional)
-    r"(?P<yyyy>[0-9]{4})?/?"         # partition year (yyyy) (optional)
-    r"(?P<mm>[0-9]{2})?/?"           # partition month (mm) (optional)
-    r"(?P<dd>[0-9]{2})?/?"           # partition day (dd)  (optional)
-    r"(?P<hh>[0-9]{2})?/?"           # partition hour (hh) (optional)
-    r"(?P<batch>[\w\-_0-9]+)?/"      # batch id (optional)
-)
-# yapf: enable
-
-CLIENT_INFO = google.api_core.client_info.ClientInfo(
-    user_agent="google-pso-tool/bq-severless-loader")
+from . import constants, utils
 
 
 def main(event: Dict, context):  # pylint: disable=unused-argument
@@ -54,27 +32,28 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     # Set by Cloud Function Execution Environment
     # https://cloud.google.com/functions/docs/env-var
     destination_regex = os.getenv("DESTINATION_REGEX",
-                                  DEFAULT_DESTINATION_REGEX)
+                                  constants.DEFAULT_DESTINATION_REGEX)
     dest_re = re.compile(destination_regex)
 
-    bucket_id, object_id = parse_notification(event)
+    bucket_id, object_id = utils.parse_notification(event)
 
     # Exit eagerly if not a success file.
     # we can improve this with pub/sub message filtering once it supports
     # a hasSuffix filter function (we can filter on hasSuffix successfile name)
     #  https://cloud.google.com/pubsub/docs/filtering
-    if not object_id.endswith(f"/{SUCCESS_FILENAME}"):
+    if not object_id.endswith(f"/{constants.SUCCESS_FILENAME}"):
         print(
-            f"No-op. This notification was not for a {SUCCESS_FILENAME} file.")
+            f"No-op. This notification was not for a {constants.SUCCESS_FILENAME} file."
+        )
         return
 
-    prefix_to_load = removesuffix(object_id, SUCCESS_FILENAME)
+    prefix_to_load = utils.removesuffix(object_id, constants.SUCCESS_FILENAME)
     gsurl = f"gs://{bucket_id}/{prefix_to_load}"
-    gcs_client = storage.Client(client_info=CLIENT_INFO)
+    gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     project = os.getenv("BQ_PROJECT", gcs_client.project)
-    bkt = cached_get_bucket(gcs_client, bucket_id)
+    bkt = utils.cached_get_bucket(gcs_client, bucket_id)
     success_blob: storage.Blob = bkt.blob(object_id)
-    handle_duplicate_notification(bkt, success_blob, gsurl)
+    utils.handle_duplicate_notification(bkt, success_blob, gsurl)
 
     destination_match = dest_re.match(object_id)
     if not destination_match:
@@ -95,7 +74,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     if not partition and any(part_list):
         partition = '$' + ''.join(part_list)
     batch_id = destination_details.get('batch')
-    labels = DEFAULT_JOB_LABELS
+    labels = constants.DEFAULT_JOB_LABELS
     labels["bucket"] = bucket_id
 
     if batch_id:
@@ -111,23 +90,23 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(client_info=CLIENT_INFO,
+    bq_client = bigquery.Client(client_info=constants.CLIENT_INFO,
                                 default_query_job_config=default_query_config)
 
     print("looking for bq_transform.sql")
-    external_query_sql = read_gcs_file_if_exists(
+    external_query_sql = utils.read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/bq_transform.sql")
     if not external_query_sql:
-        external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
-                                                        "bq_transform.sql")
+        external_query_sql = utils.look_for_config_in_parents(
+            gcs_client, gsurl, "bq_transform.sql")
     if external_query_sql:
         print("EXTERNAL QUERY")
         print(f"found external query:\n{external_query_sql}")
-        external_query(gcs_client, bq_client, gsurl, external_query_sql,
-                       dest_table_ref,
-                       create_job_id_prefix(dest_table_ref, batch_id))
+        utils.external_query(
+            gcs_client, bq_client, gsurl, external_query_sql, dest_table_ref,
+            utils.create_job_id_prefix(dest_table_ref, batch_id))
         return
 
     print("LOAD_JOB")
-    load_batches(gcs_client, bq_client, gsurl, dest_table_ref,
-                 create_job_id_prefix(dest_table_ref, batch_id))
+    utils.load_batches(gcs_client, bq_client, gsurl, dest_table_ref,
+                       utils.create_job_id_prefix(dest_table_ref, batch_id))
