@@ -19,6 +19,7 @@ from typing import Dict, Optional
 import pytest
 
 import gcs_ocn_bq_ingest.main
+import gcs_ocn_bq_ingest.utils
 
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
     gcs_ocn_bq_ingest.main.DEFAULT_DESTINATION_REGEX)
@@ -118,7 +119,7 @@ def test_default_destination_regex(test_input: str,
     ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
 ])
 def test_flattend2dlist(test_input, expected):
-    assert gcs_ocn_bq_ingest.main.flatten2dlist(test_input) == expected
+    assert gcs_ocn_bq_ingest.utils.flatten2dlist(test_input) == expected
 
 
 @pytest.mark.parametrize(
@@ -201,4 +202,4 @@ def test_flattend2dlist(test_input, expected):
         # yapf: enable
     ])
 def test_recursive_update(original, update, expected):
-    assert gcs_ocn_bq_ingest.main.recursive_update(original, update) == expected
+    assert gcs_ocn_bq_ingest.utils.recursive_update(original, update) == expected
