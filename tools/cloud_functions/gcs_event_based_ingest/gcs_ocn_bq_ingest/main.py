@@ -24,11 +24,11 @@ import google.api_core.client_info
 import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
-from .utils import (parse_notification, SUCCESS_FILENAME, removesuffix,
-                    cached_get_bucket, handle_duplicate_notification,
-                    DEFAULT_JOB_LABELS, read_gcs_file_if_exists,
-                    look_for_config_in_parents, external_query,
-                    create_job_id_prefix, load_batches)
+from .utils import (DEFAULT_JOB_LABELS, SUCCESS_FILENAME, cached_get_bucket,
+                    create_job_id_prefix, external_query,
+                    handle_duplicate_notification, load_batches,
+                    look_for_config_in_parents, parse_notification,
+                    read_gcs_file_if_exists, removesuffix)
 
 # yapf: disable
 DEFAULT_DESTINATION_REGEX = (

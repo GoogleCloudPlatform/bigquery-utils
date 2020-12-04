@@ -16,18 +16,18 @@
 # limitations under the License.
 """Contains utility methods used by the BQIngest process
 """
-import os
 import collections
 import collections.abc
 import copy
 import json
+import os
 import pathlib
 import time
 from typing import Any, Deque, Dict, List, Optional, Tuple
 
 import cachetools
-import google.api_core.exceptions
 import google.api_core.client_info
+import google.api_core.exceptions
 import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
