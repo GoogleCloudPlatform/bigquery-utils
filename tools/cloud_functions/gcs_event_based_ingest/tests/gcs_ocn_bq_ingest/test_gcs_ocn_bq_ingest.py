@@ -18,10 +18,12 @@ from typing import Dict, Optional
 
 import pytest
 
+import gcs_ocn_bq_ingest.constants
 import gcs_ocn_bq_ingest.main
+import gcs_ocn_bq_ingest.utils
 
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
-    gcs_ocn_bq_ingest.main.DEFAULT_DESTINATION_REGEX)
+    gcs_ocn_bq_ingest.constants.DEFAULT_DESTINATION_REGEX)
 
 
 @pytest.mark.parametrize(
@@ -118,7 +120,7 @@ def test_default_destination_regex(test_input: str,
     ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
 ])
 def test_flattend2dlist(test_input, expected):
-    assert gcs_ocn_bq_ingest.main.flatten2dlist(test_input) == expected
+    assert gcs_ocn_bq_ingest.utils.flatten2dlist(test_input) == expected
 
 
 @pytest.mark.parametrize(
@@ -126,40 +128,31 @@ def test_flattend2dlist(test_input, expected):
     [
         # yapf: disable
         (  # empty original
-            {},
-            {
+            {}, {
                 "a": 1
-            },
-            {
+            }, {
                 "a": 1
-            }
-        ),
+            }),
         (  # empty update
             {
                 "a": 1
-            },
-            {},
-            {
+            }, {}, {
                 "a": 1
             }),
         (  # basic update of top-level key
             {
                 "a": 1
-            },
-            {
+            }, {
                 "a": 2
-            },
-            {
+            }, {
                 "a": 2
             }),
         (  # update of list
             {
                 "a": [1]
-            },
-            {
+            }, {
                 "a": [2]
-            },
-            {
+            }, {
                 "a": [2]
             }),
         (  # update of nested key
@@ -167,13 +160,11 @@ def test_flattend2dlist(test_input, expected):
                 "a": {
                     "b": 1
                 }
-            },
-            {
+            }, {
                 "a": {
                     "b": 2
                 }
-            },
-            {
+            }, {
                 "a": {
                     "b": 2
                 }
@@ -185,13 +176,11 @@ def test_flattend2dlist(test_input, expected):
                     "c": 2
                 },
                 "d": 3
-            },
-            {
+            }, {
                 "a": {
                     "b": 4
                 },
-            },
-            {
+            }, {
                 "a": {
                     "b": 4,
                     "c": 2
@@ -201,4 +190,5 @@ def test_flattend2dlist(test_input, expected):
         # yapf: enable
     ])
 def test_recursive_update(original, update, expected):
-    assert gcs_ocn_bq_ingest.main.recursive_update(original, update) == expected
+    assert gcs_ocn_bq_ingest.utils.recursive_update(original,
+                                                    update) == expected

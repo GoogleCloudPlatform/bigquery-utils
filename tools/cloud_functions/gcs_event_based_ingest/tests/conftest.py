@@ -21,7 +21,7 @@ from typing import List
 import pytest
 from google.cloud import bigquery, storage
 
-import gcs_ocn_bq_ingest.main
+import gcs_ocn_bq_ingest.utils
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
@@ -93,7 +93,7 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
 def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "nation_schema.json")) as schema_file:
-        schema = gcs_ocn_bq_ingest.main.dict_to_bq_schema(
+        schema = gcs_ocn_bq_ingest.utils.dict_to_bq_schema(
             json.load(schema_file))
 
     table = bigquery.Table(
