@@ -31,7 +31,8 @@ import google.api_core.exceptions
 import google.cloud.exceptions
 from google.cloud import bigquery, storage
 
-from . import constants
+# pylint in cloud build is being flaky about this import discovery.
+from . import constants  # pylint: disable=no-name-in-module
 
 
 def create_job_id_prefix(dest_table_ref: bigquery.TableReference,
