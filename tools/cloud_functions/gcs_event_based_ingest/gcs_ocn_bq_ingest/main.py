@@ -22,7 +22,8 @@ from typing import Dict
 
 from google.cloud import bigquery, storage
 
-from . import constants, utils
+# pylint in cloud build is being flaky about this import discovery.
+from . import constants, utils  # pylint: disable=no-name-in-module
 
 
 def main(event: Dict, context):  # pylint: disable=unused-argument
