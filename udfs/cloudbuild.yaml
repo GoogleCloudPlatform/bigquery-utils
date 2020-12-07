@@ -155,5 +155,6 @@ steps:
   waitFor:
     - run_udf_unit_tests
 
+timeout: 1800s # 30 minutes
 options:
   machineType: N1_HIGHCPU_32
