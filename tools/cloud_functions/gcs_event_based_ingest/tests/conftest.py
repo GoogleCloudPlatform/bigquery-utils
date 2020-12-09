@@ -349,7 +349,7 @@ def dest_ordered_update_table(request, bq, mock_env,
         schema=schema,
     )
 
-    table: bigquery.Table = bq.create_table(table)
+    table = bq.create_table(table)
     # Our test query only updates so we need to populate the first row.
     bq.load_table_from_json([{"id": 1, "alpha_update": ""}], table)
 
