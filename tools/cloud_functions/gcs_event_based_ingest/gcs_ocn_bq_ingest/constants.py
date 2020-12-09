@@ -23,14 +23,14 @@ import re
 import google.api_core.client_info
 import google.cloud.exceptions
 
-# Will wait up to this polling for errors before exiting
+# Will wait up to this long polling for errors in a bq job before exiting
 # This is to check if job fail quickly, not to assert it succeed.
 # This may not be honored if longer than cloud function timeout.
 # https://cloud.google.com/functions/docs/concepts/exec#timeout
 # One might consider lowering this to 1-2 seconds to lower the
 # upper bound of expected execution time to stay within the free tier.
 # https://cloud.google.com/functions/pricing#free_tier
-WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "5"))
+WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "1"))
 
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
     # The default must be a self describing data format
@@ -113,4 +113,4 @@ RESTART_BUFFER_SECONDS = int(os.getenv("RESTART_BUFFER_SECONDS", "30"))
 ORDER_ALL_JOBS = bool(
     distutils.util.strtobool(os.getenv("ORDER_ALL_JOBS", "False")))
 
-BQ_TRANSFORM_SQL="*.sql"
+BQ_TRANSFORM_SQL = "*.sql"

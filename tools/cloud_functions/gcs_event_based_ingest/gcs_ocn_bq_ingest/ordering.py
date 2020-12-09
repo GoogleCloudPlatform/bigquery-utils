@@ -79,11 +79,12 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
             "setting the timeout to 540 seconds or at least "
             "1 minute (Cloud Functions default).")
     while time.monotonic() < restart_time - polling_timeout:
-        job_id = utils.read_gcs_file_if_exists(
+        lock_contents = utils.read_gcs_file_if_exists(
             gcs_client, f"gs://{bkt.name}/{lock_blob.name}")
-        if job_id:
-            if job_id.startswith(
+        if lock_contents:
+            if lock_contents.startswith(
                     os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)):
+                job_id = lock_contents
                 try:
                     last_job_done = utils.wait_on_bq_job_id(
                         bq_client, job_id, polling_timeout)
@@ -110,9 +111,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
             else:
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
-                      "contents:\n"
-                      f"""{utils.read_gcs_file_if_exists(gcs_client,
-                        f'gs://{lock_blob.bucket.name}/{lock_blob.name}')}""")
+                      f"contents:\n {lock_contents}")
                 time.sleep(polling_timeout)
                 continue
         if last_job_done:
