@@ -18,7 +18,6 @@ import time
 import uuid
 from typing import List
 
-import google.api_core.exceptions
 import pytest
 from google.cloud import bigquery, error_reporting, storage
 
