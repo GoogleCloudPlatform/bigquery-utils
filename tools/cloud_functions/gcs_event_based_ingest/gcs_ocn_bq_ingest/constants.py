@@ -112,3 +112,5 @@ RESTART_BUFFER_SECONDS = int(os.getenv("RESTART_BUFFER_SECONDS", "30"))
 
 ORDER_ALL_JOBS = bool(
     distutils.util.strtobool(os.getenv("ORDER_ALL_JOBS", "False")))
+
+BQ_TRANSFORM_SQL="*.sql"

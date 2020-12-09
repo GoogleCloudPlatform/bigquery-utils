@@ -19,6 +19,7 @@
 import collections
 import collections.abc
 import copy
+import fnmatch
 import json
 import os
 import pathlib
@@ -42,7 +43,7 @@ def external_query(  # pylint: disable=too-many-arguments
         query: str, dest_table_ref: bigquery.TableReference, job_id: str):
     """Load from query over external table from GCS.
 
-    This hinges on a SQL query defined in GCS at _config/bq_transform.sql and
+    This hinges on a SQL query defined in GCS at _config/*.sql and
     an external table definition _config/external.json (otherwise will assume
     CSV external table)
     """
@@ -126,11 +127,27 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id):
 
 
 def _get_parent_config_file(storage_client, config_filename, bucket, path):
+    bkt = storage_client.lookup_bucket(bucket)
     config_dir_name = "_config"
     parent_path = pathlib.Path(path).parent
-    config_path = parent_path / config_dir_name / config_filename
+    config_path = parent_path / config_dir_name
+    config_file_path = config_path / config_filename
+    # Handle wild card (to support bq transform sql with different names).
+    if "*" in config_filename:
+        matches: List[storage.Blob] = list(filter(
+            lambda blob: fnmatch.fnmatch(blob.name, config_filename),
+            bkt.list_blobs(prefix=config_path)))
+        if matches:
+            if len(matches) > 1:
+                raise RuntimeError(
+                    f"Multiple matches for gs://{bucket}/{config_file_path}"
+                )
+            return read_gcs_file_if_exists(storage_client,
+                                           f"gs://{bucket}/{matches[0].name}")
+        else:
+            return None
     return read_gcs_file_if_exists(storage_client,
-                                   f"gs://{bucket}/{config_path}")
+                                   f"gs://{bucket}/{config_file_path}")
 
 
 def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
@@ -678,12 +695,13 @@ def apply(
     dest_table_ref, _ = gcs_path_to_table_ref_and_batch(success_blob.name)
     gsurl = removesuffix(f"gs://{bkt.name}/{success_blob.name}",
                          constants.SUCCESS_FILENAME)
-    print("looking for bq_transform.sql")
+    print(
+        f"looking for a transformation tranformation sql file in parent _config.")
     external_query_sql = read_gcs_file_if_exists(
-        gcs_client, f"{gsurl}_config/bq_transform.sql")
+        gcs_client, f"{gsurl}_config/*.sql")
     if not external_query_sql:
         external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
-                                                        "bq_transform.sql")
+                                                        "*.sql")
     if external_query_sql:
         print("EXTERNAL QUERY")
         print(f"found external query:\n{external_query_sql}")
