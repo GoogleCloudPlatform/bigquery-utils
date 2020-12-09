@@ -108,7 +108,7 @@ ACTION_FILENAMES = {
     START_BACKFILL_FILENAME,
 }
 
-RESTART_BUFFER_SECONDS = os.getenv("RESTART_BUFFER_SECONDS", 30)
+RESTART_BUFFER_SECONDS = int(os.getenv("RESTART_BUFFER_SECONDS", "30"))
 
 ORDER_ALL_JOBS = bool(
     distutils.util.strtobool(os.getenv("ORDER_ALL_JOBS", "False")))
