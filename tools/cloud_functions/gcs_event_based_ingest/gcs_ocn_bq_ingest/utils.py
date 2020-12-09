@@ -55,10 +55,12 @@ def external_query(  # pylint: disable=too-many-arguments
     if external_table_config:
         external_table_def = json.loads(external_table_config)
     else:
-        print(f"Falling back to default CSV external table."
-              f" {gsurl}_config/external.json not found.")
+        print(f" {gsurl}_config/external.json not found in parents of {gsurl}."
+              "Falling back to default PARQUET external table:\n"
+              f"{json.dumps(constants.DEFAULT_EXTERNAL_TABLE_DEFINITION)}")
         external_table_def = constants.DEFAULT_EXTERNAL_TABLE_DEFINITION
 
+    # This may cause an issue if >10,000 files. however, we
     external_table_def["sourceUris"] = flatten2dlist(
         get_batches_for_prefix(gcs_client, gsurl))
     print(f"external table def = {json.dumps(external_table_config, indent=2)}")
@@ -88,6 +90,8 @@ def external_query(  # pylint: disable=too-many-arguments
         if job.errors:
             raise exceptions.BigQueryJobFailure(
                 f"query job {job.job_id} failed quickly: {job.errors}")
+        if job.state == "DONE":
+            return
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
@@ -134,18 +138,16 @@ def _get_parent_config_file(storage_client, config_filename, bucket, path):
     config_file_path = config_path / config_filename
     # Handle wild card (to support bq transform sql with different names).
     if "*" in config_filename:
-        matches: List[storage.Blob] = list(filter(
-            lambda blob: fnmatch.fnmatch(blob.name, config_filename),
-            bkt.list_blobs(prefix=config_path)))
+        matches: List[storage.Blob] = list(
+            filter(lambda blob: fnmatch.fnmatch(blob.name, config_filename),
+                   bkt.list_blobs(prefix=config_path)))
         if matches:
             if len(matches) > 1:
                 raise RuntimeError(
-                    f"Multiple matches for gs://{bucket}/{config_file_path}"
-                )
+                    f"Multiple matches for gs://{bucket}/{config_file_path}")
             return read_gcs_file_if_exists(storage_client,
                                            f"gs://{bucket}/{matches[0].name}")
-        else:
-            return None
+        return None
     return read_gcs_file_if_exists(storage_client,
                                    f"gs://{bucket}/{config_file_path}")
 
@@ -696,9 +698,10 @@ def apply(
     gsurl = removesuffix(f"gs://{bkt.name}/{success_blob.name}",
                          constants.SUCCESS_FILENAME)
     print(
-        f"looking for a transformation tranformation sql file in parent _config.")
-    external_query_sql = read_gcs_file_if_exists(
-        gcs_client, f"{gsurl}_config/*.sql")
+        "looking for a transformation tranformation sql file in parent _config."
+    )
+    external_query_sql = read_gcs_file_if_exists(gcs_client,
+                                                 f"{gsurl}_config/*.sql")
     if not external_query_sql:
         external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
                                                         "*.sql")
