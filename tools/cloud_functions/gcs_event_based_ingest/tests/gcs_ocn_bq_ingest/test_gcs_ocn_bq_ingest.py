@@ -14,8 +14,7 @@
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
 import re
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional
 
 import pytest
 

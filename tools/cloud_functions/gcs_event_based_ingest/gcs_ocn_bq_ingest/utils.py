@@ -25,13 +25,7 @@ import os
 import pathlib
 import time
 import uuid
-from typing import Any
-from typing import Deque
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from typing import Any, Deque, Dict, List, Optional, Tuple, Union
 
 import cachetools
 import google.api_core

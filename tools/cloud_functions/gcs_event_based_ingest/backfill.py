@@ -19,9 +19,7 @@ import logging
 import os
 import pprint
 import sys
-from typing import Dict
-from typing import Iterator
-from typing import List
+from typing import Dict, Iterator, List
 
 import google.api_core.client_info
 from google.cloud import storage

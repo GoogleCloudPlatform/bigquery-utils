@@ -30,6 +30,7 @@ from . import constants
 from . import exceptions
 from . import ordering
 from . import utils
+
 # Reuse GCP Clients across function invocations using globbals
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 # pylint: disable=global-statement
