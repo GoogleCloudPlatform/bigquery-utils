@@ -173,6 +173,39 @@ def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
 
 
 @pytest.mark.IT
+def test_external_query_partitioned(bq, gcs_partitioned_data,
+                                    gcs_external_partitioned_config,
+                                    dest_dataset, dest_partitioned_table,
+                                    mock_env):
+    """tests the basic external query ingrestion mechanics
+    with bq_transform.sql and external.json
+    """
+    if not all((blob.exists() for blob in gcs_external_partitioned_config)):
+        raise google.cloud.exceptions.NotFound("config objects must exist")
+
+    for blob in gcs_partitioned_data:
+        if not blob.exists():
+            raise google.cloud.exceptions.NotFound(
+                "test data objects must exist")
+        test_event = {
+            "attributes": {
+                "bucketId": blob.bucket.name,
+                "objectId": blob.name
+            }
+        }
+        gcs_ocn_bq_ingest.main.main(test_event, None)
+    expected_num_rows = 0
+    for part in [
+            "$2017041101",
+            "$2017041102",
+    ]:
+        test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
+                                      "nyc_311", part, "nyc_311.csv")
+        expected_num_rows += sum(1 for _ in open(test_data_file))
+    bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)
+
+
+@pytest.mark.IT
 def test_load_job_partitioned(bq, gcs_partitioned_data,
                               gcs_truncating_load_config, dest_dataset,
                               dest_partitioned_table, mock_env):

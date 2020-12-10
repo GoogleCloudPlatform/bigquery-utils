@@ -159,9 +159,10 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/bq_transform.sql")
-    print(f"external_query_sql = {external_query_sql}")
     if not external_query_sql:
-        look_for_config_in_parents(gcs_client, gsurl, "*.sql")
+        external_query_sql = look_for_config_in_parents(
+            gcs_client, gsurl, "*.sql")
+    print(f"external_query_sql = {external_query_sql}")
     if external_query_sql:
         print("EXTERNAL QUERY")
         external_query(gcs_client, bq_client, gsurl, external_query_sql,
@@ -217,11 +218,14 @@ def external_query(  # pylint: disable=too-many-arguments
     """
     external_table_config = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/external.json")
+    if not external_table_config:
+        external_table_config = look_for_config_in_parents(
+            gcs_client, gsurl, "external.json")
     if external_table_config:
         external_table_def = json.loads(external_table_config)
     else:
         print(f"Falling back to default CSV external table."
-              f" {gsurl}/_config/external.json not found.")
+              f" {gsurl}_config/external.json not found.")
         external_table_def = DEFAULT_EXTERNAL_TABLE_DEFINITION
 
     external_table_def["sourceUris"] = flatten2dlist(

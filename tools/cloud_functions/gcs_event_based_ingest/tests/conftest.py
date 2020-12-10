@@ -310,3 +310,53 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
         f"{table.project}.{table.dataset_id}.{table.table_id} to "
         f"reach {expected_num_rows} rows."
         f"last poll returned {actual_num_rows} rows.")
+
+
+@pytest.mark.usefixtures("bq", "gcs_bucket", "dest_dataset",
+                         "dest_partitioned_table")
+@pytest.fixture
+def gcs_external_partitioned_config(
+        request, bq, gcs_bucket, dest_dataset,
+        dest_partitioned_table) -> List[storage.blob.Blob]:
+    config_objs = []
+    sql_obj = gcs_bucket.blob("/".join([
+        dest_dataset.dataset_id,
+        dest_partitioned_table.table_id,
+        "_config",
+        "bq_transform.sql",
+    ]))
+
+    sql = "INSERT {dest_dataset}.cf_test_nyc_311 SELECT * FROM temp_ext"
+    sql_obj.upload_from_string(sql)
+
+    config_obj = gcs_bucket.blob("/".join([
+        dest_dataset.dataset_id, dest_partitioned_table.table_id, "_config",
+        "external.json"
+    ]))
+
+    public_table: bigquery.Table = bq.get_table(
+        bigquery.TableReference.from_string(
+            "bigquery-public-data.new_york_311.311_service_requests"))
+    config = {
+        "schema": public_table.to_api_repr()['schema'],
+        "csvOptions": {
+            "allowJaggedRows": False,
+            "allowQuotedNewlines": False,
+            "encoding": "UTF-8",
+            "fieldDelimiter": "|",
+            "skipLeadingRows": 0,
+        },
+        "sourceFormat": "CSV",
+        "sourceUris": ["REPLACEME"],
+    }
+    config_obj.upload_from_string(json.dumps(config))
+    config_objs.append(sql_obj)
+    config_objs.append(config_obj)
+
+    def teardown():
+        for do in config_objs:
+            if do.exists:
+                do.delete()
+
+    request.addfinalizer(teardown)
+    return config_objs
