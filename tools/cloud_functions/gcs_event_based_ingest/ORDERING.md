@@ -42,7 +42,7 @@ gs://${BUCKET}/${DATASET}/${TABLE}/incremental/_config/bq_transform.sql
 gs://${BUCKET}/${DATASET}/${TABLE}/incremental/_config/ORDERME
 ```
 
-## Dealing With Out of Order Publishing to GCS During Historical Load
+## Dealing With Out-of-Order Publishing to GCS During Historical Load
 In some use cases, there is a period where incrementals that must be applied in
 order are uploaded in parallel (meaning their _SUCCESS files are expected to be
 out of order). This typically happens during some historical backfill period.
@@ -82,7 +82,8 @@ We've treated ordering incremental commits to table  as a variation on the
 Where we have multiple producers (each call of Backlog Publisher) and a single
 Consumer (the Backlog Subscriber which is enforced to be a singleton per table
 with a claim file). Our solution is to use GCS `_backlog` directory as our queue
-and `_bqlock` as a mutex.
+and `_bqlock` as a mutex. There is still a rare corner case of a race condition
+that we handle as well.
 
 ### Backlog Publisher 
 The Backlog Publisher has two responsibilities:
@@ -105,3 +106,34 @@ In order to escape the maximum nine-minute (540s) Cloud Function Timeout, the
 backfill subscriber will re-trigger itself by posting a new `_BACKFILL` file
 until the `_backlog` for the table prefix is empty. When a new success file
 arrives it is the reponsibility of the publisher to restart the subscriber.
+
+
+### Note on Handling Race Condition
+we use subscribe_monitor to handle a rare race condition where:
+
+1. subscriber reads an empty backlog (before it can delete the
+  _BACKFILL blob...)
+2. a new item is added to the backlog (causing a separate
+   function invocation)
+3. In this new invocation we reach this point in the code path
+   and start_subscriber_if_not_running sees the old _BACKFILL
+   and does not create a new one.
+4. The subscriber deletes the _BACKFILL blob and exits without
+   processing the new item on the backlog from #2.
+
+We handle this by the following: 
+
+1. When success file added to the backlog starts this monitoring
+to wait 10 seconds before checking that the backfill file exists. To catch if
+the backfill file disappears when it should not. This might trigger an extra
+loop of the backfill subscriber but this loop will not take any action and this
+wasted compute is far better than dropping a batch of data.
+1. On the subscriber side we check if there was more time
+than 10 seconds between list backlog items and delete backfill calls. If so the
+subscriber double checks that the backlog is still empty. This way
+we always handle this race condition either in this monitor or in the
+subscriber itself.
+
+
+### Visualization of Ordering Triggers in the Cloud Function
+![architecture](img/ordering.png)
