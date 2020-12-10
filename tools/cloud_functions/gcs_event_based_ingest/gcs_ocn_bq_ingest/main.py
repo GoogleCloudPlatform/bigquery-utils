@@ -22,9 +22,14 @@ from typing import Dict
 
 # pylint in cloud build is being flaky about this import discovery.
 # pylint: disable=no-name-in-module
-from google.cloud import bigquery, error_reporting, storage
+from google.cloud import bigquery
+from google.cloud import error_reporting
+from google.cloud import storage
 
-from . import constants, exceptions, ordering, utils
+from . import constants
+from . import exceptions
+from . import ordering
+from . import utils
 # Reuse GCP Clients across function invocations using globbals
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 # pylint: disable=global-statement
@@ -73,16 +78,15 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         if enforce_ordering:
             # For SUCCESS files in a backlog directory, ensure that subscriber
             # is running.
-            if (
-                basename_object_id == constants.SUCCESS_FILENAME
-                and "/_backlog/" in object_id
-            ):
-                print(f"This notification was for "
-                      f"gs://{bucket_id}/{object_id} a"
-                      f"{constants.SUCCESS_FILENAME} in a"
-                      "/_backlog/ directory. "
-                      f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
-                      "ensure that subscriber is running.")
+            if (basename_object_id == constants.SUCCESS_FILENAME
+                    and "/_backlog/" in object_id):
+                print(
+                    f"This notification was for "
+                    f"gs://{bucket_id}/{object_id} a"
+                    f"{constants.SUCCESS_FILENAME} in a"
+                    "/_backlog/ directory. "
+                    f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
+                    "ensure that subscriber is running.")
                 ordering.subscriber_monitor(gcs_client, bkt, object_id)
                 return
             if (constants.START_BACKFILL_FILENAME and basename_object_id
@@ -95,8 +99,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                 ordering.backlog_publisher(gcs_client, event_blob)
                 return
             elif basename_object_id == constants.BACKFILL_FILENAME:
-                ordering.backlog_subscriber(gcs_client, bq_client,
-                                            event_blob, function_start_time)
+                ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
+                                            function_start_time)
                 return
         else:  # Default behavior submit job as soon as success file lands.
             bkt = utils.cached_get_bucket(gcs_client, bucket_id)

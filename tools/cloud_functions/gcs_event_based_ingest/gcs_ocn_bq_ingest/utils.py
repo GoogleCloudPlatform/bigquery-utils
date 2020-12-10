@@ -25,7 +25,13 @@ import os
 import pathlib
 import time
 import uuid
-from typing import Any, Deque, Dict, List, Optional, Tuple, Union
+from typing import Any
+from typing import Deque
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
 import cachetools
 import google.api_core
@@ -33,9 +39,11 @@ import google.api_core.client_info
 import google.api_core.exceptions
 import google.cloud.exceptions
 # pylint in cloud build is being flaky about this import discovery.
-from google.cloud import bigquery, storage
+from google.cloud import bigquery
+from google.cloud import storage
 
-from . import constants, exceptions  # pylint: disable=no-name-in-module
+from . import constants  # pylint: disable=no-name-in-module
+from . import exceptions
 
 
 def external_query(  # pylint: disable=too-many-arguments
