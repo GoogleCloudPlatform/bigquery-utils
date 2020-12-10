@@ -123,7 +123,7 @@ def test_single_backlog_subscriber_in_order(bq, gcs, gcs_bucket, error,
     Populate a backlog with 3 files that make updates where we can assert
     that these jobs were applied in order.
     """
-    gcs_ocn_bq_ingest.ordering.backlog_subscriber(gcs, bq, error,
+    gcs_ocn_bq_ingest.ordering.backlog_subscriber(gcs, bq,
                                                   gcs_external_update_config,
                                                   time.monotonic())
     backlog_blobs = gcs_bucket.list_blobs(

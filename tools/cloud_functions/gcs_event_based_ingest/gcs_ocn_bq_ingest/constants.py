@@ -72,6 +72,7 @@ DEFAULT_JOB_PREFIX = "gcf-ingest-"
 DEFAULT_DESTINATION_REGEX = (
     r"^(?P<dataset>[\w\-\._0-9]+)/"  # dataset (required)
     r"(?P<table>[\w\-_0-9]+)/?"      # table name (required)
+    r"(?:historical|incremental)?/?" # break up hist v.s. inc to separate prefixes (optional)
     r"(?P<partition>\$[0-9]+)?/?"    # partition decorator (optional)
     r"(?:"                           # [begin] yyyy/mm/dd/hh/ group (optional)
     r"(?P<yyyy>[0-9]{4})/?"          # partition year (yyyy) (optional)
@@ -110,7 +111,9 @@ ACTION_FILENAMES = {
 
 RESTART_BUFFER_SECONDS = int(os.getenv("RESTART_BUFFER_SECONDS", "30"))
 
-ORDER_ALL_JOBS = bool(
-    distutils.util.strtobool(os.getenv("ORDER_ALL_JOBS", "False")))
+ORDER_PER_TABLE = bool(
+    distutils.util.strtobool(os.getenv("ORDER_PER_TABLE", "False")))
 
 BQ_TRANSFORM_SQL = "*.sql"
+
+ENSURE_SUBSCRIBER_SECONDS = 10
