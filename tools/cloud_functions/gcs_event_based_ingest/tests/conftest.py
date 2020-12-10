@@ -338,7 +338,7 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
 
 
 @pytest.fixture
-def dest_ordered_update_table(request, bq, mock_env,
+def dest_ordered_update_table(request, gcs, gcs_bucket, bq, mock_env,
                               dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "ordering_schema.json")) as schema_file:
@@ -352,11 +352,31 @@ def dest_ordered_update_table(request, bq, mock_env,
     )
 
     table = bq.create_table(table)
-    # Our test query only updates so we need to populate the first row.
-    bq.load_table_from_json([{"id": 1, "alpha_update": ""}], table)
+
+    # Our test query only updates on a single row so we need to populate
+    # original row.
+    # This can be used to simulate an existing _bqlock from a prior run of the
+    # subscriber loop with a job that has succeeded.
+    job: bigquery.LoadJob = bq.load_table_from_json(
+        [{
+            "id": 1,
+            "alpha_update": ""
+        }],
+        table,
+        job_id_prefix=gcs_ocn_bq_ingest.constants.DEFAULT_JOB_PREFIX)
+
+    # The subscriber will be responsible for cleaning up this file.
+    bqlock_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}", table.table_id,
+        "_bqlock"
+    ]))
+
+    bqlock_obj.upload_from_string(job.job_id)
 
     def teardown():
         bq.delete_table(table, not_found_ok=True)
+        if bqlock_obj.exists():
+            bqlock_obj.delete()
 
     request.addfinalizer(teardown)
     return table
@@ -367,10 +387,17 @@ def gcs_ordered_update_data(
         request, gcs_bucket, dest_dataset,
         dest_ordered_update_table) -> List[storage.blob.Blob]:
     data_objs = []
+    older_success_blob: storage.blob.Blob = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_ordered_update_table.table_id, "00", "_SUCCESS"
+    ]))
+    older_success_blob.upload_from_string("")
+    data_objs.append(older_success_blob)
+
     chunks = {
-        "00",
         "01",
         "02",
+        "03",
     }
     for chunk in chunks:
         for test_file in ["data.csv", "_SUCCESS"]:
@@ -397,6 +424,8 @@ def gcs_backlog(request, gcs, gcs_bucket,
                 gcs_ordered_update_data) -> List[storage.blob.Blob]:
     data_objs = []
 
+    # We will deal with the last incremental in the test itself to test the
+    # behavior of a new backlog subscriber.
     for success_blob in gcs_ordered_update_data:
         gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, success_blob)
         backlog_blob = gcs_ocn_bq_ingest.ordering.success_blob_to_backlog_blob(

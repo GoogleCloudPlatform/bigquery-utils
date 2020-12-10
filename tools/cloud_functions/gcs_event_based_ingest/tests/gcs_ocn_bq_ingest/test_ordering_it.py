@@ -114,11 +114,11 @@ def test_backlog_publisher_with_existing_backfill_file(gcs, gcs_bucket,
 
 @pytest.mark.IT
 @pytest.mark.ORDERING
-def test_single_backlog_subscriber_in_order(bq, gcs, gcs_bucket, error,
-                                            dest_ordered_update_table,
-                                            gcs_ordered_update_data,
-                                            gcs_external_update_config,
-                                            gcs_backlog, mock_env):
+def test_backlog_subscriber_in_order(bq, gcs, gcs_bucket, error, dest_dataset,
+                                     dest_ordered_update_table,
+                                     gcs_ordered_update_data,
+                                     gcs_external_update_config, gcs_backlog,
+                                     mock_env):
     """Test basic functionality of backlog subscriber.
     Populate a backlog with 3 files that make updates where we can assert
     that these jobs were applied in order.
@@ -130,6 +130,8 @@ def test_single_backlog_subscriber_in_order(bq, gcs, gcs_bucket, error,
         prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/_backlog/"
     )
     assert backlog_blobs.num_results == 0, "backlog is not empty"
+    bqlock_blob: storage.Blob = gcs_bucket.blob("_bqlock")
+    assert not bqlock_blob.exists(), "_bqlock was not cleaned up"
     rows = bq.query("SELECT alpha_update FROM "
                     f"{dest_ordered_update_table.dataset_id}"
                     f".{dest_ordered_update_table.table_id}")
@@ -137,5 +139,30 @@ def test_single_backlog_subscriber_in_order(bq, gcs, gcs_bucket, error,
     num_rows = 0
     for row in rows:
         num_rows += 1
-        assert row["alpha_update"] == "ABC", "incrementals not applied in order"
+        assert row["alpha_update"] == "ABC", "backlog not applied in order"
+    assert num_rows == expected_num_rows
+
+    # Now we will test what happens when the publisher posts another batch after
+    # the backlog subscriber has exited.
+    data_obj: storage.Blob
+    for test_file in ["data.csv", "_SUCCESS"]:
+        data_obj = gcs_bucket.blob("/".join([
+            f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+            dest_ordered_update_table.table_id, "04", test_file
+        ]))
+        data_obj.upload_from_filename(
+            os.path.join(TEST_DIR, "resources", "test-data", "ordering", "04",
+                         test_file))
+    backfill_blob = gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, data_obj)
+    gcs_ocn_bq_ingest.ordering.backlog_subscriber(gcs, bq, backfill_blob,
+                                                  time.monotonic())
+
+    rows = bq.query("SELECT alpha_update FROM "
+                    f"{dest_ordered_update_table.dataset_id}"
+                    f".{dest_ordered_update_table.table_id}")
+    expected_num_rows = 1
+    num_rows = 0
+    for row in rows:
+        num_rows += 1
+        assert row["alpha_update"] == "ABCD", "new incremental not applied"
     assert num_rows == expected_num_rows
