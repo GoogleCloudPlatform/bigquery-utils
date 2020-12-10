@@ -33,7 +33,6 @@ from . import utils
 # Reuse GCP Clients across function invocations using globbals
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 # pylint: disable=global-statement
-from .utils import apply
 
 ERROR_REPORTING_CLIENT = None
 
@@ -105,7 +104,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         else:  # Default behavior submit job as soon as success file lands.
             if basename_object_id == constants.SUCCESS_FILENAME:
                 utils.handle_duplicate_notification(event_blob)
-                apply(
+                utils.apply(
                     gcs_client,
                     bq_client,
                     event_blob,
