@@ -387,6 +387,12 @@ In theory, one could set up Pub/Sub notifications from multiple GCS Buckets
 Pub/Sub topic so that data uploaded to any of these buckets could get
 automatically loaded to BigQuery by a single deployment of the Cloud Function.
 
+## Ordering Guarantees
+It is possible to configure the Cloud Function to apply incrementals in order if
+this is crucial to your data integrity. This naturally comes with a performance
+penalty as for a given table we cannot parallelize ingestion of batches.
+The ordering behavior and options are described in detail in [ORDERING.md](ORDERING.md)
+
 ## Backfill
 There are some cases where you may have data already copied to GCS according to
 the naming convention / with success files before the Object Change

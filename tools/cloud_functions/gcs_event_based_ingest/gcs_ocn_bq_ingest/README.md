@@ -9,7 +9,8 @@ BigQuery Table.
 1. [Pub/Sub Notification](https://cloud.google.com/storage/docs/pubsub-notifications)
 object finalize.
 1. Cloud Function subscribes to notifications and ingests all the data into
-BigQuery a directory once a `_SUCCESS` file arrives.
+BigQuery from a GCS prefix once a `_SUCCESS` file arrives. The success file name
+is configurable with environment variable.
 
 
 ## Deployment
@@ -32,9 +33,13 @@ following default behavior.
 | `MAX_BATCH_BYTES`     | Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
 | `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
 | `BQ_PROJECT`          | Default BQ project to use if not specified in dataset capturing group | Project where Cloud Function is deployed |
-| `ORDERED_PER_TABLE`   | Force jobs to be executed sequentially (rather than parallel) based on the backlog. This is the same as having an `ORDERME` file in every config directory | `False` | 
+| `ORDER_PER_TABLE`\*   | Force jobs to be executed sequentially (rather than parallel) based on the backlog. This is the same as having an `ORDERME` file in every config directory | `False` | 
+| `START_BACKFILL_FILENAME`\*| Block submitting BigQuery Jobs for a table until this file is present at the table prefix. By default this will not happen. | `None` |
+| `RESTART_BUFFER_SECONDS`\* | Buffer before Cloud Function timeout to leave before re-triggering the backfill subscriber | 30 |
 
-
+\* only affect the behavior when ordering is enabled for a table.
+See [ORDERING.md](../ORDERING.md)
+ 
 ## Implementation notes
 1. To support notifications based on a GCS prefix
 (rather than every object in the bucket), we chose to use manually

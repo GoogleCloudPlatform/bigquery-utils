@@ -19,6 +19,7 @@
 import os
 import time
 import traceback
+from typing import Optional
 
 import google.api_core
 import google.api_core.exceptions
@@ -42,20 +43,12 @@ def backlog_publisher(
     print(f"added gs://{backlog_blob.bucket.name}/{backlog_blob.name} "
           "to the backlog.")
 
-    start_backfill = True
     table_prefix = utils.get_table_prefix(event_blob.name)
-    if constants.START_BACKFILL_FILENAME:
-        start_backfill_blob = bkt.blob(
-            f"{table_prefix}/{constants.START_BACKFILL_FILENAME}")
-        start_backfill = start_backfill_blob.exists()
-
-    if start_backfill:
-        start_backfill_subscriber_if_not_running(gcs_client, bkt, table_prefix)
+    start_backfill_subscriber_if_not_running(gcs_client, bkt, table_prefix)
 
 
 # pylint: disable=too-many-arguments,too-many-locals
 def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
-                       error_client: error_reporting.Client,
                        backfill_blob: storage.Blob, function_start_time: float):
     """Pick up the table lock, poll BQ job id until completion and process next
     item in the backlog.
@@ -90,40 +83,47 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                         bq_client, job_id, polling_timeout)
                 except (exceptions.BigQueryJobFailure,
                         google.api_core.exceptions.NotFound):
-                    last_job_done = False
-                    error_client.report(
+                    raise exceptions.BigQueryJobFailure(
                         f"previous BigQuery job: {job_id} failed or could not "
                         "be found. This will kill the backfill subscriber for "
-                        f"the table prefix {table_prefix}."
-                        "Once the issue is dealt with by a human, the lock"
+                        f"the table prefix: {table_prefix}."
+                        "Once the issue is dealt with by a human, the lock "
                         "file at: "
                         f"gs://{lock_blob.bucket.name}/{lock_blob.name} "
                         "should be manually removed and a new empty "
-                        f"{constants.BACKFILL_FILENAME}"
-                        "file uploaded to:"
-                        f"gs://{lock_blob.bucket.name}/{table_prefix}/_BACKFILL"
+                        f"{constants.BACKFILL_FILENAME} "
+                        "file uploaded to: "
+                        f"gs://{backfill_blob.bucket.name}/{table_prefix}"
+                        "/_BACKFILL "
                         f"to resume the backfill subscriber so it can "
                         "continue with the next item in the backlog.\n"
                         "Original Exception:\n"
                         f"{traceback.format_exc()}")
-                    time.sleep(polling_timeout)
-                    continue
             else:
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
-                      f"contents:\n {lock_contents}")
+                      f"contents:\n {lock_contents}. This will be an infinite"
+                      "loop until the manual lock is released.")
                 time.sleep(polling_timeout)
                 continue
         if last_job_done:
             utils.remove_oldest_backlog_item(gcs_client, bkt, table_prefix)
             last_job_done = False
 
+        check_backlog_time = time.monotonic()
         next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
                                                         table_prefix)
         if not next_backlog_file:
-            print(f"backlog is empty for gs://{bkt.name}/{table_prefix}."
-                  "baclog subscriber exiting.")
+            backfill_blob.delete(if_generation_match=backfill_blob.generation)
+            if time.monotonic() > check_backlog_time:
+                raise exceptions.BacklogException(
+                    "Please check if the backlog is empty for "
+                    f"gs://${bkt.name}/{table_prefix}/_backlog/"
+                    "There was more than {}"
+                )
             utils.handle_bq_lock(gcs_client, lock_blob, None)
+            print(f"backlog is empty for gs://{bkt.name}/{table_prefix}. "
+                  "backlog subscriber exiting.")
             return
         next_success_file: storage.Blob = bkt.blob(
             next_backlog_file.name.replace("/_backlog/", "/"))
@@ -144,28 +144,43 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
     backfill_blob.upload_from_string("")
 
 
-def start_backfill_subscriber_if_not_running(gcs_client: storage.Client,
-                                             bkt: storage.Bucket,
-                                             table_prefix: str):
+def start_backfill_subscriber_if_not_running(
+    gcs_client: storage.Client,
+    bkt: storage.Bucket,
+    table_prefix: str
+) -> Optional[storage.Blob]:
     """start the backfill subscriber if  it is not already runnning for this
     table prefix.
 
     created a backfill file for the table prefix if not exists.
     """
-    # Create a _BACKFILL file for this table if not exists
-    backfill_blob = bkt.blob(f"{table_prefix}/{constants.BACKFILL_FILENAME}")
-    try:
-        backfill_blob.upload_from_string("",
-                                         if_generation_match=0,
-                                         client=gcs_client)
-        print("triggered backfill with "
-              f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
-              f"created at {backfill_blob.time_created}. exiting. ")
-    except google.api_core.exceptions.PreconditionFailed:
-        backfill_blob.reload()
-        print("backfill already in progress due to: "
-              f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
-              f"created at {backfill_blob.time_created}. exiting.")
+    start_backfill = True
+    # Do not start subscriber until START_BACKFILL_FILENAME has been dropped
+    # at the table prefix.
+    if constants.START_BACKFILL_FILENAME:
+        start_backfill_blob = bkt.blob(
+            f"{table_prefix}/{constants.START_BACKFILL_FILENAME}")
+        start_backfill = start_backfill_blob.exists()
+
+    if start_backfill:
+        # Create a _BACKFILL file for this table if not exists
+        backfill_blob = bkt.blob(f"{table_prefix}/{constants.BACKFILL_FILENAME}")
+        try:
+            backfill_blob.upload_from_string("",
+                                             if_generation_match=0,
+                                             client=gcs_client)
+            print("triggered backfill with "
+                  f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
+                  f"created at {backfill_blob.time_created}. exiting. ")
+            return backfill_blob
+        except google.api_core.exceptions.PreconditionFailed:
+            backfill_blob.reload()
+            print("backfill already in progress due to: "
+                  f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
+                  f"created at {backfill_blob.time_created}. exiting.")
+            return backfill_blob
+    else:
+        return None
 
 
 def success_blob_to_backlog_blob(success_blob: storage.Blob) -> storage.Blob:

@@ -48,7 +48,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
 
         basename_object_id = os.path.basename(object_id)
 
-        # Exit eagerly if this is not a file to take action on.
+        # Exit eagerly if this is not a file to take action on
+        # (e.g. a data, config, or lock file)
         if basename_object_id not in constants.ACTION_FILENAMES:
             action_filenames = constants.ACTION_FILENAMES
             if constants.START_BACKFILL_FILENAME is None:
@@ -57,26 +58,49 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                   f"{action_filenames} file.")
             return
 
-        # Ignore success files in the backlog directory
-        if (basename_object_id == constants.SUCCESS_FILENAME
-                and "/_backlog/" in object_id):
-            print(f"No-op. This notification was for "
-                  f"gs://{bucket_id}/{object_id} a"
-                  f"{constants.SUCCESS_FILENAME} in a"
-                  "/_backlog/ directory.")
-            return
-
         gcs_client = lazy_gcs_client()
         bq_client = lazy_bq_client()
         table_ref, batch = utils.gcs_path_to_table_ref_and_batch(object_id)
 
-        enforce_ordering = (constants.ORDER_ALL_JOBS
+        enforce_ordering = (constants.ORDER_PER_TABLE
                             or utils.look_for_config_in_parents(
                                 gcs_client, f"gs://{bucket_id}/{object_id}",
                                 "ORDERME") is not None)
 
         bkt: storage.Bucket = utils.cached_get_bucket(gcs_client, bucket_id)
         event_blob: storage.Blob = bkt.blob(object_id)
+
+        # For SUCCESS files in a backlog directory, ensure that subscriber is
+        # running.
+        if (
+            basename_object_id == constants.SUCCESS_FILENAME
+            and "/_backlog/" in object_id
+        ):
+            print(f"This notification was for "
+                  f"gs://{bucket_id}/{object_id} a"
+                  f"{constants.SUCCESS_FILENAME} in a"
+                  "/_backlog/ directory. Ensuring that subscriber is running.")
+            # Handle rare race condition where:
+            # 1. subscriber reads an empty backlog (before it can delete the
+            #   _BACKFILL blob...)
+            # 2. a new item is added to the backlog (causing a separate function
+            #   invocation)
+            # 3. In this new invocation we reach this point in the code path and
+            #    start_subscriber_if_not_running sees the old _BACKFILL and does
+            #    not create a new one.
+            # 4. The subscriber deletes the _BACKFILL blob and exits without
+            #    processing the new item on the backlog from #2.
+            backfill_blob = ordering.start_backfill_subscriber_if_not_running(
+                gcs_client, bkt, utils.get_table_prefix(object_id))
+
+            time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
+            while not utils.wait_on_gcs_blob(
+                gcs_client, backfill_blob, constants.ENSURE_SUBSCRIBER_SECONDS
+            ):
+                backfill_blob =\
+                    ordering.start_backfill_subscriber_if_not_running(
+                        gcs_client, bkt, utils.get_table_prefix(object_id))
+            return
 
         if enforce_ordering:
             if (constants.START_BACKFILL_FILENAME and basename_object_id
@@ -89,7 +113,6 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                 ordering.backlog_publisher(gcs_client, event_blob)
             elif basename_object_id == constants.BACKFILL_FILENAME:
                 ordering.backlog_subscriber(gcs_client, bq_client,
-                                            lazy_error_reporting_client(),
                                             event_blob, function_start_time)
         else:  # Default behavior submit job as soon as success file lands.
             bkt = utils.cached_get_bucket(gcs_client, bucket_id)
@@ -102,10 +125,16 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                 None,  # None lock blob as there is no serialization required.
                 utils.create_job_id(table_ref, batch))
     # Unexpected exceptions will actually raise which may cause a cold restart.
-    except tuple(exceptions.EXCEPTIONS_TO_REPORT):
+    except tuple(exceptions.EXCEPTIONS_TO_REPORT) as original_error:
         # We do this because we know these errors do not require a cold restart
         # of the cloud function.
-        lazy_error_reporting_client().report_exception()
+        try:
+            lazy_error_reporting_client().report_exception()
+        except Exception:  # pylint: disable=broad-except
+            # This mostly handles the case where error reporting API is not
+            # enabled or IAM permissions did not allow us to report errors with
+            # error reporting API.
+            raise original_error
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:
