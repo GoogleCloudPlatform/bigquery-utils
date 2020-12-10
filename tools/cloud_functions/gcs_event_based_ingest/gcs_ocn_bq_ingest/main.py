@@ -151,7 +151,8 @@ def lazy_bq_client() -> bigquery.Client:
         default_query_config.labels = constants.DEFAULT_JOB_LABELS
         BQ_CLIENT = bigquery.Client(
             client_info=constants.CLIENT_INFO,
-            default_query_job_config=default_query_config)
+            default_query_job_config=default_query_config,
+            project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
     return BQ_CLIENT
 
 

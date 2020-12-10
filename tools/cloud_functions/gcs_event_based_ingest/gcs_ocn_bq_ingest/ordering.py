@@ -36,7 +36,7 @@ from . import utils
 def backlog_publisher(
     gcs_client: storage.Client,
     event_blob: storage.Blob,
-):
+) -> Optional[storage.Blob]:
     """add success files to the the backlog and trigger backfill if necessary"""
     bkt = event_blob.bucket
 
@@ -47,7 +47,8 @@ def backlog_publisher(
           "to the backlog.")
 
     table_prefix = utils.get_table_prefix(event_blob.name)
-    start_backfill_subscriber_if_not_running(gcs_client, bkt, table_prefix)
+    return start_backfill_subscriber_if_not_running(gcs_client, bkt,
+                                                    table_prefix)
 
 
 # pylint: disable=too-many-arguments,too-many-locals
@@ -118,7 +119,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                                                         table_prefix)
         if not next_backlog_file:
             backfill_blob.delete(if_generation_match=backfill_blob.generation)
-            if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS - 2 <
+            if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
                     time.monotonic()):
                 print(
                     "checking if the backlog is still empty for "
@@ -134,7 +135,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                     gcs_client, bkt, table_prefix)
                 if next_backlog_file:
                     # The backfill file may have been deleted but the backlog is
-                    # not empty. Retrigger the backfill subscriber loop by
+                    # not empty. Re-trigger the backfill subscriber loop by
                     # dropping a new backfill file.
                     start_backfill_subscriber_if_not_running(
                         gcs_client, bkt, table_prefix)

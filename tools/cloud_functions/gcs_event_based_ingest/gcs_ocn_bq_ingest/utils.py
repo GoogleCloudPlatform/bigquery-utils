@@ -72,15 +72,16 @@ def external_query(  # pylint: disable=too-many-arguments
 
     # Note, dest_table might include a partition decorator.
     rendered_query = query.format(
-        dest_dataset=dest_table_ref.dataset_id,
+        dest_dataset=f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}",
         dest_table=dest_table_ref.table_id,
     )
 
-    job: bigquery.QueryJob = bq_client.query(
-        rendered_query,
-        job_config=job_config,
-        job_id=job_id,
-    )
+    job: bigquery.QueryJob = bq_client.query(rendered_query,
+                                             job_config=job_config,
+                                             job_id=job_id,
+                                             project=os.getenv(
+                                                 "BQ_PROJECT",
+                                                 bq_client.project))
 
     print(f"started asynchronous query job: {job.job_id}")
 
@@ -259,12 +260,10 @@ def get_batches_for_prefix(
         batch.clear()
 
     if len(batches) > 1:
-        print(f"split into {len(batches)} load jobs.")
-    elif len(batches) == 1:
-        print("using single load job.")
-    else:
+        print(f"split into {len(batches)} batches.")
+    elif len(batches) < 1:
         raise google.api_core.exceptions.NotFound(
-            f"No files to load at gs://{bucket_name}/{prefix_path}!")
+            f"No files to load at {prefix_path}!")
     return batches
 
 
