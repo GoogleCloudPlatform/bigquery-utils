@@ -154,6 +154,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
     bq_client = bigquery.Client(client_info=CLIENT_INFO,
+                                project=project,
                                 default_query_job_config=default_query_config)
 
     print(f"looking for {gsurl}_config/bq_transform.sql")
@@ -236,7 +237,7 @@ def external_query(  # pylint: disable=too-many-arguments
 
     # Note, dest_table might include a partition decorator.
     rendered_query = query.format(
-        dest_dataset=dest_table_ref.dataset_id,
+        dest_dataset=f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}",
         dest_table=dest_table_ref.table_id,
     )
 
@@ -244,6 +245,7 @@ def external_query(  # pylint: disable=too-many-arguments
         rendered_query,
         job_config=job_config,
         job_id_prefix=job_id_prefix,
+        project=os.getenv("BQ_PROJECT", bq_client.project)
     )
 
     print(f"started asynchronous query job: {job.job_id}")
