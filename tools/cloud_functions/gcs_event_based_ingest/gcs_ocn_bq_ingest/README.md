@@ -15,7 +15,7 @@ is configurable with environment variable.
 
 ## Deployment
 The source for this Cloud Function can easily be reused to repeat this pattern
-for many tables by using the accompanying terraform module (TODO).
+for many tables by using the accompanying terraform module.
 
 This way we can reuse the tested source code for the Cloud Function.
 

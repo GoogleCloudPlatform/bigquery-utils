@@ -85,7 +85,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                     last_job_done = utils.wait_on_bq_job_id(
                         bq_client, job_id, polling_timeout)
                 except (exceptions.BigQueryJobFailure,
-                        google.api_core.exceptions.NotFound):
+                        google.api_core.exceptions.NotFound) as err:
                     raise exceptions.BigQueryJobFailure(
                         f"previous BigQuery job: {job_id} failed or could not "
                         "be found. This will kill the backfill subscriber for "
@@ -101,7 +101,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                         f"to resume the backfill subscriber so it can "
                         "continue with the next item in the backlog.\n"
                         "Original Exception:\n"
-                        f"{traceback.format_exc()}")
+                        f"{traceback.format_exc()}") from err
             else:
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"

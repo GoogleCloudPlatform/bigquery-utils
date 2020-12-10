@@ -98,20 +98,20 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
             if basename_object_id == constants.SUCCESS_FILENAME:
                 ordering.backlog_publisher(gcs_client, event_blob)
                 return
-            elif basename_object_id == constants.BACKFILL_FILENAME:
+            if basename_object_id == constants.BACKFILL_FILENAME:
                 ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
                                             function_start_time)
                 return
         else:  # Default behavior submit job as soon as success file lands.
-            bkt = utils.cached_get_bucket(gcs_client, bucket_id)
-            success_blob: storage.Blob = bkt.blob(object_id)
-            utils.handle_duplicate_notification(success_blob)
-            apply(
-                gcs_client,
-                bq_client,
-                success_blob,
-                None,  # None lock blob as there is no serialization required.
-                utils.create_job_id(table_ref, batch))
+            if basename_object_id == constants.SUCCESS_FILENAME:
+                utils.handle_duplicate_notification(event_blob)
+                apply(
+                    gcs_client,
+                    bq_client,
+                    event_blob,
+                    # None lock blob as there is no serialization required.
+                    None,
+                    utils.create_job_id(table_ref, batch))
     # Unexpected exceptions will actually raise which may cause a cold restart.
     except tuple(exceptions.EXCEPTIONS_TO_REPORT) as original_error:
         # We do this because we know these errors do not require a cold restart
@@ -122,7 +122,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
             # This mostly handles the case where error reporting API is not
             # enabled or IAM permissions did not allow us to report errors with
             # error reporting API.
-            raise original_error
+            raise original_error  # pylint: disable=raise-missing-from
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:
