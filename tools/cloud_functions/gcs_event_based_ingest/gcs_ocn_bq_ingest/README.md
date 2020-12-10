@@ -29,7 +29,7 @@ following default behavior.
 |-----------------------|---------------------------------------|----------------------------------------------|
 | `WAIT_FOR_JOB_SECONDS`| How long to wait before deciding BQ job did not fail quickly| `5` |
 | `SUCCESS_FILENAME`    | Filename to trigger a load of a prefix| `_SUCCESS` |
-| `DESTINATION_REGEX`   | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for `dataset`, `table`, (optional: `partition` or `yyyy`, `mm`, `dd`, `hh`, `batch`)
+| `DESTINATION_REGEX`   | A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for `dataset`, `table`, (optional: `partition` or `yyyy`, `mm`, `dd`, `hh`, `batch`) | (see below)|
 | `MAX_BATCH_BYTES`     | Max bytes for BigQuery Load job      | `15000000000000` ([15 TB](https://cloud.google.com/bigquery/quotas#load_jobs)|
 | `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
 | `BQ_PROJECT`          | Default BQ project to use if not specified in dataset capturing group | Project where Cloud Function is deployed |
@@ -39,10 +39,29 @@ following default behavior.
 
 \* only affect the behavior when ordering is enabled for a table.
 See [ORDERING.md](../ORDERING.md)
+
+## Default Destination Regex
+```python3
+DEFAULT_DESTINATION_REGEX = (
+    r"^(?P<dataset>[\w\-\._0-9]+)/"   # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"       # table name (required)
+    # break up historical v.s. incremental to separate prefixes (optional)
+    r"(?:historical|incremental)?/?"
+    r"(?P<partition>\$[0-9]+)?/?"     # partition decorator (optional)
+    r"(?:"                            # [begin] yyyy/mm/dd/hh/ group (optional)
+    r"(?P<yyyy>[0-9]{4})/?"           # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"            # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"            # partition day (dd)  (optional)
+    r"(?P<hh>[0-9]{2})?/?"            # partition hour (hh) (optional)
+    r")?"                             # [end]yyyy/mm/dd/hh/ group (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"       # batch id (optional)
+)
+`
  
 ## Implementation notes
 1. To support notifications based on a GCS prefix
 (rather than every object in the bucket), we chose to use manually
 configure Pub/Sub Notifications manually and use a Pub/Sub triggered
 Cloud Function.
+
 
