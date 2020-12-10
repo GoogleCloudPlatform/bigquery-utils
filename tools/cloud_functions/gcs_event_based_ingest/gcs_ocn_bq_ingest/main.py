@@ -70,39 +70,21 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         bkt: storage.Bucket = utils.cached_get_bucket(gcs_client, bucket_id)
         event_blob: storage.Blob = bkt.blob(object_id)
 
-        # For SUCCESS files in a backlog directory, ensure that subscriber is
-        # running.
-        if (
-            basename_object_id == constants.SUCCESS_FILENAME
-            and "/_backlog/" in object_id
-        ):
-            print(f"This notification was for "
-                  f"gs://{bucket_id}/{object_id} a"
-                  f"{constants.SUCCESS_FILENAME} in a"
-                  "/_backlog/ directory. Ensuring that subscriber is running.")
-            # Handle rare race condition where:
-            # 1. subscriber reads an empty backlog (before it can delete the
-            #   _BACKFILL blob...)
-            # 2. a new item is added to the backlog (causing a separate function
-            #   invocation)
-            # 3. In this new invocation we reach this point in the code path and
-            #    start_subscriber_if_not_running sees the old _BACKFILL and does
-            #    not create a new one.
-            # 4. The subscriber deletes the _BACKFILL blob and exits without
-            #    processing the new item on the backlog from #2.
-            backfill_blob = ordering.start_backfill_subscriber_if_not_running(
-                gcs_client, bkt, utils.get_table_prefix(object_id))
-
-            time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
-            while not utils.wait_on_gcs_blob(
-                gcs_client, backfill_blob, constants.ENSURE_SUBSCRIBER_SECONDS
-            ):
-                backfill_blob =\
-                    ordering.start_backfill_subscriber_if_not_running(
-                        gcs_client, bkt, utils.get_table_prefix(object_id))
-            return
-
         if enforce_ordering:
+            # For SUCCESS files in a backlog directory, ensure that subscriber
+            # is running.
+            if (
+                basename_object_id == constants.SUCCESS_FILENAME
+                and "/_backlog/" in object_id
+            ):
+                print(f"This notification was for "
+                      f"gs://{bucket_id}/{object_id} a"
+                      f"{constants.SUCCESS_FILENAME} in a"
+                      "/_backlog/ directory. "
+                      f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
+                      "ensure that subscriber is running.")
+                ordering.subscriber_monitor(gcs_client, bkt, object_id)
+                return
             if (constants.START_BACKFILL_FILENAME and basename_object_id
                     == constants.START_BACKFILL_FILENAME):
                 # This will be the first backfill file.
@@ -111,9 +93,11 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                 return
             if basename_object_id == constants.SUCCESS_FILENAME:
                 ordering.backlog_publisher(gcs_client, event_blob)
+                return
             elif basename_object_id == constants.BACKFILL_FILENAME:
                 ordering.backlog_subscriber(gcs_client, bq_client,
                                             event_blob, function_start_time)
+                return
         else:  # Default behavior submit job as soon as success file lands.
             bkt = utils.cached_get_bucket(gcs_client, bucket_id)
             success_blob: storage.Blob = bkt.blob(object_id)

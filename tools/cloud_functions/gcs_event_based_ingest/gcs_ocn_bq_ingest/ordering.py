@@ -115,12 +115,25 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
                                                         table_prefix)
         if not next_backlog_file:
             backfill_blob.delete(if_generation_match=backfill_blob.generation)
-            if time.monotonic() > check_backlog_time:
-                raise exceptions.BacklogException(
-                    "Please check if the backlog is empty for "
+            if (
+                check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
+                time.monotonic()
+            ):
+                print(
+                    "checking if the backlog is still empty for "
                     f"gs://${bkt.name}/{table_prefix}/_backlog/"
-                    "There was more than {}"
+                    f"There was more than {constants.ENSURE_SUBSCRIBER_SECONDS}"
+                    " seconds between listing items on the backlog and "
+                    f"attempting to delete the {constants.BACKFILL_FILENAME}. "
+                    "This should not happen often but is meant to alleviate a "
+                    "race condition in the event that something caused the "
+                    "delete operation was delayed or had to be retried for a "
+                    "long time."
                 )
+                next_backlog_file = utils.get_next_backlog_item(
+                    gcs_client, bkt, table_prefix)
+                if next_backlog_file:
+                    continue
             utils.handle_bq_lock(gcs_client, lock_blob, None)
             print(f"backlog is empty for gs://{bkt.name}/{table_prefix}. "
                   "backlog subscriber exiting.")
@@ -192,3 +205,41 @@ def success_blob_to_backlog_blob(success_blob: storage.Blob) -> storage.Blob:
     success_file_suffix = utils.removeprefix(success_blob.name,
                                              f"{table_prefix}/")
     return bkt.blob(f"{table_prefix}/_backlog/{success_file_suffix}")
+
+
+def subscriber_monitor(
+    gcs_client: storage.Client,
+    bkt: storage.Bucket,
+    object_id: str
+):
+    """
+    Monitor to handle a rare race condition where:
+
+    1. subscriber reads an empty backlog (before it can delete the
+      _BACKFILL blob...)
+    2. a new item is added to the backlog (causing a separate
+       function invocation)
+    3. In this new invocation we reach this point in the code path
+       and start_subscriber_if_not_running sees the old _BACKFILL
+       and does not create a new one.
+    4. The subscriber deletes the _BACKFILL blob and exits without
+       processing the new item on the backlog from #2.
+
+    We handle this by success file added to the backlog starts this monitoring
+    to wait constants.ENSURE_SUBSCRIBER_SECONDS before checking that the
+    backfill file exists. On the subscriber side we check if there was more time
+    than this between list backlog items and delete backfill calls. This way
+    we always handle this race condition either in this monitor or in the
+    subscriber itself.
+    """
+    backfill_blob = start_backfill_subscriber_if_not_running(
+        gcs_client, bkt, utils.get_table_prefix(object_id))
+
+    time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
+    while not utils.wait_on_gcs_blob(
+        gcs_client, backfill_blob, constants.ENSURE_SUBSCRIBER_SECONDS
+    ):
+        backfill_blob = \
+            start_backfill_subscriber_if_not_running(
+                gcs_client, bkt, utils.get_table_prefix(object_id))
+
