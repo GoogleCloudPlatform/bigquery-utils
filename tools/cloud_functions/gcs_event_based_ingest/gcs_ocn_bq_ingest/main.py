@@ -17,6 +17,7 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import collections
+import fnmatch
 import json
 import os
 import pathlib
@@ -152,16 +153,15 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(
-        client_info=CLIENT_INFO,
-        default_query_job_config=default_query_config)
+    bq_client = bigquery.Client(client_info=CLIENT_INFO,
+                                default_query_job_config=default_query_config)
 
     print(f"looking for {gsurl}_config/bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/bq_transform.sql")
     print(f"external_query_sql = {external_query_sql}")
     if not external_query_sql:
-        external_query_sql = look_for_transform_sql(gcs_client, gsurl)
+        look_for_config_in_parents(gcs_client, gsurl, "*.sql")
     if external_query_sql:
         print("EXTERNAL QUERY")
         external_query(gcs_client, bq_client, gsurl, external_query_sql,
@@ -308,10 +308,8 @@ def handle_duplicate_notification(bkt: storage.Bucket,
     success_created_unix_timestamp = success_blob.time_created.timestamp()
 
     claim_blob: storage.Blob = bkt.blob(
-        success_blob.name.replace(
-            SUCCESS_FILENAME,
-            f"_claimed_{success_created_unix_timestamp}")
-    )
+        success_blob.name.replace(SUCCESS_FILENAME,
+                                  f"_claimed_{success_created_unix_timestamp}"))
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
     except google.api_core.exceptions.PreconditionFailed as err:
@@ -326,23 +324,36 @@ def handle_duplicate_notification(bkt: storage.Bucket,
 
 
 def _get_parent_config_file(storage_client, config_filename, bucket, path):
+    bkt = storage_client.lookup_bucket(bucket)
     config_dir_name = "_config"
     parent_path = pathlib.Path(path).parent
-    config_path = parent_path / config_dir_name / config_filename
+    config_path = parent_path / config_dir_name
+    config_file_path = config_path / config_filename
+    # Handle wild card (to support bq transform sql with different names).
+    if "*" in config_filename:
+        matches: List[storage.Blob] = list(
+            filter(lambda blob: fnmatch.fnmatch(blob.name, config_filename),
+                   bkt.list_blobs(prefix=config_path)))
+        if matches:
+            if len(matches) > 1:
+                raise RuntimeError(
+                    f"Multiple matches for gs://{bucket}/{config_file_path}")
+            return read_gcs_file_if_exists(storage_client,
+                                           f"gs://{bucket}/{matches[0].name}")
+        return None
     return read_gcs_file_if_exists(storage_client,
-                                   f"gs://{bucket}/{config_path}")
+                                   f"gs://{bucket}/{config_file_path}")
 
 
-def look_for_transform_sql(storage_client: storage.Client,
-                           gsurl: str) -> Optional[str]:
-    """look in parent directories for _config/bq_transform.sql"""
-    config_filename = "bq_transform.sql"
+def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
+                               config_filename: str) -> Optional[str]:
+    """look in parent directories for _config/config_filename"""
     blob: storage.Blob = storage.Blob.from_string(gsurl)
     bucket_name = blob.bucket.name
     obj_path = blob.name
     parts = removesuffix(obj_path, "/").split("/")
 
-    def _get_parent_query(path):
+    def _get_parent_config(path):
         return _get_parent_config_file(storage_client, config_filename,
                                        bucket_name, path)
 
@@ -350,7 +361,7 @@ def look_for_transform_sql(storage_client: storage.Client,
     while parts:
         if config:
             return config
-        config = _get_parent_query("/".join(parts))
+        config = _get_parent_config("/".join(parts))
         parts.pop()
     return config
 
