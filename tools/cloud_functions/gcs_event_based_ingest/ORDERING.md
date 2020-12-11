@@ -44,8 +44,8 @@ gs://${BUCKET}/${DATASET}/${TABLE}/incremental/_config/ORDERME
 
 ## Dealing With Out-of-Order Publishing to GCS During Historical Load
 In some use cases, there is a period where incrementals that must be applied in
-order are uploaded in parallel (meaning their _SUCCESS files are expected to be
-out of order). This typically happens during some historical backfill period.
+order are uploaded in parallel (meaning their `_SUCCESS` files are expected to
+be out of order). This typically happens during some historical backfill period.
 This can be solved by setting the `START_BACKFILL_FILENAME` environment
 variable to a file name that indicates that the parallel upload of historical
 incrementals is complete (e.g. `_HISTORYDONE`). This will cause all success
@@ -90,7 +90,8 @@ The Backlog Publisher has two responsibilities:
 1. add incoming success files to a
 table's `_backlog` so they are not "forgotten" by the ingestion system.
 1. if there is a non-empty backlog start the backfill subscriber (if one is not
-already running). This is accomplished by dropping a table level `_BACKFILL` file.
+already running). This is accomplished by dropping a table level `_BACKFILL`
+file if it does not already exist.
 
 ### Backlog Subscriber
 The Backlog Subscriber is responsible for keeping track of BigQuery jobs running
@@ -105,11 +106,11 @@ The state of what BigQuery job is currently running on a table is kept in a
 In order to escape the maximum nine-minute (540s) Cloud Function Timeout, the
 backfill subscriber will re-trigger itself by posting a new `_BACKFILL` file
 until the `_backlog` for the table prefix is empty. When a new success file
-arrives it is the reponsibility of the publisher to restart the subscriber.
+arrives it is the responsibility of the publisher to restart the subscriber.
 
 
 ### Note on Handling Race Condition
-we use subscribe_monitor to handle a rare race condition where:
+We use `subscribe_monitor` to handle a rare race condition where:
 
 1. subscriber reads an empty backlog (before it can delete the
   _BACKFILL blob...)
@@ -130,9 +131,8 @@ loop of the backfill subscriber but this loop will not take any action and this
 wasted compute is far better than dropping a batch of data.
 1. On the subscriber side we check if there was more time
 than 10 seconds between list backlog items and delete backfill calls. If so the
-subscriber double checks that the backlog is still empty. This way
-we always handle this race condition either in this monitor or in the
-subscriber itself.
+subscriber double checks that the backlog is still empty. This way we always
+handle this race condition either in this monitor or in the subscriber itself.
 
 
 ### Visualization of Ordering Triggers in the Cloud Function

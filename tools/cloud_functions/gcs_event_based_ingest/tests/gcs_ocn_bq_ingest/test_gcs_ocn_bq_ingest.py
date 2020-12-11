@@ -14,9 +14,11 @@
 # limitations under the License.
 """unit tests for gcs_ocn_bq_ingest"""
 import re
+import time
 from typing import Dict, Optional
 
 import pytest
+from google.cloud import storage
 
 import gcs_ocn_bq_ingest.constants
 import gcs_ocn_bq_ingest.main
@@ -236,3 +238,49 @@ def test_recursive_update(original, update, expected):
     ])
 def test_get_table_prefix(test_input, expected):
     assert gcs_ocn_bq_ingest.utils.get_table_prefix(test_input) == expected
+
+
+def test_triage_event(mock_env, mocker):
+    test_event_blob: storage.Blob = storage.Blob.from_string(
+        "gs://foo/bar/baz/00/_SUCCESS")
+    apply_mock = mocker.patch('gcs_ocn_bq_ingest.utils.apply')
+    gcs_ocn_bq_ingest.main.triage_event(None, None, test_event_blob,
+                                        time.monotonic())
+    apply_mock.assert_called_once()
+
+
+def test_triage_event_ordered(ordered_mock_env, mocker):
+    enforce_ordering = True
+    test_event_blob: storage.Blob = storage.Blob.from_string(
+        "gs://foo/bar/baz/00/_SUCCESS")
+    apply_mock = mocker.patch('gcs_ocn_bq_ingest.utils.apply')
+    publisher_mock = mocker.patch(
+        'gcs_ocn_bq_ingest.ordering.backlog_publisher')
+    gcs_ocn_bq_ingest.main.triage_event(None,
+                                        None,
+                                        test_event_blob,
+                                        time.monotonic(),
+                                        enforce_ordering=enforce_ordering)
+    publisher_mock.assert_called_once()
+
+    test_event_blob: storage.Blob = storage.Blob.from_string(
+        "gs://foo/bar/baz/_BACKFILL")
+    subscriber_mock = mocker.patch(
+        'gcs_ocn_bq_ingest.ordering.backlog_subscriber')
+    gcs_ocn_bq_ingest.main.triage_event(None,
+                                        None,
+                                        test_event_blob,
+                                        time.monotonic(),
+                                        enforce_ordering=enforce_ordering)
+    subscriber_mock.assert_called_once()
+
+    test_event_blob: storage.Blob = storage.Blob.from_string(
+        "gs://foo/bar/baz/_backlog/00/_SUCCESS")
+    monitor_mock = mocker.patch('gcs_ocn_bq_ingest.ordering.subscriber_monitor')
+    gcs_ocn_bq_ingest.main.triage_event(None,
+                                        None,
+                                        test_event_blob,
+                                        time.monotonic(),
+                                        enforce_ordering=enforce_ordering)
+    monitor_mock.assert_called_once()
+    apply_mock.assert_not_called()

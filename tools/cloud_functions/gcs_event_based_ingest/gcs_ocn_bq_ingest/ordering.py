@@ -14,8 +14,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Background Cloud Function for loading data from GCS to BigQuery.
+"""Implement function to ensure loading data from GCS to BigQuery in order.
 """
+import datetime
 import os
 import time
 import traceback
@@ -192,7 +193,7 @@ def start_backfill_subscriber_if_not_running(
                                              client=gcs_client)
             print("triggered backfill with "
                   f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
-                  f"created at {backfill_blob.time_created}. exiting. ")
+                  f"created at {backfill_blob.time_created}. exiting.")
             return backfill_blob
         except google.api_core.exceptions.PreconditionFailed:
             backfill_blob.reload(client=gcs_client)
@@ -225,7 +226,7 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
     2. a new item is added to the backlog (causing a separate
        function invocation)
     3. In this new invocation we reach this point in the code path
-       and start_subscriber_if_not_running sees the old _BACKFILL
+       and start_backlog_subscriber_if_not_running sees the old _BACKFILL
        and does not create a new one.
     4. The subscriber deletes the _BACKFILL blob and exits without
        processing the new item on the backlog from #2.
@@ -240,23 +241,42 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
     backfill_blob = start_backfill_subscriber_if_not_running(
         gcs_client, bkt, utils.get_table_prefix(object_id))
 
-    time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
-    while not utils.wait_on_gcs_blob(gcs_client, backfill_blob,
-                                     constants.ENSURE_SUBSCRIBER_SECONDS):
-        backfill_blob = \
+    # backfill blob may be none if the START_BACKFILL_FILENAME has not been
+    # dropped
+    if backfill_blob:
+        # Handle case where a subscriber loop was not able to repost the
+        # backfill file before the cloud function timeout.
+        if (datetime.datetime.utcnow() - backfill_blob.time_created >
+                datetime.timedelta(
+                    seconds=int(os.getenv("FUNCTION_TIMEOUT_SEC", "60")))):
+            print(
+                f"backfill blob gs://{backfill_blob.bucket.name}/"
+                f"{backfill_blob.name} appears to be abandoned as it is older "
+                "than the cloud function timeout of "
+                f"{os.getenv('FUNCTION_TIMEOUT_SEC', '60')} seconds."
+                "reposting this backfill blob to restart the backfill"
+                "subscriber for this table.")
+            backfill_blob.delete(client=gcs_client)
             start_backfill_subscriber_if_not_running(
                 gcs_client, bkt, utils.get_table_prefix(object_id))
+            return
+
+        time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
+        while not utils.wait_on_gcs_blob(gcs_client, backfill_blob,
+                                         constants.ENSURE_SUBSCRIBER_SECONDS):
+            backfill_blob = \
+                start_backfill_subscriber_if_not_running(
+                    gcs_client, bkt, utils.get_table_prefix(object_id))
 
 
 def _get_clients_if_none(
-    gcs_client: Optional[storage.Client],
-    bq_client: Optional[bigquery.Client]
+    gcs_client: Optional[storage.Client], bq_client: Optional[bigquery.Client]
 ) -> Tuple[storage.Client, bigquery.Client]:
     """method to handle case where clients are None.
 
     This is a workaround to be able to run the backlog subscriber in a separate
     process to facilitate some of our integration tests. Though it should be
-    harmless.
+    harmless if these clients are recreated in the Cloud Function.
     """
     print("instantiating missing clients in backlog subscriber this should only"
           "happen during integration tests.")

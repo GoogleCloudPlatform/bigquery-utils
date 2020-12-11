@@ -8,4 +8,4 @@ pylint
 pytest-parallel
 pytest-cov
 google-cloud-pubsub>=2.2.0
-pytest-repeat
+pytest-mock

@@ -113,19 +113,21 @@ steps:
     - 'mypy-main'
     - 'mypy-tests'
     - 'terraform-fmt'
+  entrypoint: /bin/sh
   args:
-    - '-m'
-    - 'not IT'
+    - '-c'
+    # pip installing again to get GCB to recognize mocker from pytest-mock
+    - 'pip install -r requirements-dev.txt && python3 -m pytest -m "not IT"'
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   dir: '${_BUILD_DIR}'
   waitFor:
     - 'build-ci-image'
     - 'unit-test'
+  entrypoint: /bin/sh
   args:
-    - '--maxfail=1'
-    - '-m'
-    - 'IT'
+  - '-c'
+  - 'pip install -r requirements-dev.txt && python3 -m pytest -m IT'
   id: 'integration-test'
 options:
   machineType: 'N1_HIGHCPU_32'

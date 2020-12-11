@@ -78,6 +78,12 @@ def mock_env(gcs, monkeypatch):
 
 
 @pytest.fixture
+def ordered_mock_env(mock_env, monkeypatch):
+    """environment variable mocks"""
+    monkeypatch.setenv("ORDER_PER_TABLE", "TRUE")
+
+
+@pytest.fixture
 def dest_dataset(request, bq, mock_env, monkeypatch):
     random_dataset = f"test_bq_ingest_gcf_{str(uuid.uuid4())[:8].replace('-','_')}"
     dataset = bigquery.Dataset(f"{os.getenv('GCP_PROJECT')}"
