@@ -38,8 +38,8 @@ variable "data_ingester_sa" {
 
 variable "environment_variables" {
   description = "Environment variables to set on the cloud function."
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 
