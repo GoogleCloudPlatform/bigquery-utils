@@ -19,7 +19,7 @@
 import os
 import time
 import traceback
-from typing import Optional
+from typing import Optional, Tuple
 
 import google.api_core
 import google.api_core.exceptions
@@ -52,17 +52,19 @@ def backlog_publisher(
 
 
 # pylint: disable=too-many-arguments,too-many-locals
-def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
+def backlog_subscriber(gcs_client: Optional[storage.Client],
+                       bq_client: Optional[bigquery.Client],
                        backfill_blob: storage.Blob, function_start_time: float):
     """Pick up the table lock, poll BQ job id until completion and process next
     item in the backlog.
     """
+    gcs_client, bq_client = _get_clients_if_none(gcs_client, bq_client)
     # We need to retrigger the backfill loop before the Cloud Functions Timeout.
     restart_time = function_start_time + (
         float(os.getenv("FUNCTION_TIMEOUT_SEC", "60")) -
         constants.RESTART_BUFFER_SECONDS)
     bkt = backfill_blob.bucket
-    utils.handle_duplicate_notification(backfill_blob)
+    utils.handle_duplicate_notification(gcs_client, backfill_blob)
     table_prefix = utils.get_table_prefix(backfill_blob.name)
     last_job_done = False
     # we will poll for job completion this long in an individual iteration of
@@ -118,7 +120,8 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
         next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
                                                         table_prefix)
         if not next_backlog_file:
-            backfill_blob.delete(if_generation_match=backfill_blob.generation)
+            backfill_blob.delete(if_generation_match=backfill_blob.generation,
+                                 client=gcs_client)
             if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
                     time.monotonic()):
                 print(
@@ -148,7 +151,7 @@ def backlog_subscriber(gcs_client: storage.Client, bq_client: bigquery.Client,
             next_backlog_file.name.replace("/_backlog/", "/"))
         table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
             next_success_file.name)
-        if not next_success_file.exists():
+        if not next_success_file.exists(client=gcs_client):
             raise exceptions.BacklogException(
                 "backlog contains"
                 f"gs://{next_backlog_file.bucket}/{next_backlog_file.name}"
@@ -177,7 +180,7 @@ def start_backfill_subscriber_if_not_running(
     if constants.START_BACKFILL_FILENAME:
         start_backfill_blob = bkt.blob(
             f"{table_prefix}/{constants.START_BACKFILL_FILENAME}")
-        start_backfill = start_backfill_blob.exists()
+        start_backfill = start_backfill_blob.exists(client=gcs_client)
 
     if start_backfill:
         # Create a _BACKFILL file for this table if not exists
@@ -192,7 +195,7 @@ def start_backfill_subscriber_if_not_running(
                   f"created at {backfill_blob.time_created}. exiting. ")
             return backfill_blob
         except google.api_core.exceptions.PreconditionFailed:
-            backfill_blob.reload()
+            backfill_blob.reload(client=gcs_client)
             print("backfill already in progress due to: "
                   f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
                   f"created at {backfill_blob.time_created}. exiting.")
@@ -243,3 +246,28 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
         backfill_blob = \
             start_backfill_subscriber_if_not_running(
                 gcs_client, bkt, utils.get_table_prefix(object_id))
+
+
+def _get_clients_if_none(
+    gcs_client: Optional[storage.Client],
+    bq_client: Optional[bigquery.Client]
+) -> Tuple[storage.Client, bigquery.Client]:
+    """method to handle case where clients are None.
+
+    This is a workaround to be able to run the backlog subscriber in a separate
+    process to facilitate some of our integration tests. Though it should be
+    harmless.
+    """
+    print("instantiating missing clients in backlog subscriber this should only"
+          "happen during integration tests.")
+    if not gcs_client:
+        gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
+    if not bq_client:
+        default_query_config = bigquery.QueryJobConfig()
+        default_query_config.use_legacy_sql = False
+        default_query_config.labels = constants.DEFAULT_JOB_LABELS
+        bq_client = bigquery.Client(
+            client_info=constants.CLIENT_INFO,
+            default_query_job_config=default_query_config,
+            project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
+    return gcs_client, bq_client

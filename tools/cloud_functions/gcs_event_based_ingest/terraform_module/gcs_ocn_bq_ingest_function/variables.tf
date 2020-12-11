@@ -36,27 +36,12 @@ variable "data_ingester_sa" {
   description = "Service Account Email responsible for ingesting data to BigQuery"
 }
 
-variable "wait_for_job_seconds" {
-  description = "How long to wait before deciding BQ job did not fail quickly"
-  default     = ""
-}
-variable "success_filename" {
-  description = "Filename to trigger a load of a prefix"
-  default     = ""
-}
-variable "destination_regex" {
-  description = "A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for destination `dataset`, `table`, (optional: `partition`, `batch`)"
-  default     = ""
-}
-variable "max_batch_bytes" {
-  description = "Max bytes for BigQuery Load job"
-  default     = ""
+variable "environment_variables" {
+  description = "Environment variables to set on the cloud function."
+  type = map(string)
+  default = {}
 }
 
-variable "job_prefix" {
-  description = "Prefix for BigQuery Job IDs "
-  default     = ""
-}
 
 variable "region" {
   description = "GCP region in which to deploy cloud function"

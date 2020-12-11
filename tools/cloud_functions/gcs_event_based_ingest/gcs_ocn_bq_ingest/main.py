@@ -104,7 +104,6 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
                 return
         else:  # Default behavior submit job as soon as success file lands.
             if basename_object_id == constants.SUCCESS_FILENAME:
-                utils.handle_duplicate_notification(event_blob)
                 utils.apply(
                     gcs_client,
                     bq_client,

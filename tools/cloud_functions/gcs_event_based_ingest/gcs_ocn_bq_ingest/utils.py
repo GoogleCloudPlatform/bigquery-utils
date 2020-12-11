@@ -89,7 +89,7 @@ def external_query(  # pylint: disable=too-many-arguments
     # Check if job failed quickly
     while time.monotonic(
     ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
-        job.reload()
+        job.reload(client=bq_client)
         if job.errors:
             raise exceptions.BigQueryJobFailure(
                 f"query job {job.job_id} failed quickly: {job.errors}")
@@ -126,7 +126,7 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id):
     ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
         # Check if job failed quickly
         for job in jobs:
-            job.reload()
+            job.reload(client=bq_client)
             if job.errors:
                 raise exceptions.BigQueryJobFailure(
                     f"load job {job.job_id} failed quickly: {job.errors}")
@@ -402,7 +402,8 @@ def recursive_update(original: Dict, update: Dict, in_place: bool = False):
     return out
 
 
-def handle_duplicate_notification(blob_to_claim: storage.Blob):
+def handle_duplicate_notification(gcs_client: storage.Client,
+                                  blob_to_claim: storage.Blob):
     """
     Need to handle potential duplicate Pub/Sub notifications.
     To achieve this we will drop an empty "claimed" file that indicates
@@ -412,7 +413,7 @@ def handle_duplicate_notification(blob_to_claim: storage.Blob):
     duplicate ingestion due to multiple Pub/Sub messages for a success file
     with the same creation time.
     """
-    blob_to_claim.reload()
+    blob_to_claim.reload(client=gcs_client)
     created_unix_timestamp = blob_to_claim.time_created.timestamp()
 
     basename = os.path.basename(blob_to_claim.name)
@@ -421,7 +422,9 @@ def handle_duplicate_notification(blob_to_claim: storage.Blob):
             basename, f"_claimed_{basename}_created_at_"
             f"{created_unix_timestamp}"))
     try:
-        claim_blob.upload_from_string("", if_generation_match=0)
+        claim_blob.upload_from_string("",
+                                      if_generation_match=0,
+                                      client=gcs_client)
     except google.api_core.exceptions.PreconditionFailed as err:
         raise exceptions.DuplicateNotificationException(
             f"gs://{blob_to_claim.bucket.name}/{blob_to_claim.name} appears"
@@ -504,7 +507,7 @@ def remove_oldest_backlog_item(
     # https://cloud.google.com/storage/docs/json_api/v1/objects/list
     blob: storage.Blob
     for blob in backlog_blobs:
-        blob.delete()
+        blob.delete(client=gcs_client)
         return True  # Return after deleteing first blob in the iterator
     return False
 
@@ -651,7 +654,7 @@ def handle_bq_lock(gcs_client: storage.Client, lock_blob: storage.Blob,
     blob if next_job_id is None."""
     try:
         if next_job_id:
-            if lock_blob.exists():
+            if lock_blob.exists(client=gcs_client):
                 lock_blob.upload_from_string(
                     next_job_id,
                     if_generation_match=lock_blob.generation,
@@ -669,7 +672,7 @@ def handle_bq_lock(gcs_client: storage.Client, lock_blob: storage.Blob,
             )
     except google.api_core.exceptions.PreconditionFailed as err:
         raise exceptions.BacklogException(
-            f"The lock at gs://{lock_blob.bucket.name}/{lock_blob.name}"
+            f"The lock at gs://{lock_blob.bucket.name}/{lock_blob.name} "
             f"was changed by another process.") from err
 
 
@@ -692,6 +695,7 @@ def apply(
         lock_blob: storage.Blob
         job_id: str
     """
+    handle_duplicate_notification(gcs_client, success_blob)
     bkt = success_blob.bucket
     if lock_blob is not None:
         handle_bq_lock(gcs_client, lock_blob, job_id)
