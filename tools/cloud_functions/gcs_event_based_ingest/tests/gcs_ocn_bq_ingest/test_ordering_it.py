@@ -168,11 +168,13 @@ def test_backlog_subscriber_in_order_with_new_batch_after_exit(
 
 @pytest.mark.IT
 @pytest.mark.ORDERING
-@pytest.mark.repeat(5)
+@pytest.mark.parametrize('execution_number', range(5))
 def test_backlog_subscriber_in_order_with_new_batch_while_running(
-        bq, gcs, gcs_bucket, dest_dataset, dest_ordered_update_table,
-        gcs_ordered_update_data, gcs_external_update_config: storage.Blob,
-        gcs_backlog, mock_env):
+    execution_number,
+    bq, gcs, gcs_bucket, dest_dataset, dest_ordered_update_table,
+    gcs_ordered_update_data, gcs_external_update_config: storage.Blob,
+    gcs_backlog, mock_env
+):
     """Test functionality of backlog subscriber when new batches are added
     before the subscriber is done finishing the existing backlog.
 

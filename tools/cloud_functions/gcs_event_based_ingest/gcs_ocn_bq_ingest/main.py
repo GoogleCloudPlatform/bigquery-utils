@@ -18,7 +18,8 @@
 """
 import os
 import time
-from typing import Dict
+import traceback
+from typing import Dict, Optional
 
 # pylint in cloud build is being flaky about this import discovery.
 # pylint: disable=no-name-in-module
@@ -65,7 +66,6 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
 
         gcs_client = lazy_gcs_client()
         bq_client = lazy_bq_client()
-        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(object_id)
 
         enforce_ordering = (constants.ORDER_PER_TABLE
                             or utils.look_for_config_in_parents(
@@ -75,43 +75,14 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         bkt: storage.Bucket = utils.cached_get_bucket(gcs_client, bucket_id)
         event_blob: storage.Blob = bkt.blob(object_id)
 
-        if enforce_ordering:
-            # For SUCCESS files in a backlog directory, ensure that subscriber
-            # is running.
-            if (basename_object_id == constants.SUCCESS_FILENAME
-                    and "/_backlog/" in object_id):
-                print(
-                    f"This notification was for "
-                    f"gs://{bucket_id}/{object_id} a"
-                    f"{constants.SUCCESS_FILENAME} in a"
-                    "/_backlog/ directory. "
-                    f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
-                    "ensure that subscriber is running.")
-                ordering.subscriber_monitor(gcs_client, bkt, object_id)
-                return
-            if (constants.START_BACKFILL_FILENAME and basename_object_id
-                    == constants.START_BACKFILL_FILENAME):
-                # This will be the first backfill file.
-                ordering.start_backfill_subscriber_if_not_running(
-                    gcs_client, bkt, utils.get_table_prefix(object_id))
-                return
-            if basename_object_id == constants.SUCCESS_FILENAME:
-                ordering.backlog_publisher(gcs_client, event_blob)
-                return
-            if basename_object_id == constants.BACKFILL_FILENAME:
-                ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
-                                            function_start_time)
-                return
-        else:  # Default behavior submit job as soon as success file lands.
-            if basename_object_id == constants.SUCCESS_FILENAME:
-                utils.apply(
-                    gcs_client,
-                    bq_client,
-                    event_blob,
-                    # None lock blob as there is no serialization required.
-                    None,
-                    utils.create_job_id(table_ref, batch))
+        triage_event(gcs_client, bq_client, event_blob, function_start_time,
+                     enforce_ordering)
+
     # Unexpected exceptions will actually raise which may cause a cold restart.
+    except exceptions.DuplicateNotificationException:
+        print("recieved duplicate notification. this was handled gracefully."
+              f"{traceback.format_exc()}")
+
     except tuple(exceptions.EXCEPTIONS_TO_REPORT) as original_error:
         # We do this because we know these errors do not require a cold restart
         # of the cloud function.
@@ -122,6 +93,59 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
             # enabled or IAM permissions did not allow us to report errors with
             # error reporting API.
             raise original_error  # pylint: disable=raise-missing-from
+
+
+def triage_event(gcs_client: Optional[storage.Client],
+                 bq_client: Optional[bigquery.Client],
+                 event_blob: storage.Blob,
+                 function_start_time: float,
+                 enforce_ordering: bool = False):
+    """call the appropriate method based on the details of the trigger event
+    blob."""
+    bkt = event_blob.bucket
+    basename_object_id = os.path.basename(event_blob.name)
+    table_ref, batch = utils.gcs_path_to_table_ref_and_batch(event_blob.name)
+    if enforce_ordering:
+        # For SUCCESS files in a backlog directory, ensure that subscriber
+        # is running.
+        if (basename_object_id == constants.SUCCESS_FILENAME
+                and "/_backlog/" in event_blob.name):
+            print(f"This notification was for "
+                  f"gs://{bkt.name}/{event_blob.name} a"
+                  f"{constants.SUCCESS_FILENAME} in a"
+                  "/_backlog/ directory. "
+                  f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
+                  "ensure that subscriber is running.")
+            ordering.subscriber_monitor(gcs_client, bkt, event_blob.name)
+            return
+        if (constants.START_BACKFILL_FILENAME
+                and basename_object_id == constants.START_BACKFILL_FILENAME):
+            # This will be the first backfill file.
+            ordering.start_backfill_subscriber_if_not_running(
+                gcs_client, bkt, utils.get_table_prefix(event_blob.name))
+            return
+        if basename_object_id == constants.SUCCESS_FILENAME:
+            ordering.backlog_publisher(gcs_client, event_blob)
+            return
+        if basename_object_id == constants.BACKFILL_FILENAME:
+            if (event_blob.name != f"{utils.get_table_prefix(event_blob.name)}/"
+                    f"{constants.BACKFILL_FILENAME}"):
+                raise RuntimeError(
+                    f"recieved notification for gs://{event_blob.bucket.name}/"
+                    f"{event_blob.name}\n{constants.BACKFILL_FILENAME} files "
+                    "are expected only at the table prefix level.")
+            ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
+                                        function_start_time)
+            return
+    else:  # Default behavior submit job as soon as success file lands.
+        if basename_object_id == constants.SUCCESS_FILENAME:
+            utils.apply(
+                gcs_client,
+                bq_client,
+                event_blob,
+                # None lock blob as there is no serialization required.
+                None,
+                utils.create_job_id(table_ref, batch))
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:

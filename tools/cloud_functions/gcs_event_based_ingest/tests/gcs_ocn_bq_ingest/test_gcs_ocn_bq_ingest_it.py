@@ -14,7 +14,6 @@
 """integration tests for gcs_ocn_bq_ingest"""
 import os
 import time
-import unittest.mock
 
 import google.cloud.exceptions
 import pytest
@@ -80,11 +79,6 @@ def test_duplicate_success_notification(bq, gcs_data, dest_dataset, dest_table,
         }
     }
     gcs_ocn_bq_ingest.main.main(test_event, None)
-    with unittest.mock.patch.object(google.cloud.error_reporting.Client,
-                                    "report_exception") as mock_method:
-        gcs_ocn_bq_ingest.main.main(test_event, None)
-
-    mock_method.assert_called_once()
 
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")

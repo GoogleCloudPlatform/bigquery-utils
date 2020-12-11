@@ -306,14 +306,6 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
         "https://cloud.google.com/functions/docs/tutorials/storage")
 
 
-# cache lookups against GCS API for 1 second as buckets / objects have update
-# limit of once per second and we might do several of the same lookup during
-# the functions lifetime. This should improve performance by eliminating
-# unnecessary API calls. The lookups on bucket and objects in this function
-# should not be changing during the function's lifetime as this would lead to
-# non-deterministic results with or without this cache.
-# https://cloud.google.com/storage/quotas
-@cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
 def read_gcs_file(gcs_client: storage.Client, gsurl: str) -> str:
     """
     Read a GCS object as a string
@@ -338,7 +330,11 @@ def read_gcs_file_if_exists(gcs_client: storage.Client,
         return None
 
 
-# Cache bucket lookups (see reasoning in comment above)
+# cache lookups against GCS API for 1 second as buckets have update
+# limit of once per second and we might do several of the same lookup during
+# the functions lifetime. This should improve performance by eliminating
+# unnecessary API calls.
+# https://cloud.google.com/storage/quotas
 @cachetools.cached(cachetools.TTLCache(maxsize=1024, ttl=1))
 def cached_get_bucket(
     gcs_client: storage.Client,

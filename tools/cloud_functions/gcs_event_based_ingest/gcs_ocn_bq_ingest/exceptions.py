@@ -48,5 +48,4 @@ EXCEPTIONS_TO_REPORT = {
     UnexpectedTriggerException,
     DestinationRegexMatchException,
     BacklogException,
-    DuplicateNotificationException,
 }
