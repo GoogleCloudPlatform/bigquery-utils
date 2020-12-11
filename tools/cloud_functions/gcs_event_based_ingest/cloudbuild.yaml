@@ -128,6 +128,6 @@ steps:
     - 'IT'
   id: 'integration-test'
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'N1_HIGHCPU_32'
 substitutions:
   '_BUILD_DIR': 'tools/cloud_functions/gcs_event_based_ingest'

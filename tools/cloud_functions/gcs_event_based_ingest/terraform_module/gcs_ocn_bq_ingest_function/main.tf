@@ -69,13 +69,7 @@ resource "google_cloudfunctions_function" "gcs_to_bq" {
   source_archive_bucket = var.cloudfunctions_source_bucket
   source_archive_object = google_storage_bucket_object.function_zip_object.name
   entry_point           = "main"
-  environment_variables = {
-    WAIT_FOR_JOB_SECONDS = var.wait_for_job_seconds
-    SUCCESS_FILENAME     = var.success_filename
-    DESTINATION_REGEX    = var.destination_regex
-    MAX_BATCH_BYTES      = var.max_batch_bytes
-    JOB_PREFIX           = var.job_prefix
-  }
+  environment_variables = var.environment_variables
   event_trigger {
     event_type = var.use_pubsub_notifications ? "providers/cloud.pubsub/eventTypes/topic.publish" : "google.storage.object.finalize"
     resource   = var.use_pubsub_notifications ? google_pubsub_topic.notification_topic[0].id : module.bucket.name
