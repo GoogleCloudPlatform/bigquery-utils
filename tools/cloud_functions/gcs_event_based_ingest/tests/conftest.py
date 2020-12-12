@@ -74,7 +74,7 @@ def mock_env(gcs, monkeypatch):
     # Infer project from ADC of gcs client.
     monkeypatch.setenv("GCP_PROJECT", gcs.project)
     monkeypatch.setenv("FUNCTION_NAME", "integration-test")
-    monkeypatch.setenv("FUNCTION_TIMEOUT_SEC", "120")
+    monkeypatch.setenv("FUNCTION_TIMEOUT_SEC", "540")
 
 
 @pytest.fixture
