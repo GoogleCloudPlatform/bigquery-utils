@@ -486,7 +486,7 @@ def remove_oldest_backlog_item(
     table_prefix: str,
 ) -> bool:
     """
-    Remove the oldes pointer in the backlog if the backlog is not empty.
+    Remove the oldest pointer in the backlog if the backlog is not empty.
 
     Args:
         gcs_client: storage.Client

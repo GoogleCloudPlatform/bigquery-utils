@@ -64,12 +64,14 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
     restart_time = function_start_time + (
         float(os.getenv("FUNCTION_TIMEOUT_SEC", "60")) -
         constants.RESTART_BUFFER_SECONDS)
+    backfill_blob_generation = backfill_blob.generation
     bkt = backfill_blob.bucket
     utils.handle_duplicate_notification(gcs_client, backfill_blob)
     table_prefix = utils.get_table_prefix(backfill_blob.name)
     last_job_done = False
     # we will poll for job completion this long in an individual iteration of
-    # the while loop.
+    # the while loop (before checking if we are too close to cloud function
+    # timeout and should retrigger).
     polling_timeout = 5  # seconds
     lock_blob: storage.Blob = bkt.blob(f"{table_prefix}/_bqlock")
     if restart_time - polling_timeout < time.monotonic():
@@ -82,6 +84,8 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
         lock_contents = utils.read_gcs_file_if_exists(
             gcs_client, f"gs://{bkt.name}/{lock_blob.name}")
         if lock_contents:
+            # is this a lock placed by this cloud function.
+            # the else will handle a manual _bqlock
             if lock_contents.startswith(
                     os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)):
                 job_id = lock_contents
@@ -109,8 +113,9 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
             else:
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
-                      f"contents:\n {lock_contents}. This will be an infinite"
-                      "loop until the manual lock is released.")
+                      "This will be an infinite loop until the manual lock is "
+                      "released.\n"
+                      f"manual lock contents:\n {lock_contents}. ")
                 time.sleep(polling_timeout)
                 continue
         if last_job_done:
@@ -121,7 +126,7 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
         next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
                                                         table_prefix)
         if not next_backlog_file:
-            backfill_blob.delete(if_generation_match=backfill_blob.generation,
+            backfill_blob.delete(if_generation_match=backfill_blob_generation,
                                  client=gcs_client)
             if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
                     time.monotonic()):
@@ -154,9 +159,9 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
             next_success_file.name)
         if not next_success_file.exists(client=gcs_client):
             raise exceptions.BacklogException(
-                "backlog contains"
-                f"gs://{next_backlog_file.bucket}/{next_backlog_file.name}"
-                "but the corresponding success file does not exist at:"
+                "backlog contains "
+                f"gs://{next_backlog_file.bucket}/{next_backlog_file.name} "
+                "but the corresponding success file does not exist at: "
                 f"gs://{next_success_file.bucket}/{next_success_file.name}")
         utils.apply(gcs_client, bq_client, next_success_file, lock_blob,
                     utils.create_job_id(table_ref, batch))

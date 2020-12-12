@@ -132,7 +132,8 @@ def triage_event(gcs_client: Optional[storage.Client],
                     f"{constants.BACKFILL_FILENAME}"):
                 raise RuntimeError(
                     f"recieved notification for gs://{event_blob.bucket.name}/"
-                    f"{event_blob.name}\n{constants.BACKFILL_FILENAME} files "
+                    f"{event_blob.name}\n"
+                    f"{constants.BACKFILL_FILENAME} files "
                     "are expected only at the table prefix level.")
             ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
                                         function_start_time)

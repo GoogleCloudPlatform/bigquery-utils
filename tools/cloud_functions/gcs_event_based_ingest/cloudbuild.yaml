@@ -129,6 +129,7 @@ steps:
   - '-c'
   - 'pip install -r requirements-dev.txt && python3 -m pytest -m IT'
   id: 'integration-test'
+timeout: '1200s'
 options:
   machineType: 'N1_HIGHCPU_32'
 substitutions:
