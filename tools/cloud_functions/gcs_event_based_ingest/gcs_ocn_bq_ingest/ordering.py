@@ -24,6 +24,7 @@ from typing import Optional, Tuple
 
 import google.api_core
 import google.api_core.exceptions
+import pytz
 # pylint in cloud build is being flaky about this import discovery.
 # pylint: disable=no-name-in-module
 from google.cloud import bigquery
@@ -52,7 +53,7 @@ def backlog_publisher(
                                                     table_prefix)
 
 
-# pylint: disable=too-many-arguments,too-many-locals
+# pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches
 def backlog_subscriber(gcs_client: Optional[storage.Client],
                        bq_client: Optional[bigquery.Client],
                        backfill_blob: storage.Blob, function_start_time: float):
@@ -80,7 +81,8 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
             "backlog subscriber to do it's job. We recommend "
             "setting the timeout to 540 seconds or at least "
             "1 minute (Cloud Functions default).")
-    while time.monotonic() < restart_time - polling_timeout:
+    while time.monotonic() < restart_time - polling_timeout - 1:
+        first_bq_lock_claim = False
         lock_contents = utils.read_gcs_file_if_exists(
             gcs_client, f"gs://{bkt.name}/{lock_blob.name}")
         if lock_contents:
@@ -118,14 +120,25 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                       f"manual lock contents:\n {lock_contents}. ")
                 time.sleep(polling_timeout)
                 continue
-        if last_job_done:
+        else:  # this condition handles absence of _bqlock file
+            first_bq_lock_claim = True
+            last_job_done = True  # there's no running job to poll.
+
+        if not last_job_done:
+            # keep polling th running job.
+            continue
+
+        # if reached here, last job is done.
+        if not first_bq_lock_claim:
+            # If the BQ lock was missing we do not want to delete a backlog
+            # item for a job we have not yet submitted.
             utils.remove_oldest_backlog_item(gcs_client, bkt, table_prefix)
-            last_job_done = False
 
         check_backlog_time = time.monotonic()
         next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
                                                         table_prefix)
         if not next_backlog_file:
+            print("no more files found in the backlog deleteing backfill blob")
             backfill_blob.delete(if_generation_match=backfill_blob_generation,
                                  client=gcs_client)
             if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
@@ -135,7 +148,7 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                     f"gs://${bkt.name}/{table_prefix}/_backlog/"
                     f"There was more than {constants.ENSURE_SUBSCRIBER_SECONDS}"
                     " seconds between listing items on the backlog and "
-                    f"attempting to delete the {constants.BACKFILL_FILENAME}. "
+                    f"deleting the {constants.BACKFILL_FILENAME}. "
                     "This should not happen often but is meant to alleviate a "
                     "race condition in the event that something caused the "
                     "delete operation was delayed or had to be retried for a "
@@ -143,7 +156,7 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                 next_backlog_file = utils.get_next_backlog_item(
                     gcs_client, bkt, table_prefix)
                 if next_backlog_file:
-                    # The backfill file may have been deleted but the backlog is
+                    # The backfill file was deleted but the backlog is
                     # not empty. Re-trigger the backfill subscriber loop by
                     # dropping a new backfill file.
                     start_backfill_subscriber_if_not_running(
@@ -163,8 +176,11 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                 f"gs://{next_backlog_file.bucket}/{next_backlog_file.name} "
                 "but the corresponding success file does not exist at: "
                 f"gs://{next_success_file.bucket}/{next_success_file.name}")
+        print("applying next batch for:"
+              f"gs://{next_success_file.bucket}/{next_success_file.name}")
+        next_job_id = utils.create_job_id(table_ref, batch)
         utils.apply(gcs_client, bq_client, next_success_file, lock_blob,
-                    utils.create_job_id(table_ref, batch))
+                    next_job_id)
     # retrigger the subscriber loop by reposting the _BACKFILL file
     print("ran out of time, restarting backfill subscriber loop for:"
           f"gs://{bkt.name}/{table_prefix}")
@@ -173,13 +189,15 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
 
 
 def start_backfill_subscriber_if_not_running(
-        gcs_client: storage.Client, bkt: storage.Bucket,
+        gcs_client: Optional[storage.Client], bkt: storage.Bucket,
         table_prefix: str) -> Optional[storage.Blob]:
     """start the backfill subscriber if  it is not already runnning for this
     table prefix.
 
     created a backfill file for the table prefix if not exists.
     """
+    if not gcs_client:
+        gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     start_backfill = True
     # Do not start subscriber until START_BACKFILL_FILENAME has been dropped
     # at the table prefix.
@@ -198,7 +216,7 @@ def start_backfill_subscriber_if_not_running(
                                              client=gcs_client)
             print("triggered backfill with "
                   f"gs://{backfill_blob.bucket.name}/{backfill_blob.name} "
-                  f"created at {backfill_blob.time_created}. exiting.")
+                  f"created at {backfill_blob.time_created}.")
             return backfill_blob
         except google.api_core.exceptions.PreconditionFailed:
             backfill_blob.reload(client=gcs_client)
@@ -221,8 +239,8 @@ def success_blob_to_backlog_blob(success_blob: storage.Blob) -> storage.Blob:
     return bkt.blob(f"{table_prefix}/_backlog/{success_file_suffix}")
 
 
-def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
-                       object_id: str):
+def subscriber_monitor(gcs_client: Optional[storage.Client],
+                       bkt: storage.Bucket, object_id: str) -> bool:
     """
     Monitor to handle a rare race condition where:
 
@@ -243,6 +261,8 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
     we always handle this race condition either in this monitor or in the
     subscriber itself.
     """
+    if not gcs_client:
+        gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     backfill_blob = start_backfill_subscriber_if_not_running(
         gcs_client, bkt, utils.get_table_prefix(object_id))
 
@@ -251,9 +271,10 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
     if backfill_blob:
         # Handle case where a subscriber loop was not able to repost the
         # backfill file before the cloud function timeout.
-        if (datetime.datetime.utcnow() - backfill_blob.time_created >
-                datetime.timedelta(
-                    seconds=int(os.getenv("FUNCTION_TIMEOUT_SEC", "60")))):
+        time_created_utc = backfill_blob.time_created.replace(tzinfo=pytz.UTC)
+        now_utc = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
+        if (now_utc - time_created_utc > datetime.timedelta(
+                seconds=int(os.getenv("FUNCTION_TIMEOUT_SEC", "60")))):
             print(
                 f"backfill blob gs://{backfill_blob.bucket.name}/"
                 f"{backfill_blob.name} appears to be abandoned as it is older "
@@ -264,14 +285,15 @@ def subscriber_monitor(gcs_client: storage.Client, bkt: storage.Bucket,
             backfill_blob.delete(client=gcs_client)
             start_backfill_subscriber_if_not_running(
                 gcs_client, bkt, utils.get_table_prefix(object_id))
-            return
+            return True
 
         time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
         while not utils.wait_on_gcs_blob(gcs_client, backfill_blob,
                                          constants.ENSURE_SUBSCRIBER_SECONDS):
-            backfill_blob = \
-                start_backfill_subscriber_if_not_running(
-                    gcs_client, bkt, utils.get_table_prefix(object_id))
+            start_backfill_subscriber_if_not_running(
+                gcs_client, bkt, utils.get_table_prefix(object_id))
+            return True
+    return False
 
 
 def _get_clients_if_none(

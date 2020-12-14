@@ -140,13 +140,8 @@ def triage_event(gcs_client: Optional[storage.Client],
             return
     else:  # Default behavior submit job as soon as success file lands.
         if basename_object_id == constants.SUCCESS_FILENAME:
-            utils.apply(
-                gcs_client,
-                bq_client,
-                event_blob,
-                # None lock blob as there is no serialization required.
-                None,
-                utils.create_job_id(table_ref, batch))
+            utils.apply(gcs_client, bq_client, event_blob, None,
+                        utils.create_job_id(table_ref, batch))
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:

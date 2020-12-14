@@ -62,7 +62,7 @@ def external_query(  # pylint: disable=too-many-arguments
               f"{json.dumps(constants.DEFAULT_EXTERNAL_TABLE_DEFINITION)}")
         external_table_def = constants.DEFAULT_EXTERNAL_TABLE_DEFINITION
 
-    # This may cause an issue if >10,000 files. however, we
+    # This may cause an issue if >10,000 files.
     external_table_def["sourceUris"] = flatten2dlist(
         get_batches_for_prefix(gcs_client, gsurl))
     print(f"external table def = {json.dumps(external_table_config, indent=2)}")
@@ -70,10 +70,12 @@ def external_query(  # pylint: disable=too-many-arguments
     job_config = bigquery.QueryJobConfig(
         table_definitions={"temp_ext": external_config}, use_legacy_sql=False)
 
-    # Note, dest_table might include a partition decorator.
+    # drop partition decorator if present.
+    table_id = dest_table_ref.table_id.split("$")[0]
+
     rendered_query = query.format(
         dest_dataset=f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}",
-        dest_table=dest_table_ref.table_id,
+        dest_table=table_id
     )
 
     job: bigquery.QueryJob = bq_client.query(rendered_query,
@@ -398,8 +400,10 @@ def recursive_update(original: Dict, update: Dict, in_place: bool = False):
     return out
 
 
-def handle_duplicate_notification(gcs_client: storage.Client,
-                                  blob_to_claim: storage.Blob):
+def handle_duplicate_notification(
+    gcs_client: storage.Client,
+    blob_to_claim: storage.Blob,
+):
     """
     Need to handle potential duplicate Pub/Sub notifications.
     To achieve this we will drop an empty "claimed" file that indicates
@@ -422,8 +426,9 @@ def handle_duplicate_notification(gcs_client: storage.Client,
                                       if_generation_match=0,
                                       client=gcs_client)
     except google.api_core.exceptions.PreconditionFailed as err:
+        blob_to_claim.reload(client=gcs_client)
         raise exceptions.DuplicateNotificationException(
-            f"gs://{blob_to_claim.bucket.name}/{blob_to_claim.name} appears"
+            f"gs://{blob_to_claim.bucket.name}/{blob_to_claim.name} appears "
             "to already have been claimed for created timestamp: "
             f"{created_unix_timestamp}."
             "This means that another invocation of this cloud function has "
@@ -540,6 +545,7 @@ def wait_on_bq_job_id(bq_client: bigquery.Client,
         if job.state in {"RUNNING", "PENDING"}:
             print(f"waiting on BigQuery Job {job.job_id}")
             time.sleep(polling_interval)
+    print(f"reached polling timeout waiting for bigquery job {job_id}")
     return False
 
 
@@ -688,13 +694,13 @@ def apply(
         bq_client: bigquery.Client
         success_blob: storage.Blob the success file whose batch should be
             applied.
-        lock_blob: storage.Blob
+        lock_blob: storage.Blob _bqlock blob to acquire for this job.
         job_id: str
     """
     handle_duplicate_notification(gcs_client, success_blob)
-    bkt = success_blob.bucket
-    if lock_blob is not None:
+    if lock_blob:
         handle_bq_lock(gcs_client, lock_blob, job_id)
+    bkt = success_blob.bucket
     dest_table_ref, _ = gcs_path_to_table_ref_and_batch(success_blob.name)
     gsurl = removesuffix(f"gs://{bkt.name}/{success_blob.name}",
                          constants.SUCCESS_FILENAME)
@@ -715,3 +721,4 @@ def apply(
 
     print("LOAD_JOB")
     load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id)
+    return

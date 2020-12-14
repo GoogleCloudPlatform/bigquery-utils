@@ -16,6 +16,7 @@ import multiprocessing
 import os
 import queue
 import time
+from typing import Optional
 
 import pytest
 from google.cloud import bigquery
@@ -32,6 +33,8 @@ LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 # Testing that the subscriber does not get choked up by a common race condition
 # is crucial to ensuring this solution works.
 # This parameter is for running the subscriber tests many times.
+# During development it can be helpful to tweak this up or down as you are
+# experimenting.
 NUM_TRIES_SUBSCRIBER_TESTS = 25
 
 
@@ -134,11 +137,7 @@ def test_backlog_subscriber_in_order_with_new_batch_after_exit(
     we will drop a 4th batch after the subscriber has exited and assert that it
     gets applied as expected.
     """
-    _run_subscriber(
-        gcs,
-        bq,
-        gcs_external_update_config
-    )
+    _run_subscriber(gcs, bq, gcs_external_update_config)
     backlog_blobs = gcs_bucket.list_blobs(
         prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/_backlog/"
     )
@@ -176,10 +175,9 @@ def test_backlog_subscriber_in_order_with_new_batch_after_exit(
 @pytest.mark.ORDERING
 @pytest.mark.repeat(NUM_TRIES_SUBSCRIBER_TESTS)
 def test_backlog_subscriber_in_order_with_new_batch_while_running(
-    bq, gcs, gcs_bucket, dest_dataset, dest_ordered_update_table,
-    gcs_ordered_update_data, gcs_external_update_config: storage.Blob,
-    gcs_backlog, mock_env
-):
+        bq, gcs, gcs_bucket, dest_dataset, dest_ordered_update_table,
+        gcs_ordered_update_data, gcs_external_update_config: storage.Blob,
+        gcs_backlog, mock_env):
     """Test functionality of backlog subscriber when new batches are added
     before the subscriber is done finishing the existing backlog.
 
@@ -203,25 +201,33 @@ def test_backlog_subscriber_in_order_with_new_batch_while_running(
     claim_blob: storage.Blob = gcs_external_update_config.bucket.blob(
         gcs_external_update_config.name.replace(
             basename, f"_claimed_{basename}_created_at_"
-                      f"{gcs_external_update_config.time_created.timestamp()}"))
+            f"{gcs_external_update_config.time_created.timestamp()}"))
     # Run subscriber w/ backlog and publisher w/ new batch in parallel.
-    with multiprocessing.Pool(processes=2) as pool:
-        res_subscriber = pool.apply_async(
-            _run_subscriber,
-            (None, None, backfill_blob))
+    with multiprocessing.Pool(processes=3) as pool:
+        res_subscriber = pool.apply_async(_run_subscriber,
+                                          (None, None, backfill_blob))
         # wait for existence of claim blob to ensure subscriber is running.
         while not claim_blob.exists():
             pass
         res_backlog_publisher = pool.apply_async(_post_a_new_batch,
                                                  (bkt, dataset, table))
-
-        # wait on each function to complete
-        res_subscriber.wait()
         res_backlog_publisher.wait()
+        res_monitor = pool.apply_async(
+            gcs_ocn_bq_ingest.ordering.subscriber_monitor,
+            (None, bkt,
+             f"{dataset.project}.{dataset.dataset_id}/{table.table_id}/"
+             f"_backlog/04/_SUCCESS"))
+
+        if res_monitor.get():
+            print("subscriber monitor had to retrigger subscriber loop")
+            backfill_blob.reload(client=gcs)
+            _run_subscriber(None, None, backfill_blob)
+
+        res_subscriber.wait()
 
     backlog_blobs = gcs_bucket.list_blobs(
-        prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/_backlog/"
-    )
+        prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/"
+        f"_backlog/")
     assert backlog_blobs.num_results == 0, "backlog is not empty"
     bqlock_blob: storage.Blob = gcs_bucket.blob("_bqlock")
     assert not bqlock_blob.exists(), "_bqlock was not cleaned up"
@@ -237,20 +243,13 @@ def test_backlog_subscriber_in_order_with_new_batch_while_running(
 
 
 def _run_subscriber(
-    gcs_client: storage.Client,
-    bq_client: bigquery.Client,
+    gcs_client: Optional[storage.Client],
+    bq_client: Optional[bigquery.Client],
     backfill_blob,
 ):
-    try:
-        gcs_ocn_bq_ingest.ordering.backlog_subscriber(
-            gcs_client,
-            bq_client,
-            backfill_blob,
-            time.monotonic())
-    except gcs_ocn_bq_ingest.exceptions.DuplicateNotificationException:
-        print("ignoring potential duplicate notification exception as this is"
-              "not a critical error and would be ignored by the main method"
-              "of the cloud function.")
+    gcs_ocn_bq_ingest.ordering.backlog_subscriber(gcs_client,
+                                                  bq_client, backfill_blob,
+                                                  time.monotonic())
 
 
 def _post_a_new_batch(gcs_bucket, dest_dataset, dest_ordered_update_table):
