@@ -85,7 +85,8 @@ def ordered_mock_env(mock_env, monkeypatch):
 
 @pytest.fixture
 def dest_dataset(request, bq, mock_env, monkeypatch):
-    random_dataset = f"test_bq_ingest_gcf_{str(uuid.uuid4())[:8].replace('-','_')}"
+    random_dataset = (f"test_bq_ingest_gcf_"
+                      f"{str(uuid.uuid4())[:8].replace('-','_')}")
     dataset = bigquery.Dataset(f"{os.getenv('GCP_PROJECT')}"
                                f".{random_dataset}")
     dataset.location = "US"
@@ -109,7 +110,9 @@ def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
             json.load(schema_file))
 
     table = bigquery.Table(
-        f"{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}.cf_test_nation",
+        f"{os.environ.get('GCP_PROJECT')}"
+        f".{dest_dataset.dataset_id}.cf_test_nation_"
+        f"{str(uuid.uuid4()).replace('-','_')}",
         schema=schema,
     )
 
@@ -298,7 +301,8 @@ def dest_partitioned_table(request, bq: bigquery.Client, mock_env,
 
     table: bigquery.Table = bigquery.Table(
         f"{os.environ.get('GCP_PROJECT')}"
-        f".{dest_dataset.dataset_id}.cf_test_nyc_311",
+        f".{dest_dataset.dataset_id}.cf_test_nyc_311_"
+        f"{str(uuid.uuid4()).replace('-','_')}",
         schema=schema,
     )
 
@@ -353,7 +357,7 @@ def dest_ordered_update_table(request, gcs, gcs_bucket, bq, mock_env,
 
     table = bigquery.Table(
         f"{os.environ.get('GCP_PROJECT')}.{dest_dataset.dataset_id}"
-        ".cf_test_ordering",
+        f".cf_test_ordering_{str(uuid.uuid4()).replace('-','_')}",
         schema=schema,
     )
 
@@ -523,7 +527,7 @@ def gcs_external_partitioned_config(
         "bq_transform.sql",
     ]))
 
-    sql = "INSERT {dest_dataset}.cf_test_nyc_311 SELECT * FROM temp_ext"
+    sql = "INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext"
     sql_obj.upload_from_string(sql)
 
     config_obj = gcs_bucket.blob("/".join([
