@@ -455,7 +455,7 @@ def get_table_prefix(object_id: str) -> str:
     }:
         # These files will not match the regex and always should appear at the
         # table level.
-        return removesuffix(object_id, basename)
+        return removesuffix(object_id, f"/{basename}")
     match = constants.DESTINATION_REGEX.match(
         object_id.replace("_backlog/", ""))
     if not match:
