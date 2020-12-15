@@ -138,5 +138,6 @@ module "project-services" {
     "pubsub.googleapis.com",
     "clouderrorreporting.googleapis.com",
     "cloudresourcemanager.googleapis.com",
+    "cloudfunctions.googleapis.com",
   ]
 }
