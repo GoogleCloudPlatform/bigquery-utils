@@ -21,3 +21,7 @@ output "data-ingester-sa" {
   value       = module.data_ingester_service_account.email
 }
 
+output "input-bucket" {
+  value = module.bucket.bucket.name
+}
+

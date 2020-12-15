@@ -22,10 +22,10 @@ import pytest
 from google.cloud import bigquery
 from google.cloud import storage
 
-import gcs_ocn_bq_ingest.constants
+import gcs_ocn_bq_ingest.common.constants
+import gcs_ocn_bq_ingest.common.ordering
+import gcs_ocn_bq_ingest.common.utils
 import gcs_ocn_bq_ingest.main
-import gcs_ocn_bq_ingest.ordering
-import gcs_ocn_bq_ingest.utils
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
@@ -52,19 +52,20 @@ def test_backlog_publisher(gcs, gcs_bucket, gcs_partitioned_data, mock_env):
     for gcs_data in gcs_partitioned_data:
         if not gcs_data.exists():
             raise EnvironmentError("test data objects must exist")
-        if gcs_data.name.endswith(gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME):
-            table_prefix = gcs_ocn_bq_ingest.utils.get_table_prefix(
+        if gcs_data.name.endswith(
+                gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME):
+            table_prefix = gcs_ocn_bq_ingest.common.utils.get_table_prefix(
                 gcs_data.name)
-            gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, gcs_data)
+            gcs_ocn_bq_ingest.common.ordering.backlog_publisher(gcs, gcs_data)
 
     expected_backlog_blobs = queue.Queue()
     expected_backlog_blobs.put("/".join([
         table_prefix, "_backlog", "$2017041101",
-        gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME
+        gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME
     ]))
     expected_backlog_blobs.put("/".join([
         table_prefix, "_backlog", "$2017041102",
-        gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME
+        gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME
     ]))
 
     for backlog_blob in gcs_bucket.list_blobs(
@@ -72,7 +73,8 @@ def test_backlog_publisher(gcs, gcs_bucket, gcs_partitioned_data, mock_env):
         assert backlog_blob.name == expected_backlog_blobs.get(block=False)
 
     backfill_blob: storage.Blob = gcs_bucket.blob(
-        f"{table_prefix}/{gcs_ocn_bq_ingest.constants.BACKFILL_FILENAME}")
+        f"{table_prefix}/{gcs_ocn_bq_ingest.common.constants.BACKFILL_FILENAME}"
+    )
     assert backfill_blob.exists()
 
 
@@ -89,7 +91,8 @@ def test_backlog_publisher_with_existing_backfill_file(gcs, gcs_bucket,
     table_prefix = "/".join(
         [dest_dataset.dataset_id, dest_partitioned_table.table_id])
     backfill_blob: storage.Blob = gcs_bucket.blob(
-        f"{table_prefix}/{gcs_ocn_bq_ingest.constants.BACKFILL_FILENAME}")
+        f"{table_prefix}/{gcs_ocn_bq_ingest.common.constants.BACKFILL_FILENAME}"
+    )
     backfill_blob.upload_from_string("")
     backfill_blob.reload()
     original_backfill_blob_generation = backfill_blob.generation
@@ -98,20 +101,21 @@ def test_backlog_publisher_with_existing_backfill_file(gcs, gcs_bucket,
     for gcs_data in gcs_partitioned_data:
         if not gcs_data.exists():
             raise EnvironmentError("test data objects must exist")
-        if gcs_data.name.endswith(gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME):
-            table_prefix = gcs_ocn_bq_ingest.utils.get_table_prefix(
+        if gcs_data.name.endswith(
+                gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME):
+            table_prefix = gcs_ocn_bq_ingest.common.utils.get_table_prefix(
                 gcs_data.name)
-            gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, gcs_data)
+            gcs_ocn_bq_ingest.common.ordering.backlog_publisher(gcs, gcs_data)
 
     # Use of queue to test that list responses are returned in expected order.
     expected_backlog_blobs = queue.Queue()
     expected_backlog_blobs.put("/".join([
         table_prefix, "_backlog", "$2017041101",
-        gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME
+        gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME
     ]))
     expected_backlog_blobs.put("/".join([
         table_prefix, "_backlog", "$2017041102",
-        gcs_ocn_bq_ingest.constants.SUCCESS_FILENAME
+        gcs_ocn_bq_ingest.common.constants.SUCCESS_FILENAME
     ]))
 
     for backlog_blob in gcs_bucket.list_blobs(
@@ -138,9 +142,9 @@ def test_backlog_subscriber_in_order_with_new_batch_after_exit(
     gets applied as expected.
     """
     _run_subscriber(gcs, bq, gcs_external_update_config)
-    backlog_blobs = gcs_bucket.list_blobs(
-        prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/_backlog/"
-    )
+    table_prefix = gcs_ocn_bq_ingest.common.utils.get_table_prefix(
+        gcs_external_update_config.name)
+    backlog_blobs = gcs_bucket.list_blobs(prefix=f"{table_prefix}/_backlog/")
     assert backlog_blobs.num_results == 0, "backlog is not empty"
     bqlock_blob: storage.Blob = gcs_bucket.blob("_bqlock")
     assert not bqlock_blob.exists(), "_bqlock was not cleaned up"
@@ -213,7 +217,7 @@ def test_backlog_subscriber_in_order_with_new_batch_while_running(
                                                  (bkt, dataset, table))
         res_backlog_publisher.wait()
         res_monitor = pool.apply_async(
-            gcs_ocn_bq_ingest.ordering.subscriber_monitor,
+            gcs_ocn_bq_ingest.common.ordering.subscriber_monitor,
             (None, bkt,
              f"{dataset.project}.{dataset.dataset_id}/{table.table_id}/"
              f"_backlog/04/_SUCCESS"))
@@ -225,9 +229,10 @@ def test_backlog_subscriber_in_order_with_new_batch_while_running(
 
         res_subscriber.wait()
 
-    backlog_blobs = gcs_bucket.list_blobs(
-        prefix=f"{gcs_ocn_bq_ingest.utils.get_table_prefix(gcs_external_update_config.name)}/"
-        f"_backlog/")
+    table_prefix = gcs_ocn_bq_ingest.common.utils.get_table_prefix(
+        gcs_external_update_config.name)
+    backlog_blobs = gcs_bucket.list_blobs(prefix=f"{table_prefix}/"
+                                          f"_backlog/")
     assert backlog_blobs.num_results == 0, "backlog is not empty"
     bqlock_blob: storage.Blob = gcs_bucket.blob("_bqlock")
     assert not bqlock_blob.exists(), "_bqlock was not cleaned up"
@@ -247,9 +252,8 @@ def _run_subscriber(
     bq_client: Optional[bigquery.Client],
     backfill_blob,
 ):
-    gcs_ocn_bq_ingest.ordering.backlog_subscriber(gcs_client,
-                                                  bq_client, backfill_blob,
-                                                  time.monotonic())
+    gcs_ocn_bq_ingest.common.ordering.backlog_subscriber(
+        gcs_client, bq_client, backfill_blob, time.monotonic())
 
 
 def _post_a_new_batch(gcs_bucket, dest_dataset, dest_ordered_update_table):
@@ -265,4 +269,4 @@ def _post_a_new_batch(gcs_bucket, dest_dataset, dest_ordered_update_table):
                                                    "test-data", "ordering",
                                                    "04", test_file),
                                       client=gcs)
-    return gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, data_obj)
+    return gcs_ocn_bq_ingest.common.ordering.backlog_publisher(gcs, data_obj)

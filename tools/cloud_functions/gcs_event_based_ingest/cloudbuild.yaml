@@ -117,7 +117,7 @@ steps:
   args:
     - '-c'
     # pip installing again to get GCB to recognize mocker from pytest-mock
-    - 'pip install -r requirements-dev.txt && python3 -m pytest -m "not IT"'
+    - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m "not IT"'
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   dir: '${_BUILD_DIR}'
@@ -127,10 +127,55 @@ steps:
   entrypoint: /bin/sh
   args:
   - '-c'
-  - 'pip install -r requirements-dev.txt && python3 -m pytest -m IT'
+  - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m IT'
   id: 'integration-test'
-timeout: '1200s'
+- name: 'hashicorp/terraform'
+  waitFor:
+  - 'integration-test'
+  dir: '${_BUILD_DIR}/e2e'
+  args: ['init']
+  id: 'terraform-e2e-init'
+- name: 'hashicorp/terraform'
+  waitFor:
+  - 'terraform-e2e-init'
+  dir: '${_BUILD_DIR}/e2e'
+  args: ['apply', '-auto-approve']
+  env:
+  - 'TF_VAR_project_id=$PROJECT_ID'
+  - 'TF_VAR_region=$_REGION'
+  - 'TF_VAR_suffix=$SHORT_SHA'
+  id: 'terraform-e2e-apply'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  waitFor:
+    - 'build-ci-image'
+    - 'terraform-e2e-apply'
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - 'python3 -m pytest e2e --tfstate=${_BUILD_DIR}/e2e/terraform.state'
+  id: 'e2e-test'
+- name: 'hashicorp/terraform'
+  waitFor:
+  - 'e2e-test'
+  dir: '${_BUILD_DIR}/e2e'
+  # Note if the e2e test fails the resources will not be cleaned up due to
+  # cloud build not allowing ignored failed steps.
+  # this will allow maintainer to evaluate what went wrong during e2e test
+  # because the evidence will not be destroyed.
+  # Maintainers of bqutil project should destroy these resources after the
+  # failure cause has been diagnosed.
+  # We do not run this e2e test unless all unit and integration tests pass.
+  # https://github.com/GoogleCloudPlatform/cloud-builders/issues/253
+  args: ['destroy', '-auto-approve']
+  env:
+  - 'TF_VAR_project_id=$PROJECT_ID'
+  - 'TF_VAR_region=$_REGION'
+  - 'TF_VAR_suffix=$SHORT_SHA'
+  id: 'terraform-e2e-destroy'
+timeout: '3600s'
 options:
   machineType: 'N1_HIGHCPU_32'
 substitutions:
   '_BUILD_DIR': 'tools/cloud_functions/gcs_event_based_ingest'
+  '_REGION': 'us-central1'

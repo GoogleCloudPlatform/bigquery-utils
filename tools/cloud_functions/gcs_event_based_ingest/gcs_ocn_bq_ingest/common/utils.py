@@ -75,8 +75,7 @@ def external_query(  # pylint: disable=too-many-arguments
 
     rendered_query = query.format(
         dest_dataset=f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}",
-        dest_table=table_id
-    )
+        dest_table=table_id)
 
     job: bigquery.QueryJob = bq_client.query(rendered_query,
                                              job_config=job_config,
@@ -199,12 +198,16 @@ def construct_load_job_config(storage_client: storage.Client,
     while parts:
         config = _get_parent_config("/".join(parts))
         if config:
+            print(f"found config: {'/'.join(parts)}")
             config_q.append(json.loads(config))
         parts.pop()
 
     merged_config: Dict = {}
     while config_q:
         recursive_update(merged_config, config_q.popleft(), in_place=True)
+    if merged_config == constants.BASE_LOAD_JOB_CONFIG:
+        print("falling back to default CSV load job config")
+        return constants.DEFAULT_LOAD_JOB_CONFIG
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
@@ -580,7 +583,8 @@ def wait_on_gcs_blob(gcs_client: storage.Client,
 
 
 def gcs_path_to_table_ref_and_batch(
-        object_id) -> Tuple[bigquery.TableReference, Optional[str]]:
+    object_id: str, default_project: Optional[str]
+) -> Tuple[bigquery.TableReference, Optional[str]]:
     """extract bigquery table reference and batch id from gcs object id"""
 
     destination_match = constants.DESTINATION_REGEX.match(object_id)
@@ -611,11 +615,11 @@ def gcs_path_to_table_ref_and_batch(
 
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}{partition}",
-            default_project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
+            default_project=os.getenv("BQ_PROJECT", default_project))
     else:
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}",
-            default_project=os.getenv("BQ_PROJECT", os.getenv("GCP_PROJECT")))
+            default_project=os.getenv("BQ_PROJECT", default_project))
     return dest_table_ref, batch_id
 
 
@@ -701,7 +705,8 @@ def apply(
     if lock_blob:
         handle_bq_lock(gcs_client, lock_blob, job_id)
     bkt = success_blob.bucket
-    dest_table_ref, _ = gcs_path_to_table_ref_and_batch(success_blob.name)
+    dest_table_ref, _ = gcs_path_to_table_ref_and_batch(success_blob.name,
+                                                        bq_client.project)
     gsurl = removesuffix(f"gs://{bkt.name}/{success_blob.name}",
                          constants.SUCCESS_FILENAME)
     print(

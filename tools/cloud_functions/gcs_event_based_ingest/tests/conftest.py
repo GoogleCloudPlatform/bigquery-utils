@@ -23,8 +23,8 @@ from google.cloud import bigquery
 from google.cloud import error_reporting
 from google.cloud import storage
 
-import gcs_ocn_bq_ingest.ordering
-import gcs_ocn_bq_ingest.utils
+import gcs_ocn_bq_ingest.common.ordering
+import gcs_ocn_bq_ingest.common.utils
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
@@ -75,6 +75,7 @@ def mock_env(gcs, monkeypatch):
     monkeypatch.setenv("GCP_PROJECT", gcs.project)
     monkeypatch.setenv("FUNCTION_NAME", "integration-test")
     monkeypatch.setenv("FUNCTION_TIMEOUT_SEC", "540")
+    monkeypatch.setenv("BQ_PROJECT", gcs.project)
 
 
 @pytest.fixture
@@ -106,7 +107,7 @@ def dest_dataset(request, bq, mock_env, monkeypatch):
 def dest_table(request, bq, mock_env, dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "nation_schema.json")) as schema_file:
-        schema = gcs_ocn_bq_ingest.utils.dict_to_bq_schema(
+        schema = gcs_ocn_bq_ingest.common.utils.dict_to_bq_schema(
             json.load(schema_file))
 
     table = bigquery.Table(
@@ -352,7 +353,7 @@ def dest_ordered_update_table(request, gcs, gcs_bucket, bq, mock_env,
                               dest_dataset) -> bigquery.Table:
     with open(os.path.join(TEST_DIR, "resources",
                            "ordering_schema.json")) as schema_file:
-        schema = gcs_ocn_bq_ingest.utils.dict_to_bq_schema(
+        schema = gcs_ocn_bq_ingest.common.utils.dict_to_bq_schema(
             json.load(schema_file))
 
     table = bigquery.Table(
@@ -373,7 +374,7 @@ def dest_ordered_update_table(request, gcs, gcs_bucket, bq, mock_env,
             "alpha_update": ""
         }],
         table,
-        job_id_prefix=gcs_ocn_bq_ingest.constants.DEFAULT_JOB_PREFIX)
+        job_id_prefix=gcs_ocn_bq_ingest.common.constants.DEFAULT_JOB_PREFIX)
 
     # The subscriber will be responsible for cleaning up this file.
     bqlock_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
@@ -437,9 +438,11 @@ def gcs_backlog(request, gcs, gcs_bucket,
     # We will deal with the last incremental in the test itself to test the
     # behavior of a new backlog subscriber.
     for success_blob in gcs_ordered_update_data:
-        gcs_ocn_bq_ingest.ordering.backlog_publisher(gcs, success_blob)
-        backlog_blob = gcs_ocn_bq_ingest.ordering.success_blob_to_backlog_blob(
-            success_blob)
+        gcs_ocn_bq_ingest.common.ordering.backlog_publisher(gcs, success_blob)
+        backlog_blob = \
+            gcs_ocn_bq_ingest.common.ordering.success_blob_to_backlog_blob(
+                success_blob
+            )
         backlog_blob.upload_from_string("")
         data_objs.append(backlog_blob)
 
@@ -497,7 +500,7 @@ def gcs_external_update_config(request, gcs_bucket, dest_dataset,
     backfill_blob = gcs_bucket.blob("/".join([
         f"{dest_dataset.project}.{dest_dataset.dataset_id}",
         dest_ordered_update_table.table_id,
-        gcs_ocn_bq_ingest.constants.BACKFILL_FILENAME
+        gcs_ocn_bq_ingest.common.constants.BACKFILL_FILENAME
     ]))
     backfill_blob.upload_from_string("")
     config_objs.append(sql_obj)

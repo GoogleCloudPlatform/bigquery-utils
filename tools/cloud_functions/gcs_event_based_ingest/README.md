@@ -316,8 +316,10 @@ docker run --rm -it gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci
 #### Running on your local machine
 Alternatively to the local cloudbuild or using the docker container to run your
 tests, you can `pip3 install -r requirements-dev.txt` and select certain tests
-to run with [`pytest`](https://docs.pytest.org/en/stable/usage.html). This is
-mostly useful if you'd like to integrate with your IDE debugger.
+to run with [`python3 -m pytest`](https://docs.pytest.org/en/stable/usage.html).
+Note, this is not quite the same as callin `pytest` without the `python -m` prefix
+([pytest invocation docs](https://docs.pytest.org/en/stable/usage.html#calling-pytest-through-python-m-pytest)) 
+This is mostly useful if you'd like to integrate with your IDE debugger.
 
 Note that integration tests will spin up / tear down cloud resources that can
 incur a small cost. These resources will be spun up based on your Google Cloud SDK
@@ -331,16 +333,25 @@ See more info on sharing pytest fixtures in the [pytest docs](https://docs.pytes
 
 #### Running All Tests
 ```bash
-pytest
+python3 -m pytest
 ```
 #### Running Unit Tests Only
 ```bash
-pytest -m "not IT"
+python3 -m pytest -m "not IT"
 ```
 
 #### Running Integration Tests Only
 ```bash
-pytest -m IT
+python3 -m pytest -m IT
+```
+
+#### Running System Tests Only
+The system tests assume that you have deployed the cloud function.
+```bash
+export TF_VAR_short_sha=$(git rev-parse --short=7 HEAD)
+export TF_VAR_project_id=${YOUR_GCP_PROJECT_ID}
+(cd e2e && terraform init && terraform apply -auto-approve)
+python3 -m pytest -m SYS
 ```
 
 ## Deployment

@@ -65,3 +65,12 @@ variable "bigquery_project_ids" {
   default     = []
 }
 
+variable "force_destroy" {
+  description = "force destroy resources (e.g. for e2e tests)"
+  default     = "false"
+}
+
+variable "timeout" {
+  description = "Cloud Functions timeout in seconds"
+  default     = 540
+}

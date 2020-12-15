@@ -16,16 +16,17 @@
 import re
 import time
 from typing import Dict, Optional
+from unittest.mock import Mock
 
 import pytest
 from google.cloud import storage
 
-import gcs_ocn_bq_ingest.constants
+import gcs_ocn_bq_ingest.common.constants
+import gcs_ocn_bq_ingest.common.utils
 import gcs_ocn_bq_ingest.main
-import gcs_ocn_bq_ingest.utils
 
 COMPILED_DEFAULT_DENTINATION_REGEX = re.compile(
-    gcs_ocn_bq_ingest.constants.DEFAULT_DESTINATION_REGEX)
+    gcs_ocn_bq_ingest.common.constants.DEFAULT_DESTINATION_REGEX)
 
 
 @pytest.mark.parametrize(
@@ -142,7 +143,7 @@ def test_default_destination_regex(test_input: str,
     ([["foo"], [], ["bar", "baz"]], ["foo", "bar", "baz"]),
 ])
 def test_flattend2dlist(test_input, expected):
-    assert gcs_ocn_bq_ingest.utils.flatten2dlist(test_input) == expected
+    assert gcs_ocn_bq_ingest.common.utils.flatten2dlist(test_input) == expected
 
 
 @pytest.mark.parametrize(
@@ -212,8 +213,8 @@ def test_flattend2dlist(test_input, expected):
         # yapf: enable
     ])
 def test_recursive_update(original, update, expected):
-    assert gcs_ocn_bq_ingest.utils.recursive_update(original,
-                                                    update) == expected
+    assert gcs_ocn_bq_ingest.common.utils.recursive_update(original,
+                                                           update) == expected
 
 
 @pytest.mark.parametrize(
@@ -237,14 +238,17 @@ def test_recursive_update(original, update, expected):
         ("dataset/table/_backlog/_BACKFILL", "dataset/table"),
     ])
 def test_get_table_prefix(test_input, expected):
-    assert gcs_ocn_bq_ingest.utils.get_table_prefix(test_input) == expected
+    assert gcs_ocn_bq_ingest.common.utils.get_table_prefix(
+        test_input) == expected
 
 
 def test_triage_event(mock_env, mocker):
     test_event_blob: storage.Blob = storage.Blob.from_string(
         "gs://foo/bar/baz/00/_SUCCESS")
-    apply_mock = mocker.patch('gcs_ocn_bq_ingest.utils.apply')
-    gcs_ocn_bq_ingest.main.triage_event(None, None, test_event_blob,
+    apply_mock = mocker.patch('gcs_ocn_bq_ingest.common.utils.apply')
+    bq_mock = Mock()
+    bq_mock.project = "foo"
+    gcs_ocn_bq_ingest.main.triage_event(None, bq_mock, test_event_blob,
                                         time.monotonic())
     apply_mock.assert_called_once()
 
@@ -253,11 +257,13 @@ def test_triage_event_ordered(ordered_mock_env, mocker):
     enforce_ordering = True
     test_event_blob: storage.Blob = storage.Blob.from_string(
         "gs://foo/bar/baz/00/_SUCCESS")
-    apply_mock = mocker.patch('gcs_ocn_bq_ingest.utils.apply')
+    apply_mock = mocker.patch('gcs_ocn_bq_ingest.common.utils.apply')
     publisher_mock = mocker.patch(
-        'gcs_ocn_bq_ingest.ordering.backlog_publisher')
+        'gcs_ocn_bq_ingest.common.ordering.backlog_publisher')
+    bq_mock = Mock()
+    bq_mock.project = "foo"
     gcs_ocn_bq_ingest.main.triage_event(None,
-                                        None,
+                                        bq_mock,
                                         test_event_blob,
                                         time.monotonic(),
                                         enforce_ordering=enforce_ordering)
@@ -266,7 +272,7 @@ def test_triage_event_ordered(ordered_mock_env, mocker):
     test_event_blob: storage.Blob = storage.Blob.from_string(
         "gs://foo/bar/baz/_BACKFILL")
     subscriber_mock = mocker.patch(
-        'gcs_ocn_bq_ingest.ordering.backlog_subscriber')
+        'gcs_ocn_bq_ingest.common.ordering.backlog_subscriber')
     gcs_ocn_bq_ingest.main.triage_event(None,
                                         None,
                                         test_event_blob,
@@ -276,7 +282,8 @@ def test_triage_event_ordered(ordered_mock_env, mocker):
 
     test_event_blob: storage.Blob = storage.Blob.from_string(
         "gs://foo/bar/baz/_backlog/00/_SUCCESS")
-    monitor_mock = mocker.patch('gcs_ocn_bq_ingest.ordering.subscriber_monitor')
+    monitor_mock = mocker.patch(
+        'gcs_ocn_bq_ingest.common.ordering.subscriber_monitor')
     gcs_ocn_bq_ingest.main.triage_event(None,
                                         None,
                                         test_event_blob,
