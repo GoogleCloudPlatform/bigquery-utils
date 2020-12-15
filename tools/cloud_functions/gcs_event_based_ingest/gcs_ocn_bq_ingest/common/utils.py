@@ -36,8 +36,8 @@ import google.cloud.exceptions
 from google.cloud import bigquery
 from google.cloud import storage
 
-from . import constants  # pylint: disable=no-name-in-module
-from . import exceptions  # pylint: disable=no-name-in-module
+from . import constants  # pylint: disable=no-name-in-module,import-error
+from . import exceptions  # pylint: disable=no-name-in-module,import-error
 
 
 def external_query(  # pylint: disable=too-many-arguments
