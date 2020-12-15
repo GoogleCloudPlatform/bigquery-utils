@@ -43,3 +43,9 @@ module "gcs_ocn_bq_ingest" {
   force_destroy = "true"
 }
 
+terraform {
+  backend "local" {
+    path = "terraform.tfstate"
+  }
+}
+
