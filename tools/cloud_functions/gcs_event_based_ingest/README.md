@@ -252,6 +252,7 @@ SELECT
    total_slot_ms,
    destination_table
    state,
+   error_result,
    (SELECT value FROM UNNEST(labels) WHERE key = "component") as component,
    (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name,
    (SELECT value FROM UNNEST(labels) WHERE key = "batch-id") as batch_id,
@@ -351,7 +352,7 @@ The system tests assume that you have deployed the cloud function.
 export TF_VAR_short_sha=$(git rev-parse --short=7 HEAD)
 export TF_VAR_project_id=${YOUR_GCP_PROJECT_ID}
 (cd e2e && terraform init && terraform apply -auto-approve)
-python3 -m pytest -m SYS
+python3 -m pytest e2e --tfstate e2e/terraform.tfstate
 ```
 
 ## Deployment
@@ -379,7 +380,7 @@ gcloud functions deploy test-gcs-bq-ingest \
   --trigger-topic=${PUBSUB_TOPIC} \
   --service-account=${SERVICE_ACCOUNT_EMAIL} \
   --timeout=540 \
-  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?,FUNCTION_TIMEOUT_SEC=540'
 ```
 
 #### Cloud Functions Events
@@ -396,7 +397,7 @@ gcloud functions deploy test-gcs-bq-ingest \
   --trigger-event google.storage.object.finalize
   --service-account=${SERVICE_ACCOUNT_EMAIL} \
   --timeout=540 \
-  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?,FUNCTION_TIMEOUT_SEC=540'
 ```
 
 In theory, one could set up Pub/Sub notifications from multiple GCS Buckets
