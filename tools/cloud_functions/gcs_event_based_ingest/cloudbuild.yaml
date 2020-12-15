@@ -143,7 +143,7 @@ steps:
   env:
   - 'TF_VAR_project_id=$PROJECT_ID'
   - 'TF_VAR_region=$_REGION'
-  - 'TF_VAR_suffix=$SHORT_SHA'
+  - 'TF_VAR_short_sha=$SHORT_SHA'
   id: 'terraform-e2e-apply'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   dir: '${_BUILD_DIR}'
@@ -171,7 +171,7 @@ steps:
   env:
   - 'TF_VAR_project_id=$PROJECT_ID'
   - 'TF_VAR_region=$_REGION'
-  - 'TF_VAR_suffix=$SHORT_SHA'
+  - 'TF_VAR_short_sha=$SHORT_SHA'
   id: 'terraform-e2e-destroy'
 timeout: '3600s'
 options:
