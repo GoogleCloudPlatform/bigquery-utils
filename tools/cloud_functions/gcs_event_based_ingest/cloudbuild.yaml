@@ -154,7 +154,8 @@ steps:
   entrypoint: /bin/sh
   args:
   - '-c'
-  - 'python3 -m pytest e2e --tfstate=/workspace/${_BUILD_DIR}/e2e/terraform.state'
+#  - 'python3 -m pytest e2e --tfstate=/workspace/${_BUILD_DIR}/e2e/terraform.state'
+  - 'ls -R /workspace'
   id: 'e2e-test'
 - name: 'hashicorp/terraform'
   waitFor:
