@@ -36,7 +36,6 @@ module "gcs_ocn_bq_ingest" {
   project_id                   = var.project_id
   environment_variables = {
     START_BACKFILL_FILENAME = "_HISTORYDONE"
-    ORDER_PER_TABLE         = "True"
   }
   # We'll use a shorter timeout for e2e stress subscriber re-triggering
   timeout       = 60

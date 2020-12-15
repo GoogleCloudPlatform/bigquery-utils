@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""End-to-end test for GCS event based ingest to BigQuery Cloud Function"""
 import concurrent.futures
 import json
 import time
@@ -27,14 +28,20 @@ WAIT_FOR_ROWS_TIMEOUT = 180  # seconds
 
 
 @pytest.mark.SYS
-def test_gcs_ocn_bq_ingest_cloud_function(
+def test_gcs_ocn_bq_ingest_cloud_function_long_runnning_bq_jobs_with_orderme(
     gcs: storage.Client,
     bq: bigquery.Client,
     tf_state: Dict,
     dest_table: bigquery.Table,
 ):
-    """drop some test data and assert that the excpected actions are taken by
-    the deployed cloud function"""
+    """This test assumes the cloud function has been deployed with the
+    accompanying terraform module which configures a 1 min timeout.
+    It exports some larger data from a public BigQuery table and then reloads
+    them to test table to test the cloud function behavior with longer running
+    BigQuery jobs which are likely to require the backlog subscriber to restart
+    itself by reposting a _BACKFILL file. The ordering behavior is controlled
+    with the ORDERME blob.
+    """
     input_bucket_id = tf_state['outputs']['bucket']['value']
     table_prefix = f"{dest_table.dataset_id}/" \
                    f"{dest_table.table_id}"
@@ -64,13 +71,15 @@ def test_gcs_ocn_bq_ingest_cloud_function(
 
     bkt: storage.Bucket = gcs.lookup_bucket(input_bucket_id)
     # configure load jobs for this table
-    load_config = bkt.blob(f"{table_prefix}/_config/load.json")
-    load_config.upload_from_string(
+    load_config_blob = bkt.blob(f"{table_prefix}/_config/load.json")
+    load_config_blob.upload_from_string(
         json.dumps({
             "writeDisposition": "WRITE_APPEND",
             "sourceFormat": "AVRO",
             "useAvroLogicalTypes": "True",
         }))
+    orderme_blob = bkt.blob(f"{table_prefix}/_config/ORDERME")
+    orderme_blob.upload_from_string("")
     # add historical success files
     for batch in history_batch_nums:
         historical_success_blob: storage.Blob = bkt.blob(
@@ -78,7 +87,7 @@ def test_gcs_ocn_bq_ingest_cloud_function(
         historical_success_blob.upload_from_string("")
 
     # assert 0 bq rows (because _HISTORYDONE not dropped yet)
-    dest_table: bigquery.Table = bq.get_table(dest_table)
+    dest_table = bq.get_table(dest_table)
     assert dest_table.num_rows == 0, \
         "history was ingested before _HISTORYDONE was uploaded"
 
