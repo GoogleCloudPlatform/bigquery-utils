@@ -154,7 +154,7 @@ steps:
   entrypoint: /bin/sh
   args:
   - '-c'
-  - 'python3 -m pytest e2e --tfstate=e2e/terraform.state'
+  - 'python3 -m pytest e2e --tfstate=e2e/terraform.tfstate'
   id: 'e2e-test'
 - name: 'hashicorp/terraform'
   waitFor:
