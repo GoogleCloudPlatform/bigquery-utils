@@ -128,7 +128,9 @@ def triage_event(gcs_client: Optional[storage.Client],
                 and basename_object_id == constants.START_BACKFILL_FILENAME):
             # This will be the first backfill file.
             ordering.start_backfill_subscriber_if_not_running(
-                gcs_client, bkt, utils.get_table_prefix(event_blob.name))
+                gcs_client, bkt,
+                utils.removesuffix(event_blob.name,
+                                   constants.START_BACKFILL_FILENAME))
             return
         if basename_object_id == constants.SUCCESS_FILENAME:
             ordering.backlog_publisher(gcs_client, event_blob)
@@ -169,8 +171,7 @@ def lazy_error_reporting_client() -> error_reporting.Client:
     """
     global ERROR_REPORTING_CLIENT
     if not ERROR_REPORTING_CLIENT:
-        ERROR_REPORTING_CLIENT = error_reporting.Client(
-            client_info=constants.CLIENT_INFO)
+        ERROR_REPORTING_CLIENT = error_reporting.Client()
     return ERROR_REPORTING_CLIENT
 
 

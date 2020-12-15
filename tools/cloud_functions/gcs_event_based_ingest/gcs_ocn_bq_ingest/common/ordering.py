@@ -69,7 +69,8 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
     print(f"restart time is {restart_time}")
     bkt = backfill_blob.bucket
     utils.handle_duplicate_notification(gcs_client, backfill_blob)
-    table_prefix = utils.get_table_prefix(backfill_blob.name)
+    table_prefix = utils.removesuffix(backfill_blob.name,
+                                      constants.BACKFILL_FILENAME)
     last_job_done = False
     # we will poll for job completion this long in an individual iteration of
     # the while loop (before checking if we are too close to cloud function
@@ -142,7 +143,8 @@ def wait_on_last_job(bq_client: bigquery.Client, lock_blob: storage.Blob,
         return utils.wait_on_bq_job_id(bq_client, job_id, polling_timeout)
     except (exceptions.BigQueryJobFailure,
             google.api_core.exceptions.NotFound) as err:
-        table_prefix = utils.get_table_prefix(backfill_blob.name)
+        table_prefix = utils.removesuffix(backfill_blob.name,
+                                          constants.BACKFILL_FILENAME)
         raise exceptions.BigQueryJobFailure(
             f"previous BigQuery job: {job_id} failed or could not "
             "be found. This will kill the backfill subscriber for "
@@ -179,7 +181,8 @@ def handle_backlog(
     Returns:
         bool: should this backlog subscriber exit
     """
-    table_prefix = utils.get_table_prefix(backfill_blob.name)
+    table_prefix = utils.removesuffix(backfill_blob.name,
+                                      constants.BACKFILL_FILENAME)
     check_backlog_time = time.monotonic()
     next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
                                                     table_prefix)
@@ -305,8 +308,8 @@ def subscriber_monitor(gcs_client: Optional[storage.Client],
     if not gcs_client:
         gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     backfill_blob = start_backfill_subscriber_if_not_running(
-        gcs_client, bkt, utils.get_table_prefix(
-            object_id.replace("_backlog/", "")))
+        gcs_client, bkt,
+        utils.get_table_prefix(object_id))
 
     # backfill blob may be none if the START_BACKFILL_FILENAME has not been
     # dropped
@@ -326,14 +329,16 @@ def subscriber_monitor(gcs_client: Optional[storage.Client],
                 "subscriber for this table.")
             backfill_blob.delete(client=gcs_client)
             start_backfill_subscriber_if_not_running(
-                gcs_client, bkt, utils.get_table_prefix(object_id))
+                gcs_client, bkt,
+                utils.get_table_prefix(object_id))
             return True
 
         time.sleep(constants.ENSURE_SUBSCRIBER_SECONDS)
         while not utils.wait_on_gcs_blob(gcs_client, backfill_blob,
                                          constants.ENSURE_SUBSCRIBER_SECONDS):
             start_backfill_subscriber_if_not_running(
-                gcs_client, bkt, utils.get_table_prefix(object_id))
+                gcs_client, bkt,
+                utils.get_table_prefix(object_id))
             return True
     return False
 
