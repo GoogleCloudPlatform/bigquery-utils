@@ -440,6 +440,7 @@ def handle_duplicate_notification(
             "storage notification.") from err
 
 
+@cachetools.cached(cachetools.LRUCache(maxsize=1024))
 def get_table_prefix(object_id: str) -> str:
     """Find the table prefix for a object_id based on the destination regex.
     Args:

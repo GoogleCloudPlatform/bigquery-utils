@@ -53,7 +53,6 @@ def backlog_publisher(
                                                     table_prefix)
 
 
-# pylint: disable=too-many-arguments,too-many-locals,too-many-statements,too-many-branches
 def backlog_subscriber(gcs_client: Optional[storage.Client],
                        bq_client: Optional[bigquery.Client],
                        backfill_blob: storage.Blob, function_start_time: float):
@@ -68,7 +67,6 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
         float(os.getenv("FUNCTION_TIMEOUT_SEC", "60")) -
         constants.RESTART_BUFFER_SECONDS)
     print(f"restart time is {restart_time}")
-    backfill_blob_generation = backfill_blob.generation
     bkt = backfill_blob.bucket
     utils.handle_duplicate_notification(gcs_client, backfill_blob)
     table_prefix = utils.get_table_prefix(backfill_blob.name)
@@ -93,28 +91,9 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
             # the else will handle a manual _bqlock
             if lock_contents.startswith(
                     os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)):
-                job_id = lock_contents
-                try:
-                    last_job_done = utils.wait_on_bq_job_id(
-                        bq_client, job_id, polling_timeout)
-                except (exceptions.BigQueryJobFailure,
-                        google.api_core.exceptions.NotFound) as err:
-                    raise exceptions.BigQueryJobFailure(
-                        f"previous BigQuery job: {job_id} failed or could not "
-                        "be found. This will kill the backfill subscriber for "
-                        f"the table prefix: {table_prefix}."
-                        "Once the issue is dealt with by a human, the lock "
-                        "file at: "
-                        f"gs://{lock_blob.bucket.name}/{lock_blob.name} "
-                        "should be manually removed and a new empty "
-                        f"{constants.BACKFILL_FILENAME} "
-                        "file uploaded to: "
-                        f"gs://{backfill_blob.bucket.name}/{table_prefix}"
-                        "/_BACKFILL "
-                        f"to resume the backfill subscriber so it can "
-                        "continue with the next item in the backlog.\n"
-                        "Original Exception:\n"
-                        f"{traceback.format_exc()}") from err
+                last_job_done = wait_on_last_job(bq_client, lock_blob,
+                                                 backfill_blob, lock_contents,
+                                                 polling_timeout)
             else:
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
@@ -136,39 +115,75 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
             # If the BQ lock was missing we do not want to delete a backlog
             # item for a job we have not yet submitted.
             utils.remove_oldest_backlog_item(gcs_client, bkt, table_prefix)
-
-        check_backlog_time = time.monotonic()
-        next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
-                                                        table_prefix)
-        if not next_backlog_file:
-            print("no more files found in the backlog deleteing backfill blob")
-            backfill_blob.delete(if_generation_match=backfill_blob_generation,
-                                 client=gcs_client)
-            if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
-                    time.monotonic()):
-                print(
-                    "checking if the backlog is still empty for "
-                    f"gs://${bkt.name}/{table_prefix}/_backlog/"
-                    f"There was more than {constants.ENSURE_SUBSCRIBER_SECONDS}"
-                    " seconds between listing items on the backlog and "
-                    f"deleting the {constants.BACKFILL_FILENAME}. "
-                    "This should not happen often but is meant to alleviate a "
-                    "race condition in the event that something caused the "
-                    "delete operation was delayed or had to be retried for a "
-                    "long time.")
-                next_backlog_file = utils.get_next_backlog_item(
-                    gcs_client, bkt, table_prefix)
-                if next_backlog_file:
-                    # The backfill file was deleted but the backlog is
-                    # not empty. Re-trigger the backfill subscriber loop by
-                    # dropping a new backfill file.
-                    start_backfill_subscriber_if_not_running(
-                        gcs_client, bkt, table_prefix)
-                    return
-            utils.handle_bq_lock(gcs_client, lock_blob, None)
-            print(f"backlog is empty for gs://{bkt.name}/{table_prefix}. "
-                  "backlog subscriber exiting.")
+        should_subscriber_exit = handle_backlog(gcs_client, bq_client, bkt,
+                                                lock_blob, backfill_blob)
+        if should_subscriber_exit:
             return
+    # retrigger the subscriber loop by reposting the _BACKFILL file
+    print("ran out of time, restarting backfill subscriber loop for:"
+          f"gs://{bkt.name}/{table_prefix}")
+    backfill_blob = bkt.blob(f"{table_prefix}/{constants.BACKFILL_FILENAME}")
+    backfill_blob.upload_from_string("")
+
+
+def wait_on_last_job(bq_client: bigquery.Client, lock_blob: storage.Blob,
+                     backfill_blob: storage.blob, job_id: str,
+                     polling_timeout: int):
+    """wait on a bigquery job or raise informative exception.
+
+    Args:
+        bq_client: bigquery.Client
+        lock_blob: storage.Blob _bqlock blob
+        backfill_blob: storage.blob _BACKFILL blob
+        job_id: str BigQuery job ID to wait on (read from _bqlock file)
+        polling_timeout: int seconds to poll before returning.
+    """
+    try:
+        return utils.wait_on_bq_job_id(bq_client, job_id, polling_timeout)
+    except (exceptions.BigQueryJobFailure,
+            google.api_core.exceptions.NotFound) as err:
+        table_prefix = utils.get_table_prefix(backfill_blob.name)
+        raise exceptions.BigQueryJobFailure(
+            f"previous BigQuery job: {job_id} failed or could not "
+            "be found. This will kill the backfill subscriber for "
+            f"the table prefix: {table_prefix}."
+            "Once the issue is dealt with by a human, the lock "
+            "file at: "
+            f"gs://{lock_blob.bucket.name}/{lock_blob.name} "
+            "should be manually removed and a new empty "
+            f"{constants.BACKFILL_FILENAME} "
+            "file uploaded to: "
+            f"gs://{backfill_blob.bucket.name}/{table_prefix}"
+            "/_BACKFILL "
+            f"to resume the backfill subscriber so it can "
+            "continue with the next item in the backlog.\n"
+            "Original Exception:\n"
+            f"{traceback.format_exc()}") from err
+
+
+def handle_backlog(
+    gcs_client: storage.Client,
+    bq_client: bigquery.Client,
+    bkt: storage.Bucket,
+    lock_blob: storage.Blob,
+    backfill_blob: storage.Blob,
+):
+    """submit the next item in the _backlog if it is non-empty or clean up the
+    _BACKFILL and _bqlock files.
+    Args:
+        gcs_client: storage.Client
+        bq_client: bigquery.Client
+        bkt: storage.Bucket
+        lock_blob: storage.Blob _bqlock blob
+        backfill_blob: storage.blob _BACKFILL blob
+    Returns:
+        bool: should this backlog subscriber exit
+    """
+    table_prefix = utils.get_table_prefix(backfill_blob.name)
+    check_backlog_time = time.monotonic()
+    next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
+                                                    table_prefix)
+    if next_backlog_file:
         next_success_file: storage.Blob = bkt.blob(
             next_backlog_file.name.replace("/_backlog/", "/"))
         table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
@@ -184,11 +199,34 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
         next_job_id = utils.create_job_id(table_ref, batch)
         utils.apply(gcs_client, bq_client, next_success_file, lock_blob,
                     next_job_id)
-    # retrigger the subscriber loop by reposting the _BACKFILL file
-    print("ran out of time, restarting backfill subscriber loop for:"
-          f"gs://{bkt.name}/{table_prefix}")
-    backfill_blob = bkt.blob(f"{table_prefix}/{constants.BACKFILL_FILENAME}")
-    backfill_blob.upload_from_string("")
+        return False  # BQ job running
+    print("no more files found in the backlog deleteing backfill blob")
+    backfill_blob.delete(if_generation_match=backfill_blob.generation,
+                         client=gcs_client)
+    if (check_backlog_time + constants.ENSURE_SUBSCRIBER_SECONDS <
+            time.monotonic()):
+        print("checking if the backlog is still empty for "
+              f"gs://${bkt.name}/{table_prefix}/_backlog/"
+              f"There was more than {constants.ENSURE_SUBSCRIBER_SECONDS}"
+              " seconds between listing items on the backlog and "
+              f"deleting the {constants.BACKFILL_FILENAME}. "
+              "This should not happen often but is meant to alleviate a "
+              "race condition in the event that something caused the "
+              "delete operation was delayed or had to be retried for a "
+              "long time.")
+        next_backlog_file = utils.get_next_backlog_item(gcs_client, bkt,
+                                                        table_prefix)
+        if next_backlog_file:
+            # The backfill file was deleted but the backlog is
+            # not empty. Re-trigger the backfill subscriber loop by
+            # dropping a new backfill file.
+            start_backfill_subscriber_if_not_running(gcs_client, bkt,
+                                                     table_prefix)
+            return True  # we are re-triggering a new backlog subscriber
+    utils.handle_bq_lock(gcs_client, lock_blob, None)
+    print(f"backlog is empty for gs://{bkt.name}/{table_prefix}. "
+          "backlog subscriber exiting.")
+    return True  # the backlog is empty
 
 
 def start_backfill_subscriber_if_not_running(
