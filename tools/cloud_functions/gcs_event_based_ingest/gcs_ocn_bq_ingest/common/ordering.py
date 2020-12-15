@@ -60,11 +60,14 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
     """Pick up the table lock, poll BQ job id until completion and process next
     item in the backlog.
     """
+    print(f"started backfill subscriber for gs://{backfill_blob.bucket.name}/"
+          f"{backfill_blob.name}")
     gcs_client, bq_client = _get_clients_if_none(gcs_client, bq_client)
     # We need to retrigger the backfill loop before the Cloud Functions Timeout.
     restart_time = function_start_time + (
         float(os.getenv("FUNCTION_TIMEOUT_SEC", "60")) -
         constants.RESTART_BUFFER_SECONDS)
+    print(f"restart time is {restart_time}")
     backfill_blob_generation = backfill_blob.generation
     bkt = backfill_blob.bucket
     utils.handle_duplicate_notification(gcs_client, backfill_blob)
@@ -169,7 +172,7 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
         next_success_file: storage.Blob = bkt.blob(
             next_backlog_file.name.replace("/_backlog/", "/"))
         table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-            next_success_file.name)
+            next_success_file.name, bq_client.project)
         if not next_success_file.exists(client=gcs_client):
             raise exceptions.BacklogException(
                 "backlog contains "

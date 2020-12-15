@@ -27,10 +27,16 @@ from google.cloud import bigquery
 from google.cloud import error_reporting
 from google.cloud import storage
 
-from . import constants
-from . import exceptions
-from . import ordering
-from . import utils
+try:
+    from common import constants
+    from common import exceptions
+    from common import ordering
+    from common import utils
+except ModuleNotFoundError:
+    from .common import constants
+    from .common import exceptions
+    from .common import ordering
+    from .common import utils
 
 # Reuse GCP Clients across function invocations using globbals
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
@@ -83,7 +89,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         print("recieved duplicate notification. this was handled gracefully."
               f"{traceback.format_exc()}")
 
-    except tuple(exceptions.EXCEPTIONS_TO_REPORT) as original_error:
+    except exceptions.EXCEPTIONS_TO_REPORT as original_error:
         # We do this because we know these errors do not require a cold restart
         # of the cloud function.
         try:
@@ -104,7 +110,13 @@ def triage_event(gcs_client: Optional[storage.Client],
     blob."""
     bkt = event_blob.bucket
     basename_object_id = os.path.basename(event_blob.name)
-    table_ref, batch = utils.gcs_path_to_table_ref_and_batch(event_blob.name)
+    if bq_client:
+        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
+            event_blob.name, bq_client.project)
+    else:
+        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
+            event_blob.name, None)
+
     if enforce_ordering:
         # For SUCCESS files in a backlog directory, ensure that subscriber
         # is running.
@@ -140,8 +152,12 @@ def triage_event(gcs_client: Optional[storage.Client],
             return
     else:  # Default behavior submit job as soon as success file lands.
         if basename_object_id == constants.SUCCESS_FILENAME:
-            utils.apply(gcs_client, bq_client, event_blob, None,
-                        utils.create_job_id(table_ref, batch))
+            utils.apply(
+                gcs_client,
+                bq_client,
+                event_blob,
+                None,  # no lock blob when ordering not enabled.
+                utils.create_job_id(table_ref, batch))
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:

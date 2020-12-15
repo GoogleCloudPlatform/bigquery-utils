@@ -47,12 +47,17 @@ JOB_POLL_INTERVAL_SECONDS = 1
 
 DEFAULT_JOB_LABELS = {
     "component": "event-based-gcs-ingest",
-    "cloud-function-name": os.getenv("FUNCTION_NAME"),
+    "cloud-function-name": os.getenv("K_SERVICE"),
+}
+
+DEFAULT_LOAD_JOB_CONFIG = {
+    "sourceFormat": "CSV",
+    "fieldDelimiter": ",",
+    "writeDisposition": "WRITE_APPEND",
+    "labels": DEFAULT_JOB_LABELS,
 }
 
 BASE_LOAD_JOB_CONFIG = {
-    "sourceFormat": "CSV",
-    "fieldDelimiter": ",",
     "writeDisposition": "WRITE_APPEND",
     "labels": DEFAULT_JOB_LABELS,
 }

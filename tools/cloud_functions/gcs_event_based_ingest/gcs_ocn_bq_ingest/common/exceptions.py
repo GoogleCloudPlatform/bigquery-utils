@@ -43,9 +43,9 @@ class BacklogException(Exception):
     function."""
 
 
-EXCEPTIONS_TO_REPORT = {
+EXCEPTIONS_TO_REPORT = (
     BigQueryJobFailure,
     UnexpectedTriggerException,
     DestinationRegexMatchException,
     BacklogException,
-}
+)
