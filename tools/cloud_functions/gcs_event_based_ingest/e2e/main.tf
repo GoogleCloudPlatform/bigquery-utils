@@ -19,7 +19,7 @@ output "bucket" {
 }
 
 resource "google_storage_bucket" "cloud_functions_source" {
-  name          = "gcf-source-archives-${var.short_sha}"
+  name          = "gcf-source-archives${var.short_sha}"
   project       = var.project_id
   storage_class = "REGIONAL"
   location      = var.region
@@ -29,10 +29,10 @@ resource "google_storage_bucket" "cloud_functions_source" {
 module "gcs_ocn_bq_ingest" {
   source                       = "../terraform_module/gcs_ocn_bq_ingest_function"
   function_source_folder       = "../gcs_ocn_bq_ingest"
-  app_id                       = "gcs-ocn-bq-ingest-e2e-test-${var.short_sha}"
+  app_id                       = "gcs-ocn-bq-ingest-e2e-test${var.short_sha}"
   cloudfunctions_source_bucket = google_storage_bucket.cloud_functions_source.name
-  data_ingester_sa             = "data-ingester-sa-${var.short_sha}"
-  input_bucket                 = "gcs-ocn-bq-ingest-e2e-tests-${var.short_sha}"
+  data_ingester_sa             = "data-ingester-sa${var.short_sha}"
+  input_bucket                 = "gcs-ocn-bq-ingest-e2e-tests${var.short_sha}"
   project_id                   = var.project_id
   environment_variables = {
     START_BACKFILL_FILENAME = "_HISTORYDONE"
