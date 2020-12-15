@@ -110,15 +110,6 @@ def triage_event(gcs_client: Optional[storage.Client],
     blob."""
     bkt = event_blob.bucket
     basename_object_id = os.path.basename(event_blob.name)
-    # the _backlog/ directory is likely to mess up the regex matching
-    # in gcs_path_to_table_ref_and_batch and we won't use the variables in that
-    # code path anyway.
-    if bq_client and '_backlog' not in event_blob.name:
-        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-            event_blob.name, bq_client.project)
-    else:
-        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-            event_blob.name, None)
 
     if enforce_ordering:
         # For SUCCESS files in a backlog directory, ensure that subscriber
@@ -155,6 +146,12 @@ def triage_event(gcs_client: Optional[storage.Client],
             return
     else:  # Default behavior submit job as soon as success file lands.
         if basename_object_id == constants.SUCCESS_FILENAME:
+            if bq_client:
+                table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
+                    event_blob.name, bq_client.project)
+            else:
+                table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
+                    event_blob.name, None)
             utils.apply(
                 gcs_client,
                 bq_client,
