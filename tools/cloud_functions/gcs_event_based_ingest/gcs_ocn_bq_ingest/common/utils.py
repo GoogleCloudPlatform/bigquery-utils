@@ -170,7 +170,7 @@ def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
 
     config = None
     while parts:
-        if config:
+        if config is not None:
             return config
         config = _get_parent_config("/".join(parts))
         parts.pop()
