@@ -235,7 +235,6 @@ def test_recursive_update(original, update, expected):
         ("dataset/table/2020/01/02/03/batch_id/_SUCCESS", "dataset/table"),
         ("project.dataset/table/2020/01/02/03/batch_id/_SUCCESS",
          "project.dataset/table"),
-        ("dataset/table/_backlog/_BACKFILL", "dataset/table"),
     ])
 def test_get_table_prefix(test_input, expected):
     assert gcs_ocn_bq_ingest.common.utils.get_table_prefix(
