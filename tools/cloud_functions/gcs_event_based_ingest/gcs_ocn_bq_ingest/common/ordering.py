@@ -305,7 +305,8 @@ def subscriber_monitor(gcs_client: Optional[storage.Client],
     if not gcs_client:
         gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     backfill_blob = start_backfill_subscriber_if_not_running(
-        gcs_client, bkt, utils.get_table_prefix(object_id))
+        gcs_client, bkt, utils.get_table_prefix(
+            object_id.replace("_backlog/", "")))
 
     # backfill blob may be none if the START_BACKFILL_FILENAME has not been
     # dropped
