@@ -110,7 +110,10 @@ def triage_event(gcs_client: Optional[storage.Client],
     blob."""
     bkt = event_blob.bucket
     basename_object_id = os.path.basename(event_blob.name)
-    if bq_client:
+    # the _backlog/ directory is likely to mess up the regex matching
+    # in gcs_path_to_table_ref_and_batch and we won't use the variables in that
+    # code path anyway.
+    if bq_client and '_backlog' not in event_blob.name:
         table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
             event_blob.name, bq_client.project)
     else:
