@@ -450,14 +450,13 @@ def get_table_prefix(object_id: str) -> str:
     """
     basename = os.path.basename(object_id)
     if basename in {
-        constants.BACKFILL_FILENAME,
-        constants.START_BACKFILL_FILENAME
+            constants.BACKFILL_FILENAME, constants.START_BACKFILL_FILENAME
     }:
         # These files will not match the regex and always should appear at the
         # table level.
         return removesuffix(object_id, f"/{basename}")
     match = constants.DESTINATION_REGEX.match(
-        object_id.replace("_backlog/", ""))
+        object_id.replace("/_backlog/", "/"))
     if not match:
         raise exceptions.DestinationRegexMatchException(
             f"could not determine table prefix for object id: {object_id}"
