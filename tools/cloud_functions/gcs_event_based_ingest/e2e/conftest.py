@@ -28,11 +28,6 @@ from google.cloud import storage
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 
 
-def pytest_addoption(parser):
-    # if Terraform was used to deploy resources, pass the state details
-    parser.addoption("--tfstate", action="store", default=None)
-
-
 @pytest.fixture(scope="module")
 def bq() -> bigquery.Client:
     """BigQuery Client"""
