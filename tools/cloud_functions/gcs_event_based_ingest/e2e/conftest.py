@@ -17,11 +17,16 @@
 """End-to-end tests for event based BigQuery ingest Cloud Function."""
 import json
 import os
+import shlex
+import subprocess
 import uuid
 
 import pytest
 from google.cloud import bigquery
 from google.cloud import storage
+
+
+TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 
 
 def pytest_addoption(parser):
@@ -42,13 +47,29 @@ def gcs() -> storage.Client:
 
 
 @pytest.fixture(scope='module')
-def tf_state(pytestconfig):
+def terraform_infra(request):
+    def _run(cmd):
+        print(
+            subprocess.check_output(
+                cmd,
+                stderr=subprocess.STDOUT,
+                cwd=TEST_DIR
+            )
+        )
 
-    # if we used Terraform to create the GCP resources, use the output variables
-    if pytestconfig.getoption('tfstate') is not None:
-        tf_state_file = pytestconfig.getoption('tfstate')
-        with open(tf_state_file, 'r', encoding='utf-8') as fp:
-            return json.load(fp)
+    init = shlex.split("terraform init")
+    apply = shlex.split("terraform apply -auto-approve")
+    destroy = shlex.split("terraform destroy -auto-approve")
+
+    _run(init)
+    _run(apply)
+
+    def teardown():
+        _run(destroy)
+
+    request.addfinalizer(teardown)
+    with open(os.path.join(TEST_DIR, "terraform.tfstate")) as tf_state_file:
+        return json.load(tf_state_file)
 
 
 @pytest.fixture

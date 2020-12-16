@@ -28,9 +28,11 @@ WAIT_FOR_ROWS_TIMEOUT = 180  # seconds
 
 
 @pytest.mark.SYS
-def test_gcs_ocn_bq_ingest_cloud_function_long_runnning_bq_jobs_with_orderme(
-        gcs: storage.Client, bq: bigquery.Client, tf_state: Dict,
-        dest_table: bigquery.Table):
+def test_cloud_function_long_runnning_bq_jobs_with_orderme(
+    gcs: storage.Client, bq: bigquery.Client,
+    dest_table: bigquery.Table,
+    terraform_infra: Dict
+):
     """This test assumes the cloud function has been deployed with the
     accompanying terraform module which configures a 1 min timeout.
     It exports some larger data from a public BigQuery table and then reloads
@@ -39,7 +41,7 @@ def test_gcs_ocn_bq_ingest_cloud_function_long_runnning_bq_jobs_with_orderme(
     itself by reposting a _BACKFILL file. The ordering behavior is controlled
     with the ORDERME blob.
     """
-    input_bucket_id = tf_state['outputs']['bucket']['value']
+    input_bucket_id = terraform_infra['outputs']['bucket']['value']
     table_prefix = f"{dest_table.dataset_id}/" \
                    f"{dest_table.table_id}"
     extract_config = bigquery.ExtractJobConfig()
