@@ -666,7 +666,8 @@ def create_job_id(success_file_path):
         success_file_path.replace('/', '-')
     )
     # add uniqueness in case we have to "re-process" a success file that is
-    # republished or handle multiple load jobs.
+    # republished (e.g. to fix a bad batch of data) or handle multiple load jobs
+    # for a single success file.
     clean_job_id += str(uuid.uuid4())
     return clean_job_id[:1024]  # make sure job id isn't too long
 
