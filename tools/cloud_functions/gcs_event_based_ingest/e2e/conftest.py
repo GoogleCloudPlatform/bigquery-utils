@@ -17,6 +17,7 @@
 """End-to-end tests for event based BigQuery ingest Cloud Function."""
 import json
 import os
+import re
 import shlex
 import subprocess
 import uuid
@@ -26,6 +27,8 @@ from google.cloud import bigquery
 from google.cloud import storage
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
+
+ANSI_ESCAPE_PATTERN = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 
 @pytest.fixture(scope="module")
@@ -45,8 +48,15 @@ def terraform_infra(request):
 
     def _run(cmd):
         print(
-            subprocess.check_output(cmd, stderr=subprocess.STDOUT,
-                                    cwd=TEST_DIR))
+            ANSI_ESCAPE_PATTERN.sub(
+                '',
+                subprocess.check_output(
+                    cmd,
+                    stderr=subprocess.STDOUT,
+                    cwd=TEST_DIR
+                ).decode('UTF-8')
+            )
+        )
 
     init = shlex.split("terraform init")
     apply = shlex.split("terraform apply -auto-approve")
