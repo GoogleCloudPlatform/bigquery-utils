@@ -120,6 +120,7 @@ steps:
     - '-c'
     # pip installing again to get GCB to recognize mocker from pytest-mock
     - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m "not IT"'
+  # GCB can sometimes get hung on this step for no reason but is doomed to not recover.
   timeout: 15s
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
