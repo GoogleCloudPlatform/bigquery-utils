@@ -246,6 +246,10 @@ def start_backfill_subscriber_if_not_running(
         start_backfill_blob = bkt.blob(
             f"{table_prefix}/{constants.START_BACKFILL_FILENAME}")
         start_backfill = start_backfill_blob.exists(client=gcs_client)
+        if not start_backfill:
+            print("note triggering backfill because"
+                  f"gs://{start_backfill_blob.bucket.name}/"
+                  f"{start_backfill_blob.name} was not found.")
 
     if start_backfill:
         # Create a _BACKFILL file for this table if not exists
