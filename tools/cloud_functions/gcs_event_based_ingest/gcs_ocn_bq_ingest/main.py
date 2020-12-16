@@ -127,14 +127,11 @@ def triage_event(gcs_client: Optional[storage.Client],
             return
         if (constants.START_BACKFILL_FILENAME
                 and basename_object_id == constants.START_BACKFILL_FILENAME):
-            print(
-                f"notification for gs://{event_blob.bucket.name}/"
-                f"{event_blob.name}")
+            print(f"notification for gs://{event_blob.bucket.name}/"
+                  f"{event_blob.name}")
             # This will be the first backfill file.
             ordering.start_backfill_subscriber_if_not_running(
-                gcs_client, bkt,
-                utils.get_table_prefix(event_blob.name)
-            )
+                gcs_client, bkt, utils.get_table_prefix(event_blob.name))
             return
         if basename_object_id == constants.SUCCESS_FILENAME:
             ordering.backlog_publisher(gcs_client, event_blob)
@@ -150,9 +147,8 @@ def triage_event(gcs_client: Optional[storage.Client],
             ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
                                         function_start_time)
             return
-        raise RuntimeError(
-            f"gs://{event_blob.bucket.name}/"
-            f"{event_blob.name} could not be triaged.")
+        raise RuntimeError(f"gs://{event_blob.bucket.name}/"
+                           f"{event_blob.name} could not be triaged.")
     else:  # Default behavior submit job as soon as success file lands.
         if basename_object_id == constants.SUCCESS_FILENAME:
             if bq_client:

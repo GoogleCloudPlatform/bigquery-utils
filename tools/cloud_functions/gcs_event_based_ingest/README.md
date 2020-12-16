@@ -154,14 +154,33 @@ before they can be loaded to BigQuery. This is handled by query on an
 temporary external table over the GCS objects as a proxy for load job.
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/${BQ_TABLE_NAME}/_config/bq_transform.sql`
 
-Note, external queries will consume query slots from this project's reservation
-or count towards your on-demand billing. They will _not_ use free tie load slots.
+By default, if a query job finishes of statement type
+`INSERT`,`UPDATE`,`DELETE`, or `MERGE` and `numDmlRowsAffected = 0` this will be
+treated as a failure ([See Query Job Statistics API docs](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobstatistics2)).
+This is usually due to a bad query / configuration with bad DML predicate.
+For example running the following query on an empty table:
 
+```sql
+UPDATE foo.bar dest ... FROM temp_ext src WHERE src.id = dest.id
+```
+
+By failing on this condition we keep the backlog intact when we run a query job
+that unexpectedly did no affect any rows.
+This can be disabled by setting the environment variable
+`FAIL_ON_ZERO_DML_ROWS_AFFECTED=False`.
+
+A `CREATE OR REPLACE TABLE` is not DML and will not be subject to this behavior.
+
+##### Cost Note
+External queries will consume query slots from this project's reservation
+or count towards your on-demand billing.
+They will _not_ use free tier load slots.
+
+##### External Table Name: `temp_ext`
 Note, that the query should select from a `temp_ext` which will be a temporary
 external table configured on the fly by the Cloud Function.
 The query must handle the logic for inserting into the destination table.
-This means it should use BigQuery DML to either `INSERT` or `MERGE` into the
-destination table.
+This means it should use BigQuery DML to mutate the destination table.
 For example:
 ```sql
 INSERT {dest_dataset}.{dest_table}

@@ -123,3 +123,14 @@ ORDER_PER_TABLE = bool(
 BQ_TRANSFORM_SQL = "*.sql"
 
 ENSURE_SUBSCRIBER_SECONDS = 5
+
+FAIL_ON_ZERO_DML_ROWS_AFFECTED = bool(
+    distutils.util.strtobool(os.getenv("FAIL_ON_ZERO_DML_ROWS_AFFECTED",
+                                       "True")))
+
+BQ_DML_STATEMENT_TYPES = {
+    "INSERT",
+    "UPDATE",
+    "DELETE",
+    "MERGE",
+}

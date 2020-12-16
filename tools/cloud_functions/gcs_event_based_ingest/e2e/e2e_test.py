@@ -29,10 +29,8 @@ WAIT_FOR_ROWS_TIMEOUT = 180  # seconds
 
 @pytest.mark.SYS
 def test_cloud_function_long_runnning_bq_jobs_with_orderme(
-    gcs: storage.Client, bq: bigquery.Client,
-    dest_table: bigquery.Table,
-    terraform_infra: Dict
-):
+        gcs: storage.Client, bq: bigquery.Client, dest_table: bigquery.Table,
+        terraform_infra: Dict):
     """This test assumes the cloud function has been deployed with the
     accompanying terraform module which configures a 1 min timeout.
     It exports some larger data from a public BigQuery table and then reloads

@@ -47,14 +47,11 @@ def gcs() -> storage.Client:
 
 @pytest.fixture(scope='module')
 def terraform_infra(request):
+
     def _run(cmd):
         print(
-            subprocess.check_output(
-                cmd,
-                stderr=subprocess.STDOUT,
-                cwd=TEST_DIR
-            )
-        )
+            subprocess.check_output(cmd, stderr=subprocess.STDOUT,
+                                    cwd=TEST_DIR))
 
     init = shlex.split("terraform init")
     apply = shlex.split("terraform apply -auto-approve")
