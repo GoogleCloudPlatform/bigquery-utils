@@ -66,7 +66,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
             action_filenames = constants.ACTION_FILENAMES
             if constants.START_BACKFILL_FILENAME is None:
                 action_filenames.remove(None)
-            print(f"No-op. This notification was not for a"
+            print(f"No-op. This notification was not for a "
                   f"{action_filenames} file.")
             return
 
@@ -86,7 +86,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
 
     # Unexpected exceptions will actually raise which may cause a cold restart.
     except exceptions.DuplicateNotificationException:
-        print("recieved duplicate notification. this was handled gracefully."
+        print("recieved duplicate notification. this was handled gracefully.\n "
               f"{traceback.format_exc()}")
 
     except exceptions.EXCEPTIONS_TO_REPORT as original_error:
@@ -117,8 +117,8 @@ def triage_event(gcs_client: Optional[storage.Client],
         if (basename_object_id == constants.SUCCESS_FILENAME
                 and "/_backlog/" in event_blob.name):
             print(f"This notification was for "
-                  f"gs://{bkt.name}/{event_blob.name} a"
-                  f"{constants.SUCCESS_FILENAME} in a"
+                  f"gs://{bkt.name}/{event_blob.name} a "
+                  f"{constants.SUCCESS_FILENAME} in a "
                   "/_backlog/ directory. "
                   f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
                   "ensure that subscriber is running.")
@@ -129,8 +129,8 @@ def triage_event(gcs_client: Optional[storage.Client],
             # This will be the first backfill file.
             ordering.start_backfill_subscriber_if_not_running(
                 gcs_client, bkt,
-                utils.removesuffix(event_blob.name,
-                                   constants.START_BACKFILL_FILENAME))
+                utils.get_table_prefix(event_blob.name)
+            )
             return
         if basename_object_id == constants.SUCCESS_FILENAME:
             ordering.backlog_publisher(gcs_client, event_blob)
