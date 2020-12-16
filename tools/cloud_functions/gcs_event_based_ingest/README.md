@@ -351,9 +351,7 @@ The system tests assume that you have deployed the cloud function.
 ```bash
 export TF_VAR_short_sha=$(git rev-parse --short=10 HEAD)
 export TF_VAR_project_id=jferriero-pp-dev
-(cd e2e && terraform init && terraform apply -auto-approve)
-python3 -m pytest e2e --tfstate e2e/terraform.tfstate
-(cd e2e && terraform destroy -auto-approve)
+python3 -m pytest -vvv e2e
 ```
 
 ## Deployment

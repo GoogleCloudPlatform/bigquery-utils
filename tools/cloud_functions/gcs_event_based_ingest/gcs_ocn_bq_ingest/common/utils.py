@@ -450,7 +450,9 @@ def get_table_prefix(object_id: str) -> str:
     """
     basename = os.path.basename(object_id)
     if basename in {
-            constants.BACKFILL_FILENAME, constants.START_BACKFILL_FILENAME
+        constants.BACKFILL_FILENAME,
+        constants.START_BACKFILL_FILENAME,
+        "_bqlock",
     }:
         # These files will not match the regex and always should appear at the
         # table level.
