@@ -651,35 +651,24 @@ def gcs_path_to_table_ref_and_batch(
     return dest_table_ref, batch_id
 
 
-def create_job_id(dest_table_ref: bigquery.TableReference,
-                  batch_id: Optional[str]):
-    """Create job id prefix with a consistent naming convention.
-    The naming conventions is as follows:
-    gcf-ingest-<dataset_id>-<table_id>-<partition_num>-<batch_id>-
-    Parts that are not inferrable from the GCS path with have a 'None'
-    placeholder. This naming convention is crucial for monitoring the system.
+def create_job_id(success_file_path):
+    """Create job id prefix with a consistent naming convention based on the
+    success file path to give context of what caused this job to be submitted.
+    the rules for success file name -> job id are:
+    1. slashes to dashes
+    2. all non-alphanumeric dash or underscore will be replaced with underscore
     Note, gcf-ingest- can be overridden with environment variable JOB_PREFIX
-
-    Examples:
-
-    Non-partitioned Non batched tables:
-      - gs://${BUCKET}/tpch/lineitem/_SUCCESS
-      - gcf-ingest-tpch-lineitem-None-None-
-    Non-partitioned batched tables:
-      - gs://${BUCKET}/tpch/lineitem/batch000/_SUCCESS
-      - gcf-ingest-tpch-lineitem-None-batch000-
-    Partitioned Batched tables:
-      - gs://${BUCKET}/tpch/lineitem/$20201031/batch000/_SUCCESS
-      - gcf-ingest-tpch-lineitem-20201031-batch000-
+    3. uuid for uniqueness
     """
-    table_partition = dest_table_ref.table_id.split("$")
-    if len(table_partition) < 2:
-        # If there is no partition put a None placeholder
-        table_partition.append("None")
-    return f"{os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)}" \
-           f"{dest_table_ref.dataset_id}-" \
-           f"{'-'.join(table_partition)}-" \
-           f"{batch_id}-{uuid.uuid4()}"
+    clean_job_id = os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)
+    clean_job_id += constants.NON_BQ_JOB_ID_REGEX.sub(
+        '_',
+        success_file_path.replace('/', '-')
+    )
+    # add uniqueness in case we have to "re-process" a success file that is
+    # republished or handle multiple load jobs.
+    clean_job_id += str(uuid.uuid4())
+    return clean_job_id[:1024]  # make sure job id isn't too long
 
 
 def handle_bq_lock(gcs_client: storage.Client, lock_blob: storage.Blob,
