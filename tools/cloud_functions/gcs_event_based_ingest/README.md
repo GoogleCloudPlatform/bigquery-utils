@@ -276,8 +276,13 @@ SELECT
 FROM
    `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
 WHERE
-   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "gcf-ingest-"
+   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "event-based-gcs-ingest"
 ```
+If your external queries have mutliple sql statements only the parent job will
+follow the `gcf-ingest-*` naming convention. Children jobs (for each statement)
+begin with prefix _script_job. These jobs will still be labelled with
+`component` and `cloud-function-name`.
+For more information see [Scripting in Standard SQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/scripting)
 
 ## Triggers
 GCS Object Finalize triggers can communicate with Cloud Functions directly or

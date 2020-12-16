@@ -162,7 +162,7 @@ def triage_event(gcs_client: Optional[storage.Client],
                 bq_client,
                 event_blob,
                 None,  # no lock blob when ordering not enabled.
-                utils.create_job_id(table_ref, batch))
+                utils.create_job_id(event_blob.name))
 
 
 def lazy_error_reporting_client() -> error_reporting.Client:

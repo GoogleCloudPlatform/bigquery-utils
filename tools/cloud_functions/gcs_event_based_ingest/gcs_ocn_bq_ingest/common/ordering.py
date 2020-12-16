@@ -196,7 +196,7 @@ def handle_backlog(
                 f"gs://{next_success_file.bucket}/{next_success_file.name}")
         print("applying next batch for:"
               f"gs://{next_success_file.bucket}/{next_success_file.name}")
-        next_job_id = utils.create_job_id(table_ref, batch)
+        next_job_id = utils.create_job_id(next_success_file.name)
         utils.apply(gcs_client, bq_client, next_success_file, lock_blob,
                     next_job_id)
         return False  # BQ job running

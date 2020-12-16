@@ -134,3 +134,6 @@ BQ_DML_STATEMENT_TYPES = {
     "DELETE",
     "MERGE",
 }
+
+# https://cloud.google.com/bigquery/docs/running-jobs#generate-jobid
+NON_BQ_JOB_ID_REGEX = re.compile('[^0-9a-zA-Z_\-]+')
