@@ -186,8 +186,6 @@ def handle_backlog(
     if next_backlog_file:
         next_success_file: storage.Blob = bkt.blob(
             next_backlog_file.name.replace("/_backlog/", "/"))
-        table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-            next_success_file.name, bq_client.project)
         if not next_success_file.exists(client=gcs_client):
             raise exceptions.BacklogException(
                 "backlog contains "
