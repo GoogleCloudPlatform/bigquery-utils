@@ -111,6 +111,7 @@ def triage_event(gcs_client: Optional[storage.Client],
     bkt = event_blob.bucket
     basename_object_id = os.path.basename(event_blob.name)
 
+    # pylint: disable=no-else-raise
     if enforce_ordering:
         # For SUCCESS files in a backlog directory, ensure that subscriber
         # is running.
