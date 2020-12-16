@@ -25,7 +25,6 @@ import pytest
 from google.cloud import bigquery
 from google.cloud import storage
 
-
 TEST_DIR = os.path.realpath(os.path.dirname(__file__))
 
 
