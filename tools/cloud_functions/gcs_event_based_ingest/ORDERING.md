@@ -75,6 +75,12 @@ address the failed batch:
     "Original Exception:\n"
     f"{traceback.format_exc()}")
 ```
+Note that once the `_bqlock` is removed and `_BACKFILL` is reposted, the Cloud
+Function will proceed by applying the next batch in the `_backlog`. This means,
+if you have applied the batch manually you should remove this object from the
+`_backlog`. However, if you have patched the data on GCS for the failed batch
+and would like the cloud function to apply it, then you leave this object in the
+`_backlog`. 
 
 ## Ordering Mechanics Explained
 We've treated ordering incremental commits to table  as a variation on the
@@ -90,13 +96,14 @@ The Backlog Publisher has two responsibilities:
 1. add incoming success files to a
 table's `_backlog` so they are not "forgotten" by the ingestion system.
 1. if there is a non-empty backlog start the backfill subscriber (if one is not
-already running). This is accomplished by dropping a table level `_BACKFILL`
+already running). This is accomplished by uploading a table level `_BACKFILL`
 file if it does not already exist.
 
 ### Backlog Subscriber
 The Backlog Subscriber is responsible for keeping track of BigQuery jobs running
 on a table and ensure that batches are committed in order. When the backlog is
-not empty for a table the backlog subscriber should be running for that table.
+not empty for a table the backlog subscriber should be running for that table
+unless a job has failed.
 It will either be polling a `RUNNING` BigQuery job for completion, or submitting
 the next batch in the `_backlog`.
 
@@ -106,7 +113,63 @@ The state of what BigQuery job is currently running on a table is kept in a
 In order to escape the maximum nine-minute (540s) Cloud Function Timeout, the
 backfill subscriber will re-trigger itself by posting a new `_BACKFILL` file
 until the `_backlog` for the table prefix is empty. When a new success file
-arrives it is the responsibility of the publisher to restart the subscriber.
+arrives it is the responsibility of the publisher to restart the subscriber if
+one is not already running.
+
+### Example: Life of a Table
+The following process explains the triggers (GCS files) and actions of the
+Cloud Function for a single table prefix.
+
+1. Source data uploaded to GCS prefix for the destination dataset / table, etc.
+    - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/03/foo-data-00.csv`
+    - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/03/foo-data-01.csv`
+    - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/04/foo-data-00.csv`
+    - `gs://ingestion-bucket/dataset/table/incremental/2020/01/02/05/foo-data-01.csv`
+1. Success file uploaded to GCS (to indicate this atomic batch is ready to be
+applied).
+    - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/03/_SUCCESS`
+    - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/04/_SUCCESS`
+    - `gs://ingestion-bucket/dataset/table/incremental/2020/01/02/05/_SUCCESS`
+1. Backlog Publisher adds a pointer to each success file in the backlog for the
+table.
+    - `gs://ingestion-bucket/dataset/table/_backlog/historical/2020/01/02/03/_SUCCESS`
+    - `gs://ingestion-bucket/dataset/table/_backlog/historical/2020/01/02/04/_SUCCESS`
+    - `gs://ingestion-bucket/dataset/table/_backlog/incremental/2020/01/02/05/_SUCCESS`
+1. If the `START_BACKFILL_FILENAME` is set and the file exists at the table prefix, After adding each item the backlog, the Backlog Publisher will start the
+Backfill Subscriber if it is not already running (as indicated by a `_BACKFILL`
+file). If the `START_BACKFILL_FILENAME` is not present the backlog subscriber
+will not be started until this file is uploaded.
+    - `gs://ingestion-bucket/dataset/table/_BACKFILL`
+1. The Backlog Subscriber will look at the backlog and apply the batches in
+order (lexicographic). This process looks like this:
+    1. Claim this backfill file:
+        - `gs://ingestion-bucket/dataset/table/_claimed__BACKFILL_created_at_...`
+    1. Claim first batch in backlog (ensure no duplicate processing):
+        - `gs://ingestion-bucket/dataset/table/historical/2020/01/02/03/_claimed__SUCCESS_created_at_...`
+    1. Submit the BigQuery Job for this batch (load job or external query based on the `_config/*` files)
+        - Ingest the data at the `gs://ingestion-bucket/dataset/table/historical/2020/01/02/03/*` prefix
+        - Store the job ID in `gs://ingestion-bucket/dataset/table/_bqlock`
+    1. Wait for this Job to complete successfully and remove this item from the backlog.
+        - If job is `DONE` with  errors:
+            - Raise exception (do not continue to process any more batches)
+        - If job is `DONE` without errors remove the pointer from the backlog:
+            - DELETE `gs://ingestion-bucket/dataset/table/_backlog/historical/2020/01/02/03/_SUCCESS`
+    1. Repeat from Backlog Subscriber step 2
+        - Where the first item in the backlog is now 
+            - `gs://ingestion-bucket/dataset/table/_backlog/historical/2020/01/02/04/_SUCCESS`
+        - And on the next loop:
+            - `gs://ingestion-bucket/dataset/table/_backlog/incremental/2020/01/02/05/_SUCCESS`
+1. Backlog Subscriber sees the `_backlog/` is empty for the table. In other words
+The BigQuery table is caught up with the data on GCS.        
+    - DELETE `gs://ingestion-bucket/dataset/table/_BACKFILL` and exit
+1. The next day a new incremental arrives
+    - `gs://ingestion-bucket/dataset/table/_backlog/incremental/2020/01/02/05/_SUCCESS`
+1. The Backlog Publisher adds this item to the backlog and wakes up the
+Backfill Subscriber by posting a new `_BACKFILL` file.
+    - `gs://ingestion-bucket/dataset/table/_backlog/incremental/2020/01/02/05/_SUCCESS`
+    - `gs://ingestion-bucket/dataset/table/_BACKFILL`
+1. Backlog Subscriber will handle the backlog of just one item
+(See Backlog Subscriber step #5 and #6 above)
 
 
 ### Note on Handling Race Condition

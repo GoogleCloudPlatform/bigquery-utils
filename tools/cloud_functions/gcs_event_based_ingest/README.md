@@ -441,6 +441,21 @@ files. The utility supports either invoking the Cloud Function main method
 locally (in concurrent threads) or publishing notifications for the success
 files (for a deployed Cloud Function to pick up).
 
+### Backfill and Ordering
+If you use the ordering feature on a table (or function wide) you should use the
+`NOTIFICATIONS` mode to repost notifications to a pub/sub topic that your
+deployed Cloud Function is listening to. The `LOCAL` mode does not support
+ordering because this feature relies on (re)posting files like `_bqlock`,
+`_BACKFILL` and various claim files and getting re-triggered by object
+notifications for these.
+The script will publish the notifications for success files and the Cloud
+Function will add these to the appropriate table's backlog.
+Once the script completes you can drop the `START_BACKFILL_FILENAME`
+(e.g. `_HISTORYDONE`) for each table you want to trigger the backfill for.
+In general, it would not be safe for this utility to drop a `_HISTORYDONE` for
+every table because the parallel historical loads might still be in progress.
+
+
 ### Usage
 ```
 python3 -m backfill -h
