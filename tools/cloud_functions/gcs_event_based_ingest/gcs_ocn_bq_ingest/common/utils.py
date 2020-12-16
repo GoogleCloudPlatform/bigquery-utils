@@ -23,6 +23,7 @@ import fnmatch
 import json
 import os
 import pathlib
+import pprint
 import time
 import uuid
 from typing import Any, Deque, Dict, List, Optional, Tuple, Union
@@ -93,8 +94,15 @@ def external_query(  # pylint: disable=too-many-arguments
         job.reload(client=bq_client)
         if job.errors:
             raise exceptions.BigQueryJobFailure(
-                f"query job {job.job_id} failed quickly: {job.errors}")
+                f"query job {job.job_id} failed quickly: {job.errors}."
+                f"\n{pprint.pformat(job.to_api_repr())}")
         if job.state == "DONE":
+            if (constants.FAIL_ON_ZERO_DML_ROWS_AFFECTED
+                    and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
+                    and job.num_dml_affected_rows < 1):
+                raise exceptions.BigQueryJobFailure(
+                    f"query job {job.job_id} ran successfully but did not affect"
+                    f"any rows.\n {pprint.pformat(job.to_api_repr())}")
             return
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
@@ -130,7 +138,8 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id):
             job.reload(client=bq_client)
             if job.errors:
                 raise exceptions.BigQueryJobFailure(
-                    f"load job {job.job_id} failed quickly: {job.errors}")
+                    f"load job {job.job_id} failed quickly: {job.errors}\n"
+                    f"{pprint.pformat(job.to_api_repr())}")
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
@@ -450,9 +459,9 @@ def get_table_prefix(object_id: str) -> str:
     """
     basename = os.path.basename(object_id)
     if basename in {
-        constants.BACKFILL_FILENAME,
-        constants.START_BACKFILL_FILENAME,
-        "_bqlock",
+            constants.BACKFILL_FILENAME,
+            constants.START_BACKFILL_FILENAME,
+            "_bqlock",
     }:
         # These files will not match the regex and always should appear at the
         # table level.
@@ -554,7 +563,15 @@ def wait_on_bq_job_id(bq_client: bigquery.Client,
             if job.errors:
                 raise exceptions.BigQueryJobFailure(
                     f"BigQuery Job {job.job_id} failed during backfill with the"
-                    f"following errors: {job.errors}")
+                    f"following errors: {job.errors}\n"
+                    f"{pprint.pformat(job.to_api_repr())}")
+            if (isinstance(job, bigquery.QueryJob)
+                    and constants.FAIL_ON_ZERO_DML_ROWS_AFFECTED
+                    and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
+                    and job.num_dml_affected_rows < 1):
+                raise exceptions.BigQueryJobFailure(
+                    f"query job {job.job_id} ran successfully but did not"
+                    f"affect any rows.\n {pprint.pformat(job.to_api_repr())}")
             return True
         if job.state in {"RUNNING", "PENDING"}:
             print(f"waiting on BigQuery Job {job.job_id}")

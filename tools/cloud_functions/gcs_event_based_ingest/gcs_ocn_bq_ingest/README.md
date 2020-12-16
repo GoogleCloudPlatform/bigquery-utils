@@ -34,6 +34,7 @@ following default behavior.
 | `JOB_PREFIX`          | Prefix for BigQuery Job IDs          | `gcf-ingest-` |
 | `BQ_PROJECT`          | Default BQ project to use if not specified in dataset capturing group | Project where Cloud Function is deployed |
 | `FUNCTION_TIMEOUT_SEC`| Number of seconds set for this deployment of Cloud Function (no longer part of python38 runtime) | 60 |
+| `FAIL_ON_ZERO_DML_ROWS_AFFECTED` | Treat External Queries that result in `numDmlAffectedRows = 0` as failures | True | 
 | `ORDER_PER_TABLE`\*   | Force jobs to be executed sequentially (rather than parallel) based on the backlog. This is the same as having an `ORDERME` file in every config directory | `False` | 
 | `START_BACKFILL_FILENAME`\*| Block submitting BigQuery Jobs for a table until this file is present at the table prefix. By default this will not happen. | `None` |
 | `RESTART_BUFFER_SECONDS`\* | Buffer before Cloud Function timeout to leave before re-triggering the backfill subscriber | 30 |
