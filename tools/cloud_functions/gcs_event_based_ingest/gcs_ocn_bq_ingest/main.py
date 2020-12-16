@@ -151,12 +151,6 @@ def triage_event(gcs_client: Optional[storage.Client],
                            f"{event_blob.name} could not be triaged.")
     else:  # Default behavior submit job as soon as success file lands.
         if basename_object_id == constants.SUCCESS_FILENAME:
-            if bq_client:
-                table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-                    event_blob.name, bq_client.project)
-            else:
-                table_ref, batch = utils.gcs_path_to_table_ref_and_batch(
-                    event_blob.name, None)
             utils.apply(
                 gcs_client,
                 bq_client,
