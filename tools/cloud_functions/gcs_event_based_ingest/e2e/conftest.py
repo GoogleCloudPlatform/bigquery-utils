@@ -50,13 +50,9 @@ def terraform_infra(request):
         print(
             ANSI_ESCAPE_PATTERN.sub(
                 '',
-                subprocess.check_output(
-                    cmd,
-                    stderr=subprocess.STDOUT,
-                    cwd=TEST_DIR
-                ).decode('UTF-8')
-            )
-        )
+                subprocess.check_output(cmd,
+                                        stderr=subprocess.STDOUT,
+                                        cwd=TEST_DIR).decode('UTF-8')))
 
     init = shlex.split("terraform init")
     apply = shlex.split("terraform apply -auto-approve")
