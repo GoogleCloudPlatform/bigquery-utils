@@ -215,8 +215,10 @@ def construct_load_job_config(storage_client: storage.Client,
     while config_q:
         recursive_update(merged_config, config_q.popleft(), in_place=True)
     if merged_config == constants.BASE_LOAD_JOB_CONFIG:
-        print("falling back to default CSV load job config")
-        return constants.DEFAULT_LOAD_JOB_CONFIG
+        print("falling back to default CSV load job config. "
+              "Did you forget load.json?")
+        return bigquery.LoadJobConfig.from_api_repr(
+            constants.DEFAULT_LOAD_JOB_CONFIG)
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
@@ -662,9 +664,7 @@ def create_job_id(success_file_path):
     """
     clean_job_id = os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)
     clean_job_id += constants.NON_BQ_JOB_ID_REGEX.sub(
-        '_',
-        success_file_path.replace('/', '-')
-    )
+        '_', success_file_path.replace('/', '-'))
     # add uniqueness in case we have to "re-process" a success file that is
     # republished (e.g. to fix a bad batch of data) or handle multiple load jobs
     # for a single success file.
