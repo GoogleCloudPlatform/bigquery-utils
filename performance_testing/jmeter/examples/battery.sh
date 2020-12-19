@@ -16,9 +16,9 @@
 
 set -ex
 
-reservation_sizes="1000 500 250"
+reservation_sizes="1000 750 500 250"
 export USERS=10
-export NUM_TEST_RUNS=${NUM_TEST_RUNS=:1}
+export NUM_TEST_RUNS=${NUM_TEST_RUNS:=1}
 
 if [ -z $PROJECT_ID ]; then
   echo "Please set PROJECT_ID to the project ID where you intend the queries to execute."
@@ -34,8 +34,6 @@ if [ -z $BQ_RESERVATION_ID ]; then
   echo "Please set BQ_RESERVATION_ID to the reservation ID you want to vary between test runs."
   exit 1
 fi
-
-if [ -z N
 
 for r in $reservation_sizes; do
   echo "Setting slot reservation to $r slots for the next test."
