@@ -58,7 +58,7 @@ def external_query(  # pylint: disable=too-many-arguments
     if external_table_config:
         external_table_def = json.loads(external_table_config)
     else:
-        print(f" {gsurl}_config/external.json not found in parents of {gsurl}."
+        print(f" {gsurl}_config/external.json not found in parents of {gsurl}. "
               "Falling back to default PARQUET external table:\n"
               f"{json.dumps(constants.DEFAULT_EXTERNAL_TABLE_DEFINITION)}")
         external_table_def = constants.DEFAULT_EXTERNAL_TABLE_DEFINITION
@@ -101,8 +101,8 @@ def external_query(  # pylint: disable=too-many-arguments
                     and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
                     and job.num_dml_affected_rows < 1):
                 raise exceptions.BigQueryJobFailure(
-                    f"query job {job.job_id} ran successfully but did not affect"
-                    f"any rows.\n {pprint.pformat(job.to_api_repr())}")
+                    f"query job {job.job_id} ran successfully but did not "
+                    f"affect any rows.\n {pprint.pformat(job.to_api_repr())}")
             return
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
@@ -136,10 +136,7 @@ def load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id):
         # Check if job failed quickly
         for job in jobs:
             job.reload(client=bq_client)
-            if job.errors:
-                raise exceptions.BigQueryJobFailure(
-                    f"load job {job.job_id} failed quickly: {job.errors}\n"
-                    f"{pprint.pformat(job.to_api_repr())}")
+            check_for_bq_job_and_children_errors(bq_client, job)
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
@@ -240,9 +237,8 @@ def get_batches_for_prefix(
     bucket_name = blob.bucket.name
     prefix_name = blob.name
 
-    prefix_filter = f"{prefix_name}"
     bucket = cached_get_bucket(gcs_client, bucket_name)
-    blobs = list(bucket.list_blobs(prefix=prefix_filter, delimiter="/"))
+    blobs = list(bucket.list_blobs(prefix=prefix_name, delimiter="/"))
 
     cumulative_bytes = 0
     max_batch_size = int(
@@ -309,14 +305,14 @@ def parse_notification(notification: dict) -> Tuple[str, str]:
             return attributes["bucketId"], attributes["objectId"]
         except KeyError:
             raise exceptions.UnexpectedTriggerException(
-                "Issue with Pub/Sub message, did not contain expected"
+                "Issue with Pub/Sub message, did not contain expected "
                 f"attributes: 'bucketId' and 'objectId': {notification}"
             ) from KeyError
     raise exceptions.UnexpectedTriggerException(
         "Cloud Function received unexpected trigger:\n"
         f"{notification}\n"
-        "This function only supports direct Cloud Functions"
-        "Background Triggers or Pub/Sub storage notificaitons"
+        "This function only supports direct Cloud Functions "
+        "Background Triggers or Pub/Sub storage notificaitons "
         "as described in the following links:\n"
         "https://cloud.google.com/storage/docs/pubsub-notifications\n"
         "https://cloud.google.com/functions/docs/tutorials/storage")
@@ -538,6 +534,38 @@ def remove_oldest_backlog_item(
     return False
 
 
+def check_for_bq_job_and_children_errors(bq_client: bigquery.Client,
+                                         job: Union[bigquery.LoadJob,
+                                                    bigquery.QueryJob]):
+    """checks if BigQuery job (or children jobs in case of multi-statement sql)
+    should be considered failed because there were errors or the query affected
+    no rows while FAIL_ON_ZERO_DML_ROWS_AFFECTED env var is set to True
+    (this is the default).
+
+    Args:
+        bq_client: bigquery.Client
+        job: Union[bigquery.LoadJob, bigquery.QueryJob] job to check for errors.
+    Raises:
+        exceptions.BigQueryJobFailure
+    """
+    if job.state != "DONE":
+        wait_on_bq_job_id(bq_client, job.job_id, 5)
+    if job.errors:
+        raise exceptions.BigQueryJobFailure(
+            f"BigQuery Job {job.job_id} failed during backfill with the "
+            f"following errors: {job.errors}\n"
+            f"{pprint.pformat(job.to_api_repr())}")
+    if isinstance(job, bigquery.QueryJob):
+        if (constants.FAIL_ON_ZERO_DML_ROWS_AFFECTED
+                and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
+                and job.num_dml_affected_rows < 1):
+            raise exceptions.BigQueryJobFailure(
+                f"query job {job.job_id} ran successfully but did not "
+                f"affect any rows.\n {pprint.pformat(job.to_api_repr())}")
+        for child_job in bq_client.list_jobs(parent_job=job):
+            check_for_bq_job_and_children_errors(bq_client, child_job)
+
+
 def wait_on_bq_job_id(bq_client: bigquery.Client,
                       job_id: str,
                       polling_timeout: int,
@@ -562,18 +590,7 @@ def wait_on_bq_job_id(bq_client: bigquery.Client,
         job: Union[bigquery.LoadJob,
                    bigquery.QueryJob] = bq_client.get_job(job_id)
         if job.state == "DONE":
-            if job.errors:
-                raise exceptions.BigQueryJobFailure(
-                    f"BigQuery Job {job.job_id} failed during backfill with the"
-                    f"following errors: {job.errors}\n"
-                    f"{pprint.pformat(job.to_api_repr())}")
-            if (isinstance(job, bigquery.QueryJob)
-                    and constants.FAIL_ON_ZERO_DML_ROWS_AFFECTED
-                    and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
-                    and job.num_dml_affected_rows < 1):
-                raise exceptions.BigQueryJobFailure(
-                    f"query job {job.job_id} ran successfully but did not"
-                    f"affect any rows.\n {pprint.pformat(job.to_api_repr())}")
+            check_for_bq_job_and_children_errors(bq_client, job)
             return True
         if job.state in {"RUNNING", "PENDING"}:
             print(f"waiting on BigQuery Job {job.job_id}")
