@@ -16,6 +16,7 @@
 # limitations under the License.
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
+import distutils.util
 import os
 import time
 import traceback
@@ -92,13 +93,19 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     except exceptions.EXCEPTIONS_TO_REPORT as original_error:
         # We do this because we know these errors do not require a cold restart
         # of the cloud function.
-        try:
-            lazy_error_reporting_client().report_exception()
-        except Exception:  # pylint: disable=broad-except
-            # This mostly handles the case where error reporting API is not
-            # enabled or IAM permissions did not allow us to report errors with
-            # error reporting API.
-            raise original_error  # pylint: disable=raise-missing-from
+        if (
+            distutils.util.strtobool(
+                os.getenv("USE_ERROR_REPORTING_API", "True"))
+        ):
+            try:
+                lazy_error_reporting_client().report_exception()
+            except Exception:  # pylint: disable=broad-except
+                # This mostly handles the case where error reporting API is not
+                # enabled or IAM permissions did not allow us to report errors
+                # with error reporting API.
+                raise original_error  # pylint: disable=raise-missing-from
+        else:
+            raise original_error
 
 
 def triage_event(gcs_client: Optional[storage.Client],

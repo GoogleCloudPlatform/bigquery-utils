@@ -38,6 +38,7 @@ following default behavior.
 | `ORDER_PER_TABLE`\*   | Force jobs to be executed sequentially (rather than parallel) based on the backlog. This is the same as having an `ORDERME` file in every config directory | `False` | 
 | `START_BACKFILL_FILENAME`\*| Block submitting BigQuery Jobs for a table until this file is present at the table prefix. By default this will not happen. | `None` |
 | `RESTART_BUFFER_SECONDS`\* | Buffer before Cloud Function timeout to leave before re-triggering the backfill subscriber | 30 |
+| `USE_ERROR_REPORTING_API` | Should errors be reported using error reporting api to avoid cold restart (optimization) | True |
 
 \* only affect the behavior when ordering is enabled for a table.
 See [ORDERING.md](../ORDERING.md)
