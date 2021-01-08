@@ -93,10 +93,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     except exceptions.EXCEPTIONS_TO_REPORT as original_error:
         # We do this because we know these errors do not require a cold restart
         # of the cloud function.
-        if (
-            distutils.util.strtobool(
-                os.getenv("USE_ERROR_REPORTING_API", "True"))
-        ):
+        if (distutils.util.strtobool(
+                os.getenv("USE_ERROR_REPORTING_API", "True"))):
             try:
                 lazy_error_reporting_client().report_exception()
             except Exception:  # pylint: disable=broad-except

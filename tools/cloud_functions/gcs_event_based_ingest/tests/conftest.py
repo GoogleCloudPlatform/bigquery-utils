@@ -573,8 +573,8 @@ def no_use_error_reporting(monkeypatch):
 
 @pytest.fixture
 def gcs_external_config_bad_statement(
-    request, gcs_bucket, dest_dataset, dest_table, no_use_error_reporting
-) -> List[storage.blob.Blob]:
+        request, gcs_bucket, dest_dataset, dest_table,
+        no_use_error_reporting) -> List[storage.blob.Blob]:
     config_objs = []
     sql_obj = gcs_bucket.blob("/".join([
         f"{dest_dataset.project}.{dest_dataset.dataset_id}",
