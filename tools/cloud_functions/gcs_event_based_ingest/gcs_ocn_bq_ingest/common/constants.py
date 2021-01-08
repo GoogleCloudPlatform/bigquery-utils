@@ -137,4 +137,3 @@ BQ_DML_STATEMENT_TYPES = {
 
 # https://cloud.google.com/bigquery/docs/running-jobs#generate-jobid
 NON_BQ_JOB_ID_REGEX = re.compile(r'[^0-9a-zA-Z_\-]+')
-
