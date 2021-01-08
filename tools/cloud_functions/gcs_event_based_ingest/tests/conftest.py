@@ -530,7 +530,7 @@ def gcs_external_partitioned_config(
         "bq_transform.sql",
     ]))
 
-    sql = "INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext"
+    sql = "INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext;"
     sql_obj.upload_from_string(sql)
 
     config_obj = gcs_bucket.blob("/".join([
@@ -560,6 +560,62 @@ def gcs_external_partitioned_config(
     def teardown():
         for do in config_objs:
             if do.exists:
+                do.delete()
+
+    request.addfinalizer(teardown)
+    return config_objs
+
+
+@pytest.fixture
+def no_use_error_reporting(monkeypatch):
+    monkeypatch.setenv("USE_ERROR_REPORTING_API", "False")
+
+
+@pytest.fixture
+def gcs_external_config_bad_statement(
+    request, gcs_bucket, dest_dataset, dest_table, no_use_error_reporting
+) -> List[storage.blob.Blob]:
+    config_objs = []
+    sql_obj = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_table.table_id,
+        "_config",
+        "bq_transform.sql",
+    ]))
+
+    sql = ("INSERT {dest_dataset}.{dest_table} SELECT * FROM temp_ext;\n"
+           "INSERT {dest_dataset}.{dest_table} SELECT 1/0;")
+    sql_obj.upload_from_string(sql)
+
+    config_obj = gcs_bucket.blob("/".join([
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_table.table_id, "_config", "external.json"
+    ]))
+
+    with open(os.path.join(TEST_DIR, "resources",
+                           "nation_schema.json")) as schema:
+        fields = json.load(schema)
+    config = {
+        "schema": {
+            "fields": fields
+        },
+        "csvOptions": {
+            "allowJaggedRows": False,
+            "allowQuotedNewlines": False,
+            "encoding": "UTF-8",
+            "fieldDelimiter": "|",
+            "skipLeadingRows": 0,
+        },
+        "sourceFormat": "CSV",
+        "sourceUris": ["REPLACEME"],
+    }
+    config_obj.upload_from_string(json.dumps(config))
+    config_objs.append(sql_obj)
+    config_objs.append(config_obj)
+
+    def teardown():
+        for do in config_objs:
+            if do.exists():
                 do.delete()
 
     request.addfinalizer(teardown)

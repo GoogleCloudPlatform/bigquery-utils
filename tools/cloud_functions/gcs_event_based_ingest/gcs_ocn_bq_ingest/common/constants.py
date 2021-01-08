@@ -30,7 +30,7 @@ import google.cloud.exceptions
 # One might consider lowering this to 1-2 seconds to lower the
 # upper bound of expected execution time to stay within the free tier.
 # https://cloud.google.com/functions/pricing#free_tier
-WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "1"))
+WAIT_FOR_JOB_SECONDS = int(os.getenv("WAIT_FOR_JOB_SECONDS", "5"))
 
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
     # The default must be a self describing data format
@@ -137,3 +137,4 @@ BQ_DML_STATEMENT_TYPES = {
 
 # https://cloud.google.com/bigquery/docs/running-jobs#generate-jobid
 NON_BQ_JOB_ID_REGEX = re.compile(r'[^0-9a-zA-Z_\-]+')
+

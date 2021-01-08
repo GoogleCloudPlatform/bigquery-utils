@@ -143,8 +143,8 @@ def test_load_job_appending_batches(bq, gcs_batched_data, dest_dataset,
 
 
 @pytest.mark.IT
-def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
-                        dest_table, mock_env):
+def test_external_query_pure(bq, gcs_data, gcs_external_config, dest_dataset,
+                             dest_table, mock_env):
     """tests the basic external query ingrestion mechanics
     with bq_transform.sql and external.json
     """
@@ -286,3 +286,30 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
         f"{table.project}.{table.dataset_id}.{table.table_id} to "
         f"reach {expected_num_rows} rows."
         f"last poll returned {actual_num_rows} rows.")
+
+
+@pytest.mark.IT
+def test_external_query_with_bad_statement(bq, gcs_data,
+                                           gcs_external_config_bad_statement,
+                                           dest_dataset, dest_table, mock_env):
+    """tests the basic external query ingrestion mechanics
+    with bq_transform.sql and external.json
+    """
+    if not gcs_data.exists():
+        raise google.cloud.exceptions.NotFound("test data objects must exist")
+    if not all((blob.exists() for blob in gcs_external_config_bad_statement)):
+        raise google.cloud.exceptions.NotFound("config objects must exist")
+
+    test_event = {
+        "attributes": {
+            "bucketId": gcs_data.bucket.name,
+            "objectId": gcs_data.name
+        }
+    }
+    raised = False
+    try:
+        gcs_ocn_bq_ingest.main.main(test_event, None)
+    except gcs_ocn_bq_ingest.common.exceptions.BigQueryJobFailure:
+        raised = True
+
+    assert raised, "bad statement did not raise BigQueryJobFailure"

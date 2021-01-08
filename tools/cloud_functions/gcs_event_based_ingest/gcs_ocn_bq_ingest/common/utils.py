@@ -92,17 +92,8 @@ def external_query(  # pylint: disable=too-many-arguments
     while time.monotonic(
     ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
         job.reload(client=bq_client)
-        if job.errors:
-            raise exceptions.BigQueryJobFailure(
-                f"query job {job.job_id} failed quickly: {job.errors}."
-                f"\n{pprint.pformat(job.to_api_repr())}")
         if job.state == "DONE":
-            if (constants.FAIL_ON_ZERO_DML_ROWS_AFFECTED
-                    and job.statement_type in constants.BQ_DML_STATEMENT_TYPES
-                    and job.num_dml_affected_rows < 1):
-                raise exceptions.BigQueryJobFailure(
-                    f"query job {job.job_id} ran successfully but did not "
-                    f"affect any rows.\n {pprint.pformat(job.to_api_repr())}")
+            check_for_bq_job_and_children_errors(bq_client, job)
             return
         time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
@@ -747,11 +738,9 @@ def apply(
     print(
         "looking for a transformation tranformation sql file in parent _config."
     )
-    external_query_sql = read_gcs_file_if_exists(gcs_client,
-                                                 f"{gsurl}_config/*.sql")
-    if not external_query_sql:
-        external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
-                                                        "*.sql")
+    external_query_sql = look_for_config_in_parents(
+        gcs_client, f"gs://{bkt.name}/{success_blob.name}", '*.sql')
+
     if external_query_sql:
         print("EXTERNAL QUERY")
         print(f"found external query:\n{external_query_sql}")
