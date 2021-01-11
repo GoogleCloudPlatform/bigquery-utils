@@ -203,33 +203,32 @@ def generate_js_libs_package_json():
     all the js libs that are specified in the udfs/js_libs/js_libs.yaml file.
     """
     js_libs_dict = get_js_libs_from_yaml()
+    js_libs_package_dict = {
+        "name": "js-bq-libs",
+        "version": "1.0.0",
+        "scripts": {
+            "build-all-libs": "concurrently \"npm:webpack-*\""
+        },
+        "dependencies": {
+            f'{lib_name}-v{version}': f'npm:{lib_name}@^{version}'
+            for lib_name in js_libs_dict
+            for version in js_libs_dict.get(lib_name).get('versions')
+        },
+        "devDependencies": {
+            "webpack": "^5.3.1",
+            "webpack-cli": "^4.1.0",
+            "concurrently": "^5.3.0"
+        }
+    }
+    # Update with webpack scripts for building all js packages
+    for lib_name in js_libs_dict:
+        for version in js_libs_dict.get(lib_name).get('versions'):
+            js_libs_package_dict.get('scripts').update({
+                f'webpack-{lib_name}-v{version}': f'webpack --config {lib_name}-v{version}-webpack.config.js'
+            })
+
     with open('./package.json', 'w') as js_libs_package_json:
-        js_libs_package_json.write(
-            f'{{\n'
-            f'    "name": "js-bq-libs",\n'
-            f'    "version": "1.0.0",\n'
-            f'    "scripts": {{\n'
-            f'        "build-all-libs": "concurrently \\"npm:webpack-*\\""\n')
-        for lib_name in js_libs_dict:
-            for version in js_libs_dict.get(lib_name).get('versions'):
-                js_libs_package_json.write(
-                    f'        ,"webpack-{lib_name}-v{version}": '
-                    f'"webpack --config {lib_name}-v{version}-webpack.config.js"\n'
-                )
-        js_libs_package_json.write(f'    }},\n' f'    "dependencies": {{\n')
-        for index, lib_name in enumerate(js_libs_dict):
-            for version in js_libs_dict.get(lib_name).get('versions'):
-                js_libs_package_json.write(
-                    f'        {"," if index > 0 else ""}"{lib_name}-v{version}": '
-                    f'"npm:{lib_name}@^{version}"\n')
-        js_libs_package_json.write(
-            f'    }},\n'
-            f'    "devDependencies": {{\n'
-            f'        "webpack": "^5.3.1",\n'
-            f'        "webpack-cli": "^4.1.0",\n'
-            f'        "concurrently": "^5.3.0"\n'
-            f'    }}\n'
-            f'}}')
+        js_libs_package_json.write(json.dumps(js_libs_package_dict, indent=2))
 
 
 def generate_webpack_configs():
@@ -272,7 +271,7 @@ def generate_webpack_configs():
                 f'    output: {{\n'
                 f'        path: path.resolve(__dirname, "js_builds"),\n'
                 f'        filename: "{js_lib_name}-v{js_lib_version}{js_lib_file_extension}",\n'
-                f'        library: "{js_lib_name}",\n'
+                f'        library: "{js_lib_name.replace("-", "_")}",\n'
                 f'        libraryTarget: "var",\n'
                 f'    }},\n'
                 f'    optimization: {{\n'
