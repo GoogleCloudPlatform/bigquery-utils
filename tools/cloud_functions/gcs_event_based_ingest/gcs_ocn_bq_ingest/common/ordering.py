@@ -349,7 +349,7 @@ def _get_clients_if_none(
     harmless if these clients are recreated in the Cloud Function.
     """
     print("instantiating missing clients in backlog subscriber this should only"
-          "happen during integration tests.")
+          " happen during integration tests.")
     if not gcs_client:
         gcs_client = storage.Client(client_info=constants.CLIENT_INFO)
     if not bq_client:

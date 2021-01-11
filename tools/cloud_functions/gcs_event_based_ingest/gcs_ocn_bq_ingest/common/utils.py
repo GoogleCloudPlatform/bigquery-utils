@@ -80,10 +80,7 @@ def external_query(  # pylint: disable=too-many-arguments
 
     job: bigquery.QueryJob = bq_client.query(rendered_query,
                                              job_config=job_config,
-                                             job_id=job_id,
-                                             project=os.getenv(
-                                                 "BQ_PROJECT",
-                                                 bq_client.project))
+                                             job_id=job_id)
 
     print(f"started asynchronous query job: {job.job_id}")
 
@@ -653,11 +650,11 @@ def gcs_path_to_table_ref_and_batch(
 
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}{partition}",
-            default_project=os.getenv("BQ_PROJECT", default_project))
+            default_project=os.getenv("BQ_STORAGE_PROJECT", default_project))
     else:
         dest_table_ref = bigquery.TableReference.from_string(
             f"{dataset}.{table}",
-            default_project=os.getenv("BQ_PROJECT", default_project))
+            default_project=os.getenv("BQ_STORAGE_PROJECT", default_project))
     return dest_table_ref, batch_id
 
 
