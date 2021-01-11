@@ -122,7 +122,7 @@ Next you can extend the query to show how long each thread group took to run.
 N.B. - the base CTE is the same as above, but the query that uses the CTE is
 different:
 
-```
+```sql
 WITH
   test_run_queries AS (
   SELECT
