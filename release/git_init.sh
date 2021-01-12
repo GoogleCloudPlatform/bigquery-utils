@@ -34,7 +34,7 @@ if [[ ! "${BRANCH_NAME}" = "master" || -n "${_PR_NUMBER}" ]]; then
     git reset --hard origin/"${BRANCH_NAME}"
   elif [[ -n "${_PR_NUMBER}" ]]; then
     printf "Fetching and --hard resetting to the merge commit of pull request #%s which triggered this build." "${_PR_NUMBER}"
-    git fetch origin +refs/pull/"${_PR_NUMBER}"/merge:refs/remotes/origin/pr/"${_PR_NUMBER}"
+    git fetch origin +refs/pull/"${_PR_NUMBER}"/head:refs/remotes/origin/pr/"${_PR_NUMBER}"
     git reset --hard origin/pr/"${_PR_NUMBER}"
   fi
 fi
