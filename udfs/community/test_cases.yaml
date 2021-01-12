@@ -330,6 +330,29 @@ ts_gen_keyed_timestamps:
   - test:
     input: ARRAY<STRING>['abc', 'def'], CAST(60 AS INT64), CAST('2020-01-01 00:30:00' AS TIMESTAMP), CAST('2020-01-01 00:30:30' AS TIMESTAMP)
     expected_output: ([STRUCT(CAST('abc' AS STRING) AS series_key, CAST('2020-01-01 00:30:00' AS TIMESTAMP) AS tumble_val), STRUCT(CAST('def' AS STRING) AS series_key, CAST('2020-01-01 00:30:00' AS TIMESTAMP) AS tumble_val)])
+ts_session_group:
+  - test:
+    input: CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP), (NULL), 300
+    expected_output: CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP)
+  - test:
+    input: CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP), CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP), 300
+    expected_output: (NULL)
+  - test:
+    input: CAST('2020-01-01 01:24:01 UTC' AS TIMESTAMP), CAST('2020-01-01 01:09:01 UTC' AS TIMESTAMP), 300
+    expected_output: CAST('2020-01-01 01:24:01 UTC' AS TIMESTAMP)
+ts_slide:
+  - test:
+    input: CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP), 300, 600
+    expected_output: ([STRUCT(CAST('2020-01-01 00:55:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP) AS window_end), STRUCT(CAST('2020-01-01 01:00:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:10:00 UTC' AS TIMESTAMP) AS window_end)])
+  - test:
+    input: CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP), 600, 900
+    expected_output: ([STRUCT(CAST('2020-01-01 00:50:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP) AS window_end), STRUCT(CAST('2020-01-01 01:00:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:15:00 UTC' AS TIMESTAMP) AS window_end)])
+  - test:
+    input: CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP), 300, 600
+    expected_output: ([STRUCT(CAST('2020-01-01 01:00:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:10:00 UTC' AS TIMESTAMP) AS window_end), STRUCT(CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:15:00 UTC' AS TIMESTAMP) AS window_end)])
+  - test:
+    input: CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP), 600, 900
+    expected_output: ([STRUCT(CAST('2020-01-01 01:00:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:15:00 UTC' AS TIMESTAMP) AS window_end)])
 nlp_compromise_number:
   - test:
     input: CAST('one hundred fifty seven' AS STRING)
