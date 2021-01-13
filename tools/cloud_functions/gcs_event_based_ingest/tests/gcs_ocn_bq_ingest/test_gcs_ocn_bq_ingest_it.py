@@ -209,6 +209,30 @@ def test_load_job_partitioned(bq, gcs_partitioned_data,
     bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)
 
 
+@pytest.mark.IT
+def test_look_for_config_in_parents(bq, gcs_data_under_sub_dirs,
+                                    gcs_external_config, dest_dataset,
+                                    dest_table, mock_env):
+    """test discovery of configuration files for external query in parent
+    _config paths.
+    """
+    if not all((blob.exists() for blob in gcs_external_config)):
+        raise google.cloud.exceptions.NotFound("config objects must exist")
+    if not gcs_data_under_sub_dirs.exists():
+        raise google.cloud.exceptions.NotFound("test data objects must exist")
+    test_event = {
+        "attributes": {
+            "bucketId": gcs_data_under_sub_dirs.bucket.name,
+            "objectId": gcs_data_under_sub_dirs.name
+        }
+    }
+    gcs_ocn_bq_ingest.main.main(test_event, None)
+    test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                                  "part-m-00001")
+    expected_num_rows = sum(1 for _ in open(test_data_file))
+    bq_wait_for_rows(bq, dest_table, expected_num_rows)
+
+
 def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
                      expected_num_rows: int):
     """
