@@ -17,6 +17,8 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import collections
+import collections.abc
+import copy
 import json
 import os
 import pathlib
@@ -256,8 +258,17 @@ def external_query(  # pylint: disable=too-many-arguments
     while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
-            raise RuntimeError(
-                f"query job {job.job_id} failed quickly: {job.errors}")
+            msg = f"query job {job.job_id} failed quickly: {job.errors}"
+            for err in job.errors:
+                # BQ gives confusing warning about missing dataset if the
+                # external query refers to the wrong external table name.
+                # In this case we can give the end user a little more context.
+                if "missing dataset" in err.get("message", ""):
+                    raise RuntimeError(
+                        "External queries must select from the external table "
+                        "named 'temp_ext'. This error may be due to specifying"
+                        "the wrong name for the external table. " + msg)
+            raise RuntimeError(msg)
         time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
@@ -383,9 +394,9 @@ def construct_load_job_config(storage_client: storage.Client,
             config_q.append(json.loads(config))
         parts.pop()
 
-    merged_config = dict()
+    merged_config: Dict = {}
     while config_q:
-        merged_config.update(config_q.popleft())
+        recursive_update(merged_config, config_q.popleft(), in_place=True)
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
@@ -553,3 +564,29 @@ def removesuffix(in_str: str, suffix: str) -> str:
     if suffix and in_str.endswith(suffix):
         return in_str[:-len(suffix)]
     return in_str[:]
+
+
+def recursive_update(
+    original: Dict,
+    update: Dict,
+    in_place: bool = False
+):
+    """
+    return a recursively updated dictionary.
+
+    Note, lists will be completely overwritten by value in update if there is a
+    conflict.
+
+    original: (dict) the base dictionary
+    update:  (dict) the dictionary of updates to apply on original
+    in_place: (bool) if true then original will be mutated in place else a new
+        dictionary as a result of the update will be returned.
+    """
+    out = original if in_place else copy.deepcopy(original)
+
+    for key, value in update.items():
+        if isinstance(value, dict):
+            out[key] = recursive_update(out.get(key, {}), value)
+        else:
+            out[key] = value
+    return out
