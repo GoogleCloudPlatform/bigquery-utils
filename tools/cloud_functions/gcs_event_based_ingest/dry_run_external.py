@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Command Line utility for backfilling gcs_ocn_bq_ingest cloud function
+"""Command Line utility for dry running BigQuery queries that reference
+temporary external tables over data in GCS.
 """
 import argparse
 import json
