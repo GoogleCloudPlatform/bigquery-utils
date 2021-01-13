@@ -16,3 +16,8 @@ output "cloud-function" {
   value       = google_cloudfunctions_function.gcs_to_bq
 }
 
+output "data-ingester-sa" {
+  description = "data ingester service account email created as cloud function identity"
+  value       = module.data_ingester_service_account.email
+}
+
