@@ -136,6 +136,32 @@ def gcs_data(request, gcs_bucket, dest_dataset,
 
 @pytest.fixture(scope="function")
 @pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
+def gcs_data_under_sub_dirs(request, gcs_bucket, dest_dataset,
+                            dest_table) -> storage.blob.Blob:
+    """test that config files in parents are discovered when a success file
+    is uploaded in a child directory."""
+    data_objs = []
+    for test_file in ["part-m-00000", "part-m-00001", "_SUCCESS"]:
+        data_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
+            f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+            dest_table.table_id, "foo", "bar", "baz", test_file
+        ]))
+        data_obj.upload_from_filename(
+            os.path.join(TEST_DIR, "resources", "test-data", "nation",
+                         test_file))
+        data_objs.append(data_obj)
+
+    def teardown():
+        for do in data_objs:
+            if do.exists:
+                do.delete()
+
+    request.addfinalizer(teardown)
+    return data_objs[-1]
+
+
+@pytest.fixture(scope="function")
+@pytest.mark.usefixtures("gcs_bucket", "dest_dataset", "dest_table")
 def gcs_truncating_load_config(request, gcs_bucket, dest_dataset,
                                dest_table) -> storage.blob.Blob:
     config_obj: storage.blob.Blob = gcs_bucket.blob("/".join([
@@ -188,7 +214,7 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
                         dest_table) -> List[storage.blob.Blob]:
     config_objs = []
     sql_obj = gcs_bucket.blob("/".join([
-        dest_dataset.dataset_id,
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
         dest_table.table_id,
         "_config",
         "bq_transform.sql",
@@ -198,7 +224,8 @@ def gcs_external_config(request, gcs_bucket, dest_dataset,
     sql_obj.upload_from_string(sql)
 
     config_obj = gcs_bucket.blob("/".join([
-        dest_dataset.dataset_id, dest_table.table_id, "_config", "external.json"
+        f"{dest_dataset.project}.{dest_dataset.dataset_id}",
+        dest_table.table_id, "_config", "external.json"
     ]))
 
     with open(os.path.join(TEST_DIR, "resources",
