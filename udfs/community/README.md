@@ -21,6 +21,7 @@ SELECT bqutil.fn.int(1.684)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
 * [last_day](#lastdaydt-date)
+* [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -30,6 +31,11 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [ts_gen_keyed_timestamps](#ts_gen_keyed_timestampskeys-arraystring-tumble_seconds-int64-min_ts-timestamp-max_ts-timestamp)
+* [ts_linear_interpolate](#ts_linear_interpolatepos-timestamp-prev-structx-timestamp-y-float64-next-structx-timestamp-y-float64)
+* [ts_session_group](#ts_session_grouprow_ts-timestamp-prev_ts-timestamp-session_gap-int64)
+* [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
+* [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
@@ -230,6 +236,22 @@ results:
 | 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
+### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sql)
+Interpolate the current positions value from the preceding and folllowing coordinates
+
+```sql
+SELECT 
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(10 AS x, 10.0 AS y)),
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(20 AS x, 10.0 AS y))
+```
+
+results:
+
+| f0_ | f1_ |
+|-----|-----|
+| 2.0 | 1.0 |
+
+
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
 
@@ -343,6 +365,127 @@ SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
 most tin
 ```
+
+### [ts_gen_keyed_timestamps(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts TIMESTAMP)](ts_gen_keyed_timestamps.sql)
+Generate a timestamp array associated with each key
+
+```sql
+SELECT *
+FROM 
+  UNNEST(bqutil.fn.ts_gen_keyed_timestamps(['abc', 'def'], 60, TIMESTAMP '2020-01-01 00:30:00', TIMESTAMP '2020-01-01 00:31:00))
+```
+
+| series_key | tumble_val
+|------------|-------------------------|
+| abc        | 2020-01-01 00:30:00 UTC |
+| def        | 2020-01-01 00:30:00 UTC |
+| abc        | 2020-01-01 00:31:00 UTC |
+| def        | 2020-01-01 00:31:00 UTC |
+  
+
+### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sql)
+Interpolate the positions value using timestamp seconds as the x-axis
+
+```sql
+select bqutil.fn.ts_linear_interpolate(
+  TIMESTAMP '2020-01-01 00:30:00', 
+  STRUCT(TIMESTAMP '2020-01-01 00:29:00' AS x, 1.0 AS y),
+  STRUCT(TIMESTAMP '2020-01-01 00:31:00' AS x, 3.0 AS y)
+)
+```
+
+| f0_ |
+|-----|
+| 2.0 |
+
+### [ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)](ts_session_group.sql)
+Function to compare two timestamp as being within the same session window. A timestamp in the same session window as its previous timestamp will evaluate as NULL, otherwise the current row's timestamp is returned.  The "LAST_VALUE(ts IGNORE NULLS)" window function can then be used to stamp all rows with the starting timestamp for the session window.
+
+```sql
+--5 minute (300 seconds) session window
+WITH ticks AS (
+  SELECT 'abc' as key, 1.0 AS price, CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP) AS ts
+  UNION ALL
+  SELECT 'abc', 2.0, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 3.0, CAST('2020-01-01 01:05:01 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 4.0, CAST('2020-01-01 01:09:01 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 5.0, CAST('2020-01-01 01:24:01 UTC' AS TIMESTAMP)
+)
+SELECT
+  * EXCEPT(session_group),
+  LAST_VALUE(session_group IGNORE NULLS)
+    OVER (PARTITION BY key ORDER BY ts ASC) AS session_group
+FROM (
+  SELECT
+    *,
+    bqutil.fn.ts_session_group(
+      ts,
+      LAG(ts) OVER (PARTITION BY key ORDER BY ts ASC),
+      300
+    ) AS session_group
+  FROM ticks 
+)
+```
+
+| key | price | ts                      |  sesssion_group         |
+|-----|-------|-------------------------|-------------------------|
+| abc | 1.0   | 2020-01-01 01:04:59 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 2.0   | 2020-01-01 01:05:00 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 3.0   | 2020-01-01 01:05:01 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 4.0   | 2020-01-01 01:09:01 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 5.0   | 2020-01-01 01:24:01 UTC | 2020-01-01 01:24:01 UTC |
+
+
+### [ts_slide(ts TIMESTAMP, period INT64, duration INT64)](ts_slide.sql)
+Calculate the sliding windows the ts parameter belongs to.
+
+```sql
+-- show a 15 minute window every 5 minutes and a 15 minute window every 10 minutes
+WITH ticks AS (
+  SELECT 1.0 AS price, CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP) AS ts
+  UNION ALL
+  SELECT 2.0, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 3.0, CAST('2020-01-01 01:05:01 UTC' AS TIMESTAMP)
+)
+SELECT
+  price,
+  ts,
+  bqutil.fn.ts_slide(ts, 300, 900) as _5_15,
+  bqutil.fn.ts_slide(ts, 600, 900) as _10_15,
+FROM ticks
+```
+
+| price | ts                      | _5_15.window_start      | _5_15.window_end        | _5_15.window_start      | _5_15.window_end        |
+|-------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+| 1.0   | 2020-01-01 01:04:59 UTC | 2020-01-01 00:50:00 UTC | 2020-01-01 01:05:00 UTC | 2020-01-01 00:50:00 UTC | 2020-01-01 01:05:00 UTC |
+|       |                         | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+| 2.0   | 2020-01-01 01:05:00 UTC | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+|       |                         | 2020-01-01 01:05:00 UTC | 2020-01-01 01:20:00 UTC |                         |                         |
+| 3.0   | 2020-01-01 01:05:01 UTC | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+|       |                         | 2020-01-01 01:05:00 UTC | 2020-01-01 01:20:00 UTC |                         |                         |
+
+
+
+### [ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)](ts_tumble.sql)
+Calculate the [tumbling window](https://cloud.google.com/dataflow/docs/concepts/streaming-pipelines#tumbling-windows) the input_ts belongs in
+
+```sql
+SELECT
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 900) AS min_15,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 600) AS min_10,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 60) As min_1
+```
+
+| min_15                  | min_10                  |                         |       
+|-------------------------|-------------------------|-------------------------|
+| 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
 
 ### [typeof(input ANY TYPE)](typeof.sql)
