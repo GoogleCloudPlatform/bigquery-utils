@@ -86,6 +86,7 @@ steps:
     - '-'
   args:
     - 'init'
+    - '--upgrade=true'
   id: 'terraform-init'
 - name: 'hashicorp/terraform'
   dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
