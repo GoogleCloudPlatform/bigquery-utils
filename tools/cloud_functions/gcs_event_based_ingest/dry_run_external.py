@@ -57,8 +57,7 @@ def main(args: argparse.Namespace):
     if args.query.startswith("gs://"):
         gsurl = args.query
         bq_client.query(gcs_ocn_bq_ingest.common.utils.read_gcs_file(
-            gcs_client, gsurl),
-                        job_config=job_config)
+            gcs_client, gsurl), job_config=job_config)
     else:
         with open(args.query, 'r') as query_file:
             bq_client.query(query_file.read(), job_config=job_config)
