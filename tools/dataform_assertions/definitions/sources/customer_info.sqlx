@@ -1,0 +1,7 @@
+config {
+    type: "declaration",
+    database: "ruinanliu-sandbox",
+    schema: "raw_data_zone",
+    name: "customer_info",
+    description: "A table containing a customer's information such as phone number, birthday, and etc."
+}

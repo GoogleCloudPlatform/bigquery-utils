@@ -1,0 +1,7 @@
+config {
+    type: "declaration",
+    database: "ruinanliu-sandbox",
+    schema: "raw_data_zone",
+    name: "customer",
+    description: "A table containing the customer's first name, last name, and second last name"
+}

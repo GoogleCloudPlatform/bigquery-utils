@@ -1,0 +1,11 @@
+customerID, date_of_birth, gender, marital_status, RFC, telephone_number, email
+1, "1956/09/13", "Male", "Married", "AAAA000000A0B1", "111111111x","Specimen.Test1@abc.com"
+2, "1956/09/14", "Female", "Single", "AAAA000000A0B2", "2222222222","Specimen.Test2@abc.com"
+3, "1956/09/15", "Transgender Female", "Married", "AAAA000000A0B3", "3333333333","Specimen.Test3@abc.com"
+4, "1956/11/03", "Transgender Male", "Single", "AAAA000000A0B4", "4444444444","Specimen.Test4@abc.com"
+5, "1956/09/17", "Female", "Married", "AAAA000000A0B5", "5555555555","S#$$%pecimen.Test5@abc.com"
+6, "2056/09/18", "Gender Variant", "Single", "AAAA000000A0B6", "6666666666","Specimen.Test6@abc.com"
+7, "1956/09/19", "Male", "Married", "AAAA000000A0B7", "7777777777","Specimen.Test7@abc.com"
+8, "195q/09/20", "Female1", "Single", "AAAA000000A0B8", "8888888888","Specimen.Test8@abc.com"
+9, "1956/14/21", "Male", "Married", "AAAA000000A0B9", "9999999999","Specimen.Test9.abc.com"
+10, "1856/09/35", "Prefer Not to Say", "Single1", "AAAA000000A1B0", "1234567890","Specimen.Test10@abc.com"
