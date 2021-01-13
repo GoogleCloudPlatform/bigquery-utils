@@ -249,8 +249,17 @@ def external_query(  # pylint: disable=too-many-arguments
     while time.monotonic() - start_poll_for_errors < WAIT_FOR_JOB_SECONDS:
         job.reload()
         if job.errors:
-            raise RuntimeError(
-                f"query job {job.job_id} failed quickly: {job.errors}")
+            msg = f"query job {job.job_id} failed quickly: {job.errors}"
+            for err in job.errors:
+                # BQ gives confusing warning about missing dataset if the
+                # external query refers to the wrong external table name.
+                # In this case we can give the end user a little more context.
+                if "missing dataset" in err.get("message", ""):
+                    raise RuntimeError(
+                        "External queries must select from the external table "
+                        "named 'temp_ext'. This error may be due to specifying"
+                        "the wrong name for the external table. " + msg)
+            raise RuntimeError(msg)
         time.sleep(JOB_POLL_INTERVAL_SECONDS)
 
 
