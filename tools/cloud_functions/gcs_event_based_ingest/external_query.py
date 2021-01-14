@@ -53,16 +53,23 @@ def main(args: argparse.Namespace):
             ]
     job_config: bigquery.QueryJobConfig = bigquery.QueryJobConfig()
     job_config.table_definitions = {'temp_ext': external_config}
-    job_config.dry_run = True
+    job_config.dry_run = args.dry_run
+    job: bigquery.QueryJob
     if args.query.startswith("gs://"):
         gsurl = args.query
-        bq_client.query(gcs_ocn_bq_ingest.common.utils.read_gcs_file(
-            gcs_client, gsurl), job_config=job_config)
+        job = bq_client.query(gcs_ocn_bq_ingest.common.utils.read_gcs_file(
+            gcs_client, gsurl),
+                              job_config=job_config)
     else:
         with open(args.query, 'r') as query_file:
-            bq_client.query(query_file.read(), job_config=job_config)
-    logging.info(f"successful dry run of {args.query} "
-                 f"with temp_ext = {args.external_config}")
+            job = bq_client.query(query_file.read(), job_config=job_config)
+    if not args.dry_run:
+        job.result()
+        print(f"query job {job.job_id} complete")
+        print(job.to_api_repr())
+    else:
+        logging.info(f"successful dry run of {args.query} "
+                     f"with temp_ext = {args.external_config}")
 
 
 def parse_args(args: List[str]) -> argparse.Namespace:
@@ -83,6 +90,12 @@ def parse_args(args: List[str]) -> argparse.Namespace:
         help="path to file containing external table definition",
         required=True,
     )
+
+    parser.add_argument("--dry-run",
+                        "-d",
+                        help="perform a dry run of the query",
+                        action='store_true')
+
     return parser.parse_args(args)
 
 

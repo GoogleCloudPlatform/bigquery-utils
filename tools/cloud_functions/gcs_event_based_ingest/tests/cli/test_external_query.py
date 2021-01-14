@@ -15,7 +15,7 @@
 import json
 import os
 
-import dry_run_external
+import external_query
 import pytest
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
@@ -49,11 +49,9 @@ def test_dry_run_external(tmp_path):
     external_path = tmp_path / "external.json"
     external_path.write_text(json.dumps(config))
 
-    args = dry_run_external.parse_args([
-        f"-q={query_path}",
-        f"-e={external_path}",
-    ])
-    dry_run_external.main(args)
+    args = external_query.parse_args(
+        [f"-q={query_path}", f"-e={external_path}", "--dry-run"])
+    external_query.main(args)
 
 
 @pytest.mark.IT
@@ -85,13 +83,11 @@ def test_failed_dry_run_external(tmp_path):
     external_path = tmp_path / "external.json"
     external_path.write_text(json.dumps(config))
 
-    args = dry_run_external.parse_args([
-        f"-q={query_path}",
-        f"-e={external_path}",
-    ])
+    args = external_query.parse_args(
+        [f"-q={query_path}", f"-e={external_path}", "--dry-run"])
     raised = False
     try:
-        dry_run_external.main(args)
+        external_query.main(args)
     except Exception:
         raised = True
     assert raised
