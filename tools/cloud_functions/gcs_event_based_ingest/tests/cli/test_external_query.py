@@ -14,6 +14,7 @@
 """integrtion tests for gcs_ocn_bq_ingest"""
 import json
 import os
+from google.cloud import storage
 
 import external_query
 import pytest
@@ -91,3 +92,5 @@ def test_failed_dry_run_external(tmp_path):
     except Exception:
         raised = True
     assert raised
+
+

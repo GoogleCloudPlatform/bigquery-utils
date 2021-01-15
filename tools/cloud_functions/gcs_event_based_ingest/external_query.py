@@ -94,7 +94,8 @@ def parse_args(args: List[str]) -> argparse.Namespace:
     parser.add_argument("--dry-run",
                         "-d",
                         help="perform a dry run of the query",
-                        action='store_true')
+                        action='store_true',
+                        default=False)
 
     return parser.parse_args(args)
 
