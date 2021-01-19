@@ -72,7 +72,7 @@ function execute_query() {
 #######################################
 function build_udf_testing_image() {
   gcloud builds submit "${UDF_DIR}"/tests/ \
-    --config="${UDF_DIR}"/tests/cloudbuild.yaml
+    --config="${UDF_DIR}"/tests/cloudbuild_udf_test_image.yaml
 }
 
 #######################################
