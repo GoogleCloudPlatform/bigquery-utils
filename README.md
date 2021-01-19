@@ -32,6 +32,7 @@ This repository is broken up into:
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
         the audit logs which can be used to power dashboards
         ([example](https://codelabs.developers.google.com/codelabs/bigquery-pricing-workshop/#0)).
+*   [Cloud Functions](/cloud_functions) - Cloud Functions to automate common use cases
 
 ## Public UDFs
 
