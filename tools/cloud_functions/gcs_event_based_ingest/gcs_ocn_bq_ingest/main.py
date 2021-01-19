@@ -17,6 +17,8 @@
 """Background Cloud Function for loading data from GCS to BigQuery.
 """
 import collections
+import collections.abc
+import copy
 import json
 import os
 import pathlib
@@ -37,7 +39,10 @@ DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
 MAX_SOURCE_URIS_PER_LOAD = 10**4
 
 DEFAULT_EXTERNAL_TABLE_DEFINITION = {
-    "sourceFormat": "CSV",
+    # The default must be a self describing data format
+    # because autodetecting CSV /JSON schemas is likely to not match
+    # expectations / assumptions of the transformation query.
+    "sourceFormat": "PARQUET",
 }
 
 DEFAULT_JOB_LABELS = {
@@ -152,18 +157,18 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
     default_query_config = bigquery.QueryJobConfig()
     default_query_config.use_legacy_sql = False
     default_query_config.labels = labels
-    bq_client = bigquery.Client(
-        client_info=CLIENT_INFO,
-        default_query_job_config=default_query_config)
+    bq_client = bigquery.Client(client_info=CLIENT_INFO,
+                                default_query_job_config=default_query_config)
 
-    print(f"looking for {gsurl}_config/bq_transform.sql")
+    print("looking for bq_transform.sql")
     external_query_sql = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/bq_transform.sql")
-    print(f"external_query_sql = {external_query_sql}")
     if not external_query_sql:
-        external_query_sql = look_for_transform_sql(gcs_client, gsurl)
+        external_query_sql = look_for_config_in_parents(gcs_client, gsurl,
+                                                        "bq_transform.sql")
     if external_query_sql:
         print("EXTERNAL QUERY")
+        print(f"found external query:\n{external_query_sql}")
         external_query(gcs_client, bq_client, gsurl, external_query_sql,
                        dest_table_ref,
                        create_job_id_prefix(dest_table_ref, batch_id))
@@ -217,15 +222,19 @@ def external_query(  # pylint: disable=too-many-arguments
     """
     external_table_config = read_gcs_file_if_exists(
         gcs_client, f"{gsurl}_config/external.json")
+    if not external_table_config:
+        external_table_config = look_for_config_in_parents(
+            gcs_client, gsurl, "external.json")
     if external_table_config:
         external_table_def = json.loads(external_table_config)
     else:
         print(f"Falling back to default CSV external table."
-              f" {gsurl}/_config/external.json not found.")
+              f" {gsurl}_config/external.json not found.")
         external_table_def = DEFAULT_EXTERNAL_TABLE_DEFINITION
 
     external_table_def["sourceUris"] = flatten2dlist(
         get_batches_for_prefix(gcs_client, gsurl))
+    print(f"external table def = {json.dumps(external_table_config, indent=2)}")
     external_config = bigquery.ExternalConfig.from_api_repr(external_table_def)
     job_config = bigquery.QueryJobConfig(
         table_definitions={"temp_ext": external_config}, use_legacy_sql=False)
@@ -317,10 +326,8 @@ def handle_duplicate_notification(bkt: storage.Bucket,
     success_created_unix_timestamp = success_blob.time_created.timestamp()
 
     claim_blob: storage.Blob = bkt.blob(
-        success_blob.name.replace(
-            SUCCESS_FILENAME,
-            f"_claimed_{success_created_unix_timestamp}")
-    )
+        success_blob.name.replace(SUCCESS_FILENAME,
+                                  f"_claimed_{success_created_unix_timestamp}"))
     try:
         claim_blob.upload_from_string("", if_generation_match=0)
     except google.api_core.exceptions.PreconditionFailed as err:
@@ -342,10 +349,9 @@ def _get_parent_config_file(storage_client, config_filename, bucket, path):
                                    f"gs://{bucket}/{config_path}")
 
 
-def look_for_transform_sql(storage_client: storage.Client,
-                           gsurl: str) -> Optional[str]:
-    """look in parent directories for _config/bq_transform.sql"""
-    config_filename = "bq_transform.sql"
+def look_for_config_in_parents(storage_client: storage.Client, gsurl: str,
+                               config_filename: str) -> Optional[str]:
+    """look in parent directories for _config/config_filename"""
     blob: storage.Blob = storage.Blob.from_string(gsurl)
     bucket_name = blob.bucket.name
     obj_path = blob.name
@@ -388,9 +394,9 @@ def construct_load_job_config(storage_client: storage.Client,
             config_q.append(json.loads(config))
         parts.pop()
 
-    merged_config = dict()
+    merged_config: Dict = {}
     while config_q:
-        merged_config.update(config_q.popleft())
+        recursive_update(merged_config, config_q.popleft(), in_place=True)
     print(f"merged_config: {merged_config}")
     return bigquery.LoadJobConfig.from_api_repr({"load": merged_config})
 
@@ -558,3 +564,29 @@ def removesuffix(in_str: str, suffix: str) -> str:
     if suffix and in_str.endswith(suffix):
         return in_str[:-len(suffix)]
     return in_str[:]
+
+
+def recursive_update(
+    original: Dict,
+    update: Dict,
+    in_place: bool = False
+):
+    """
+    return a recursively updated dictionary.
+
+    Note, lists will be completely overwritten by value in update if there is a
+    conflict.
+
+    original: (dict) the base dictionary
+    update:  (dict) the dictionary of updates to apply on original
+    in_place: (bool) if true then original will be mutated in place else a new
+        dictionary as a result of the update will be returned.
+    """
+    out = original if in_place else copy.deepcopy(original)
+
+    for key, value in update.items():
+        if isinstance(value, dict):
+            out[key] = recursive_update(out.get(key, {}), value)
+        else:
+            out[key] = value
+    return out

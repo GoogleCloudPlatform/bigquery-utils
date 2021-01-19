@@ -119,3 +119,86 @@ def test_default_destination_regex(test_input: str,
 ])
 def test_flattend2dlist(test_input, expected):
     assert gcs_ocn_bq_ingest.main.flatten2dlist(test_input) == expected
+
+
+@pytest.mark.parametrize(
+    "original, update, expected",
+    [
+        # yapf: disable
+        (  # empty original
+            {},
+            {
+                "a": 1
+            },
+            {
+                "a": 1
+            }
+        ),
+        (  # empty update
+            {
+                "a": 1
+            },
+            {},
+            {
+                "a": 1
+            }),
+        (  # basic update of top-level key
+            {
+                "a": 1
+            },
+            {
+                "a": 2
+            },
+            {
+                "a": 2
+            }),
+        (  # update of list
+            {
+                "a": [1]
+            },
+            {
+                "a": [2]
+            },
+            {
+                "a": [2]
+            }),
+        (  # update of nested key
+            {
+                "a": {
+                    "b": 1
+                }
+            },
+            {
+                "a": {
+                    "b": 2
+                }
+            },
+            {
+                "a": {
+                    "b": 2
+                }
+            }),
+        (  # don't drop keys that only appear in original
+            {
+                "a": {
+                    "b": 1,
+                    "c": 2
+                },
+                "d": 3
+            },
+            {
+                "a": {
+                    "b": 4
+                },
+            },
+            {
+                "a": {
+                    "b": 4,
+                    "c": 2
+                },
+                "d": 3
+            }),
+        # yapf: enable
+    ])
+def test_recursive_update(original, update, expected):
+    assert gcs_ocn_bq_ingest.main.recursive_update(original, update) == expected
