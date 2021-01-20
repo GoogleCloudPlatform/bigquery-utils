@@ -13,18 +13,175 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [csv_to_struct](#csv_to_structstrlist-string)
+* [find_in_set](#find_in_setstr-string-strlist-string)
+* [freq_table](#freq_tablearr-any-type)
+* [get_array_value](#get_array_valuek-string-arr-any-type)
+* [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
+* [json_typeof](#json_typeofjson-string)
+* [last_day](#lastdaydt-date)
+* [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
+* [percentage_change](#percentage_changeval1-float64-val2-float64)
+* [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
+* [ts_gen_keyed_timestamps](#ts_gen_keyed_timestampskeys-arraystring-tumble_seconds-int64-min_ts-timestamp-max_ts-timestamp)
+* [ts_linear_interpolate](#ts_linear_interpolatepos-timestamp-prev-structx-timestamp-y-float64-next-structx-timestamp-y-float64)
+* [ts_session_group](#ts_session_grouprow_ts-timestamp-prev_ts-timestamp-session_gap-int64)
+* [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
+* [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
+* [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
+* [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
+
+### [csv_to_struct(strList STRING)](csv_to_struct.sql)
+Take a list of comma separated key-value pairs and creates a struct.
+Input:
+strList: string that has map in the format a:b,c:d....
+Output: struct for the above map.
+```sql
+WITH test_cases AS (
+  SELECT NULL as s
+  UNION ALL
+  SELECT '' as s
+  UNION ALL
+  SELECT ',' as s
+  UNION ALL
+  SELECT ':' as s
+  UNION ALL
+  SELECT 'a:b' as s
+  UNION ALL
+  SELECT 'a:b,c:d' as s
+  UNION ALL
+  SELECT 'a:b' as s
+)
+SELECT key, value from test_cases as t, UNNEST(bqutil.fn.csv_to_struct(t.s)) s;
+```
+
+results:
+
+| key | value |
+|-----|-------|
+| a   | b     |
+| a   | b     |
+| c   | d     |
+| a   | b     |
+
+
+
+### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
+Returns the first occurance of str in strList where strList is a comma-delimited string.
+Returns null if either argument is null.
+Returns 0 if the first argument contains any commas.
+For example, find_in_set('ab', 'abc,b,ab,c,def') returns 3.
+Input:
+str: string to search for.
+strList: string in which to search.
+Output: Position of str in strList
+```sql
+WITH test_cases AS (
+  SELECT 'ab' as str, 'abc,b,ab,c,def' as strList
+  UNION ALL
+  SELECT 'ab' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+  UNION ALL
+  SELECT 'mobile,' as str, 'mobile,tablet,mobile/tablet,phone,text' as strList
+)
+SELECT bqutil.fn.find_in_set(str, strList) from test_cases
+```
+
+results:
+
+| f0_  |
+|------|
+|    3 |
+| NULL |
+|    1 |
+|    0 |
+
+
+
+### [freq_table(arr ANY TYPE)](freq_table.sql)
+Construct a frequency table (histogram) of an array of elements.
+Frequency table is represented as an array of STRUCT(value, freq)
+
+```sql
+SELECT bqutil.fn.freq_table([1,2,1,3,1,5,1000,5]) ft
+```
+
+results:
+
+|   Row   |  ft.value  |  ft.freq  |
+|---------|------------|-----------|
+|    1    |       1    |     3     |
+|         |       2    |     1     |
+|         |       3    |     1     |
+|         |       5    |     2     |
+|         |    1000    |     1     |
+
+
+
+### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
+Given a key and a map, returns the ARRAY type value.
+This is same as get_value except it returns an ARRAY type.
+This can be used when the map has multiple values for a given key.
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('a' AS key, 'AAA' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.get_array_value('b', a), bqutil.fn.get_array_value('a', a), bqutil.fn.get_array_value('c', a) from test;
+```
+
+results:
+
+|   f0_   |      f1_      |   f2_   |
+|---------|---------------|---------|
+| ["bbb"] | ["aaa","AAA"] | ["ccc"] |
+
+
+
+### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
+Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
+
+```sql
+WITH test AS (
+  SELECT ARRAY(
+    SELECT STRUCT('a' AS key, 'aaa' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('b' AS key, 'bbb' AS value) AS s
+    UNION ALL
+    SELECT STRUCT('c' AS key, 'ccc' AS value) AS s
+  ) AS a
+)
+SELECT bqutil.fn.get_value('b', a), bqutil.fn.get_value('a', a), bqutil.fn.get_value('c', a) from test;
+```
+
+results:
+
+| f0_ | f1_ | f2_ |
+|-----|-----|-----|
+| bbb | aaa | ccc |
+
+
 
 ### [int(v ANY TYPE)](int.sql)
 Convience wrapper which can be used to convert values to integers in place of
@@ -66,6 +223,59 @@ Row | source | target | distance
 
 > This function is based on the [Levenshtein distance algorithm](https://en.wikipedia.org/wiki/Levenshtein_distance) which determines the minimum number of single-character edits (insertions, deletions or substitutions) required to change one string into the other.
 
+### [json_typeof(json string)](json_typeof.sql)
+
+Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
+
+```sql
+SELECT
+       bqutil.fn.json_typeof('{"foo": "bar"}'),
+       bqutil.fn.json_typeof(TO_JSON_STRING(("foo", "bar"))),
+       bqutil.fn.json_typeof(TO_JSON_STRING([1,2,3])),
+       bqutil.fn.json_typeof(TO_JSON_STRING("test")),
+       bqutil.fn.json_typeof(TO_JSON_STRING(123)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(TRUE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(FALSE)),
+       bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
+
+object, array, string, number, boolean, boolean, null
+```
+
+
+### [last_day(dt DATE)](last_day.sql)
+
+Get the date representing the last day of the month.
+
+```sql
+SELECT bqutil.fn.last_day(DATE("1987-12-25"))
+  , bqutil.fn.last_day(DATE("1998-09-04"))
+  , bqutil.fn.last_day(DATE("2020-02-21")) -- leap year
+  , bqutil.fn.last_day(DATE("2019-02-21")) -- non-leap year
+```
+
+results:
+
+|     f0_    |     f1_    |     f2_    |     f3_    |
+|------------|------------|------------|------------|
+| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
+
+
+### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sql)
+Interpolate the current positions value from the preceding and folllowing coordinates
+
+```sql
+SELECT 
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(10 AS x, 10.0 AS y)),
+  bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(20 AS x, 10.0 AS y))
+```
+
+results:
+
+| f0_ | f1_ |
+|-----|-----|
+| 2.0 | 1.0 |
+
+
 ### [median(arr ANY TYPE)](median.sql)
 Get the median of an array of numbers.
 
@@ -102,6 +312,40 @@ SELECT bqutil.fn.nlp_compromise_people(
 
 ["felipe hoffa", "elliott brossard", "jordan tigani"]
 ```
+
+
+### [percentage_change(val1 FLOAT64, val2 FLOAT64)](percentage_change.sql)
+Calculate the percentage change (increase/decrease) between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_change(0.2, 0.4)
+  , bqutil.fn.percentage_change(5, 15)
+  , bqutil.fn.percentage_change(100, 50)
+  , bqutil.fn.percentage_change(-20, -45)
+```
+
+results:
+
+| f0_ | f1_ |  f2_  |   f3_   |
+|-----|-----|-------|---------|
+| 1.0 | 2.0 |  -0.5 |  -1.125 |
+
+
+### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sql)
+Calculate the percentage difference between two numbers.
+
+```sql
+SELECT bqutil.fn.percentage_difference(0.2, 0.8)
+  , bqutil.fn.percentage_difference(4.0, 12.0)
+  , bqutil.fn.percentage_difference(100, 200)
+  , bqutil.fn.percentage_difference(1.0, 1000000000)
+```
+
+results:
+
+| f0_ | f1_ |   f2_   | f3_ |
+|-----|-----|---------|-----|
+| 1.2 | 1.0 |  0.6667 | 2.0 |
 
 
 ### [radians(x ANY TYPE)](radians.sql)
@@ -146,6 +390,142 @@ SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 most tin
 ```
 
+### [ts_gen_keyed_timestamps(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts TIMESTAMP)](ts_gen_keyed_timestamps.sql)
+Generate a timestamp array associated with each key
+
+```sql
+SELECT *
+FROM 
+  UNNEST(bqutil.fn.ts_gen_keyed_timestamps(['abc', 'def'], 60, TIMESTAMP '2020-01-01 00:30:00', TIMESTAMP '2020-01-01 00:31:00))
+```
+
+| series_key | tumble_val
+|------------|-------------------------|
+| abc        | 2020-01-01 00:30:00 UTC |
+| def        | 2020-01-01 00:30:00 UTC |
+| abc        | 2020-01-01 00:31:00 UTC |
+| def        | 2020-01-01 00:31:00 UTC |
+  
+
+### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sql)
+Interpolate the positions value using timestamp seconds as the x-axis
+
+```sql
+select bqutil.fn.ts_linear_interpolate(
+  TIMESTAMP '2020-01-01 00:30:00', 
+  STRUCT(TIMESTAMP '2020-01-01 00:29:00' AS x, 1.0 AS y),
+  STRUCT(TIMESTAMP '2020-01-01 00:31:00' AS x, 3.0 AS y)
+)
+```
+
+| f0_ |
+|-----|
+| 2.0 |
+
+### [ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)](ts_session_group.sql)
+Function to compare two timestamp as being within the same session window. A timestamp in the same session window as its previous timestamp will evaluate as NULL, otherwise the current row's timestamp is returned.  The "LAST_VALUE(ts IGNORE NULLS)" window function can then be used to stamp all rows with the starting timestamp for the session window.
+
+```sql
+--5 minute (300 seconds) session window
+WITH ticks AS (
+  SELECT 'abc' as key, 1.0 AS price, CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP) AS ts
+  UNION ALL
+  SELECT 'abc', 2.0, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 3.0, CAST('2020-01-01 01:05:01 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 4.0, CAST('2020-01-01 01:09:01 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 'abc', 5.0, CAST('2020-01-01 01:24:01 UTC' AS TIMESTAMP)
+)
+SELECT
+  * EXCEPT(session_group),
+  LAST_VALUE(session_group IGNORE NULLS)
+    OVER (PARTITION BY key ORDER BY ts ASC) AS session_group
+FROM (
+  SELECT
+    *,
+    bqutil.fn.ts_session_group(
+      ts,
+      LAG(ts) OVER (PARTITION BY key ORDER BY ts ASC),
+      300
+    ) AS session_group
+  FROM ticks 
+)
+```
+
+| key | price | ts                      |  sesssion_group         |
+|-----|-------|-------------------------|-------------------------|
+| abc | 1.0   | 2020-01-01 01:04:59 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 2.0   | 2020-01-01 01:05:00 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 3.0   | 2020-01-01 01:05:01 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 4.0   | 2020-01-01 01:09:01 UTC | 2020-01-01 01:04:59 UTC |
+| abc | 5.0   | 2020-01-01 01:24:01 UTC | 2020-01-01 01:24:01 UTC |
+
+
+### [ts_slide(ts TIMESTAMP, period INT64, duration INT64)](ts_slide.sql)
+Calculate the sliding windows the ts parameter belongs to.
+
+```sql
+-- show a 15 minute window every 5 minutes and a 15 minute window every 10 minutes
+WITH ticks AS (
+  SELECT 1.0 AS price, CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP) AS ts
+  UNION ALL
+  SELECT 2.0, CAST('2020-01-01 01:05:00 UTC' AS TIMESTAMP)
+  UNION ALL
+  SELECT 3.0, CAST('2020-01-01 01:05:01 UTC' AS TIMESTAMP)
+)
+SELECT
+  price,
+  ts,
+  bqutil.fn.ts_slide(ts, 300, 900) as _5_15,
+  bqutil.fn.ts_slide(ts, 600, 900) as _10_15,
+FROM ticks
+```
+
+| price | ts                      | _5_15.window_start      | _5_15.window_end        | _5_15.window_start      | _5_15.window_end        |
+|-------|-------------------------|-------------------------|-------------------------|-------------------------|-------------------------|
+| 1.0   | 2020-01-01 01:04:59 UTC | 2020-01-01 00:50:00 UTC | 2020-01-01 01:05:00 UTC | 2020-01-01 00:50:00 UTC | 2020-01-01 01:05:00 UTC |
+|       |                         | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+| 2.0   | 2020-01-01 01:05:00 UTC | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+|       |                         | 2020-01-01 01:05:00 UTC | 2020-01-01 01:20:00 UTC |                         |                         |
+| 3.0   | 2020-01-01 01:05:01 UTC | 2020-01-01 00:55:00 UTC | 2020-01-01 01:10:00 UTC | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |
+|       |                         | 2020-01-01 01:00:00 UTC | 2020-01-01 01:15:00 UTC |                         |                         |
+|       |                         | 2020-01-01 01:05:00 UTC | 2020-01-01 01:20:00 UTC |                         |                         |
+
+
+
+### [ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)](ts_tumble.sql)
+Calculate the [tumbling window](https://cloud.google.com/dataflow/docs/concepts/streaming-pipelines#tumbling-windows) the input_ts belongs in
+
+```sql
+SELECT
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 900) AS min_15,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 600) AS min_10,
+  fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 60) As min_1
+```
+
+| min_15                  | min_10                  |                         |       
+|-------------------------|-------------------------|-------------------------|
+| 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
+
+
+### [typeof(input ANY TYPE)](typeof.sql)
+
+Return the type of input or 'UNKNOWN' if input is unknown typed value.
+
+```sql
+SELECT
+  bqutil.fn.typeof(""),
+  bqutil.fn.typeof(b""),
+  bqutil.fn.typeof(1.0),
+  bqutil.fn.typeof(STRUCT()),
+
+STRING, BINARY, FLOAT64, STRUCT
+```
+
 
 ### [url_keys(query STRING)](url_keys.sql)
 Get an array of url param keys.
@@ -169,6 +549,28 @@ SELECT bqutil.fn.url_param(
 ```
 
 
+### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sql)
+
+Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
+For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
+```sql
+WITH urls AS (
+  SELECT 'http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' as url
+  UNION ALL
+  SELECT 'rpc://facebook.com/' as url
+)
+SELECT bqutil.fn.url_parse(url, 'HOST'), bqutil.fn.url_parse(url, 'PATH'), bqutil.fn.url_parse(url, 'QUERY'), bqutil.fn.url_parse(url, 'REF'), bqutil.fn.url_parse(url, 'PROTOCOL') from urls
+```
+
+results:
+
+|     f0_      |     f1_     |       f2_        | f3_  | f4_  |
+|--------------|-------------|------------------|------|------|
+| facebook.com | path1/p.php | k1=v1&k2=v2#Ref1 | Ref1 | http |
+| facebook.com | NULL        | NULL             | NULL | rpc  |
+
+
+
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
 Convert a STRING formatted as a YYYYMMDD to a DATE
 
@@ -177,3 +579,34 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 
 "2020-12-20"
 ```
+
+
+### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
+Normalize a variable so that it has zero mean and unit variance.
+
+```sql
+with r AS (
+  SELECT 10 AS x
+  UNION ALL SELECT 20
+  UNION ALL SELECT 30
+  UNION ALL SELECT 40
+  UNION ALL SELECT 50
+),
+stats AS (
+  SELECT AVG(x) AS meanx, STDDEV(x) AS stddevx
+  FROM r
+)
+SELECT x, bqutil.fn.zeronorm(x, meanx, stddevx) AS zeronorm
+FROM r, stats;
+```
+
+returns:
+
+| Row | x | zeronorm |
+| --- | -- | ------- |
+| 1	| 10 | -12.649110640673518 |
+| 2	| 20 | -6.324555320336759 |
+| 3	| 30 | 0.0 |
+| 4	| 40 | 6.324555320336759 |
+| 5	| 50 | 12.649110640673518 |
+

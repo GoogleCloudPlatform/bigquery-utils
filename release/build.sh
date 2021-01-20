@@ -14,75 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Directory of this script
-SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
-
 # Directory of the UDFs
 UDF_DIR=udfs
 
-# Location for new datasets
-LOCATION=US
-
 # Set colors if terminal supports it
 ncolors=$(tput colors)
-if [[ $ncolors -gt 7 ]]; then
+if [[ "${ncolors}" -gt 7 ]]; then
   BOLD=$(tput bold)
   NORMAL=$(tput sgr0)
 fi
-
-#######################################
-# Retrieves the dataset of a file by
-# evaluating the mapping of the file's
-# parent directory to an associated
-# dataset.
-# Globals:
-#   None
-# Arguments:
-#   file
-# Returns:
-#   The dataset
-#######################################
-function get_dataset() {
-  local file=$1
-  local dataset=""
-  case $file in
-    *"community"*)
-      dataset="fn";;
-    *"netezza"*)
-      dataset="nz";;
-    *"oracle"*)
-      dataset="or";;
-    *"redshift"*)
-      dataset="rs";;
-    *"teradata"*)
-      dataset="td";;
-    *"vertica"*)
-      dataset="ve";;
-  esac
-  echo "$dataset"
-}
-
-
-#######################################
-# Creates a dataset if it doesn't exist
-# already.
-# Globals:
-#   LOCATION
-# Arguments:
-#   dataset
-# Returns:
-#   None
-#######################################
-function create_dataset_if_not_exists() {
-  local dataset=$1
-  bq show --headless $dataset > /dev/null 2>&1
-
-  # If we failed to show the dataset, it doesn't exist so create it.
-  if [[ $? -gt 0 ]]; then
-    bq mk --headless -d --data_location=$LOCATION $dataset
-  fi
-}
-
 
 #######################################
 # Executes a query file. If the execution
@@ -94,6 +34,7 @@ function create_dataset_if_not_exists() {
 #   LOCATION
 # Arguments:
 #   file
+#   dry_run
 # Returns:
 #   None
 #######################################
@@ -101,23 +42,114 @@ function execute_query() {
   local file=$1
   local dry_run=$2
 
-  printf "${BOLD}${file}${NORMAL}\n"
-  if [[ $dry_run == true ]]; then
-    bq query --headless --nouse_legacy_sql --dry_run "$(cat $file)"
+  printf "%s%s%s\n" "${BOLD}" "${file}" "${NORMAL}"
+  if [[ ${dry_run} = true ]]; then
+    if ! bq query \
+    --headless --nouse_legacy_sql --dry_run "$(cat "${file}")" ; then
+      printf "Failed to dry run: %s" "${file}"
+      # exit 1 is not called here because some dry-runs may fail due to
+      # variable placeholders which a user must replace with their own values.
+      # These dry-runs require manual revision of results.
+    fi
   else
-    bq query --headless --nouse_legacy_sql "$(cat $file)"
-  fi
-
-  if [[ $? -gt 0 ]]; then
-    printf "Failed to create: $file"
-    exit 1
+    if ! bq query \
+    --headless --nouse_legacy_sql "$(cat "${file}")" ; then
+      printf "Failed to create: %s" "${file}"
+      exit 1
+    fi
   fi
 }
 
+#######################################
+# Builds and hosts the Cloud Build image
+# used to test BigQuery UDFs.
+# Globals:
+#   UDF_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function build_udf_testing_image() {
+  gcloud builds submit "${UDF_DIR}"/tests/ \
+    --config="${UDF_DIR}"/tests/cloudbuild_udf_test_image.yaml
+}
+
+#######################################
+# Replaces all ${JS_BUCKET} placeholders
+# in javascript UDFs with bigquery-utils
+# public hosting bucket.
+# Globals:
+#   UDF_DIR
+#   _JS_BUCKET
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function replace_js_udf_bucket_placeholder() {
+  # Replace all variable placeholders "${JS_BUCKET}" in Javascript UDFs
+  # with the bucket that will host all javascript libraries
+  local sql_files
+  sql_files=$(find ${UDF_DIR} -type f -name "*.sql")
+  local num_files
+  num_files=$(echo "${sql_files}" | wc -l)
+  printf "Replacing UDF bucket placeholder \${JS_BUCKET} with %s\n" "${_JS_BUCKET}"
+  while read -r file; do
+    sed -i "s|\${JS_BUCKET}|${_JS_BUCKET}|g" "${file}"
+  done <<<"${sql_files}"
+}
+
+# Remove the ${_JS_BUCKET} directory
+# Globals:
+#   _JS_BUCKET
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function remove_gcs_js_directory(){
+  printf "Deleting Cloud Storage directory: %s\n" "${_JS_BUCKET}"
+  gsutil rm -rf "${_JS_BUCKET}"
+}
+
+#######################################
+# Builds all BigQuery UDFs within the repository.
+# Globals:
+#   UDF_DIR
+#   _JS_BUCKET
+#   SHORT_SHA
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function build_udfs() {
+  # Create all UDFs in a test dataset unique to the commit SHORT_SHA.
+  # Perform unit tests on any UDFs which have test cases.
+  # Delete test datasets when finished
+  if ! gcloud builds submit "${UDF_DIR}"/ \
+    --config="${UDF_DIR}"/cloudbuild.yaml \
+    --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}" ; then
+    # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
+    printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
+    local datasets
+    datasets=$(sed -n '/:/p' < udfs/dir_to_dataset_map.yaml | sed 's/.*: //g')
+    for dataset in ${datasets}; do
+      printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
+      bq --headless --synchronous_mode rm -r -f "${dataset}_test_${SHORT_SHA}"
+    done
+    remove_gcs_js_directory
+    exit 1
+  fi
+  remove_gcs_js_directory
+}
 
 #######################################
 # Executes dry-runs of all SQL scripts
-# within the repository.
+# within the repository except for the
+# udfs/ and the tools/ directories
+# since they're tested separately.
 # Globals:
 #   None
 # Arguments:
@@ -125,20 +157,53 @@ function execute_query() {
 # Returns:
 #   None
 #######################################
-function build() {
-  local sql_files=$(find . -type f -name "*.sql")
-  local num_files=$(echo "$sql_files" | wc -l)
+function dry_run_all_sql() {
+  # Get list of all .sql files
+  # (excluding udfs/ and tools/ directories)
+  local sql_files
+  sql_files=$(find . \
+  -wholename "./udfs/*" -prune -o \
+  -wholename "./tools/*" -prune -o \
+  -type f -name "*.sql" -print)
+  local num_files
+  num_files=$(echo "${sql_files}" | wc -l)
 
-  printf "Building $num_files database objects...\n"
+  printf "Dry-running %s SQL assets...\n" "${num_files}"
   while read -r file; do
-    local dataset=$(get_dataset $file)
-
-    if [[ ! -z $dataset ]]; then
-      execute_query $file true
-    fi
-  done <<< "$sql_files"
+    execute_query "${file}" true
+  done <<<"${sql_files}"
 }
 
+#######################################
+# Executes all build steps for SQL
+# assets within the repository.
+# Globals:
+#   UDF_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function build() {
+  replace_js_udf_bucket_placeholder
+
+  # Get a list of changed files in this commit.
+  local files_changed
+  files_changed=$(git diff --name-only origin/master)
+
+  # Only build the Cloud Build image (used for testing UDFs)
+  # if any files in the udfs/tests/ directory have changed.
+  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/; then
+    build_udf_testing_image
+  fi
+
+  # Only build the BigQuery UDFs if any files in the
+  # udfs/ directory have been changed
+  if echo "${files_changed}" | grep -q "${UDF_DIR}"/; then
+    build_udfs
+  fi
+
+}
 
 #######################################
 # Deploys UDFs to their associated datasets
@@ -150,43 +215,39 @@ function build() {
 # Returns:
 #   None
 #######################################
-function deploy() {
-  local sql_files=$(find $UDF_DIR -type f -name "*.sql")
-  local num_files=$(echo "$sql_files" | wc -l)
+function deploy_udfs() {
+  local sql_files
+  sql_files=$(find "${UDF_DIR}" -type f -name "*.sql")
+  local num_files
+  num_files=$(echo "${sql_files}" | wc -l)
 
-  printf "Creating or updating $num_files database objects...\n"
-  while read -r file; do
-    local dataset=$(get_dataset $file)
+  replace_js_udf_bucket_placeholder
 
-    if [[ ! -z $dataset ]]; then
-      create_dataset_if_not_exists $dataset
-
-      execute_query $file
-    fi
-  done <<< "$sql_files"
+  gcloud builds submit "${UDF_DIR}"/ \
+    --config="${UDF_DIR}"/cloudbuild_deploy.yaml \
+    --substitutions BRANCH_NAME="${BRANCH_NAME}",_JS_BUCKET="${_JS_BUCKET}"
 }
-
 
 #######################################
 # Main entry-point for execution
 # Globals:
-#   SCRIPT_DIR
-#   UDF_DIR
+#   BRANCH_NAME
+#   _PR_NUMBER
 # Arguments:
 #   None
 # Returns:
 #   None
 #######################################
 function main() {
-  cd $SCRIPT_DIR/..
-  local branch=$1
-  printf "Branch: $branch\n"
-
-  if [[ "$branch" == "master" ]]; then
-    deploy
+  # Only deploy UDFs when building master branch and there is
+  # no associated pull request, meaning the PR was approved
+  # and this is now building a commit on master branch.
+  if [[ "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
+    deploy_udfs
   else
     build
+    dry_run_all_sql
   fi
 }
 
-main "$@"
+main

@@ -1,0 +1,92 @@
+{
+  "features": [
+    {
+      "feature": "DQL_SELECT",
+      "dialectMap": {
+        "postgres": "SELECT",
+        "bigQuery": "SELECT",
+        "mySql": "SELECT"
+      }
+    },
+    {
+      "feature": "DQL_*",
+      "dialectMap": {
+        "postgres": "*",
+        "bigQuery": "*",
+        "mySql": "*"
+      }
+    },
+    {
+      "feature": "DQL_DISTINCT",
+      "dialectMap": {
+        "postgres": "DISTINCT",
+        "bigQuery": "DISTINCT",
+        "mySql": "DISTINCT"
+      }
+    },
+    {
+      "feature": "DQL_FROM",
+      "dialectMap": {
+        "postgres": "FROM",
+        "bigQuery": "FROM",
+        "mySql": "FROM"
+      }
+    },
+    {
+      "feature": "DQL_WHERE",
+      "dialectMap": {
+        "postgres": "WHERE",
+        "bigQuery": "WHERE",
+        "mySql": "WHERE"
+      }
+    },
+    {
+      "feature": "DQL_HAVING",
+      "dialectMap": {
+        "postgres": "HAVING",
+        "bigQuery": "HAVING",
+        "mySql": "HAVING"
+      }
+    },
+    {
+      "feature": "DQL_ORDER_BY",
+      "dialectMap": {
+        "postgres": "ORDER BY",
+        "bigQuery": "ORDER BY",
+        "mySql": "ORDER BY"
+      }
+    },
+    {
+      "feature": "DQL_ASC",
+      "dialectMap": {
+        "postgres": "ASC",
+        "bigQuery": "ASC",
+        "mySql": "ASC"
+      }
+    },
+    {
+      "feature": "DQL_DESC",
+      "dialectMap": {
+        "postgres": "DESC",
+        "bigQuery": "DESC",
+        "mySql": "DESC"
+      }
+    },
+    {
+      "feature": "DQL_LIMIT",
+      "dialectMap": {
+        "postgres": "LIMIT",
+        "bigQuery": "LIMIT",
+        "mySql": "LIMIT"
+      }
+    },
+    {
+      "feature": "DQL_OFFSET",
+      "dialectMap": {
+        "postgres": "OFFSET",
+        "bigQuery": "OFFSET",
+        "mySql": "OFFSET"
+      }
+    }
+  ]
+}

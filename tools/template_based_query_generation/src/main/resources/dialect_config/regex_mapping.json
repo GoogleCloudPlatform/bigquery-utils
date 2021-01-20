@@ -1,0 +1,18 @@
+{
+  "regexMapping": {
+    "DQL_SELECT": "DQL_SELECT {DQL_*|<expression_>[,<expression_>]|DQL_DISTINCT <expression_>[,<expression_>]}",
+    "DQL_FROM": "DQL_FROM <chosenTableName>",
+    "DQL_WHERE": "DQL_WHERE <condition_>",
+    "DQL_HAVING": "DQL_HAVING <condition_>",
+    "DQL_ORDER_BY": "DQL_ORDER_BY {<column_>|<function_>}[,{<column_>|<function_>}]{ DQL_ASC| DQL_DESC|}",
+    "DQL_LIMIT": "DQL_LIMIT <numRows>",
+    "DQL_OFFSET": "DQL_OFFSET <numRows>",
+    "DML_INSERT": "DML_INSERT <tableName>",
+    "DML_VALUES": "DML_VALUES <schemaValues>",
+    "DML_DELETE": "DML_DELETE <tableName>",
+    "DML_WHERE": "DML_WHERE <condition_>",
+    "DDL_CREATE": "DDL_CREATE {DDL_TABLE|DDL_TABLE_IF_NOT_EXISTS|DDL_OR_REPLACE_TABLE} <tableName> <schemaData>",
+    "DDL_PARTITION": "DDL_PARTITION <column_>",
+    "DDL_CLUSTER": "DDL_CLUSTER <column_>"
+  }
+}
