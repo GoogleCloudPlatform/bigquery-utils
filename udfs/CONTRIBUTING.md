@@ -58,13 +58,14 @@ the pull request can ensure a successful review process.
 Please follow these instructions to confirm that your test cases work as
 expected.
 
-1.  Change into the bigquery_utils top-level directory.
+1.  Change into the bigquery_utils [udfs/](./) directory:
+    *   `cd udfs/`
 
 1.  Create a Python virtual environment and activate it:
 
     *   `python3 -m venv venv`
     *   `source venv/bin/activate`
-    *   `pip install -r udfs/tests/requirements.txt`
+    *   `pip install -r tests/requirements.txt`
 
 1.  The test framework in this repo will create BigQuery datasets in your
     configured GCP project in order to test your UDF, and will delete them when
@@ -74,17 +75,18 @@ expected.
     *   `gcloud auth login`
     *   `gcloud config set project YOUR_PROJECT_ID`
 
-1.  Test your UDF by invoking the `run.sh` script and passing the name of the
-    UDF in lower caps as an argument.
+1.  Test your UDF by invoking the `run.sh` script and passing the pytest 
+    [`-k` argument](https://docs.pytest.org/en/stable/example/markers.html#using-k-expr-to-select-tests-based-on-their-name)
+    followed by the name of your UDF in lower case.
 
-    *   `bash udfs/tests/run.sh url_parse`
+    *   `bash tests/run.sh -k url_parse`
         *   Note: If your UDF name exists in multiple directories, you can add
             the UDF's parent directory as a prefix \
-            `bash udfs/tests/run.sh community_url_parse`
+            `bash tests/run.sh -k community_url_parse`
 
 1.  Run all tests by invoking the `run.sh` script with no arguments
 
-    *   `bash udfs/tests/run.sh`
+    *   `bash tests/run.sh`
 
 1.  If all the tests pass, submit your pull request to proceed to the code
     review process.
