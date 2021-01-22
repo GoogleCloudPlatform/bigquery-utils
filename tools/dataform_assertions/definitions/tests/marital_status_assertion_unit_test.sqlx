@@ -15,8 +15,8 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "marital_status_assertion_test",
-    tags:["marital_status_assertion_unit_test","all_test"],
+    name: "marital_status_assertions_unit_test",
+    tags:["marital_status_assertions_unit_test","all_test"],
     assertions: {
         nonNull: ["test_marital"],
         rowConditions: 

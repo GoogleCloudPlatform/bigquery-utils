@@ -15,8 +15,8 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "phone_assertions_test",
-    tags:["phone_unit_test", "all_test"],
+    name: "phone_assertions_unit_test",
+    tags:["phone_assertions_unit_test", "all_test"],
     assertions: {
         nonNull: ["phone_number"],
         rowConditions: 

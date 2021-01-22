@@ -15,8 +15,8 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "email_assertion_test",
-    tags:["email_assertion_unit_test","all_test"],
+    name: "email_assertions_unit_test",
+    tags:["email_assertions_unit_test","all_test"],
     assertions: {
         nonNull: ["test_email"],
         rowConditions: 

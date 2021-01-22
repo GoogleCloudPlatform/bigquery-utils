@@ -15,8 +15,8 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "gender_assertion_test",
-    tags:["gender_assertion_unit_test","all_test"],
+    name: "gender_assertions_unit_test",
+    tags:["gender_assertions_unit_test","all_test"],
     assertions: {
         nonNull: ["test_gender"],
         rowConditions: 

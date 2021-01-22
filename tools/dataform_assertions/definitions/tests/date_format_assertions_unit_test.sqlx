@@ -15,8 +15,8 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "date_format_test",
-    tags:["date_format_unit_test","all_test"],
+    name: "date_format_assertions_unit_test",
+    tags:["date_format_assertions_unit_test","all_test"],
     assertions: {
         nonNull: ["test_date"],
         rowConditions: 
