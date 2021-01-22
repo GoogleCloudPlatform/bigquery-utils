@@ -44,7 +44,7 @@ function test_gender_status(colName){
     This assertion checks whether the name is valid and only contain characters and numbers
 */
 function test_name_validity(colName){
-    var result_query = "REGEXP_CONTAINS(" + colName + ", r'^[a-zA-Z0-9]+$')"
+    var result_query = "REGEXP_CONTAINS(" + colName + ", r'^[a-zA-Z]+$')"
     return result_query
 }
 
