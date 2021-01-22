@@ -1,7 +1,17 @@
 config {
-    type: "declaration",
-    database: "ruinanliu-sandbox",
-    schema: "raw_data_zone",
+    type: "view",
+    schema: "YOUR_SCHEMA",
     name: "customer_info",
-    description: "A table containing a customer's information such as phone number, birthday, and etc."
+    description: "A view containing a customer's information such as phone number, birthday, and etc."
 }
+
+SELECT 1 AS customerID,  "1956/09/13" AS date_of_birth,  "Male" AS gender,               "Married" AS marital_status, "AAAA000000A0B1" AS RFC, "111111111x" AS telephone_number, "Specimen.Test1@abc.com" AS email     UNION ALL
+SELECT 2 AS customerID,  "1956/09/14" AS date_of_birth,  "Female" AS gender,             "Single" AS marital_status, "AAAA000000A0B2" AS RFC, "2222222222" AS telephone_number, "Specimen.Test2@abc.com" AS email      UNION ALL
+SELECT 3 AS customerID,  "1956/09/15" AS date_of_birth,  "Transgender Female" AS gender, "Married" AS marital_status, "AAAA000000A0B3" AS RFC, "3333333333" AS telephone_number, "Specimen.Test3@abc.com" AS email     UNION ALL
+SELECT 4 AS customerID,  "1956/11/03" AS date_of_birth,  "Transgender Male" AS gender,   "Single" AS marital_status, "AAAA000000A0B4" AS RFC, "4444444444" AS telephone_number, "Specimen.Test4@abc.com" AS email      UNION ALL
+SELECT 5 AS customerID,  "1956/09/17" AS date_of_birth,  "Female" AS gender,             "Married" AS marital_status, "AAAA000000A0B5" AS RFC, "5555555555" AS telephone_number, "S#$$%pecimen.Test5@abc.com" AS email UNION ALL
+SELECT 6 AS customerID,  "2056/09/18" AS date_of_birth,  "Gender Variant" AS gender,     "Single" AS marital_status, "AAAA000000A0B6" AS RFC, "6666666666" AS telephone_number, "Specimen.Test6@abc.com" AS email      UNION ALL
+SELECT 7 AS customerID,  "1956/09/19" AS date_of_birth,  "Male" AS gender,               "Married" AS marital_status, "AAAA000000A0B7" AS RFC, "7777777777" AS telephone_number, "Specimen.Test7@abc.com" AS email     UNION ALL
+SELECT 8 AS customerID,  "1958/09/20" AS date_of_birth,  "Female1" AS gender,            "Single" AS marital_status, "AAAA000000A0B8" AS RFC, "8888888888" AS telephone_number, "Specimen.Test8@abc.com" AS email      UNION ALL
+SELECT 9 AS customerID,  "1956/12/21" AS date_of_birth,  "Male" AS gender,               "Married" AS marital_status, "AAAA000000A0B9" AS RFC, "9999999999" AS telephone_number, "Specimen.Test9.abc.com" AS email     UNION ALL
+SELECT 10 AS customerID, "1856/09/15" AS date_of_birth, "Prefer Not to Say" AS gender,  "Single1" AS marital_status, "AAAA000000A1B0" AS RFC, "1234567890" AS telephone_number, "Specimen.Test10@abc.com" AS email

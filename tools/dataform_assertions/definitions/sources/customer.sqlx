@@ -1,7 +1,17 @@
 config {
-    type: "declaration",
-    database: "ruinanliu-sandbox",
-    schema: "raw_data_zone",
+    type: "view",
+    schema: "YOUR_SCHEMA",
     name: "customer",
-    description: "A table containing the customer's first name, last name, and second last name"
+    description: "A view containing the customer's first name, last name, and second last name"
 }
+
+SELECT 1 AS customerId,  "Test1" AS first_name, "Specimen1" AS last_name, "Specimen1" AS second_last_name UNION ALL
+SELECT 2 AS customerId,  "Test2" AS first_name, "Specimen2" AS last_name, "Specimen2" AS second_last_name UNION ALL
+SELECT 3 AS customerId,  "Tes+t3" AS first_name, "Specimen" AS last_name, "Specimen3" AS second_last_name UNION ALL
+SELECT 4 AS customerId,  "Test4" AS first_name, "Specimen" AS last_name, "Specimen4" AS second_last_name UNION ALL
+SELECT 5 AS customerId,  "Test5" AS first_name, "Specimen" AS last_name, "Specimen5" AS second_last_name UNION ALL
+SELECT 6 AS customerId,  "Test6" AS first_name, "Specimen" AS last_name, "Specimen6" AS second_last_name UNION ALL
+SELECT 7 AS customerId,  "Tes$t7" AS first_name, "Specimen" AS last_name, "Specimen7" AS second_last_name UNION ALL
+SELECT 8 AS customerId,  "Test8" AS first_name, "Specimen" AS last_name, "Specimen8" AS second_last_name UNION ALL
+SELECT 9 AS customerId,  "Testtt9" AS first_name, "Specimen" AS last_name, "Specimen9" AS second_last_name UNION ALL
+SELECT 10 AS customerId, "Alphayyyiu" AS first_name, "SpecimenY" AS last_name, "Specimen10" AS second_last_name
