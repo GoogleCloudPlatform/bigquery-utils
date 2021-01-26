@@ -21,13 +21,13 @@ config {
         nonNull: ["test_name"],
         rowConditions: 
         [
-            personal_info_assertions.test_same_character_more_than_two_times("test_name"),
+            personal_info_assertions.test_same_character_more_than_n_times("test_name",3),
             personal_info_assertions.test_name_validity("test_name")
         ]
     }
 }
 
-/* Uncomment each block of SQL statement to perform assertions tests */
+/* This test should fail 2 assertions*/
 
 /*
     test_name_validity

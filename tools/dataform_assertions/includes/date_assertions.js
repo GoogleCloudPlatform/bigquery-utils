@@ -16,7 +16,7 @@
     This assertion checks whether input date is future
 */
 function test_future_date(colName){
-    var result_query = "PARSE_DATE('%Y/%m/%d'," + colName+") < CURRENT_DATE()"
+    var result_query = `PARSE_DATE('%Y/%m/%d', ${colName}) < CURRENT_DATE()`
     return result_query
 }
 
@@ -24,7 +24,7 @@ function test_future_date(colName){
     This assertion checks whether the input birthdate is less than 100 yrs old
 */
 function test_valid_years(colName){
-    var result_query = "DATE_DIFF(CURRENT_DATE(), PARSE_DATE('%Y/%m/%d'," + colName + "), YEAR) < 100"
+    var result_query = `DATE_DIFF(CURRENT_DATE(), PARSE_DATE('%Y/%m/%d', ${colName}), YEAR) < 100`
     return result_query
 }
 
@@ -34,10 +34,10 @@ function test_valid_years(colName){
 function test_date_format(colName, date_format){
     try {
         if(date_format == "yyyy/mm/dd"){
-            var result_query = "REGEXP_CONTAINS(" + colName + ", r'^[0-9]{4}[/][0-9]{2}[/][0-9]{2}$')"
+            var result_query = `REGEXP_CONTAINS(${colName}, r'^[0-9]{4}[/][0-9]{2}[/][0-9]{2}$')`
             return result_query
         } else if (date_format == "yyyymmdd"){
-            var result_query = "REGEXP_CONTAINS(" + colName + ", r'^[0-9]{4}[0-9]{2}[0-9]{2}$')"
+            var result_query = `REGEXP_CONTAINS(${colName}, r'^[0-9]{4}[0-9]{2}[0-9]{2}$')`
             return result_query
         }
     } catch (error) {
