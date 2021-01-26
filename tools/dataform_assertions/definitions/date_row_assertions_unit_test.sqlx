@@ -14,15 +14,14 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "date_assertions_unit_test",
-    tags:["date_assertions_unit_test", "all_test"],
+    name: "date_row_assertions_unit_test",
+    tags:["date_row_assertions_unit_test", "all_test"],
     assertions: {
-        nonNull: ["test_date"],
+        nonNull: ["input"],
         rowConditions: 
         [
-            date_assertions.test_future_date("test_date"),
-            date_assertions.test_valid_years("test_date"),
-            date_assertions.test_date_format("test_date", "yyyy/mm/dd")
+            date_assertions.test_future_date("input"),
+            date_assertions.test_valid_years("input")
         ]
     }
 }
@@ -35,14 +34,14 @@ config {
     test_future_date
     Methods should return fasle if a date is future
 */
-SELECT "1997/11/03" AS test_date UNION ALL    --This should pass 
-SELECT "2008/08/08" AS test_date UNION ALL    --This should pass
-SELECT "2025/03/24" AS test_date UNION ALL             --This should fail
+SELECT "1997/11/03" AS input, True as expected_output UNION ALL
+SELECT "2008/08/08" AS input, True as expected_output UNION ALL
+SELECT "2025/03/24" AS input, False as expected_output UNION ALL
 
 /*
     test_valid_years
     Methods should return fasle if a person is above 100 years old
 */
-SELECT "1997/11/03" AS test_date UNION ALL    --This should pass 
-SELECT "2008/08/08" AS test_date UNION ALL    --This should pass
-SELECT "1769/03/24" AS test_date              --This should fail
+SELECT "1997/11/03" AS input, True as expected_output UNION ALL
+SELECT "2008/08/08" AS input, True as expected_output UNION ALL
+SELECT "1769/03/24" AS input, False as expected_output

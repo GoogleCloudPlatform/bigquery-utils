@@ -15,14 +15,14 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "personal_info_assertions_unit_test",
-    tags:["personal_info_assertions_unit_test","all_test"],
+    name: "personal_info_row_assertion_unit_test",
+    tags:["personal_info_row_assertion_unit_test","all_test"],
     assertions: {
-        nonNull: ["test_name"],
+        nonNull: ["input"],
         rowConditions: 
         [
-            personal_info_assertions.test_same_character_more_than_n_times("test_name",3),
-            personal_info_assertions.test_name_validity("test_name")
+            personal_info_assertions.test_same_character_more_than_n_times("input",3),
+            personal_info_assertions.test_name_validity("input")
         ]
     }
 }
@@ -33,14 +33,14 @@ config {
     test_name_validity
     Return false if name is irregular
 */
-SELECT "Alan" AS test_name UNION ALL    --This should pass 
-SELECT "Bob" AS test_name UNION ALL    --This should pass
-SELECT "yuy&^%" AS test_name UNION ALL             --This should fail
+SELECT "Alan" AS input, True as expected_output UNION ALL
+SELECT "Bob" AS input, True as expected_output UNION ALL
+SELECT "yuy&^%" AS input, False as expected_output UNION ALL
 
 /*
     test_same_character_more_than_two_times
     Return false if name repeated more than 3 times
 */
-SELECT "Alan" AS test_name UNION ALL    --This should pass 
-SELECT "Bob" AS test_name UNION ALL    --This should pass
-SELECT "Alannn" AS test_name              --This should fail
+SELECT "Alan" AS input, True as expected_output UNION ALL
+SELECT "Bob" AS input, True as expected_output UNION ALL
+SELECT "Alannn" AS input, False as expected_output

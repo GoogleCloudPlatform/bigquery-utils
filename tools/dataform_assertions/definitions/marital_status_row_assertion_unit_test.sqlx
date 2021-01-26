@@ -15,13 +15,13 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "marital_status_assertions_unit_test",
-    tags:["marital_status_assertions_unit_test","all_test"],
+    name: "marital_status_row_assertion_unit_test",
+    tags:["marital_status_row_assertion_unit_test","all_test"],
     assertions: {
-        nonNull: ["test_marital"],
+        nonNull: ["input"],
         rowConditions: 
         [
-            personal_info_assertions.test_marital_status("test_marital")
+            personal_info_assertions.test_marital_status("input")
         ]
     }
 }
@@ -34,6 +34,6 @@ config {
     test_marital_status
     Return false if marital status is not in the list defined Married, Single, Divorced, Widowed
 */
-SELECT "Married" AS test_marital UNION ALL    --This should pass 
-SELECT "Divorced" AS test_marital UNION ALL    --This should pass
-SELECT "Happy" AS test_marital              --This should fail
+SELECT "Married" AS input,  True as expected_output UNION ALL
+SELECT "Divorced" AS input, True as expected_output UNION ALL
+SELECT "Happy" AS input, False as expected_output

@@ -15,13 +15,13 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "gender_assertions_unit_test",
-    tags:["gender_assertions_unit_test","all_test"],
+    name: "email_row_assertion_unit_test",
+    tags:["email_row_assertion_unit_test","all_test"],
     assertions: {
-        nonNull: ["test_gender"],
+        nonNull: ["input"],
         rowConditions: 
         [
-            personal_info_assertions.test_gender_status("test_gender")
+            personal_info_assertions.test_email_validity("input")
         ]
     }
 }
@@ -31,9 +31,9 @@ config {
  */
 
 /*
-    test_gender_status
-    Return false if gender is not in the list defined gender
+    test_email_validity
+    Return false is email is not in the foramt of abc@xyc.com or other
 */
-SELECT "Female" AS test_gender UNION ALL    --This should pass 
-SELECT "Male" AS test_gender UNION ALL    --This should pass
-SELECT "one" AS test_gender              --This should fail
+SELECT "george.bail@google.com" AS input, True as expected_output UNION ALL
+SELECT "among.us@amongus.net" AS input, True as expected_output   UNION ALL
+SELECT "1736#$%.com" AS input, False as expected_output

@@ -26,7 +26,8 @@ Below is the recommended workflow when adding new custom dataform assertions and
 3. When finished adding unit test scripts, perform the command ```dataform run --tag [SELECT_TAG_TO_RUN]``` to check whether your custom assertions behaves accordingly. Note there are **3** custom tags to choose from ```date_unit_test```, ```personal_info_unit_test```, and ```phone_unit_test```. If you want to run all unit tests, use the tag ```all_test```
 
 ## Running Custom Assertions Unit Tests
-Custom assertions are tagged into 3 different catagories: ```date_unit_test```, ```personal_info_unit_test```, and ```phone_unit_test```. To run individual unit tests, run with this command: ```dataform run --tags [SELECT_TAG_TO_RUN]```. For example, ```dataform run --tags date_unit_test```. If you want to run all 3 unit test together, run with command ```dataform run --tags all_test``` 
+Row custom assertions unit tests are grouped into 7 different tags: ```date_format_row_assertions_unit_test```, ```date_row_assertions_unit_test```, ```email_row_assertion_unit_test```, ```gender_row_assertion_unit_test```, ```marital_status_row_assertion_unit_test```, ```personal_info_row_assertion_unit_test```, and ```phone_row_assertions_unit_test```.
+ To run individual unit tests, run with this command: ```dataform run --tags [SELECT_TAG_TO_RUN]```. For example, ```dataform run --tags date_row_assertions_unit_test```. If you want to run all 3 unit test together, run with command ```dataform run --tags all_test``` 
 
 ## Liscense
 All solutions within this repository are provided under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Please see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for more detailed terms and conditions.

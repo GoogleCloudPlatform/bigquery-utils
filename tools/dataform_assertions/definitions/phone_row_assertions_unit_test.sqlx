@@ -1,0 +1,67 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+config {
+    type: "view",
+    schema: "dev_data_zone",
+    name: "phone_row_assertions_unit_test",
+    tags:["phone_row_assertions_unit_test", "all_test"],
+    assertions: {
+        nonNull: ["input"],
+        rowConditions: 
+        [
+            phone_assertions.test_telephone_number_digits("input"),
+            phone_assertions.test_telephone_number_start_with_zero("input"),
+            phone_assertions.test_repeated_phone_number("input"),
+            phone_assertions.test_only_contain_digit("input")
+        ]
+    }
+}
+
+/* 
+    This test should fail 4 assertions
+ */
+
+/*
+    test_telephone_number_digits
+    Methods should return false if a phone number has less than 10 digits
+*/
+SELECT "8123456789" AS input, True as expected_output UNION ALL
+SELECT "1234567899" AS input, True as expected_output UNION ALL
+SELECT "1234567" AS input, False as expected_output    UNION ALL
+
+/*
+    test_telephone_number_start_with_zero
+    Methods should return false if a phone number starts with 0
+*/
+SELECT "5123456789" AS input, True as expected_output UNION ALL
+SELECT "4576839485" AS input, True as expected_output UNION ALL
+SELECT "0123456789" AS input, False as expected_output UNION ALL
+
+
+/*
+    test_repeated_phone_number
+    Methods should return false if a digit in a phone number repeated more than 3 times
+*/
+SELECT "2938475638" AS input, True as expected_output UNION ALL
+SELECT "7928374657" AS input, True as expected_output UNION ALL
+SELECT "1293847888" AS input, False as expected_output UNION ALL
+
+/*
+    test_only_contain_digit
+    Methods should return false if a digit in a phone number contains a character
+*/
+SELECT "7847563738" AS input, True as expected_output UNION ALL
+SELECT "6768907654" AS input, True as expected_output UNION ALL
+SELECT "374657389a" AS input, False as expected_output
