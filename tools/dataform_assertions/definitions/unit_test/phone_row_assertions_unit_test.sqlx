@@ -56,7 +56,7 @@ SELECT "0123456789" AS input, False as expected_output UNION ALL
 */
 SELECT "2938475638" AS input, True as expected_output UNION ALL
 SELECT "7928374657" AS input, True as expected_output UNION ALL
-SELECT "1293847888" AS input, False as expected_output UNION ALL
+SELECT "1111111111" AS input, False as expected_output UNION ALL
 
 /*
     test_only_contain_digit

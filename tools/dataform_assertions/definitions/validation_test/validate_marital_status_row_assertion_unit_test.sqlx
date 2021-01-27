@@ -1,0 +1,49 @@
+# Copyright 2021 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+config {
+    type: "assertion",
+    schema: "dataform_assertions_validation",
+    name: "validate_marital_status_row_assertion_unit_test",
+    tags:[
+      "validate_marital_status_row_assertion_unit_test",
+      "validate_all_unit_tests",
+    ],
+}
+
+######## Run the following steps to validate unit tests ################
+#
+# dataform run --tags marital_status_row_assertion_unit_test;
+# dataform run --tags validate_marital_status_row_assertion_unit_test;
+#
+########################################################################
+
+SELECT 1 AS failure
+FROM(
+  SELECT
+    test_data.input,
+    test_data.expected_output,
+    IF(assertion_view.input IS NULL AND test_data.expected_output IS NOT TRUE  # Failure test case did not pass
+       OR
+       assertion_view.input IS NOT NULL AND test_data.expected_output IS TRUE, # Success test case did not pass
+       'Test Failed',
+       'Test Passed') AS test_result
+  FROM
+    ${ ref("marital_status_row_assertion_unit_test") } test_data
+  LEFT JOIN
+    ${ ref("dev_data_zone_marital_status_row_assertion_unit_test_assertions_rowConditions") } assertion_view
+  USING
+    (input)
+)
+WHERE test_result = 'Test Failed'
