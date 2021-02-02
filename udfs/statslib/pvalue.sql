@@ -6,4 +6,5 @@ LANGUAGE js AS """
   return 1.0 - jStat['chisquare'].cdf(H, dof)
 """
 OPTIONS ( 
-    library="library=["gs://bqutil-lib/bq_js_libs/jstat-v1.9.4.min.js"]");
+    library=["gs://bqutil-lib/bq_js_libs/jstat-v1.9.4.min.js"]
+);
