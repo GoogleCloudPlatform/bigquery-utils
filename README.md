@@ -12,10 +12,14 @@ BigQuery.
 This repository is broken up into:
 
 *   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
+*   [Performance Testing](/performance_testing) - Examples for doing performance testing
+    *   [JMeter](/performance_testing/jmeter) - Examples for using JMeter to test BigQuery performance
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
     *   [billing](/scripts/billing) - Example queries over the GCP billing
         export
 *   [Stored Procedures](/stored_procedures) - Example stored procedures
+*   [Tools](/tools) - Custom tooling for working with BigQuery
+    *   [Cloud Functions](/tools/cloud_functions) - Cloud Functions to automate common use cases
 *   [UDFs](/udfs) - User-defined functions for common usage as well as migration
     *   [community](/udfs/community) - Community contributed user-defined
         functions
