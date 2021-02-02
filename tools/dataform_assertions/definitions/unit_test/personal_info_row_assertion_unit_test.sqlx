@@ -21,13 +21,11 @@ config {
         nonNull: ["input"],
         rowConditions: 
         [
-            personal_info_assertions.test_same_character_more_than_n_times("input",3),
-            personal_info_assertions.test_name_validity("input")
+            personal_info_assertions.test_name("input", 3)
         ]
     }
 }
 
-/* This test should fail 2 assertions*/
 
 /*
     test_name_validity

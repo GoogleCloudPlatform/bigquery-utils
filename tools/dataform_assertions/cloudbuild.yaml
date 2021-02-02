@@ -1,0 +1,23 @@
+steps:
+- name: 'gcr.io/ruinanliu-sandbox/dataform' #Installing dataform
+  args: ['install']
+- name: 'gcr.io/ruinanliu-sandbox/dataform' #Compiling dataform
+  args: ['compile']
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      gcloud secrets versions access latest --secret=dataform-key --format='get(payload.data)' | tr '_-' '/+' | base64 -d > .df-credentials.json
+- name: 'gcr.io/ruinanliu-sandbox/dataform' #Running unit test on DQ
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    dataform run --tags all_test || echo "fail"
+- name: 'gcr.io/ruinanliu-sandbox/dataform'
+  entrypoint: 'bash'
+  args: #Run unit test validation
+  - '-c'
+  - |
+    dataform run --tags validate_all_unit_tests

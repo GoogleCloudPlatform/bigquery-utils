@@ -21,17 +21,10 @@ config {
         nonNull: ["input"],
         rowConditions: 
         [
-            phone_assertions.test_telephone_number_digits("input"),
-            phone_assertions.test_telephone_number_start_with_zero("input"),
-            phone_assertions.test_repeated_phone_number("input"),
-            phone_assertions.test_only_contain_digit("input")
+            phone_assertions.test_phone_number("input")
         ]
     }
 }
-
-/* 
-    This test should fail 4 assertions
- */
 
 /*
     test_telephone_number_digits

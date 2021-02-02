@@ -88,11 +88,20 @@ function test_same_character_more_than_n_times(colName, n_times){
     return query_result
 }
 
+/*
+    This assertions combines custom assertions for names
+ */
+function test_name(colName, n_times){
+    var result_query = `${test_name_validity(colName)} AND ${test_same_character_more_than_n_times(colName, n_times)}`
+    return result_query
+}
+
 module.exports = {
     test_email_validity,
     test_marital_status,
     test_gender_status,
     test_name_validity,
     test_last_name_unique,
-    test_same_character_more_than_n_times
+    test_same_character_more_than_n_times,
+    test_name
 }

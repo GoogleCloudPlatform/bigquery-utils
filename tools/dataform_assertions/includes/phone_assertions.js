@@ -53,9 +53,19 @@ function test_only_contain_digit(colName){
     return result_query
 }
 
+/*
+    This assertions combines the above assertions
+*/
+function test_phone_number(colName){
+    var result_query = `${test_telephone_number_digits(colName)} AND ${test_telephone_number_start_with_zero(colName)} AND `+
+                       `${test_repeated_phone_number(colName)} AND ${test_only_contain_digit(colName)}`
+    return result_query
+}
+
 module.exports = {
     test_telephone_number_digits,
     test_telephone_number_start_with_zero,
     test_repeated_phone_number,
-    test_only_contain_digit
+    test_only_contain_digit,
+    test_phone_number
 }

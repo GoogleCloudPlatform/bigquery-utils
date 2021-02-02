@@ -46,8 +46,18 @@ function test_date_format(colName, date_format){
     }
 }
 
+/*
+    This assertions combines custom assertions for testing future date and valid years
+*/
+
+function test_date(colName, date_format){
+    var result_query = `${test_future_date(colName)} AND ${test_valid_years(colName)} AND ${test_date_format(colName, date_format)}`
+    return result_query
+}
+
 module.exports = {
     test_future_date,
     test_valid_years,
-    test_date_format
+    test_date_format,
+    test_date
 }

@@ -26,9 +26,6 @@ config {
     }
 }
 
-/* 
-    This test should fail 1 assertion
- */
 
 /*
     test_email_validity
