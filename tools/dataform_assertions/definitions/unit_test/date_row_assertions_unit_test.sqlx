@@ -31,22 +31,22 @@ config {
     test_future_date
     Methods should return fasle if a date is future
 */
-SELECT "1997/11/03" AS input, True as expected_output UNION ALL
-SELECT "2008/08/08" AS input, True as expected_output UNION ALL
-SELECT "2025/03/24" AS input, False as expected_output UNION ALL
+SELECT "1997/11/03" AS input, TRUE as expected_output UNION ALL
+SELECT "2008/08/08" AS input, TRUE as expected_output UNION ALL
+SELECT "2025/03/24" AS input, FALSE as expected_output UNION ALL
 
 /*
     test_valid_years
     Methods should return fasle if a person is above 100 years old
 */
-SELECT "1997/11/03" AS input, True as expected_output UNION ALL
-SELECT "2008/08/08" AS input, True as expected_output UNION ALL
-SELECT "1769/03/24" AS input, False as expected_output UNION ALL
+SELECT "1997/11/03" AS input, TRUE as expected_output UNION ALL
+SELECT "2008/08/08" AS input, TRUE as expected_output UNION ALL
+SELECT "1769/03/24" AS input, FALSE as expected_output UNION ALL
 
 /*
     test_date_format
     Methods should return fasle if a the date format miss matched
 */
-SELECT "1997/11/03" AS input, True as expected_output UNION ALL
-SELECT "2008/08/08" AS input, True as expected_output UNION ALL
-SELECT "03/24/2018" AS input, False as expected_output
+SELECT "1997/11/03" AS input, TRUE as expected_output UNION ALL
+SELECT "2008/08/08" AS input, TRUE as expected_output UNION ALL
+SELECT "03/24/2018" AS input, FALSE as expected_output

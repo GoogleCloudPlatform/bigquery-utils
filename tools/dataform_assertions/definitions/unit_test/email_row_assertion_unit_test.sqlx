@@ -31,6 +31,6 @@ config {
     test_email_validity
     Return false is email is not in the foramt of abc@xyc.com or other
 */
-SELECT "george.bail@google.com" AS input, True as expected_output UNION ALL
-SELECT "among.us@amongus.net" AS input, True as expected_output   UNION ALL
-SELECT "1736#$%.com" AS input, False as expected_output
+SELECT "george.bail@google.com" AS input, TRUE as expected_output UNION ALL
+SELECT "among.us@amongus.net" AS input, TRUE as expected_output   UNION ALL
+SELECT "1736#$%.com" AS input, FALSE as expected_output

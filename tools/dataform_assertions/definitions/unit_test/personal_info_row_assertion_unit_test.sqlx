@@ -39,6 +39,6 @@ SELECT "yuy&^%" AS input, False as expected_output UNION ALL
     test_same_character_more_than_two_times
     Return false if name repeated more than 3 times
 */
-SELECT "Alan" AS input, True as expected_output UNION ALL
-SELECT "Bob" AS input, True as expected_output UNION ALL
-SELECT "Alannn" AS input, False as expected_output
+SELECT "Alan" AS input, TRUE as expected_output UNION ALL
+SELECT "Bob" AS input, TRUE as expected_output UNION ALL
+SELECT "Alannn" AS input, FALSE as expected_output

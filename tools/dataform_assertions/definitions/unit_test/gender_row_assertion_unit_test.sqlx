@@ -31,6 +31,6 @@ config {
     test_gender_status
     Return false if gender is not in the list defined gender
 */
-SELECT "Female" AS input, True as expected_output   UNION ALL
-SELECT "Male" AS input, True as expected_output     UNION ALL
-SELECT "one" AS input, False as expected_output
+SELECT "Female" AS input, TRUE as expected_output   UNION ALL
+SELECT "Male" AS input, TRUE as expected_output     UNION ALL
+SELECT "one" AS input, FALSE as expected_output

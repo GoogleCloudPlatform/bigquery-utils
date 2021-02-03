@@ -31,6 +31,6 @@ config {
     test_marital_status
     Return false if marital status is not in the list defined Married, Single, Divorced, Widowed
 */
-SELECT "Married" AS input,  True as expected_output UNION ALL
-SELECT "Divorced" AS input, True as expected_output UNION ALL
-SELECT "Happy" AS input, False as expected_output
+SELECT "Married" AS input,  TRUE as expected_output UNION ALL
+SELECT "Divorced" AS input, TRUE as expected_output UNION ALL
+SELECT "Happy" AS input, FALSE as expected_output

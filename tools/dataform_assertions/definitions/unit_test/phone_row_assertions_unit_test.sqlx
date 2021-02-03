@@ -30,31 +30,31 @@ config {
     test_telephone_number_digits
     Methods should return false if a phone number has less than 10 digits
 */
-SELECT "8123456789" AS input, True as expected_output UNION ALL
-SELECT "1234567899" AS input, True as expected_output UNION ALL
-SELECT "1234567" AS input, False as expected_output    UNION ALL
+SELECT "8123456789" AS input, TRUE as expected_output UNION ALL
+SELECT "1234567899" AS input, TRUE as expected_output UNION ALL
+SELECT "1234567" AS input, FALSE as expected_output    UNION ALL
 
 /*
     test_telephone_number_start_with_zero
     Methods should return false if a phone number starts with 0
 */
-SELECT "5123456789" AS input, True as expected_output UNION ALL
-SELECT "4576839485" AS input, True as expected_output UNION ALL
-SELECT "0123456789" AS input, False as expected_output UNION ALL
+SELECT "5123456789" AS input, TRUE as expected_output UNION ALL
+SELECT "4576839485" AS input, TRUE as expected_output UNION ALL
+SELECT "0123456789" AS input, FALSE as expected_output UNION ALL
 
 
 /*
     test_repeated_phone_number
     Methods should return false if a digit in a phone number repeated more than 3 times
 */
-SELECT "2938475638" AS input, True as expected_output UNION ALL
-SELECT "7928374657" AS input, True as expected_output UNION ALL
-SELECT "1111111111" AS input, False as expected_output UNION ALL
+SELECT "2938475638" AS input, TRUE as expected_output UNION ALL
+SELECT "7928374657" AS input, TRUE as expected_output UNION ALL
+SELECT "1111111111" AS input, FALSE as expected_output UNION ALL
 
 /*
     test_only_contain_digit
     Methods should return false if a digit in a phone number contains a character
 */
-SELECT "7847563738" AS input, True as expected_output UNION ALL
-SELECT "6768907654" AS input, True as expected_output UNION ALL
-SELECT "374657389a" AS input, False as expected_output
+SELECT "7847563738" AS input, TRUE as expected_output UNION ALL
+SELECT "6768907654" AS input, TRUE as expected_output UNION ALL
+SELECT "374657389a" AS input, FALSE as expected_output
