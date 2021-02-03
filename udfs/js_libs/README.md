@@ -10,7 +10,7 @@ CREATE FUNCTION myFunc(a FLOAT64, b STRING)
   RETURNS STRING
   LANGUAGE js
   OPTIONS ( 
-    library=["gs://bqutil-lib/bq_js_libs/LIBRARY-NAME-v1.2.3.min.js"] 
+    library=["${JS_BUCKET}/LIBRARY-NAME-v1.2.3.min.js"] 
   )
   AS 
   """
