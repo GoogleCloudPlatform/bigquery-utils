@@ -57,34 +57,34 @@ function test_last_name_unique(colName1, colName2){
 /*
     The assertion checks that no name contain more than n repeated characters 
 */
-function test_same_character_more_than_n_times(colName, n_times){
-    var regex = `(a{${n_times},})+|` +
-                `(b{${n_times},})+|` +
-                `(c{${n_times},})+|` +
-                `(d{${n_times},})+|` +
-                `(e{${n_times},})+|` +
-                `(f{${n_times},})+|` +
-                `(g{${n_times},})+|` +
-                `(h{${n_times},})+|` +
-                `(i{${n_times},})+|` +
-                `(j{${n_times},})+|` +
-                `(k{${n_times},})+|` +
-                `(l{${n_times},})+|` +
-                `(m{${n_times},})+|` +
-                `(n{${n_times},})+|` +
-                `(o{${n_times},})+|` +
-                `(p{${n_times},})+|` +
-                `(q{${n_times},})+|` +
-                `(r{${n_times},})+|` +
-                `(s{${n_times},})+|` +
-                `(t{${n_times},})+|` +
-                `(u{${n_times},})+|` +
-                `(v{${n_times},})+|` +
-                `(w{${n_times},})+|` +
-                `(x{${n_times},})+|` +
-                `(y{${n_times},})+|` +
-                `(z{${n_times},})+`
-    var query_result = "NOT REGEXP_CONTAINS(" + colName + ", r'"+ regex + "')"
+function test_same_character_not_more_than_n_times(colName, n_times){
+    var regex = `(A{${n_times + 1},})+|` +
+                `(B{${n_times + 1},})+|` +
+                `(C{${n_times + 1},})+|` +
+                `(D{${n_times + 1},})+|` +
+                `(E{${n_times + 1},})+|` +
+                `(F{${n_times + 1},})+|` +
+                `(G{${n_times + 1},})+|` +
+                `(H{${n_times + 1},})+|` +
+                `(I{${n_times + 1},})+|` +
+                `(J{${n_times + 1},})+|` +
+                `(K{${n_times + 1},})+|` +
+                `(L{${n_times + 1},})+|` +
+                `(M{${n_times + 1},})+|` +
+                `(N{${n_times + 1},})+|` +
+                `(O{${n_times + 1},})+|` +
+                `(P{${n_times + 1},})+|` +
+                `(Q{${n_times + 1},})+|` +
+                `(R{${n_times + 1},})+|` +
+                `(S{${n_times + 1},})+|` +
+                `(T{${n_times + 1},})+|` +
+                `(U{${n_times + 1},})+|` +
+                `(V{${n_times + 1},})+|` +
+                `(W{${n_times + 1},})+|` +
+                `(X{${n_times + 1},})+|` +
+                `(Y{${n_times + 1},})+|` +
+                `(Z{${n_times + 1},})+`
+    var query_result = `NOT REGEXP_CONTAINS(UPPER(${colName}), r'${regex}')`
     return query_result
 }
 
