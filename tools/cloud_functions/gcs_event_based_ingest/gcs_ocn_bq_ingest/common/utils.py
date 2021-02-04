@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC.
+# Copyright 2021 Google LLC.
 # This software is provided as-is, without warranty or representation
 # for any use or purpose.
 # Your use of it is subject to your agreement with Google.
@@ -74,9 +74,13 @@ def external_query(  # pylint: disable=too-many-arguments
     # drop partition decorator if present.
     table_id = dest_table_ref.table_id.split("$")[0]
 
-    rendered_query = query.format(
-        dest_dataset=f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}",
-        dest_table=table_id)
+    # similar syntax to str.format but doesn't require escaping braces
+    # elsewhere in query (e.g. in a regex)
+    rendered_query = query\
+        .replace(
+            "{dest_dataset}",
+            f"`{dest_table_ref.project}`.{dest_table_ref.dataset_id}")\
+        .replace("{dest_table}", table_id)
 
     job: bigquery.QueryJob = bq_client.query(rendered_query,
                                              job_config=job_config,
