@@ -15,22 +15,22 @@
  */
 
 CREATE OR REPLACE FUNCTION st.kruskal_wallis(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
-    with H_raw AS(
-        with sums AS 
+    WITH H_raw AS(
+        WITH sums AS 
         (
-            with rank_data AS 
+            WITH rank_data AS 
             (
-                select d.factor AS f, d.val AS v, rank() over(order by d.val) AS r
-                from unnest(data) AS d 
+                SELECT d.factor AS f, d.val AS v, RANK() OVER(ORDER BY d.val) AS r
+                FROM UNNEST(data) AS d 
             ) #rank_data
-            select     
+            SELECT     
                 SUM(r) * (SUM(r) / COUNT(*)) AS sumranks, COUNT(*) AS n
-            from rank_data
+            FROM rank_data
             GROUP BY f
         ) # sums
         SELECT 12.00 /(SUM(n) *(SUM(n) + 1)) * SUM(sumranks) -(3.00 *(SUM(n) + 1)) AS H, 
-                      count(n) -1 AS DoF
+                      COUNT(n) -1 AS DoF
         FROM sums
     ) # H_raw
-    SELECT struct(H AS H, st.pvalue(H, DoF) AS p, DoF AS DoF) from H_raw
+    SELECT struct(H AS H, st.pvalue(H, DoF) AS p, DoF AS DoF) FROM H_raw
 ));
