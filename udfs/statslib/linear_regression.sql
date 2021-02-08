@@ -20,24 +20,24 @@ CREATE OR REPLACE FUNCTION st.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y F
 AS ((
      WITH results AS (
        WITH sums AS (
-         with d as (
-              select * from unnest(data)
+         WITH d AS (
+              SELECT * FROM unnest(data)
          )
-         select 
-            SUM(d.X) as Sx,
-            SUM(d.Y) as Sy,
-            SUM(d.X * d.Y) as Sxy,
-            SUM(d.X * d.X) as Sxx,
-            SUM(d.Y * d.Y) as Syy,
-            COUNT(*) as N
-         from d
+         SELECT 
+            SUM(d.X) AS Sx,
+            SUM(d.Y) AS Sy,
+            SUM(d.X * d.Y) AS Sxy,
+            SUM(d.X * d.X) AS Sxx,
+            SUM(d.Y * d.Y) AS Syy,
+            COUNT(*) AS N
+         FROM d
        )
        SELECT 
         ((Sy * Sxx) - (Sx * Sxy)) / ((N * (Sxx)) - (Sx * Sx)) AS a,
         ((N * Sxy) - (Sx * Sy))  / ((N * Sxx) - (Sx * Sx)) AS b,
         ((N * Sxy) - (Sx * Sy))/ SQRT(
             (((N * Sxx) - (Sx * Sx))* ((N * Syy - (Sy * Sy))))) AS r 
-        from sums
+        FROM sums
       )
-      select STRUCT(a, b, r) from results
+      SELECT STRUCT(a, b, r) FROM results
 ));

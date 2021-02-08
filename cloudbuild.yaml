@@ -14,12 +14,40 @@
 #
 
 steps:
-###########################################################
-# Step 1: Deploy
-###########################################################
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  entrypoint: 'bash'
-  args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
+  ############################################################
+  # Fetches master branch from GitHub and then hard "resets"
+  # to the _PR_NUMBER which triggered this build. This enables
+  # build.sh to build only what's changed relative to the
+  # master branch by checking the output of "git diff".
+  ############################################################
+- name: gcr.io/cloud-builders/git
+  entrypoint: bash
+  args:
+    - release/git_init.sh
+  env:
+    - _REPO_URL=${_REPO_URL}
+    - BRANCH_NAME=${BRANCH_NAME}
+    - _PR_NUMBER=${_PR_NUMBER}
 
+
+  ###########################################################
+  # Build and deploy
+  # (only deploy if triggered by a commit to master branch)
+  ###########################################################
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  entrypoint: bash
+  args:
+    - release/build.sh
+  env:
+    - BRANCH_NAME=${BRANCH_NAME}
+    - SHORT_SHA=${SHORT_SHA}
+    - _JS_BUCKET=${_JS_BUCKET}
+    - _PR_NUMBER=${_PR_NUMBER}
+
+substitutions:
+  _JS_BUCKET: gs://bqutil-lib/test_bq_js_libs/${SHORT_SHA} # default value
+  _REPO_URL:  https://github.com/GoogleCloudPlatform/bigquery-utils.git # default value
+
+timeout: 1800s # 30 minutes
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: N1_HIGHCPU_8

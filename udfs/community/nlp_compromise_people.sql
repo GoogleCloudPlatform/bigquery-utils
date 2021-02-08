@@ -20,4 +20,4 @@ LANGUAGE js AS """
   return nlp(str).people().out('topk').map(x=>x.normal)
 """
 OPTIONS (
-  library="gs://fh-bigquery/js/compromise.min.11.14.0.js");
+  library="${JS_BUCKET}/compromise-v11.14.3.min.js");

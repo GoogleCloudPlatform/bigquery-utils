@@ -1,0 +1,18 @@
+[
+  {
+    "name": "N_NATIONKEY",
+    "type": "INT64"
+  },
+  {
+    "name": "N_NAME",
+    "type": "STRING"
+  },
+  {
+    "name": "N_REGIONKEY",
+    "type": "INT64"
+  },
+  {
+    "name": "N_COMMENT",
+    "type": "STRING"
+  }
+]

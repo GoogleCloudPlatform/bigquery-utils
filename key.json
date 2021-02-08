@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "nih-bq",
+  "private_key_id": "350b8626ac6bff2e3c0b580352a394d39a044ad0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQDFXCD+OQdK5jUK\nEqp4Te1+fmuwSYPUZAreBZtNqEFsNv7/TLuLbqAPNUxcP/1RlpSQ19aOc6cjIUPn\n09R+lkWbhdlbE5K+WsL5LbOJqzXbGDDjQJE8Vpta6Qz41Y0GQOX1iIItTcz/db6O\nGDQ1YHKHOZoGR+6V0J5y3vpF96IeFNUn4JMB8po5WWBhDwmNJOSVpTcZuQ0AisYk\nNWBvPNK2eNZGpCvnYo+sxXCOqgpYY7LuSw3e7OOCIyyadyn1ouGyiRXqb/UR9vGN\noDYJyyff5f3qE9uMM7lfUQ7j0Fg2ZOf52aBlciCE+hNEDiIE1IenWOjJ9cl+/fsR\nT7D+4VUrAgMBAAECgf9C0EMFzZ3/vUTiJBo8oCUcAwXHUxv4yzrima358abe+79Y\nA/d5507zLG1YIvxJ+AWpA2j00N0ZsilK/RZIb0HMD4Qwpm+yAbKqqM4fIoHDqmzi\ngk6oyVPOyGxGfAVCGLZrvnWo4K3bI1a0xCeTP74ws/obe5P0eVaAN6ctXf2EMPCL\ndGztLWkKrbqSLN44pyMUqbhFrAivbg+ErlPH1N1IAZEvAfHB0xEtUcZvL0x5F962\nPvgFD2cQspnFxhkEL89mPD8Pgf1j7+Ntwp81x1lgRh0F0HW9lGTk9KlOP5TY+Ykc\n7p1mmn1SQReMX0MwRD7BAVCAcuHB3z5vb1LT2yECgYEA9QulrA25lfiEnP5ZrFty\nR7oGcz0MYTU9Y6/PhR7hqQbij5pmtBrf2Xgr71dsQxMmoydxIVsirFR+hRbN6hAd\nWYIuCUy0q1SHbCw/pHRqxpS1yJGXQkzp5F9T3s6xDJH0uqprKRbDEoTo5NjRigjI\n/OBvvjAwBAcmoCsVDGFf3NUCgYEAzi7B4eOsNNY620N78a8soZVRkdaYExunvDUp\nREn6vA96K4cYqL1whfRxRt3CgWOWohNPDTTvXjFJFl8b2SG6OqRn6UfP0O7h5cbY\nisdkos5FaKd4OBnBjq07i91ED0wmLwUwQSejkDER7gRzTnOXD6O1w7AiLTqJkSFF\nM5gNaf8CgYB2kZctZEq7bU/FozECvBDU8gcy9YQq+RbmSGiSUjoAjotLzvsJBMPx\ntzsTCWsiHX8hjPEpoa5qUkwR29HxArEg4WOjLlFxYWpRhiuZSJdt1QEMtp3I/+xg\ni1vKwJpcqbcQJ2vIqvHi4RrLuLnTH6MY8QRAs5JYMJmZAJ+jqO44rQKBgGLJNEuu\nccu++OQlKTVa4N9qU3K0hphhH7SlI+h8KY4BPF+ukroGSetkewGhLpgfxwRQjAef\n3TAcHRCC8SzPZBLEwqSaq49HZSRaaVXUwvreKZNC6e63KG3bwjP5B6rsqT7OFZii\nDVQArr6Dk1t7Nl1f6q6frUBOU6sdbbKSn5qxAoGAHjvIdGMIv83RQZjEi9v9n30G\nkUZoazHXFPKQyGdK2g9GkALm2wIOvHAGsa+0pXCx9QbxbBElhUCs0eXQBpFC+r8e\nKeuM8TihWGvu9AXEKhzEHwm0zICJc8wk1W/+bRB/O6yZPZ55Q1iydhxGyLf644G1\nJsbbWq4EnmRwqzPUdOM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "nih-bq@nih-bq.iam.gserviceaccount.com",
+  "client_id": "108143622486451250165",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nih-bq%40nih-bq.iam.gserviceaccount.com"
+}
