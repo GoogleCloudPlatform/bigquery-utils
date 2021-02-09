@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION st.kruskal_wallis(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
+CREATE OR REPLACE FUNCTION fn.kruskal_wallis(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
     WITH H_raw AS(
         WITH sums AS 
         (
