@@ -25,6 +25,7 @@ from yaml import SafeLoader
 
 from google.cloud import bigquery
 
+
 DATASET_SUFFIX = f'_test_{os.getenv("SHORT_SHA")}'
 # Some javascript libraries have issues with webpack's auto
 # minifier and therefore must be placed in the set below
