@@ -7,6 +7,7 @@ The dashboard is comprised of the following reports:
 3. [Reservation Utilization Report](./docs/reservation_utilization.md)
 4. [Job Execution Report](./docs/job_execution.md)
 5. [Job Error Report](./docs/job_error.md)
+6. [Job Comparison Report](./docs/job_comparison.md)
 
 The above links will direct you to documentation for each individual report which will describe its contents in more detail.
 
@@ -35,6 +36,7 @@ Log in to Data Studio and create a copy of the following data sources. More info
 6. [Reservation Utilization 30 Days](https://datastudio.google.com/u/0/datasources/6547f04e-3278-4576-91da-63a283c444e0)
 7. [Job Usage](https://datastudio.google.com/u/0/datasources/041aadcc-d1fc-4ea9-8103-ad21059c94dd)
 8. [Job Errors](https://datastudio.google.com/u/0/datasources/a4bedfd8-d496-4798-af03-1998f9c88efd)
+9. [Job Comparison]()
 
 #### 1.2 Set the billing project
 Once a copy is made, Data Studio will display the details for the data source. For each data source, enter the project id of the Billing Project. It is recommended to use the administration project where the capacity commitments were purchased, however a different billing project can be used.
@@ -60,7 +62,7 @@ where `{project_id}` is the project id of the billing project and `{region_name}
 
 When copying the Reservation Utilization data sources, you must also do the following:
 1. Replace all instances `"admin-project:US."` with `"{project_id}:{location}."`, where `{project_id}` is the project id of your administration project and `{location}` is the GCP region or multi-region where they are located.
-2. Replace all instances of `TIMESTAMP("2020-07-15 23:59:59.000 UTC")` with `CURRENT_TIMESTAMP()`.
+2. Replace all instances of `TIMESTAMP("2021-02-01 23:59:59.000 UTC")` with `CURRENT_TIMESTAMP()`.
 &nbsp;  
 
 Once all modifications are complete and a Billing Project is specified, click "Reconnect".
