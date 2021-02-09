@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION st.kruskal_wallis(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
+CREATE OR REPLACE FUNCTION fn.kruskal_wallis(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
     WITH H_raw AS(
         WITH sums AS 
         (
@@ -32,5 +32,5 @@ CREATE OR REPLACE FUNCTION st.kruskal_wallis(data ARRAY<STRUCT<factor STRING, va
                       COUNT(n) -1 AS DoF
         FROM sums
     ) # H_raw
-    SELECT struct(H AS H, st.pvalue(H, DoF) AS p, DoF AS DoF) FROM H_raw
+    SELECT struct(H AS H, fn.pvalue(H, DoF) AS p, DoF AS DoF) FROM H_raw
 ));
