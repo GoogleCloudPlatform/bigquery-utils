@@ -16,7 +16,7 @@
 
 
 
-CREATE OR REPLACE FUNCTION st.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>) 
+CREATE OR REPLACE FUNCTION fn.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>) 
 AS ((
      WITH results AS (
        WITH sums AS (
