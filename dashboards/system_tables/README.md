@@ -18,6 +18,7 @@ The underlying SQL queries for each report can be found [here](./sql). These que
 ### Prerequisites
 In order to create the dashboard and query the INFORMATION_SCHEMA tables a user must have access to the following INFORMATION_SCHEMA tables:
 - `INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION`
+- `INFORMATION_SCHEMA.JOBS_TIMELINE_BY_ORGANIZATION`
 - `INFORMATION_SCHEMA.CAPACITY_COMMITMENT_CHANGES_BY_PROJECT`
 - `INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT`
 - `INFORMATION_SCHEMA.ASSIGNMENT_CHANGES_BY_PROJECT`
@@ -36,7 +37,11 @@ Log in to Data Studio and create a copy of the following data sources. More info
 6. [Reservation Utilization 30 Days](https://datastudio.google.com/u/0/datasources/6547f04e-3278-4576-91da-63a283c444e0)
 7. [Job Usage](https://datastudio.google.com/u/0/datasources/041aadcc-d1fc-4ea9-8103-ad21059c94dd)
 8. [Job Errors](https://datastudio.google.com/u/0/datasources/a4bedfd8-d496-4798-af03-1998f9c88efd)
-9. [Job Comparison]()
+9. [Job Comparison](https://datastudio.google.com/datasources/d5a10d1c-89e8-4a0e-a169-c21eab8cd273)
+10. [Job Concurrency Slow](https://datastudio.google.com/datasources/b3c48dfa-65a0-4bd8-9b7f-4bab965fe695)
+11. [Job Concurrency Fast](https://datastudio.google.com/datasources/c61def4f-99e2-4861-b882-d5d8ae0ab7a6)
+12. [Job Analyzer - Slow Job](https://datastudio.google.com/datasources/5fae59f6-ce74-433d-bdec-42795b83cdf1)
+13. [Job Analyzer - Fast Job](https://datastudio.google.com/datasources/aabb6aa4-4640-4698-aedb-1a00179e7508)
 
 #### 1.2 Set the billing project
 Once a copy is made, Data Studio will display the details for the data source. For each data source, enter the project id of the Billing Project. It is recommended to use the administration project where the capacity commitments were purchased, however a different billing project can be used.
