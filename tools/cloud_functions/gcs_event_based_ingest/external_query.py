@@ -57,9 +57,8 @@ def main(args: argparse.Namespace):
     job: bigquery.QueryJob
     if args.query.startswith("gs://"):
         gsurl = args.query
-        job = bq_client.query(gcs_ocn_bq_ingest.common.utils.read_gcs_file(
-            gcs_client, gsurl),
-                              job_config=job_config)
+        query = gcs_ocn_bq_ingest.common.utils.read_gcs_file(gcs_client, gsurl)
+        job = bq_client.query(query, job_config=job_config)
     else:
         with open(args.query, 'r') as query_file:
             job = bq_client.query(query_file.read(), job_config=job_config)
@@ -68,8 +67,8 @@ def main(args: argparse.Namespace):
         print(f"query job {job.job_id} complete")
         print(job.to_api_repr())
     else:
-        logging.info(f"successful dry run of {args.query} "
-                     f"with temp_ext = {args.external_config}")
+        logging.info("successful dry run of %s  with temp_ext = %s",
+                     args.query, args.external_config)
 
 
 def parse_args(args: List[str]) -> argparse.Namespace:

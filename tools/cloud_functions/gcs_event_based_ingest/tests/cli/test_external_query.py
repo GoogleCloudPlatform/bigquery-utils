@@ -17,7 +17,6 @@ import os
 
 import external_query
 import pytest
-from google.cloud import storage
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 
@@ -92,5 +91,3 @@ def test_failed_dry_run_external(tmp_path):
     except Exception:
         raised = True
     assert raised
-
-
