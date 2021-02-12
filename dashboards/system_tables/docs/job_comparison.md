@@ -24,7 +24,7 @@ This table allows the user to identify which metrics may be causing performance 
 ![Side-by-side Job Comparison](../images/job_comparison/side_by_side_comparison.png)
 
 ### Concurrency Comparison
-This section allows a user to compare the reservation's respective state while each job ran. The user can also adjust the `Time Interval` dropdown to adjust how to aggregate data at either per-minute, hourly, or daily intervals.
+This section allows a user to compare the reservation's respective state while each job ran. The user can also adjust the `Time Interval` dropdown to adjust how to aggregate data at either per-minute or per-hour intervals.
 
 ### Concurrent Active Jobs in Same Project
 This time seres graph breaks down the count of active and pending jobs which executed at the same time as both the slow and fast job. Analyzing the job count at each time period can indicate changes in demand for slots, as a high concurrency can mean less slots are available for each job, therefore impacting performance.
@@ -47,3 +47,9 @@ This is useful as it can indicate changes in data shape. Specifically, the `inpu
 Additionally, other stages can indicate areas for optimization in the query, such as the `join` stage, which can show if the data is unbalanced.
 
 ![Job Stages](../images/job_comparison/job_stages.png)
+
+### Slot Utilization and Capacity Overview
+This time series graph displays the total slot capacity allocated and used during the query's runtime.
+The graph displays the reservation's slot capacity, as well as how many slots were actually used to give signals about the demand. 
+The graph also displays the organization-wide capacity. This is useful to see as if a reservation used more than its granted capacity, it likely used
+idle slots from other reservations in the organization.

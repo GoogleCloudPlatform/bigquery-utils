@@ -34,16 +34,43 @@ WITH
     reservation_id
   FROM
     -- PUBLIC DASHBOARD USE ONLY
-  	-- Modify this to use your project's INFORMATION_SCHEMA table as follows:
-  	-- `region-{region_name}`.INFORMATION_SCHEMA.{table}
+    -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
+    -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
     `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
   WHERE
-    job_id = @job_param ),
-reservation_capacity AS (
+    job_id = @job_param),
+   organization_capacity AS (
   SELECT
-    slot_capacity,
+    SUM(slot_capacity) AS org_capacity
+  FROM (
+    SELECT
+      slot_capacity AS slot_capacity,
+      reservation_name,
+      change_timestamp,
+      action,
+      -- Find the most recent reservation update grouped by reservation
+      DENSE_RANK() OVER (PARTITION BY reservation_name ORDER BY change_timestamp DESC) AS rownum
+    FROM
+      -- PUBLIC DASHBOARD USE ONLY
+      -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
+      -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
+      `region-us`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT
+    WHERE
+      change_timestamp <= (
+      SELECT
+        creation_time
+      FROM
+        job_info) ) reservation_cap
+  WHERE
+    reservation_cap.rownum = 1
+    -- Remove deleted reservations, so that only active reservations are displayed
+    AND action != "DELETE" ),
+  reservation_capacity AS (
+  SELECT
+    slot_capacity AS reservation_capacity,
     creation_time,
     end_time,
+    job_info.project_id,
     job_info.reservation_id
   FROM (
     SELECT
@@ -52,8 +79,8 @@ reservation_capacity AS (
       DENSE_RANK() OVER (ORDER BY change_timestamp DESC) AS rownum
     FROM
       -- PUBLIC DASHBOARD USE ONLY
-  	  -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
-  	  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
+      -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
+      -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
       `region-us`.INFORMATION_SCHEMA.RESERVATION_CHANGES_BY_PROJECT
     WHERE
       change_timestamp <= (
@@ -71,7 +98,13 @@ reservation_capacity AS (
   ON
     reservation_cap.reservation_id = job_info.reservation_id
   WHERE
-    reservation_cap.rownum = 1 )
+    reservation_cap.rownum = 1 ),
+ joined_capacity AS (SELECT
+  *
+FROM
+  reservation_capacity
+CROSS JOIN
+  organization_capacity    )
 SELECT
   DATETIME_TRUNC(DATETIME(period_start),
     MINUTE) period_start,
@@ -83,10 +116,12 @@ SELECT
   timeline_view.reservation_id,
   job_type,
   "minute" AS unit,
-  slot_capacity,
+  reservation_capacity,
+  org_capacity,
   COUNT(DISTINCT
   IF
-    (state = 'RUNNING',
+    (state = 'RUNNING'
+      AND timeline_view.project_id = joined_capacity.project_id,
       timeline_view.job_id,
       NULL)) AS running_jobs,
   COUNT(DISTINCT
@@ -96,26 +131,36 @@ SELECT
       NULL)) AS pending_projects,
   COUNT(DISTINCT
   IF
-    (state = 'PENDING',
+    (state = 'PENDING'
+      AND timeline_view.project_id = joined_capacity.project_id,
       timeline_view.job_id,
       NULL)) AS pending_jobs,
+  SUM(period_slot_ms) / (1000 * 60) AS reservation_slots_used,
+  SUM(
+  IF
+    (timeline_view.project_id = joined_capacity.project_id,
+      (period_slot_ms),
+      0)) / (1000 * 60) AS project_slots_used,
+  SUM(period_slot_ms) / (1000 * 60) / reservation_capacity AS reservation_utilization,
+
 FROM
   -- PUBLIC DASHBOARD USE ONLY
   -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
-  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
+  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
   `region-us`.INFORMATION_SCHEMA.JOBS_TIMELINE_BY_ORGANIZATION timeline_view
 JOIN
-  reservation_capacity
+  joined_capacity
 ON
-  timeline_view.reservation_id = reservation_capacity.reservation_id
-  AND period_start BETWEEN reservation_capacity.creation_time
-  AND reservation_capacity.end_time
+  timeline_view.reservation_id = joined_capacity.reservation_id
+  AND period_start BETWEEN joined_capacity.creation_time
+  AND joined_capacity.end_time
 GROUP BY
   1,
   3,
   4,
   5,
-  6
+  6,
+  7
 UNION ALL
 SELECT
   DATETIME_TRUNC(DATETIME(period_start),
@@ -128,10 +173,12 @@ SELECT
   timeline_view.reservation_id,
   job_type,
   "hour" AS unit,
-  slot_capacity,
-    COUNT(DISTINCT
+  reservation_capacity,
+  org_capacity,
+  COUNT(DISTINCT
   IF
-    (state = 'RUNNING',
+    (state = 'RUNNING'
+      AND timeline_view.project_id = joined_capacity.project_id,
       timeline_view.job_id,
       NULL)) AS running_jobs,
   COUNT(DISTINCT
@@ -141,68 +188,32 @@ SELECT
       NULL)) AS pending_projects,
   COUNT(DISTINCT
   IF
-    (state = 'PENDING',
+    (state = 'PENDING'
+      AND timeline_view.project_id = joined_capacity.project_id,
       timeline_view.job_id,
       NULL)) AS pending_jobs,
+  SUM(period_slot_ms) / (1000 * 60 * 60) AS reservation_slots_used,
+  SUM(
+  IF
+    (timeline_view.project_id = joined_capacity.project_id,
+      (period_slot_ms),
+      0)) / (1000 * 60 * 60) AS project_slots_used,
+  SUM(period_slot_ms) / (1000 * 60 * 60) / reservation_capacity AS reservation_utilization,
 FROM
   -- PUBLIC DASHBOARD USE ONLY
-  -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
-  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
+  -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
+  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
   `region-us`.INFORMATION_SCHEMA.JOBS_TIMELINE_BY_ORGANIZATION timeline_view
 JOIN
-  reservation_capacity
+  joined_capacity
 ON
-  timeline_view.reservation_id = reservation_capacity.reservation_id
-  AND period_start BETWEEN reservation_capacity.creation_time
-  AND reservation_capacity.end_time
+  timeline_view.reservation_id = joined_capacity.reservation_id
+  AND period_start BETWEEN joined_capacity.creation_time
+  AND joined_capacity.end_time
 GROUP BY
   1,
   3,
   4,
   5,
-  6
-UNION ALL
-SELECT
-  DATETIME_TRUNC(DATETIME(period_start),
-    DAY) period_start,
-  COUNT(DISTINCT
-  IF
-    (state = 'RUNNING',
-      timeline_view.project_id,
-      NULL)) AS running_projects,
-  timeline_view.reservation_id,
-  job_type,
-  "day" AS unit,
-  slot_capacity,
-    COUNT(DISTINCT
-  IF
-    (state = 'RUNNING',
-      timeline_view.job_id,
-      NULL)) AS running_jobs,
-  COUNT(DISTINCT
-  IF
-    (state = 'PENDING',
-      timeline_view.project_id,
-      NULL)) AS pending_projects,
-  COUNT(DISTINCT
-  IF
-    (state = 'PENDING',
-      timeline_view.job_id,
-      NULL)) AS pending_jobs,
-FROM
-  -- PUBLIC DASHBOARD USE ONLY
-  -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
-  -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
-  `region-us`.INFORMATION_SCHEMA.JOBS_TIMELINE_BY_ORGANIZATION timeline_view
-JOIN
-  reservation_capacity
-ON
-  timeline_view.reservation_id = reservation_capacity.reservation_id
-  AND period_start BETWEEN reservation_capacity.creation_time
-  AND reservation_capacity.end_time
-GROUP BY
-  1,
-  3,
-  4,
-  5,
-  6
+  6,
+  7
