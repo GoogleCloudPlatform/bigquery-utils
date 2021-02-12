@@ -50,6 +50,8 @@ Additionally, other stages can indicate areas for optimization in the query, suc
 
 ### Slot Utilization and Capacity Overview
 This time series graph displays the total slot capacity allocated and used during the query's runtime.
-The graph displays the reservation's slot capacity, as well as how many slots were actually used to give signals about the demand. 
+This graph indicates the relative level of saturation and demand for slots at the same time as the query. 
 The graph also displays the organization-wide capacity. This is useful to see as if a reservation used more than its granted capacity, it likely used
 idle slots from other reservations in the organization.
+
+![Slot Utilization](../images/job_comparison/slot_utilization.png)
