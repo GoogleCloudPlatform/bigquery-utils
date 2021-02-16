@@ -15,10 +15,10 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "telephone_number_assertions",
+    name: "marital_status_assertions",
 }
 
 SELECT
-    ${phone_assertions.test_phone_number("test_telephone_number")} AS is_valid_telephone_number
+    ${personal_info_assertions.test_marital_status("test_marital")} AS is_valid_marital_status
 FROM
-    ${resolve("test_telephone_numbers")}
+    ${resolve("test_marital_status")}

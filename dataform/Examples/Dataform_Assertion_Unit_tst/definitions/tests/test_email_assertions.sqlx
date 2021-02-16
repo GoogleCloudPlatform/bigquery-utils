@@ -14,36 +14,27 @@
 
 config {
     type: "test",
-    dataset: "telephone_number_assertions",
+    dataset: "email_assertions",
 }
 
 js {
     const test_cases = {
         // Assertions that pass
-        "8123456789" : "TRUE",
-        "1234567899" : "TRUE",
-        "5123456789" : "TRUE",
-        "4576839485" : "TRUE",
-        "2938475638" : "TRUE",
-        "7928374657" : "TRUE",
-        "7847563738" : "TRUE",
-        "6768907654" : "TRUE",
+        "george.bail@google.com" : "TRUE",
+        "among.us@amongus.net" : "TRUE",
 
         //Assertions that fail
-        "1234567" : "FALSE",
-        "0123456789" : "FALSE",
-        "1111111111" : "FALSE",
-        "374657389a" : "FALSE"
+        "1736#$%.com" : "FALSE"
     };
     let expected_output_select_statements = [];
     let test_input_select_statements = [];
     for(var test_name in test_cases) {
-        test_input_select_statements.push(`SELECT "${test_name}" AS test_telephone_number`);
-        expected_output_select_statements.push(`SELECT ${test_cases[test_name]} AS is_valid_telephone_number`);
+        test_input_select_statements.push(`SELECT "${test_name}" AS test_email_address`);
+        expected_output_select_statements.push(`SELECT ${test_cases[test_name]} AS is_valid_email_address`);
     }
 }
 
-input "test_telephone_numbers" {
+input "test_email_addresses" {
     ${test_input_select_statements.join(' UNION ALL\n')}
 }
 

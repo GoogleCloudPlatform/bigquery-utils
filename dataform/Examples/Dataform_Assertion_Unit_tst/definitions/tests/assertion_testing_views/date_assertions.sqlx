@@ -15,10 +15,10 @@
 config {
     type: "view",
     schema: "dev_data_zone",
-    name: "telephone_number_assertions",
+    name: "date_assertions",
 }
 
 SELECT
-    ${phone_assertions.test_phone_number("test_telephone_number")} AS is_valid_telephone_number
+    ${date_assertions.test_date("test_date", "yyyy/mm/dd")} AS is_valid_date
 FROM
-    ${resolve("test_telephone_numbers")}
+    ${resolve("test_dates")}
