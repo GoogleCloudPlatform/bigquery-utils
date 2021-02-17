@@ -68,7 +68,6 @@ where `{project_id}` is the project id of the billing project and `{region_name}
 When copying the Reservation Utilization data sources, you must also do the following:
 1. Replace all instances `"admin-project:US."` with `"{project_id}:{location}."`, where `{project_id}` is the project id of your administration project and `{location}` is the GCP region or multi-region where they are located.
 2. Replace all instances of `TIMESTAMP("2021-02-01 23:59:59.000 UTC")` with `CURRENT_TIMESTAMP()`.
-&nbsp;  
 
 Once all modifications are complete and a Billing Project is specified, click "Reconnect".
 

@@ -38,7 +38,6 @@
   total_slot_ms,
   total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND) AS avg_slots,
   cache_hit,
-  --referenced_tables,
   ARRAY(
     SELECT
       STRUCT(
@@ -147,4 +146,8 @@ FROM
   -- Modify this to use your project's INFORMATION_SCHEMA table as follows:
   -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
   `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
+-- If making a copy of this query, update `@job_param` for the Job Comparison Report.
+-- Depending on if this is for the slow or fast job, use `@job_param` or `job_param_2`.
+-- When creating the side-by-side comparison view, you will need to duplicate
+-- this data source and update parameter to @job_param_2, or similar.
 WHERE job_id = @job_param

@@ -38,6 +38,9 @@ WITH
     -- `region-{region_name}`.INFORMATION_SCHEMA.{table}
     `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
   WHERE
+    -- Update `@job_param`, depending on if this is for the slow or fast job.
+    -- When creating the side-by-side comparison view, you will need to duplicate
+    -- this data source and update parameter to @job_param_2, or similar.
     job_id = @job_param),
    organization_capacity AS (
   SELECT
