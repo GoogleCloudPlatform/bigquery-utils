@@ -87,7 +87,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
 
     # Unexpected exceptions will actually raise which may cause a cold restart.
     except exceptions.DuplicateNotificationException:
-        print("recieved duplicate notification. this was handled gracefully.\n "
+        print("recieved duplicate notification. this was handled gracefully.  "
               f"{traceback.format_exc()}")
 
     except exceptions.EXCEPTIONS_TO_REPORT as original_error:
@@ -146,7 +146,7 @@ def triage_event(gcs_client: Optional[storage.Client],
                     f"{constants.BACKFILL_FILENAME}"):
                 raise RuntimeError(
                     f"recieved notification for gs://{event_blob.bucket.name}/"
-                    f"{event_blob.name}\n"
+                    f"{event_blob.name} "
                     f"{constants.BACKFILL_FILENAME} files "
                     "are expected only at the table prefix level.")
             ordering.backlog_subscriber(gcs_client, bq_client, event_blob,

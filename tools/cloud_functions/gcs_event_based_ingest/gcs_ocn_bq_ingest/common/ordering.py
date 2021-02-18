@@ -98,8 +98,8 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                 print(f"sleeping for {polling_timeout} seconds because"
                       f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
                       "This will be an infinite loop until the manual lock is "
-                      "released.\n"
-                      f"manual lock contents:\n {lock_contents}. ")
+                      "released. "
+                      f"manual lock contents: {lock_contents}. ")
                 time.sleep(polling_timeout)
                 continue
         else:  # this condition handles absence of _bqlock file
@@ -156,8 +156,8 @@ def wait_on_last_job(bq_client: bigquery.Client, lock_blob: storage.Blob,
             f"gs://{backfill_blob.bucket.name}/{table_prefix}"
             "/_BACKFILL "
             f"to resume the backfill subscriber so it can "
-            "continue with the next item in the backlog.\n"
-            "Original Exception:\n"
+            "continue with the next item in the backlog."
+            "Original Exception:"
             f"{traceback.format_exc()}") from err
 
 
