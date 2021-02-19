@@ -57,7 +57,6 @@ function test_date(colName){
             `IF(${test_date_format(colName, "yyyymmdd")}, ` +
             `TRUE, FALSE)), FALSE)`
     return result_query
-    return result_query
 }
 
 module.exports = {
