@@ -20,49 +20,41 @@ The custom assertions are in javascript files in the includes folder. To test th
         ]
     }
 ```
+## Unit Testing Custom Assertions
+Unit testing your custom assertions is important because it helps you safeguard your ELT pipeline. In this project, we want to demonstrate an easy way for you to unit test your custom assertions. The workflow is simple and as listed below:
 
-## Workflow for adding new custom assertions
-Below is the recommended workflow when adding new custom dataform assertions and testing the valididaty of the assertions
-* Browse the custom assertions files in ```includes/``` directory. If your custom assertion falls into one of the predefined custom assertions files, add your custom assertions to that file. Otherwise, please create a new file and add your custom assertion to it. 
-* When finished adding the javascript assertion file, checkout the unit test files in the ```tests/``` directory and add the unit test scripts to the appropriate test files. Please follow similiar syntax when adding unit test files. 
-* When finished adding unit test scripts, perform the command ```dataform run --tag [SELECT_TAG_TO_RUN]``` to check whether your custom assertions behaves accordingly. 
+* Create a ```test_[NAME_YOUR_TEST]_assertions.js``` file in the ```definitions/tests/``` folder if your custom row assertions are not included in the existing template.
+* In ```test_[NAME_YOUR_TEST]_assertions.js``` change the code snippets ```const {[YOUR_CUSTOM_ASSERTION]} = [CUSTOMER_ASSERTION_FILE_NAME];``` and change the test name ```const test_name = "[YOUR_TEST_NAME]";```. 
+* Add the testing data in the ```test_cases``` block with the following format ```"[INPUT]" : "[EXPECTED_OUTPUT]"```
+* Finally supply your custom function name in the ```generatetest(...)``` function. 
 
-## Running Custom Row Assertions Unit Tests
-Row custom assertions unit tests are grouped into 6 different tags: 
+Below is an example of the ```test_[NAME_YOUR_TEST]_assertions.js``` file:
 
-* ```date_row_assertions_unit_test``` 
-* ```email_row_assertion_unit_test```
-* ```gender_row_assertion_unit_test```
-* ``` marital_status_row_assertion_unit_test```
-* ``` personal_info_row_assertion_unit_test```
-* ```phone_row_assertions_unit_test```
+```
+const {generate_test} = unit_test_utils;
+const {[YOUT_CUSTOM_ASSERTIONS]} = [CUSTOM_ASSERTION_FILE_NAME];
+const test_name = "[YOUR_TEST_NAME]";
+const test_cases = {
+    /*
+        Provide your own testing data following the structure
+        <INPUT_TESTING_DATA> : "<EXPECTED OUTCOME>"
+        For example, if a testing data has the <EXPECTED OUTCOME> to be TRUE,
+        then the program will expect the custom data quality rules to also produce TRUE. 
+        Otherwise it will show that the custom data quality rules failed. 
+    */
+    "[INPUT1]" : [EXPECTED_OUTPUT]"
+    "[INPUT2]" : [EXPECTED_OUTPUT]"
+    .
+    .
+    .
+};
+// The function below will generate the necessary SQL to run unit tests.
+generate_test(test_name,
+    test_cases,
+    [YOUT_CUSTOM_ASSERTIONS]);
+```
 
- To run individual unit tests, run with this command: ```dataform run --tags [SELECT_TAG_TO_RUN]```. For example:  
-
- ```dataform run --tags date_row_assertions_unit_test```. 
- 
- If you want to run all 7 unit test together, run with command 
- 
- ```dataform run --tags all_test``` 
-
-
- ## Validating Custom Row Assertions Unit Tests
- After writing custom row assertions, we want to test and make sure our custom row assertions behave as intended. Therefore, we have set up validation tests to validate our custom row assertions. The validation files live in the ```definitions/validation_test``` directory and similiar to custom row assertions, it has 6 validation tests.The validation tests are:
- 
- * ```validate_date_row_assertions_unit_test```
- * ```validate_email_row_assertion_unit_test```
- * ```validate_gender_row_assertion_unit_test```
- * ```validate_marital_status_row_assertion_unit_test```
- * ```validate_personal_info_row_assertions_unit_test```
- * ```validate_phone_row_assertions_unit_test```
-
- To perform a validation you simply run the command ```dataform run --tags [YOUR_VALIDATION_NAME]```. For example: 
-
- ```dataform run --tags validate_date_row_assertions_unit_test```
- 
- If the validation test does not return any ```assertion failed``` errors, then it means that your custom row assertions behaves correctly. Otherwise, your custom row assertions are erroneous. To run all validation test at once, use this command:
-
- ``` dataform run --tags validate_all_unit_tests```
+* Afterwards you can perform the unit test by running ```dataform test``` command. 
  
 ## Liscense
 All solutions within this repository are provided under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Please see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for more detailed terms and conditions.

@@ -39,7 +39,7 @@ function test_date_format(colName, date_format){
             var result_query = `REGEXP_CONTAINS(${colName}, r'^[0-9]{4}[0-9]{2}[0-9]{2}$')`
             return result_query
         }else{
-            return "Please enter a date format that is 'yyyymmdd', 'mm/dd/yyyy', or 'dd/mm/yyyy'"
+            return `FALSE`
         }
 }
 
@@ -47,8 +47,16 @@ function test_date_format(colName, date_format){
     This assertions combines custom assertions for testing future date and valid years
 */
 
-function test_date(colName, date_format){
-    var result_query = `${test_future_date(colName)} AND ${test_valid_years(colName)} AND ${test_date_format(colName, date_format)}`
+function test_date(colName){
+    var result_query =
+    `IF(${colName} IS NOT NULL AND ${colName} <> "",` +
+        `IF(${test_date_format(colName, "yyyy/mm/dd")}, ` +
+            `IF(${test_future_date(colName)}, ` +
+                `${test_valid_years(colName, 100)}` +
+                `, FALSE),` +
+            `IF(${test_date_format(colName, "yyyymmdd")}, ` +
+            `TRUE, FALSE)), FALSE)`
+    return result_query
     return result_query
 }
 
