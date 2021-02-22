@@ -593,10 +593,10 @@ returns:
 
 # StatsLib: Statistical UDFs
 
-This directory contains community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions) for Statistical Analysis
-to extend BigQuery for more specialized usage patterns. Each UDF within this
-directory will be automatically synchronized to the `bqutil` project within the
-`fn` dataset for reference in queries.
+This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions) 
+that extend BigQuery and enable more specialized Statistical Analysis usage patterns. 
+Each UDF detailed below will be automatically synchronized to the `fn` dataset
+within the `bqutil` project for reference in your queries.
 
 For example, if you'd like to reference the `int` function within your query,
 you can reference it like the following:
