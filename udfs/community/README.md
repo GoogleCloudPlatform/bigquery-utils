@@ -636,7 +636,7 @@ set data = [
 ];
 
 
-SELECT `lib_stats.kruskal_wallis`(data) as results;
+SELECT `lib_stats.kruskal_wallis`(data) AS results;
 ```
 
 results:
