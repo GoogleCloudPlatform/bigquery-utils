@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-
-
 CREATE OR REPLACE FUNCTION fn.linear_regression(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>) 
 AS ((
      WITH results AS (
