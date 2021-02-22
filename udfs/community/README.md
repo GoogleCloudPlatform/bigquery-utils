@@ -610,7 +610,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## Documentation
 
-### [kruskal_wallis(arr(struct(factor STRING, val FLOAT64))](kruskal_wallis.sql)
+### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sql)
 Takes an array of struct where each struct (point) represents a measurement, with a group label and a measurement value
 
 The [Kruskal–Wallis test by ranks](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance), Kruskal–Wallis H test (named after William Kruskal and W. Allen Wallis), or one-way ANOVA on ranks is a non-parametric method for testing whether samples originate from the same distribution. It is used for comparing two or more independent samples of equal or different sample sizes. It extends the Mann–Whitney U test, which is used for comparing only two groups. The parametric equivalent of the Kruskal–Wallis test is the one-way analysis of variance (ANOVA).
