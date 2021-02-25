@@ -636,7 +636,7 @@ set data = [
 ];
 
 
-SELECT `lib_stats.kruskal_wallis`(data) AS results;
+SELECT `bqutil.fn.kruskal_wallis`(data) AS results;
 ```
 
 results:
@@ -644,3 +644,49 @@ results:
 | results.H	| results.p	| results.DoF	|
 |-----------|-----------|-------------|
 | 3.4230769 | 0.1805877 | 2           |
+
+
+
+### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sql)
+Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
+
+The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables). 
+
+* Input: array: struct <X FLOAT64, Y FLOAT64>
+* Output: struct<a FLOAT64,b FLOAT64, r FLOAT64>
+* 
+```sql
+DECLARE data ARRAY<STRUCT<X STRING, Y FLOAT64>>;
+set data = [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)];
+SELECT `bqutils.fn.linear_regression`(data) AS results;
+```
+
+results:
+
+
+| results.a          	| results.b	         | results.r	       |
+|---------------------|--------------------|-------------------|
+| -0.4353361094588436 | 0.5300416418798544 | 0.632366563565354 |
+
+
+
+
+### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sql)
+Takes _H_ and _dof_ and returns _p_ probability value.
+
+The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
+
+* Input: H FLOAT64, dof FLOAT64
+* Output: p FLOAT64
+* 
+```sql
+SELECT `bqutils.fn.pvalue`(.3,2) AS results;
+```
+
+results:
+
+
+| results         	|
+|-------------------|
+|0.8607079764250578 |
+
