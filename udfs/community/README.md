@@ -20,13 +20,16 @@ SELECT bqutil.fn.int(1.684)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
+* [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](#lastdaydt-date)
 * [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
+* [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
+* [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
@@ -585,4 +588,108 @@ returns:
 | 3	| 30 | 0.0 |
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
+
+
+<br/>
+<br/>
+<br/>
+
+# StatsLib: Statistical UDFs
+
+This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions) 
+that extend BigQuery and enable more specialized Statistical Analysis usage patterns. 
+Each UDF detailed below will be automatically synchronized to the `fn` dataset
+within the `bqutil` project for reference in your queries.
+
+For example, if you'd like to reference the `int` function within your query,
+you can reference it like the following:
+```sql
+SELECT bqutil.fn.int(1.684)
+```
+
+## UDFs
+
+* [kruskal_wallis](#kruskal_wallisarrstructfactor-string-val-float64)
+
+## Documentation
+
+### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sql)
+Takes an array of struct where each struct (point) represents a measurement, with a group label and a measurement value
+
+The [Kruskal–Wallis test by ranks](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance), Kruskal–Wallis H test (named after William Kruskal and W. Allen Wallis), or one-way ANOVA on ranks is a non-parametric method for testing whether samples originate from the same distribution. It is used for comparing two or more independent samples of equal or different sample sizes. It extends the Mann–Whitney U test, which is used for comparing only two groups. The parametric equivalent of the Kruskal–Wallis test is the one-way analysis of variance (ANOVA).
+
+* Input: array: struct <factor STRING, val FLOAT64>
+* Output: struct<H FLOAT64, p-value FLOAT64, DOF FLOAT64>
+```sql
+DECLARE data ARRAY<STRUCT<factor STRING, val FLOAT64>>;
+
+set data = [
+('a',1.0),
+('b',2.0),
+('c',2.3),
+('a',1.4),
+('b',2.2),
+('c',5.5),
+('a',1.0),
+('b',2.3),
+('c',2.3),
+('a',1.1),
+('b',7.2),
+('c',2.8)
+];
+
+
+SELECT `bqutil.fn.kruskal_wallis`(data) AS results;
+```
+
+results:
+
+| results.H	| results.p	| results.DoF	|
+|-----------|-----------|-------------|
+| 3.4230769 | 0.1805877 | 2           |
+
+
+
+### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sql)
+Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
+
+The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables). 
+
+* Input: array: struct <X FLOAT64, Y FLOAT64>
+* Output: struct<a FLOAT64,b FLOAT64, r FLOAT64>
+* 
+```sql
+DECLARE data ARRAY<STRUCT<X STRING, Y FLOAT64>>;
+set data = [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)];
+SELECT `bqutils.fn.linear_regression`(data) AS results;
+```
+
+results:
+
+
+| results.a          	| results.b	         | results.r	       |
+|---------------------|--------------------|-------------------|
+| -0.4353361094588436 | 0.5300416418798544 | 0.632366563565354 |
+
+
+
+
+### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sql)
+Takes _H_ and _dof_ and returns _p_ probability value.
+
+The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
+
+* Input: H FLOAT64, dof FLOAT64
+* Output: p FLOAT64
+* 
+```sql
+SELECT `bqutils.fn.pvalue`(.3,2) AS results;
+```
+
+results:
+
+
+| results         	|
+|-------------------|
+|0.8607079764250578 |
 
