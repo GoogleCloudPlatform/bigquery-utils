@@ -24,7 +24,9 @@ import json
 import os
 import pathlib
 import pprint
+import sys
 import time
+import traceback
 import uuid
 from typing import Any, Deque, Dict, List, Optional, Tuple, Union
 
@@ -716,6 +718,7 @@ def apply(
     lock_blob: Optional[storage.Blob],
     job_id: str,
 ):
+    # pylint: disable=too-many-locals
     """
     Apply an incremental batch to the target BigQuery table via an asynchronous
     load job or external query.
@@ -741,14 +744,28 @@ def apply(
     )
     external_query_sql = look_for_config_in_parents(
         gcs_client, f"gs://{bkt.name}/{success_blob.name}", '*.sql')
+    try:
 
-    if external_query_sql:
-        print("EXTERNAL QUERY")
-        print(f"found external query: {external_query_sql}")
-        external_query(gcs_client, bq_client, gsurl, external_query_sql,
-                       dest_table_ref, job_id)
+        if external_query_sql:
+            print("EXTERNAL QUERY")
+            print(f"found external query: {external_query_sql}")
+            external_query(gcs_client, bq_client, gsurl, external_query_sql,
+                           dest_table_ref, job_id)
+            return
+
+        print("LOAD_JOB")
+        load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id)
         return
 
-    print("LOAD_JOB")
-    load_batches(gcs_client, bq_client, gsurl, dest_table_ref, job_id)
-    return
+    except (google.api_core.exceptions.GoogleAPIError,
+            google.api_core.exceptions.ClientError) as err:
+        etype, value, err_tb = sys.exc_info()
+        msg = (f"failed to submit job {job_id} for {gsurl}: "
+               f"{etype.__name__}: {value}")
+        blob = storage.Blob.from_string(gsurl)
+        table_prefix = get_table_prefix(blob.name)
+        bqlock = storage.Blob.from_string(
+            f"gs://{blob.bucket.name}/{table_prefix}/_bqlock")
+        # Write this error message to avoid confusion.
+        handle_bq_lock(gcs_client, bqlock, msg)
+        raise exceptions.BigQueryJobFailure(msg) from err

@@ -103,7 +103,7 @@ resource "google_project_iam_binding" "ingester_bq_admin" {
   for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
   project  = each.key
   members  = [module.data_ingester_service_account.iam_email]
-  role     = "roles/bigquery.dataEditor"
+  role     = "roles/bigquery.admin"
 }
 
 # Allow the GCS service account to publish notification for new objects to the

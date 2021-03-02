@@ -52,6 +52,8 @@ def error() -> error_reporting.Client:
 def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
     """GCS bucket for test artifacts"""
     bucket = gcs.create_bucket(str(uuid.uuid4()))
+    bucket.versioning_enabled = True
+    bucket.patch()
     # overide default field delimiter at bucket level
     load_config_json = {
         "fieldDelimiter": "|",
@@ -61,6 +63,10 @@ def gcs_bucket(request, gcs) -> storage.bucket.Bucket:
 
     def teardown():
         load_json_blob.delete()
+        bucket.versioning_enabled = False
+        bucket.patch()
+        for obj in gcs.list_blobs(bucket_or_name=bucket, versions=True):
+            obj.delete()
         bucket.delete(force=True)
 
     request.addfinalizer(teardown)

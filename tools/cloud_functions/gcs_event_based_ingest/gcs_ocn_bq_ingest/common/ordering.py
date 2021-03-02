@@ -157,7 +157,7 @@ def wait_on_last_job(bq_client: bigquery.Client, lock_blob: storage.Blob,
             "/_BACKFILL "
             f"to resume the backfill subscriber so it can "
             "continue with the next item in the backlog."
-            "Original Exception:"
+            "Original Exception: "
             f"{traceback.format_exc()}") from err
 
 

@@ -17,28 +17,35 @@
 """Custom Exceptions of GCS event based ingest to BigQuery"""
 
 
-class DuplicateNotificationException(Exception):
+class OneLineException(Exception):
+    """base class for exceptions whose messages will be displayed on a single
+    line for better readability in Cloud Function Logs"""
+    def __init__(self, msg):
+        super().__init__(msg.replace('\n', ' ').replace('\r', ''))
+
+
+class DuplicateNotificationException(OneLineException):
     """Exception to indicate that the function was triggered twice for the same
     event."""
 
 
-class BigQueryJobFailure(Exception):
+class BigQueryJobFailure(OneLineException):
     """Exception to indicate that the function was triggered twice for the same
     event."""
 
 
-class DestinationRegexMatchException(Exception):
+class DestinationRegexMatchException(OneLineException):
     """Exception to indicate that a success file did not match the destination
     regex specified in the DESTINATION_REGEX environment variable (or the
     default)"""
 
 
-class UnexpectedTriggerException(Exception):
+class UnexpectedTriggerException(OneLineException):
     """Exception to indicate the cloud function was triggered with an unexpected
     payload."""
 
 
-class BacklogException(Exception):
+class BacklogException(OneLineException):
     """Exception to indicate an issue with the backlog mechanics of this
     function."""
 

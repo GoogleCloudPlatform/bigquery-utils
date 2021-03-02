@@ -46,13 +46,24 @@ def gcs() -> storage.Client:
 @pytest.fixture(scope='module')
 def terraform_infra(request):
 
+    def _escape(in_str):
+        if in_str is not None:
+            return ANSI_ESCAPE_PATTERN.sub('', in_str.decode('UTF-8'))
+        return None
+
     def _run(cmd):
-        print(
-            ANSI_ESCAPE_PATTERN.sub(
-                '',
-                subprocess.check_output(cmd,
-                                        stderr=subprocess.STDOUT,
-                                        cwd=TEST_DIR).decode('UTF-8')))
+        result = subprocess.run(cmd,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                cwd=TEST_DIR)
+        print(_escape(result.stdout))
+        if result.returncode == 0:
+            return
+        raise subprocess.CalledProcessError(
+            returncode=result.returncode,
+            cmd=result.args,
+            output=_escape(result.stdout),
+            stderr=_escape(result.stderr))
 
     init = shlex.split("terraform init")
     apply = shlex.split("terraform apply -auto-approve")
