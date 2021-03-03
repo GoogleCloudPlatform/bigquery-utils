@@ -329,6 +329,10 @@ It's better for us to make a conscious decision to adopt new features or adjust
 CI configs or pin older version depending on the type for failure.
 This CI should be run on all new PRs and nightly.
 
+Note, all functionality of the cloud function (including ordering) is
+integration tested against buckets with object versioning enabled to ensure this
+solution works for buckets using this feature.
+
 ### Just Running the Tests
 #### Running in Docker
 ```bash
