@@ -59,11 +59,10 @@ def terraform_infra(request):
         print(_escape(result.stdout))
         if result.returncode == 0:
             return
-        raise subprocess.CalledProcessError(
-            returncode=result.returncode,
-            cmd=result.args,
-            output=_escape(result.stdout),
-            stderr=_escape(result.stderr))
+        raise subprocess.CalledProcessError(returncode=result.returncode,
+                                            cmd=result.args,
+                                            output=_escape(result.stdout),
+                                            stderr=_escape(result.stderr))
 
     init = shlex.split("terraform init")
     apply = shlex.split("terraform apply -auto-approve")

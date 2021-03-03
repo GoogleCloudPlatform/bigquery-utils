@@ -20,6 +20,7 @@
 class OneLineException(Exception):
     """base class for exceptions whose messages will be displayed on a single
     line for better readability in Cloud Function Logs"""
+
     def __init__(self, msg):
         super().__init__(msg.replace('\n', ' ').replace('\r', ''))
 
@@ -30,8 +31,10 @@ class DuplicateNotificationException(OneLineException):
 
 
 class BigQueryJobFailure(OneLineException):
-    """Exception to indicate that the function was triggered twice for the same
-    event."""
+    """Exception to indicate that there was an issue with a BigQuery job. This
+    might include client errors (e.g. bad request which can happen if a _SUCCESS
+    file is dropped but there are not data files at the GCS prefix) or server
+    side errors like a job that fails to execute successfully."""
 
 
 class DestinationRegexMatchException(OneLineException):
