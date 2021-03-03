@@ -760,7 +760,7 @@ def apply(
             google.api_core.exceptions.ClientError) as err:
         etype, value, err_tb = sys.exc_info()
         msg = (f"failed to submit job {job_id} for {gsurl}: "
-               f"{etype.__name__}: {value}")
+               f"{etype.__class__.__name__}: {value}")
         blob = storage.Blob.from_string(gsurl)
         table_prefix = get_table_prefix(blob.name)
         bqlock = storage.Blob.from_string(
