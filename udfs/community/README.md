@@ -22,6 +22,7 @@ SELECT bqutil.fn.int(1.684)
 * [json_typeof](#json_typeofjson-string)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](#lastdaydt-date)
+* [levenshtein](#levenshteinsource-string-target-string-returns-int64)
 * [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
 * [median](#medianarr-any-type)
@@ -237,6 +238,36 @@ results:
 |     f0_    |     f1_    |     f2_    |     f3_    |
 |------------|------------|------------|------------|
 | 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
+
+
+### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sql)
+Returns an integer number indicating the degree of similarity between two strings (0=identical, 1=single character difference, etc.)
+
+```sql
+SELECT
+  source,
+  target,
+  bqutil.fn.levenshtein(source, target) distance,
+FROM UNNEST([
+  STRUCT('analyze' AS source, 'analyse' AS target),
+  STRUCT('opossum', 'possum'),
+  STRUCT('potatoe', 'potatoe'),
+  STRUCT('while', 'whilst'),
+  STRUCT('aluminum', 'alumininium'),
+  STRUCT('Connecticut', 'CT')
+]);
+```
+
+Row | source      | target      | distance
+--- | ----------- | ----------- | ---------
+1   |	analyze     | analyse     | 1
+2   | opossum     | possum      | 1
+3   | potatoe     | potatoe     | 0
+4   | while       | whilst      | 2
+5   | aluminum    | alumininium | 3
+6   | Connecticut | CT          | 10
+
+> This function is based on the [Levenshtein distance algorithm](https://en.wikipedia.org/wiki/Levenshtein_distance) which determines the minimum number of single-character edits (insertions, deletions or substitutions) required to change one source string into another target one.
 
 
 ### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sql)
