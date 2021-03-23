@@ -21,4 +21,6 @@ AS
 """
   return js_levenshtein(source || '', target || '');
 """
-OPTIONS (library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"));
+OPTIONS (
+  library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"
+);
