@@ -44,6 +44,26 @@ or
 
 `CREATE OR REPLACE FUNCTION project_id.your_dataset.function_name() . . .`
 
+### Using JavaScript UDFs
+
+When creating [JavaScript UDFs](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#javascript-udf-structure) in your dataset, you need both to create 
+the UDF and upload the javascript library to a publicly available Google Storage Bucket. 
+
+In the following example, we show how to create the Levenshtein UDF function, that uses a JS
+library, in your dataset.
+
+1. We [obtain](https://www.npmjs.com/package/js-levenshtein) the latest version of the
+`js-levenshtein` function.
+2. We copy the library to our bucket:
+`gsutil cp js-levenshtein-v1.1.6.js gs://your-bucket`
+3. We give permissions to the library:
+`gsutil acl ch -u AllUsers:R gs://your-bucket/js-levenshtein-v1.1.6.js`
+4. We edit the [levenshtein.sql](community/levenshtein.sql) SQL file and replace the library 
+path `library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"` with our own path 
+`library="gs://your-bucket/js-levenshtein-v1.1.6.js`
+5. We create the SQL UDF passing the previously modified SQL file:
+`bq query --project_id YOUR_PROJECT_ID --dataset_id YOUR_DATASET_ID --nouse_legacy_sql < levenshtein.sql`
+
 ## Contributing UDFs
 
 If you are interested in contributing UDFs to this repository, please see the
