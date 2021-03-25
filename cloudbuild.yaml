@@ -43,10 +43,12 @@ steps:
     - SHORT_SHA=${SHORT_SHA}
     - _JS_BUCKET=${_JS_BUCKET}
     - _PR_NUMBER=${_PR_NUMBER}
+    - _GCR_PROJECT_ID=${_GCR_PROJECT_ID}
 
 substitutions:
   _JS_BUCKET: gs://bqutil-lib/test_bq_js_libs/${SHORT_SHA} # default value
   _REPO_URL:  https://github.com/GoogleCloudPlatform/bigquery-utils.git # default value
+  _GCR_PROJECT_ID: ${PROJECT_ID}
 
 timeout: 1800s # 30 minutes
 options:

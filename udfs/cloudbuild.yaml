@@ -18,7 +18,7 @@ steps:
   # Dynamically create the package.json file based off the libs
   # specified in the js_libs/js_libs.yaml file.
   ############################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: generate_js_libs_package_json
   entrypoint: python3
   args:
@@ -38,7 +38,7 @@ steps:
   # to build npm packages into single .js files which will be
   # hosted on GCS and used by BigQuery UDFs.
   ############################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: generate_webpack_configs
   entrypoint: python3
   args:
@@ -75,7 +75,7 @@ steps:
   ###########################################################
   # Create BigQuery datasets specifically for testing
   ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: create_test_datasets
   entrypoint: python3
   args:
@@ -89,7 +89,7 @@ steps:
   # UDF creation errors in next step when one UDF depends
   # on another UDF.
   ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: create_udf_signatures
   entrypoint: pytest
   args:
@@ -107,7 +107,7 @@ steps:
   ###########################################################
   # Create UDFs in the test datasets
   ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: create_udfs
   entrypoint: pytest
   args:
@@ -125,7 +125,7 @@ steps:
   ###########################################################
   # Run UDF Unit Tests
   ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: run_udf_unit_tests
   entrypoint: pytest
   args:
@@ -143,7 +143,7 @@ steps:
   ###########################################################
   # Delete the test datasets that were created
   ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$_GCR_PROJECT_ID/bq_udf_ci
   id: delete_test_datasets
   entrypoint: python3
   args:
