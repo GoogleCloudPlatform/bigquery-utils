@@ -50,12 +50,11 @@ When creating [JavaScript UDFs](https://cloud.google.com/bigquery/docs/reference
 
 The base route for all the compiled JS libraries is `gs://bqutil-lib/bq_js_libs/`.
 
-In the following example, we show how to create in your datasetthe Levenshtein UDF function, that uses the `js-levenshtein-v1.1.6.js` library, in your dataset.
+In the following example, we show how to create in your dataset the Levenshtein UDF function, that uses the `js-levenshtein-v1.1.6.js` library.
 
 1. Copy the compiled library to your bucket:
 `gsutil cp gs://bqutil-lib/bq_js_libs/js-levenshtein-v1.1.6.js gs://your-bucket`
-2. Give permissions to the library:
-`gsutil acl ch -u AllUsers:R gs://your-bucket/js-levenshtein-v1.1.6.js`
+2. Give permissions to the library. First, if you don't have [uniform bucket-level access](https://cloud.google.com/storage/docs/using-uniform-bucket-level-access) in your bucket, enable it: `gsutil uniformbucketlevelaccess set on gs://your-bucket`. Once done give the [Cloud Storage Object Viewer role](https://cloud.google.com/storage/docs/access-control/iam-roles) at the [bucket](https://cloud.google.com/storage/docs/access-control/using-iam-permissions#bucket-add) or [project](https://cloud.google.com/sdk/gcloud/reference/projects/add-iam-policy-binding) level to a user or group: `gsutil iam ch [user|group]:[user|group]@domain.com:roles/storage.objectViewer gs://your_bucket` 
 3. Edit the [levenshtein.sql](community/levenshtein.sql) SQL file and replace the library path `library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"` with your own path `library="gs://your-bucket/js-levenshtein-v1.1.6.js`
 4. Create the SQL UDF passing the previously modified SQL file:
 `bq query --project_id YOUR_PROJECT_ID --dataset_id YOUR_DATASET_ID --nouse_legacy_sql < levenshtein.sql`
