@@ -59,6 +59,7 @@
   &quot;labels&quot;: {&quot;jmeter_id&quot;: &quot;${simple_id}&quot;, &quot;run_id&quot;: &quot;${__P(run_id)}&quot;},&#xd;
   &quot;maxResults&quot;: 1&#xd;
 }&#xd;
+&#xd;
 </stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
