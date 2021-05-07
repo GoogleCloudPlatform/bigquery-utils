@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,5 +19,9 @@ output "cloud-function" {
 output "data-ingester-sa" {
   description = "data ingester service account email created as cloud function identity"
   value       = module.data_ingester_service_account.email
+}
+
+output "input-bucket" {
+  value = module.bucket.bucket.name
 }
 

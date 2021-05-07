@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC.
+# Copyright 2021 Google LLC.
 # This software is provided as-is, without warranty or representation
 # for any use or purpose.
 # Your use of it is subject to your agreement with Google.
@@ -20,6 +20,8 @@ steps:
   dir: '${_BUILD_DIR}'
   entrypoint: '/bin/hadolint'
   args:
+    - '--config'
+    - '.hadolint.yaml'
     - 'Dockerfile.ci'
   id: 'lint-ci-docker-image'
 - name: 'gcr.io/kaniko-project/executor:latest'
@@ -113,21 +115,43 @@ steps:
     - 'mypy-main'
     - 'mypy-tests'
     - 'terraform-fmt'
+  entrypoint: /bin/sh
   args:
-    - '-m'
-    - 'not IT'
+    - '-c'
+    # pip installing again to get GCB to recognize mocker from pytest-mock
+    - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m "not IT"'
+  # GCB sometimes get stuck on this step and is doomed to not recover.
+  # This is usually remedied by just re-running the build.
+  # adding this unit-test step level timeout so we can fail sooner and retry.
+  timeout: 15s
   id: 'unit-test'
 - name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
   dir: '${_BUILD_DIR}'
   waitFor:
     - 'build-ci-image'
     - 'unit-test'
+  entrypoint: /bin/sh
   args:
-    - '--maxfail=1'
-    - '-m'
-    - 'IT'
+  - '-c'
+  - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m IT'
   id: 'integration-test'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  env:
+  - 'TF_VAR_project_id=$PROJECT_ID'
+  - 'TF_VAR_region=$_REGION'
+  - 'TF_VAR_short_sha=$SHORT_SHA'
+  waitFor:
+    - 'integration-test'
+    - 'build-ci-image'
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - 'python3 -m pytest -vvv e2e'
+  id: 'e2e-test'
+timeout: '3600s'
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: 'N1_HIGHCPU_32'
 substitutions:
   '_BUILD_DIR': 'tools/cloud_functions/gcs_event_based_ingest'
+  '_REGION': 'us-central1'
