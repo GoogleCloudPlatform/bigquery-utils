@@ -101,10 +101,12 @@ bigquery_jdbc_sampler.jmx**)
    whether you use JDBC or HTTP as shown below:
     * `-Jproject_id=`*YOUR_PROJECT_ID*
     * `-Jdefault_dataset_id=`*YOUR_DATASET_ID*
+      
       > Note: `-Jdefault_dataset_id` specifies the default dataset id to assume
       > for any unqualified table names in the queries. If not set, all table
       > names in the query string must be qualified in the format
       > `'datasetId.tableId'`.
+
     * `-Juser.classpath=`*/path/to/your/SimbaJDBCDriverforGoogleBigQuery*
 1. Ensure proper authentication is set up for either service account or user
    account authentication:
@@ -122,10 +124,12 @@ bigquery_http_sampler.jmx**)
 1. Replace the bash script placeholders shown below with your own values:
     * `-Jproject_id=`*YOUR_PROJECT_ID*
     * `-Jdefault_dataset_id=`*YOUR_DATASET_ID*
+
       > Note: `-Jdefault_dataset_id` specifies the default dataset id to assume 
       > for any unqualified table names in the queries. If not set, all table
       > names in the query string must be qualified in the format
       > `'datasetId.tableId'`.
+
 1. Ensure proper authentication is set up
     * Service account authentication: \
       `gcloud auth activate-service-account --key-file=`*
