@@ -17,7 +17,7 @@
         <stringProp name="connectionAge">5000</stringProp>
         <stringProp name="connectionProperties"></stringProp>
         <stringProp name="dataSource">bq_pool</stringProp>
-        <stringProp name="dbUrl">jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;OAuthType=3;ProjectId=${__P(project_id)};Timeout=3600;useQueryCache=0;MaxResults=1;</stringProp>
+        <stringProp name="dbUrl">jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;OAuthType=3;ProjectId=${__P(project_id)};Timeout=3600;useQueryCache=0;MaxResults=1;defaultDataset=${__P(default_dataset_id)};</stringProp>
         <stringProp name="driver">com.simba.googlebigquery.jdbc42.Driver</stringProp>
         <stringProp name="initQuery"></stringProp>
         <boolProp name="keepAlive">true</boolProp>
