@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-terraform {
-  required_version = ">= 0.13"
-
-  required_providers {
-    google   = ">= 3.38.0"
-    archive  = "~> 2.0.0"
-    template = "~> 2.2.0"
-  }
-}
+CREATE OR REPLACE FUNCTION fn.levenshtein(source STRING, target STRING)
+RETURNS INT64
+LANGUAGE js
+AS
+"""
+  return js_levenshtein(source || '', target || '');
+"""
+OPTIONS (
+  library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"
+);
