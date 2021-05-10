@@ -51,6 +51,10 @@
   &quot;useQueryCache&quot;: false,&#xd;
   &quot;useLegacySql&quot;: false,&#xd;
   &quot;timeoutMs&quot;:21600000,&#xd;
+  &quot;defaultDataset&quot;: {&#xd;
+  	&quot;projectId&quot;: &quot;${__P(project_id)}&quot;,&#xd;
+  	&quot;datasetId&quot;: &quot;${__P(default_dataset_id)}&quot;&#xd;
+  },&#xd;
   &quot;query&quot;: &quot;${simple_query}&quot;,&#xd;
   &quot;labels&quot;: {&quot;jmeter_id&quot;: &quot;${simple_id}&quot;, &quot;run_id&quot;: &quot;${__P(run_id)}&quot;},&#xd;
   &quot;maxResults&quot;: 1&#xd;
@@ -154,6 +158,10 @@
   &quot;useQueryCache&quot;: false,&#xd;
   &quot;useLegacySql&quot;: false,&#xd;
   &quot;timeoutMs&quot;:21600000,&#xd;
+  &quot;defaultDataset&quot;: {&#xd;
+  	&quot;projectId&quot;: &quot;${__P(project_id)}&quot;,&#xd;
+  	&quot;datasetId&quot;: &quot;${__P(default_dataset_id)}&quot;&#xd;
+  },&#xd;
   &quot;query&quot;: &quot;${medium_query}&quot;,&#xd;
   &quot;labels&quot;: {&quot;jmeter_id&quot;: &quot;${medium_id}&quot;, &quot;run_id&quot;: &quot;${__P(run_id)}&quot;},&#xd;
   &quot;maxResults&quot;: 1&#xd;
@@ -257,6 +265,10 @@
   &quot;useQueryCache&quot;: false,&#xd;
   &quot;useLegacySql&quot;: false,&#xd;
   &quot;timeoutMs&quot;:21600000,&#xd;
+  &quot;defaultDataset&quot;: {&#xd;
+  	&quot;projectId&quot;: &quot;${__P(project_id)}&quot;,&#xd;
+	&quot;datasetId&quot;: &quot;${__P(default_dataset_id)}&quot;&#xd;
+  },&#xd;
   &quot;query&quot;: &quot;${complex_query}&quot;,&#xd;
   &quot;labels&quot;: {&quot;jmeter_id&quot;: &quot;${complex_id}&quot;, &quot;run_id&quot;: &quot;${__P(run_id)}&quot;},&#xd;
   &quot;maxResults&quot;: 1&#xd;
