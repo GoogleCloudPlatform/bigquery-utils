@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,27 +36,12 @@ variable "data_ingester_sa" {
   description = "Service Account Email responsible for ingesting data to BigQuery"
 }
 
-variable "wait_for_job_seconds" {
-  description = "How long to wait before deciding BQ job did not fail quickly"
-  default     = ""
-}
-variable "success_filename" {
-  description = "Filename to trigger a load of a prefix"
-  default     = ""
-}
-variable "destination_regex" {
-  description = "A [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups) for destination `dataset`, `table`, (optional: `partition`, `batch`)"
-  default     = ""
-}
-variable "max_batch_bytes" {
-  description = "Max bytes for BigQuery Load job"
-  default     = ""
+variable "environment_variables" {
+  description = "Environment variables to set on the cloud function."
+  type        = map(string)
+  default     = {}
 }
 
-variable "job_prefix" {
-  description = "Prefix for BigQuery Job IDs "
-  default     = ""
-}
 
 variable "region" {
   description = "GCP region in which to deploy cloud function"
@@ -80,3 +65,12 @@ variable "bigquery_project_ids" {
   default     = []
 }
 
+variable "force_destroy" {
+  description = "force destroy resources (e.g. for e2e tests)"
+  default     = "false"
+}
+
+variable "timeout" {
+  description = "Cloud Functions timeout in seconds"
+  default     = 540
+}
