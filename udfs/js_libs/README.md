@@ -32,5 +32,6 @@ gcloud builds submit . --config=cloudbuild_js_libs.yaml --substitutions=_JS_BUCK
 After the libraries have been built, you'll need to provide the `_JS_BUCKET` environment variable when running your local UDF tests.
 For example:
 ```bash
-_JS_BUCKET="gs://YOUR_GCS_BUCKET[/optional_sub_path]" bash tests/run.sh -k kruskal_wallis
+_JS_BUCKET="gs://YOUR_GCS_BUCKET[/optional_sub_path]" 
+bash tests/run.sh -k kruskal_wallis
 ```
