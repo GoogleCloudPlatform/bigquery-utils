@@ -1,7 +1,0 @@
-{
-    "warehouse": "bigquery",
-    "defaultSchema": "dataform",
-    "assertionSchema": "dataform_assertions",
-    "defaultDatabase": "ruinanliu-sandbox",
-    "useRunCache": false
-}
