@@ -13,8 +13,8 @@
 // limitations under the License.
 
 const {generate_test} = unit_test_utils;
-const {test_name} = personal_info_assertions;
-const test_file_name = "test_personal_info_assertions";
+const {test_date} = date_assertions;
+const test_name = "test_date_assertions";
 const test_cases = {
     /*
         Provide your own testing data following the structure
@@ -24,14 +24,17 @@ const test_cases = {
         Otherwise it will show that the custom data quality rules failed. 
     */
     
-   "Alan" : "TRUE",
-   "Bob" : "TRUE",
-   "Jack" : "TRUE",
-   "John" : "TRUE",
-   "y*(*&^^%$" : "FALSE",
-   "Alannnn" : "FALSE"
+   "1997/11/03" : "TRUE",
+   "2008/08/08" : "TRUE",
+   "1996/11/03" : "TRUE",
+   "2005/04/13" : "TRUE",
+   "1998/11/03" : "TRUE",
+   "2006/07/29" : "TRUE",
+   "2025/03/24" : "FALSE",
+   "1769/03/24" : "FALSE"
 };
 // The function below will generate the necessary SQL to run unit tests.
-generate_test(test_file_name,
+generate_test(test_name,
     test_cases,
-    test_name);
+    test_date);
+    

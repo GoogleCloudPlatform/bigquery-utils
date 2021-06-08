@@ -13,8 +13,8 @@
 // limitations under the License.
 
 const {generate_test} = unit_test_utils;
-const {test_email_validity} = personal_info_assertions;
-const test_name = "test_email_assertion_test";
+const {test_marital_status} = personal_info_assertions;
+const test_name = "test_marital_status_assertions";
 const test_cases = {
     /*
         Provide your own testing data following the structure
@@ -24,11 +24,12 @@ const test_cases = {
         Otherwise it will show that the custom data quality rules failed. 
     */
     
-    "ruinanliu@google.com" : "TRUE",
-    "among.us@amongus.net" : "TRUE",
-    "1736#$%.com" : "FALSE"
+   "Married" : "TRUE",
+   "Divorced" : "TRUE",
+   "Happy" : "FALSE"
 };
 // The function below will generate the necessary SQL to run unit tests.
 generate_test(test_name,
     test_cases,
-    test_email_validity);
+    test_marital_status);
+    
