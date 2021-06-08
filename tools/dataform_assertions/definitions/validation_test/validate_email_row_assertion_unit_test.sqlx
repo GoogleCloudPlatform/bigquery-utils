@@ -29,7 +29,7 @@ config {
 #
 ########################################################################
 
-SELECT 1 AS failure
+SELECT 'Unit Test Failed' AS test_result, input, expected_output
 FROM(
   SELECT
     test_data.input,
