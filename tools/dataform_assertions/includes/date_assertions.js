@@ -51,8 +51,9 @@ function test_date_format(colName, date_format){
 */
 
 function test_date(colName, date_format){
-    var result_query = `${test_future_date(colName)} AND ${test_valid_years(colName)} AND ${test_date_format(colName, date_format)}`
-    return result_query
+return `${test_future_date(colName)}` +
+       `AND ${test_valid_years(colName)}` +
+       `AND ${test_date_format(colName, date_format)}`
 }
 
 module.exports = {
