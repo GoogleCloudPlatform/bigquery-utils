@@ -27,7 +27,3 @@ hs_err_pid*
 .vscode
 .idea/
 target/
-
-#Dataform project
-tools/dataform_assertions/node_modules/
-tools/dataform_assertions/.df-credentials.json
