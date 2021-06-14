@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,15 +23,17 @@ resource "google_pubsub_topic" "notification_topic" {
 }
 
 module "bucket" {
-  source  = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
-  version = "~> 1.3"
+  depends_on = [module.data_ingester_service_account]
+  source     = "terraform-google-modules/cloud-storage/google//modules/simple_bucket"
+  version    = "~> 1.3"
 
-  name       = var.input_bucket
-  project_id = var.project_id
-  location   = var.region
+  name          = var.input_bucket
+  project_id    = var.project_id
+  location      = var.region
+  force_destroy = var.force_destroy
   iam_members = [{
     role   = "roles/storage.objectAdmin"
-    member = module.data_ingester_service_account.iam_email
+    member = "serviceAccount:${var.data_ingester_sa}@${var.project_id}.iam.gserviceaccount.com"
   }]
 }
 
@@ -59,26 +61,28 @@ resource "google_storage_bucket_object" "function_zip_object" {
   content_type = "application/zip"
 }
 
+locals {
+  function_name = "gcs_to_bq_${var.app_id}"
+}
 resource "google_cloudfunctions_function" "gcs_to_bq" {
+  depends_on            = [google_storage_bucket_object.function_zip_object]
   project               = var.project_id
-  name                  = "gcs_to_bq_${var.app_id}"
+  name                  = local.function_name
   region                = var.region
   runtime               = "python38"
-  timeout               = 9 * 60 # seconds
-  service_account_email = var.data_ingester_sa
+  timeout               = var.timeout
+  service_account_email = module.data_ingester_service_account.email
   source_archive_bucket = var.cloudfunctions_source_bucket
   source_archive_object = google_storage_bucket_object.function_zip_object.name
   entry_point           = "main"
-  environment_variables = {
-    WAIT_FOR_JOB_SECONDS = var.wait_for_job_seconds
-    SUCCESS_FILENAME     = var.success_filename
-    DESTINATION_REGEX    = var.destination_regex
-    MAX_BATCH_BYTES      = var.max_batch_bytes
-    JOB_PREFIX           = var.job_prefix
-  }
+  environment_variables = merge(var.environment_variables, {
+    GCP_PROJECT          = var.project_id,
+    FUNCTION_TIMEOUT_SEC = var.timeout
+    FUNCTION_NAME        = local.function_name
+  })
   event_trigger {
     event_type = var.use_pubsub_notifications ? "providers/cloud.pubsub/eventTypes/topic.publish" : "google.storage.object.finalize"
-    resource   = var.use_pubsub_notifications ? google_pubsub_topic.notification_topic[0].id : module.bucket.name
+    resource   = var.use_pubsub_notifications ? "projects/${var.project_id}/${google_pubsub_topic.notification_topic[0].id}" : module.bucket.bucket.name
   }
 }
 
@@ -89,6 +93,7 @@ module "data_ingester_service_account" {
   names      = [var.data_ingester_sa, ]
   project_roles = [
     "${var.project_id}=>roles/bigquery.jobUser",
+    "${var.project_id}=>roles/storage.admin",
   ]
 }
 
@@ -98,7 +103,7 @@ resource "google_project_iam_binding" "ingester_bq_admin" {
   for_each = toset(concat(var.bigquery_project_ids, [var.project_id]))
   project  = each.key
   members  = [module.data_ingester_service_account.iam_email]
-  role     = "roles/bigquery.dataEditor"
+  role     = "roles/bigquery.admin"
 }
 
 # Allow the GCS service account to publish notification for new objects to the
@@ -118,3 +123,21 @@ resource "google_pubsub_topic_iam_binding" "cf_subscriber" {
   members = [module.data_ingester_service_account.iam_email]
 }
 
+module "project-services" {
+  source  = "terraform-google-modules/project-factory/google//modules/project_services"
+  version = "4.0.0"
+
+  project_id                  = var.project_id
+  disable_services_on_destroy = "false"
+
+  activate_apis = [
+    "compute.googleapis.com",
+    "iam.googleapis.com",
+    "bigquery.googleapis.com",
+    "storage.googleapis.com",
+    "pubsub.googleapis.com",
+    "clouderrorreporting.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "cloudfunctions.googleapis.com",
+  ]
+}

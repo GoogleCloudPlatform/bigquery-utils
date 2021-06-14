@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC.
+# Copyright 2021 Google LLC.
 # This software is provided as-is, without warranty or representation
 # for any use or purpose.
 # Your use of it is subject to your agreement with Google.
@@ -14,7 +14,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os
-import sys
-
-sys.path.append(os.path.realpath(os.path.dirname(__file__) + "/.."))
