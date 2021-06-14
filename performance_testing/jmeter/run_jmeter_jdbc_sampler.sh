@@ -30,6 +30,7 @@
 apache-jmeter-5.3/bin/jmeter -n \
 -t bigquery_jdbc_sampler.jmx \
 -Jproject_id=YOUR_PROJECT \
+-Jdefault_dataset_id= \
 -Juser.classpath=/path/to/your/SimbaJDBCDriverforGoogleBigQuery \
 -Jsimple_csv_path=test_queries/simple_selects.csv \
 -Jmedium_csv_path=test_queries/medium_selects.csv \

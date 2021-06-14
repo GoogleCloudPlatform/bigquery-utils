@@ -21,14 +21,18 @@ By Default we try to read dataset, table, partition (or yyyy/mm/dd/hh) and
 batch id using the following python regex:
 ```python3
 DEFAULT_DESTINATION_REGEX = (
-    r"^(?P<dataset>[\w\-\._0-9]+)/"  # dataset (required)
-    r"(?P<table>[\w\-_0-9]+)/?"      # table name (required)
-    r"(?P<partition>\$[0-9]+)?/?"    # partition decortator (optional)
-    r"(?P<yyyy>[0-9]{4})?/?"         # partition year (yyyy) (optional)
-    r"(?P<mm>[0-9]{2})?/?"           # partition month (mm) (optional)
-    r"(?P<dd>[0-9]{2})?/?"           # partition day (dd)  (optional)
-    r"(?P<hh>[0-9]{2})?/?"           # partition hour (hh) (optional)
-    r"(?P<batch>[\w\-_0-9]+)?/"      # batch id (optional)
+    r"^(?P<dataset>[\w\-\._0-9]+)/"   # dataset (required)
+    r"(?P<table>[\w\-_0-9]+)/?"       # table name (required)
+    # break up historical v.s. incremental to separate prefixes (optional)
+    r"(?:historical|incremental)?/?"
+    r"(?P<partition>\$[0-9]+)?/?"     # partition decorator (optional)
+    r"(?:"                            # [begin] yyyy/mm/dd/hh/ group (optional)
+    r"(?P<yyyy>[0-9]{4})/?"           # partition year (yyyy) (optional)
+    r"(?P<mm>[0-9]{2})?/?"            # partition month (mm) (optional)
+    r"(?P<dd>[0-9]{2})?/?"            # partition day (dd)  (optional)
+    r"(?P<hh>[0-9]{2})?/?"            # partition hour (hh) (optional)
+    r")?"                             # [end]yyyy/mm/dd/hh/ group (optional)
+    r"(?P<batch>[\w\-_0-9]+)?/"       # batch id (optional)
 )
 ```
 you can see if this meets your needs in this [regex playground](https://regex101.com/r/5Y9TDh/2)
@@ -37,8 +41,10 @@ better fit your naming convention on GCS. Your regex must include
 [Python Regex with named capturing groups](https://docs.python.org/3/howto/regex.html#non-capturing-and-named-groups)
 for destination `dataset`, and `table`.
 Note, that `dataset` can optionally, explicitly specify destination project
-(i.e. `gs://${BUCKET}/project_id.dataset_id/table/....`) otherwise the default
-project will be inferred from Application Default Credential (the project in
+(i.e. `gs://${BUCKET}/project_id.dataset_id/table/....`) alternatively,
+one can set the `BQ_STORAGE_PROJECT` environment variable to set to override the
+default target project for datasets at the function level. The default behavior is to 
+infer the project from Application Default Credential (the project in
 which the Cloud Function is running, or the ADC configured in Google Cloud SDK
 if invoked locally). This is useful in scenarios where a single deployment of
 the Cloud Function is responsible for ingesting data into BigQuery tables in
@@ -137,7 +143,7 @@ override them at whatever level is appropriate as new cases come up.
 For CSV loads the `fieldDelimiter` in load.json to external.json should be
 specified as a unicode character _not_ a hexidecimal character as hexidecimal
 characters will confuse python's `json.load` function.
-For example [ctrl-P](https://en.wikipedia.org/wiki/Data_Link_Escape) should be specified as:
+For example ctrl-P should be specified as:
 ```json
 {
     "fieldDelimiter": "\u0010"
@@ -150,14 +156,33 @@ before they can be loaded to BigQuery. This is handled by query on an
 temporary external table over the GCS objects as a proxy for load job.
 `gs://${INGESTION_BUCKET}/${BQ_DATASET}/${BQ_TABLE_NAME}/_config/bq_transform.sql`
 
-Note, external queries will consume query slots from this project's reservation
-or count towards your on-demand billing. They will _not_ use free tie load slots.
+By default, if a query job finishes of statement type
+`INSERT`,`UPDATE`,`DELETE`, or `MERGE` and `numDmlRowsAffected = 0` this will be
+treated as a failure ([See Query Job Statistics API docs](https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobstatistics2)).
+This is usually due to a bad query / configuration with bad DML predicate.
+For example running the following query on an empty table:
 
+```sql
+UPDATE foo.bar dest ... FROM temp_ext src WHERE src.id = dest.id
+```
+
+By failing on this condition we keep the backlog intact when we run a query job
+that unexpectedly did no affect any rows.
+This can be disabled by setting the environment variable
+`FAIL_ON_ZERO_DML_ROWS_AFFECTED=False`.
+
+A `CREATE OR REPLACE TABLE` is not DML and will not be subject to this behavior.
+
+##### Cost Note
+External queries will consume query slots from this project's reservation
+or count towards your on-demand billing.
+They will _not_ use free tier load slots.
+
+##### External Table Name: `temp_ext`
 Note, that the query should select from a `temp_ext` which will be a temporary
 external table configured on the fly by the Cloud Function.
 The query must handle the logic for inserting into the destination table.
-This means it should use BigQuery DML to either `INSERT` or `MERGE` into the
-destination table.
+This means it should use BigQuery DML to mutate the destination table.
 For example:
 ```sql
 INSERT {dest_dataset}.{dest_table}
@@ -209,6 +234,11 @@ at any parent folders `_config` prefix. This allows you dictate
 "for this table any new batch should `WRITE_TRUNCATE` it's parent partition/table"
 or "for that table any new batch should `WRITE_APPEND` to it's parent partition/table".
 
+## Controlling BigQuery Compute Project
+By default BigQuery jobs will be submitted in the project where the Cloud Function
+is deployed. To submit jobs in another BigQuery project set the `BQ_PROJECT`
+environment variable.
+
 ## Monitoring
 Monitoring what data has been loaded by this solution should be done with the
 BigQuery [`INFORMATION_SCHEMA` jobs metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
@@ -246,14 +276,20 @@ SELECT
    total_slot_ms,
    destination_table
    state,
+   error_result,
    (SELECT value FROM UNNEST(labels) WHERE key = "component") as component,
    (SELECT value FROM UNNEST(labels) WHERE key = "cloud-function-name") as cloud_function_name,
    (SELECT value FROM UNNEST(labels) WHERE key = "batch-id") as batch_id,
 FROM
    `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
 WHERE
-   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "gcf-ingest-"
+   (SELECT value FROM UNNEST(labels) WHERE key = "component") = "event-based-gcs-ingest"
 ```
+If your external queries have mutliple sql statements only the parent job will
+follow the `gcf-ingest-*` naming convention. Children jobs (for each statement)
+begin with prefix _script_job. These jobs will still be labelled with
+`component` and `cloud-function-name`.
+For more information see [Scripting in Standard SQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/scripting)
 
 ## Triggers
 GCS Object Finalize triggers can communicate with Cloud Functions directly or
@@ -293,6 +329,10 @@ It's better for us to make a conscious decision to adopt new features or adjust
 CI configs or pin older version depending on the type for failure.
 This CI should be run on all new PRs and nightly.
 
+Note, all functionality of the cloud function (including ordering) is
+integration tested against buckets with object versioning enabled to ensure this
+solution works for buckets using this feature.
+
 ### Just Running the Tests
 #### Running in Docker
 ```bash
@@ -310,8 +350,10 @@ docker run --rm -it gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci
 #### Running on your local machine
 Alternatively to the local cloudbuild or using the docker container to run your
 tests, you can `pip3 install -r requirements-dev.txt` and select certain tests
-to run with [`pytest`](https://docs.pytest.org/en/stable/usage.html). This is
-mostly useful if you'd like to integrate with your IDE debugger.
+to run with [`python3 -m pytest`](https://docs.pytest.org/en/stable/usage.html).
+Note, this is not quite the same as callin `pytest` without the `python -m` prefix
+([pytest invocation docs](https://docs.pytest.org/en/stable/usage.html#calling-pytest-through-python-m-pytest)) 
+This is mostly useful if you'd like to integrate with your IDE debugger.
 
 Note that integration tests will spin up / tear down cloud resources that can
 incur a small cost. These resources will be spun up based on your Google Cloud SDK
@@ -325,16 +367,24 @@ See more info on sharing pytest fixtures in the [pytest docs](https://docs.pytes
 
 #### Running All Tests
 ```bash
-pytest
+python3 -m pytest
 ```
 #### Running Unit Tests Only
 ```bash
-pytest -m "not IT"
+python3 -m pytest -m "not IT"
 ```
 
 #### Running Integration Tests Only
 ```bash
-pytest -m IT
+python3 -m pytest -m IT
+```
+
+#### Running System Tests Only
+The system tests assume that you have deployed the cloud function.
+```bash
+export TF_VAR_short_sha=$(git rev-parse --short=10 HEAD)
+export TF_VAR_project_id=jferriero-pp-dev
+python3 -m pytest -vvv e2e
 ```
 
 ## Deployment
@@ -362,7 +412,7 @@ gcloud functions deploy test-gcs-bq-ingest \
   --trigger-topic=${PUBSUB_TOPIC} \
   --service-account=${SERVICE_ACCOUNT_EMAIL} \
   --timeout=540 \
-  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?,FUNCTION_TIMEOUT_SEC=540'
 ```
 
 #### Cloud Functions Events
@@ -379,13 +429,19 @@ gcloud functions deploy test-gcs-bq-ingest \
   --trigger-event google.storage.object.finalize
   --service-account=${SERVICE_ACCOUNT_EMAIL} \
   --timeout=540 \
-  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?'
+  --set-env-vars='DESTINATION_REGEX=^(?:[\w\-0-9]+)/(?P<dataset>[\w\-_0-9]+)/(?P<table>[\w\-_0-9]+)/?(?:incremental|history)?/?(?P<yyyy>[0-9]{4})?/?(?P<mm>[0-9]{2})?/?(?P<dd>[0-9]{2})?/?(?P<hh>[0-9]{2})?/?(?P<batch>[0-9]+)?/?,FUNCTION_TIMEOUT_SEC=540'
 ```
 
 In theory, one could set up Pub/Sub notifications from multiple GCS Buckets
 (owned by different teams but following a common naming convention) to the same
 Pub/Sub topic so that data uploaded to any of these buckets could get
 automatically loaded to BigQuery by a single deployment of the Cloud Function.
+
+## Ordering Guarantees
+It is possible to configure the Cloud Function to apply incrementals in order if
+this is crucial to your data integrity. This naturally comes with a performance
+penalty as for a given table we cannot parallelize ingestion of batches.
+The ordering behavior and options are described in detail in [ORDERING.md](ORDERING.md)
 
 ## Backfill
 There are some cases where you may have data already copied to GCS according to
@@ -395,6 +451,21 @@ the `backfill.py` CLI utility to crawl an existing bucket searching for success
 files. The utility supports either invoking the Cloud Function main method
 locally (in concurrent threads) or publishing notifications for the success
 files (for a deployed Cloud Function to pick up).
+
+### Backfill and Ordering
+If you use the ordering feature on a table (or function wide) you should use the
+`NOTIFICATIONS` mode to repost notifications to a pub/sub topic that your
+deployed Cloud Function is listening to. The `LOCAL` mode does not support
+ordering because this feature relies on (re)posting files like `_bqlock`,
+`_BACKFILL` and various claim files and getting re-triggered by object
+notifications for these.
+The script will publish the notifications for success files and the Cloud
+Function will add these to the appropriate table's backlog.
+Once the script completes you can drop the `START_BACKFILL_FILENAME`
+(e.g. `_HISTORYDONE`) for each table you want to trigger the backfill for.
+In general, it would not be safe for this utility to drop a `_HISTORYDONE` for
+every table because the parallel historical loads might still be in progress.
+
 
 ### Usage
 ```

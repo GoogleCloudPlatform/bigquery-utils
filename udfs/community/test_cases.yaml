@@ -389,3 +389,38 @@ nlp_compromise_people:
   - test:
     input: CAST("Randal Kieth Orton and Dwayne 'the rock' Johnson had a really funny fight." AS STRING)
     expected_output: CAST(['randal kieth orton', 'dwayne the rock johnson'] AS ARRAY<STRING>)
+levenshtein:
+  - test:
+    input: CAST('analyze' AS STRING), CAST('analyse' AS STRING)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST('opossum' AS STRING), CAST('possum' AS STRING)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST('potatoe' AS STRING), CAST('potatoe' AS STRING)
+    expected_output: CAST(0 AS INT64)
+  - test:
+    input: CAST('while' AS STRING), CAST('whilst' AS STRING)
+    expected_output: CAST(2 AS INT64)
+  - test:
+    input: CAST('aluminum' AS STRING), CAST('alumininium' AS STRING)
+    expected_output: CAST(3 AS INT64)
+  - test:
+    input: CAST('Connecticut' AS STRING), CAST('CT' AS STRING)
+    expected_output: CAST(10 AS INT64)
+#
+# Below targets StatsLib work
+#
+pvalue:
+  - test:
+    input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
+    expected_output: CAST(0.8607079764250578 AS FLOAT64)
+kruskal_wallis:
+  - test:
+    input: (SELECT [('a',1.0), ('b',2.0), ('c',2.3), ('a',1.4), ('b',2.2), ('c',5.5), ('a',1.0), ('b',2.3), ('c',2.3), ('a',1.1), ('b',7.2), ('c',2.8)])
+    expected_output: STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)
+linear_regression:
+  - test:
+    input: (SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])
+    expected_output: STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)
+    

@@ -1,4 +1,4 @@
-# Copyright 2020 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from google.cloud import bigquery
 import gcs_ocn_bq_ingest.main
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
-LOAD_JOB_POLLING_TIMEOUT = 10  # seconds
+LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 
 
 @pytest.mark.IT
@@ -67,8 +67,8 @@ def test_gcf_event_schema(bq, gcs_data, dest_dataset, dest_table, mock_env):
 
 
 @pytest.mark.IT
-def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
-                                mock_env):
+def test_duplicate_success_notification(bq, gcs_data, dest_dataset, dest_table,
+                                        mock_env):
     """tests behavior with two notifications for the same success file."""
     if not gcs_data.exists():
         raise EnvironmentError("test data objects must exist")
@@ -79,12 +79,6 @@ def test_duplicate_notification(bq, gcs_data, dest_dataset, dest_table,
         }
     }
     gcs_ocn_bq_ingest.main.main(test_event, None)
-    did_second_invocation_raise = False
-    try:
-        gcs_ocn_bq_ingest.main.main(test_event, None)
-    except RuntimeError:
-        did_second_invocation_raise = True
-    assert did_second_invocation_raise
 
     test_data_file = os.path.join(TEST_DIR, "resources", "test-data", "nation",
                                   "part-m-00001")
@@ -149,8 +143,8 @@ def test_load_job_appending_batches(bq, gcs_batched_data, dest_dataset,
 
 
 @pytest.mark.IT
-def test_external_query(bq, gcs_data, gcs_external_config, dest_dataset,
-                        dest_table, mock_env):
+def test_external_query_pure(bq, gcs_data, gcs_external_config, dest_dataset,
+                             dest_table, mock_env):
     """tests the basic external query ingrestion mechanics
     with bq_transform.sql and external.json
     """
@@ -195,6 +189,39 @@ def test_load_job_partitioned(bq, gcs_partitioned_data,
             "attributes": {
                 "bucketId": gcs_data.bucket.name,
                 "objectId": gcs_data.name
+            }
+        }
+        gcs_ocn_bq_ingest.main.main(test_event, None)
+    expected_num_rows = 0
+    for part in [
+            "$2017041101",
+            "$2017041102",
+    ]:
+        test_data_file = os.path.join(TEST_DIR, "resources", "test-data",
+                                      "nyc_311", part, "nyc_311.csv")
+        expected_num_rows += sum(1 for _ in open(test_data_file))
+    bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)
+
+
+@pytest.mark.IT
+def test_external_query_partitioned(bq, gcs_partitioned_data,
+                                    gcs_external_partitioned_config,
+                                    dest_dataset, dest_partitioned_table,
+                                    mock_env):
+    """tests the basic external query ingrestion mechanics
+    with bq_transform.sql and external.json
+    """
+    if not all((blob.exists() for blob in gcs_external_partitioned_config)):
+        raise google.cloud.exceptions.NotFound("config objects must exist")
+
+    for blob in gcs_partitioned_data:
+        if not blob.exists():
+            raise google.cloud.exceptions.NotFound(
+                "test data objects must exist")
+        test_event = {
+            "attributes": {
+                "bucketId": blob.bucket.name,
+                "objectId": blob.name
             }
         }
         gcs_ocn_bq_ingest.main.main(test_event, None)
@@ -259,3 +286,30 @@ def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
         f"{table.project}.{table.dataset_id}.{table.table_id} to "
         f"reach {expected_num_rows} rows."
         f"last poll returned {actual_num_rows} rows.")
+
+
+@pytest.mark.IT
+def test_external_query_with_bad_statement(bq, gcs_data,
+                                           gcs_external_config_bad_statement,
+                                           dest_dataset, dest_table, mock_env):
+    """tests the basic external query ingrestion mechanics
+    with bq_transform.sql and external.json
+    """
+    if not gcs_data.exists():
+        raise google.cloud.exceptions.NotFound("test data objects must exist")
+    if not all((blob.exists() for blob in gcs_external_config_bad_statement)):
+        raise google.cloud.exceptions.NotFound("config objects must exist")
+
+    test_event = {
+        "attributes": {
+            "bucketId": gcs_data.bucket.name,
+            "objectId": gcs_data.name
+        }
+    }
+    raised = False
+    try:
+        gcs_ocn_bq_ingest.main.main(test_event, None)
+    except gcs_ocn_bq_ingest.common.exceptions.BigQueryJobFailure:
+        raised = True
+
+    assert raised, "bad statement did not raise BigQueryJobFailure"
