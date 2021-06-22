@@ -27,7 +27,7 @@ function lngamm(z)
   x -= 1259.139216722289     /(z+1);
   x += 676.5203681218835     /(z);
   x += 0.9999999999995183;
-  return(Math.log(x)-5.58106146679532777-z+(z-0.5)*Math.log(z+6.5));
+  return(Math['log'](x)-5.58106146679532777-z+(z-0.5)*Math['log'](z+6.5));
 }
 function lnfact(n)
 {
@@ -67,7 +67,7 @@ function LynHyperGoe_appr( a, b, c, d ) {
      
 }
   
-  var n = Math.round(a + b + c + d);
+  var n = Math['round'](a + b + c + d);
   var temp = 0 ;
   var LnPrx = 0.0 ;
   var n1_ = a+b ;
@@ -87,28 +87,28 @@ function LynHyperGoe_appr( a, b, c, d ) {
      for (x = min; x <= max; x++) {       
         LnPrx = LnHyperGeometric( x , n1_ - x, n_1 - x, n_21 +x) ;
         if ( LnPrx <= LnPra ) { 
-            temp = temp + Math.exp( LnPrx - LnPra );
+            temp = temp + Math['exp']( LnPrx - LnPra );
         }         
      }
   } else {
      var LnPra = LynHyperGoe_appr( a, b, c, d) ; 
      LnPrx = (min, n1_-min, n_1-min, n_21+min);
      if ( LnPrx <= LnPra ) { 
-            temp = temp + Math.exp( LnPrx - LnPra );
+            temp = temp + Math['exp']( LnPrx - LnPra );
      }
      for (x = min+1; x <= max; x++) {
         if (! (x % 10 == 0)  ) {
-           LnPrx = LnPrx + Math.log( ((n_1 - x +1)/x)*(n1_ -x +1)/( n_21 + x) )     ;
+           LnPrx = LnPrx + Math['log']( ((n_1 - x +1)/x)*(n1_ -x +1)/( n_21 + x) )     ;
         }
         else {
            LnPrx = LynHyperGoe_appr(x, n1_-x, n_1-x, n_21+x);
         }
         if ( LnPrx <= LnPra ) { 
-            temp = temp + Math.exp( LnPrx - LnPra );
+            temp = temp + Math['exp']( LnPrx - LnPra );
         }
      }
   }
   
-  var LnPFET = LnPra  + Math.log( temp ); 
-  return  Math.exp( LnPFET ) ;
+  var LnPFET = LnPra  + Math['log']( temp ); 
+  return  Math['exp']( LnPFET ) ;
 """;
