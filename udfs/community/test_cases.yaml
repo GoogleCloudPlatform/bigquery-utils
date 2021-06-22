@@ -411,6 +411,10 @@ levenshtein:
 #
 # Below targets StatsLib work
 #
+jstat:
+  - test:
+    input: CAST('chisquare.cdf' AS STRING), ARRAY<FLOAT64>[0.3, 2.0]
+    expected_output: CAST(0.1392920235749422 AS FLOAT64)
 pvalue:
   - test:
     input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
