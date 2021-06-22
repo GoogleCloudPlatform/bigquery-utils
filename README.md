@@ -36,6 +36,8 @@ This repository is broken up into:
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
         the audit logs which can be used to power dashboards
         ([example](https://codelabs.developers.google.com/codelabs/bigquery-pricing-workshop/#0)).
+*   [third_party](/third_party) - Relevant third party libraries for BigQuery 
+    *   [compilerworks](/third_party/compilerworks) - BigQuery UDFs which mimic the behavior of proprietary functions in other databases
 
 ## Public UDFs
 
