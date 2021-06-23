@@ -1017,7 +1017,7 @@ SELECT
     ) AS routine,
     routineDeletionReason AS reason,
     routineDeletionJobName AS jobName
-  ) AS routineDeletio
+  ) AS routineDeletion
 FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
 LEFT JOIN tableDataReadEvent USING(jobId)
