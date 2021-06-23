@@ -291,6 +291,51 @@ tableCreationEvent AS (
   FROM `project_id.dataset_id.cloudaudit_googleapis_com_activity`
 ),
 /*
+ * TableChange: Table metadata change event
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#TableChange
+ */
+tableChangeEvent AS (
+  SELECT
+    CONCAT(
+     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableChange.jobName'),"/")[SAFE_OFFSET(1)],
+       ":",
+     SPLIT(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.tableChange.jobName'),"/")[SAFE_OFFSET(3)]
+    ) AS jobId,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+    '$.tableChange.jobName') AS tableChangeJobName,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.tableName') AS tableChangeTableName,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.tableInfo.friendlyName') AS tableChangeTableFriendlyName,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.tableInfo.description') AS tableChangeTableDescription,
+    JSON_EXTRACT(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.tableInfo.labels') AS tableChangeTableLabels,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.schemaJson') AS tableChangeTableSchemaJson,
+    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+     '$.tableChange.table.schemaJsonTruncated') AS BOOL) AS tableChangeTableSchemaJsonTruncated,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.view.query') AS tableChangeViewDefinitionQuery,
+    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.view.queryTruncated') AS BOOL) AS tableChangeViewDefinitionTruncated,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.expireTime') AS tableChangeTableExpireTime,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.createTime') AS tableChangeTableCreateTime,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.updateTime') AS tableChangeTableUpdateTime,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.truncateTime') AS tableChangeTableTruncateTime,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.table.encryption.kmsKeyName') AS tableChangeTableKmsKeyName,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.reason')  AS tableChangeReason,
+    CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.tableChange.truncated') AS BOOL) AS tableChangeTruncated
+  FROM `project_id.dataset_id.cloudaudit_googleapis_com_activity`
+),
+/*
  * TableDeletion: Table deletion event
  * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
  */
