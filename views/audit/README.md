@@ -65,6 +65,23 @@ query job and which tables expired due to having an expiration time configured.
 
 ### Getting Started with bigquery_audit_logs_v2.sql
 
+This view extracts and presents BigQuery audit log information into the
+following organized structs which mimic the BigQuery API structs:
+
+* [jobChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobchange)
+* [tableDataChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledatachange)
+* [tableCreationEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablecreation)
+* [tableChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablechange)
+* [tableDeletionEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledeletion)
+* [tableDataReadEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledataread)
+* [modelDeletionEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldeletion)
+* [modelCreationEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelcreation)
+* [modelMetadataChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelmetadatachange)
+* [modelDataChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldatachange)
+* [routineCreationEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinecreation)
+* [routineChangeEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinechange)
+* [routineDeletionEvent](https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinedeletion)
+
 1. Set your environment variables, replace \<your-project\> and \<your-dataset\>
    with the appropriate information
 
@@ -211,6 +228,10 @@ monitor, and set alerts on all your BigQuery scripting activity.
 is a BigQuery view that handles extracting and formatting BigQueryMetaData
 events so that you can focus on writing simple queries on top of this view to
 monitor your BigQuery script jobs.
+
+> Note: This view is just a subset of the SQL
+> that's present in the [bigquery_audit_logs_v2.sql](bigquery_audit_logs_v2.sql) view.
+> It exists as a tactical solution to target only logs related to scripting in BigQuery.
 
 #### Prerequisites
 

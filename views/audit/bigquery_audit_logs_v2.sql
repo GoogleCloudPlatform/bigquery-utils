@@ -39,7 +39,7 @@ WITH jobChangeEvent AS (
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobName') AS jobChangeJobName,
     /*
      * JobStatus: Running state of a job
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstatus
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobstatus
      */
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobStatus.jobState') AS jobStatusJobState,
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -52,7 +52,7 @@ WITH jobChangeEvent AS (
       '$.jobChange.job.jobStatus.errors') AS jobStatusErrorsArray,
     /*
      * JobStats: Job statistics that may change after job starts.
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstats
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobstats
      */
     JSON_EXTRACT_SCALAR(
       protopayload_auditlog.metadataJson,'$.jobChange.job.jobStats.parentJobName') AS jobStatsParentJobName,
@@ -80,7 +80,7 @@ WITH jobChangeEvent AS (
     ) AS jobStatsReservationUsageSlotMs,
     /*
      * Query: Query job statistics
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query_1
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.query_1
      */
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.queryStats.totalProcessedBytes') AS queryJobStatsTotalProcessedBytes,
@@ -103,7 +103,7 @@ WITH jobChangeEvent AS (
       '$.jobChange.job.jobStats.queryStats.cacheHit') AS BOOL) AS queryJobStatsCacheHit,
     /*
      * Load: Load job statistics
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load_1
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.load_1
      */
     CAST(JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobStats.loadStats.totalOutputBytes') AS INT64 ) AS loadJobStatsTotalOutputBytes,
@@ -130,13 +130,13 @@ WITH jobChangeEvent AS (
       SECOND), 60)) AS INT64) AS jobStatsExecutionMinuteBuckets,
     /*
      * Job configuration information.
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobconfig
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobconfig
      */
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson, '$.jobChange.job.jobConfig.type') AS jobConfigType,
     JSON_EXTRACT(protopayload_auditlog.metadataJson, '$.jobChange.job.jobConfig.labels') AS jobConfigLabels,
     /*
      * Describes a query job.
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.query
      */
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.queryConfig.query') AS queryConfigQuery,
@@ -173,7 +173,7 @@ WITH jobChangeEvent AS (
       "/")[SAFE_OFFSET(5)] AS queryConfigDestinationTableId,
     /*
      * Describes a load job.
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.load
      */
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.loadConfig.sourceUris'),
@@ -195,7 +195,7 @@ WITH jobChangeEvent AS (
     ) AS loadConfigDestinationTableEncryptionKmsKeyName,
     /*
      * Describes an extract job.
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.extract
      */
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.extractConfig.destinationUris'),
@@ -216,7 +216,7 @@ WITH jobChangeEvent AS (
       ",")[SAFE_OFFSET(5)] AS extractConfigSourceTableId,
     /*
      * Describes a copy job, which copies an existing table to another table
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecopy
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablecopy
      */
     SPLIT(TRIM(TRIM(JSON_EXTRACT(protopayload_auditlog.metadataJson,
       '$.jobChange.job.jobConfig.tableCopyConfig.sourceTables'),
@@ -249,7 +249,7 @@ WITH jobChangeEvent AS (
 ),
 /*
  * TableCreation: Table creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecreation
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablecreation
  */
 tableCreationEvent AS (
   SELECT
@@ -292,7 +292,7 @@ tableCreationEvent AS (
 ),
 /*
  * TableChange: Table metadata change event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#TableChange
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablechange
  */
 tableChangeEvent AS (
   SELECT
@@ -337,7 +337,7 @@ tableChangeEvent AS (
 ),
 /*
  * TableDeletion: Table deletion event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledeletion
  */
 tableDeletionEvent AS (
   SELECT
@@ -357,7 +357,7 @@ tableDeletionEvent AS (
 ),
 /*
  * TableDataRead: Data from tableDataRead audit logs
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledataread
  */
 tableDataReadEvent AS (
   SELECT
@@ -403,7 +403,7 @@ tableDataReadEvent AS (
 ),
 /*
  * TableDataChange: Table data change event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledatachange
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledatachange
  */
 tableDataChangeEvent AS (
   SELECT
@@ -431,7 +431,7 @@ tableDataChangeEvent AS (
 ),
 /*
  * ModelDeletion: Model deletion event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldeletion
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldeletion
  */
 modelDeletionEvent AS (
   SELECT
@@ -454,7 +454,7 @@ modelDeletionEvent AS (
 ),
 /*
  * ModelCreation: Model creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelcreation
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelcreation
  */
 modelCreationEvent AS (
   SELECT
@@ -493,7 +493,7 @@ modelCreationEvent AS (
 ),
 /*
  * ModelMetadataChange: Model metadata change event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelmetadatachange
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelmetadatachange
  */
 modelMetadataChangeEvent AS (
   SELECT
@@ -532,13 +532,14 @@ modelMetadataChangeEvent AS (
 ),
 /*
  * ModelDataChange: Model data change event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldatachange
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldatachange
  */
 modelDataChangeEvent AS (
   SELECT
     JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
-        '$.modelDataChange.reason')
-    AS modelDataChangeReason,
+      '$.modelDataChange.reason') AS modelDataChangeReason,
+    JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
+      '$.modelDataChange.jobName') AS modelDataChangeJobName,
     CONCAT(
       SPLIT(
         JSON_EXTRACT_SCALAR(protopayload_auditlog.metadataJson,
@@ -554,7 +555,7 @@ modelDataChangeEvent AS (
 ),
 /*
  * RoutineCreation: Routine creation event.
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinecreation
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinecreation
  */
 routineCreationEvent AS (
   SELECT
@@ -583,7 +584,7 @@ routineCreationEvent AS (
 ),
 /*
  * RoutineChange: Routine change event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinechange
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinechange
  */
 routineChangeEvent AS (
   SELECT
@@ -612,7 +613,7 @@ routineChangeEvent AS (
 ),
 /*
  * RoutineDeletion: Routine deletion event
- * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinedeletion
+ * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinedeletion
  */
 routineDeletionEvent AS (
   SELECT
@@ -710,20 +711,20 @@ SELECT
   queryConfigDestinationTableId AS queryDestinationTableId,
   /*
    * jobChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobchange
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobchange
   */
   STRUCT(
     jobChangeJobName AS jobName,
     /*
      * jobConfig STRUCT
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobconfig
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobconfig
      */
     STRUCT(
       jobConfigType AS type,
       jobConfigLabels AS labels,
       /*
        * queryConfig STRUCT
-       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#query
+       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.query
        */
       STRUCT(
         queryConfigQuery AS query,
@@ -744,7 +745,7 @@ SELECT
       ) AS queryConfig,
       /*
        * loadConfig STRUCT
-       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load
+       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.load
        */
       STRUCT(
         loadConfigSourceUris AS sourceUris,
@@ -760,7 +761,7 @@ SELECT
       ) AS loadConfig,
       /*
        * extractConfig STRUCT
-       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#extract
+       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.extract
        */
       STRUCT(
         extractConfigDestinationUris AS destinationUris,
@@ -769,7 +770,7 @@ SELECT
       ) AS extractConfig,
       /*
        * tableCopyConfig STRUCT
-       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecopy
+       * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablecopy
        */
       STRUCT(
         tableCopySourceTables AS sourceTables,
@@ -784,7 +785,7 @@ SELECT
     ) AS jobConfig,
     /*
      * jobStatus STRUCT
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#JobStatus
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.JobStatus
      */
     STRUCT(
       jobStatusJobState AS jobState,
@@ -797,7 +798,7 @@ SELECT
     ) AS jobStatus,
     /*
      * jobStats STRUCT
-     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#jobstats
+     * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.jobstats
      */
     STRUCT(
       jobStatsCreateTime AS createTime,
@@ -826,14 +827,14 @@ SELECT
   ) AS jobChange,
   /*
    * Load job statistics
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#load_1
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.load_1
   */
   loadJobStatsTotalOutputBytes AS totalLoadOutputBytes,
   (SAFE_DIVIDE(loadJobStatsTotalOutputBytes, pow(2,30))) AS totalLoadOutputGigabytes,
   (SAFE_DIVIDE(loadJobStatsTotalOutputBytes, pow(2,40))) AS totalLoadOutputTerabytes,
   /*
    * tableChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#TableChange
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablechange
    */
   STRUCT(
     STRUCT(
@@ -862,7 +863,7 @@ SELECT
   ) AS tableChange,
   /*
    * tableCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tablecreation
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tablecreation
    */
   STRUCT(
     STRUCT(
@@ -891,7 +892,7 @@ SELECT
   ) AS tableCreation,
   /*
    * tableDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledeletion
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledeletion
    */
   STRUCT(
     tableDeletionReason AS reason,
@@ -899,7 +900,7 @@ SELECT
   ) AS tableDeletion,
   /*
    * tableDataRead STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledataread
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledataread
    */
   STRUCT(
     tableDataReadTableName AS tableName,
@@ -913,7 +914,7 @@ SELECT
   ) AS tableDataRead,
   /*
    * tableDataChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#tabledatachange
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.tabledatachange
    */
   STRUCT(
     tableDataChangeDeletedRowsCount AS deletedRowsCount,
@@ -924,7 +925,7 @@ SELECT
   ) AS tableDataChange,
    /*
    * modelDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modeldeletion
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldeletion
    */
   STRUCT(
     modelDeletionReason AS reason,
@@ -932,7 +933,7 @@ SELECT
   ) AS modelDeletion,
   /*
    * modelCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelcreation
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelcreation
    */
   STRUCT(
     STRUCT(
@@ -952,7 +953,7 @@ SELECT
   ) AS modelCreation,
   /*
    * modelMetadataChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#modelmetadatachange
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modelmetadatachange
    */
   STRUCT(
     STRUCT(
@@ -971,8 +972,16 @@ SELECT
     modelMetadataChangeJobName AS jobName
   ) AS modelMetadataChange,
   /*
+   * modelDataChange STRUCT
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.modeldeletion
+   */
+  STRUCT(
+    modelDataChangeReason AS reason,
+    modelDataChangeJobName AS jobName
+  ) AS modelDataChange,
+  /*
    * routineCreation STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinecreation
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinecreation
    */
   STRUCT(
     STRUCT(
@@ -985,7 +994,7 @@ SELECT
   ) AS routineCreation,
   /*
    * routineChange STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinechange
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinechange
    */
   STRUCT(
     STRUCT(
@@ -998,7 +1007,7 @@ SELECT
   ) AS routineChange,
   /*
    * routineDeletion STRUCT
-   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#routinedeletion
+   * https://cloud.google.com/bigquery/docs/reference/auditlogs/rest/Shared.Types/BigQueryAuditMetadata#bigqueryauditmetadata.routinedeletion
    */
   STRUCT(
     STRUCT(
@@ -1011,10 +1020,10 @@ SELECT
   ) AS routineDeletio
 FROM jobChangeEvent
 LEFT JOIN tableDataChangeEvent USING(jobId)
+LEFT JOIN tableDataReadEvent USING(jobId)
 LEFT JOIN tableCreationEvent USING(jobId)
 LEFT JOIN tableChangeEvent USING(jobId)
 LEFT JOIN tableDeletionEvent USING(jobId)
-LEFT JOIN tableDataReadEvent USING(jobId)
 LEFT JOIN modelDeletionEvent USING(jobId)
 LEFT JOIN modelMetadataChangeEvent USING(jobId)
 LEFT JOIN modelCreationEvent USING(jobId)
