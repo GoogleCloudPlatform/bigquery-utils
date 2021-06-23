@@ -1,30 +1,36 @@
 # BigQuery Audit Logging Views
 
-This directory contains views which are designed to query audit
-log datasets
-[created via Cloud Logging sinks](https://cloud.google.com/logging/docs/export/bigquery).
+This directory contains views which are designed to query audit log datasets
+which **you must
+[create via Cloud Logging sinks](https://cloud.google.com/logging/docs/export/bigquery)**
+.
+
+The following views are based on the newer v2 BigQueryAuditMetadata logs:
 
 * [bigquery_audit_logs_v2.sql](bigquery_audit_logs_v2.sql) - Getting started
   details [here](#getting-started-with-bigquery_audit_logs_v2sql)
-* [bigquery_script_logs_v2.sql](bigquery_script_logs_v2.sql) - Getting
-  started details [here](#getting-started-with-bigquery_script_logs_v2sql)
+* [bigquery_script_logs_v2.sql](bigquery_script_logs_v2.sql) - Getting started
+  details [here](#getting-started-with-bigquery_script_logs_v2sql)
+
+The following views are based on the older v1 BigQUery AuditData logs:
+
 * [bigquery_audit_logs_v1.sql](bigquery_audit_logs_v1.sql) - Getting started
   details [here](#getting-started-1)
 
+> If you are looking to query INFORMATION_SCHEMA views which don't require
+> setting up Cloud Logging sinks, please refer to the online
+> documented examples:
+>
+> * [Dataset Metadata](https://cloud.google.com/bigquery/docs/information-schema-datasets)
+> * [Job Metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
+> * [Job Timeline Metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs-timeline)
+> * [Reservation Metadata](https://cloud.google.com/bigquery/docs/information-schema-reservations)
+> * [Streaming Metadata](https://cloud.google.com/bigquery/docs/information-schema-streaming)
+> * [Routine Metadata](https://cloud.google.com/bigquery/docs/information-schema-routines)
+> * [Table Metadata](https://cloud.google.com/bigquery/docs/information-schema-tables)
+> * [View Metadata](https://cloud.google.com/bigquery/docs/information-schema-views)
 
-If you are looking to query INFORMATION_SCHEMA views, please refer to the online
-documented examples:
-
-* [Dataset Metadata](https://cloud.google.com/bigquery/docs/information-schema-datasets)
-* [Job Metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs)
-* [Job Timeline Metadata](https://cloud.google.com/bigquery/docs/information-schema-jobs-timeline)
-* [Reservation Metadata](https://cloud.google.com/bigquery/docs/information-schema-reservations)
-* [Streaming Metadata](https://cloud.google.com/bigquery/docs/information-schema-streaming)
-* [Routine Metadata](https://cloud.google.com/bigquery/docs/information-schema-routines)
-* [Table Metadata](https://cloud.google.com/bigquery/docs/information-schema-tables)
-* [View Metadata](https://cloud.google.com/bigquery/docs/information-schema-views)
-
-## Which version should you use?
+## Which logs version should you use (v2 or v1)?
 
 Google Cloud's audit log message system relies on structured logs, and the
 BigQuery service provides three distinct kinds of structured log messages:
@@ -200,7 +206,7 @@ A common pattern in data warehousing for tracking results of DML statements is
 to collect system variable values after each DML statement and write them to a
 separate logging table. With BigQuery, you no longer have to log your SQL
 statement results because Cloud Logging allows you to store, search, analyze,
-monitor, and set alerts on all your BigQuery scripting activity. 
+monitor, and set alerts on all your BigQuery scripting activity.
 [bigquery_script_logs_v2.sql](/views/audit/bigquery_script_logs_v2.sql)
 is a BigQuery view that handles extracting and formatting BigQueryMetaData
 events so that you can focus on writing simple queries on top of this view to
