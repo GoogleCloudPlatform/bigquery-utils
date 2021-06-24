@@ -9,10 +9,10 @@ In order to create and use the UDFs within your BigQuery workstreams, ensure tha
   * bigquery.routines.create
   * bigquery.jobs.create
 
-* For query users of the UDFs please ensure that they have read access to the dataset where the udfs are stored along with the dataset with the actual data. Note that with (AUTHORIZED UDFS)[https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#authorized_udf_example] users can operate on datasets to which they do not have access and so read access to the actual data can be skipped.
+* For query users of the UDFs please ensure that they have read access to the dataset where the udfs are stored along with the dataset with the actual data. Note that with (AUTHORIZED UDFS)[https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#authorized_udf_example] users can operate on datasets to which they do not have access and so read access to the actual data is optional.
   * bigquery.routines.get
   * bigquery.jobs.create
-  * bigquery.tables.getData (skippable if using Authorized UDFs)
+  * bigquery.tables.getData (optional if using Authorized UDFs)
 
 ## Creating the UDFs
 
