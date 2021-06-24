@@ -9,10 +9,10 @@ In order to create and use the UDFs within your BigQuery workstreams, ensure tha
   * bigquery.routines.create
   * bigquery.jobs.create
 
-* For query users of the UDFs please ensure that they have read access to the dataset where the udfs are stored along with the dataset with the actual data.
+* For query users of the UDFs please ensure that they have read access to the dataset where the udfs are stored along with the dataset with the actual data. Note that with (AUTHORIZED UDFS)[https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#authorized_udf_example] users can operate on datasets to which they do not have access and so read access to the actual data can be skipped.
   * bigquery.routines.get
   * bigquery.jobs.create
-  * bigquery.tables.getData
+  * bigquery.tables.getData (skippable if using Authorized UDFs)
 
 ## Creating the UDFs
 
@@ -27,7 +27,7 @@ fully-qualified UDF name (e.g. `<PROJECT>.<DATASET>.<UDF_NAME>()`).
 
 If you are pasting and executing the UDF DDL statement in the BigQuery Console,
 you must modify the UDF name to include your desired dataset, and optionally,
-the project ID. Note that the default dataset name is cw_udf:
+the project ID.
 
 `CREATE OR REPLACE FUNCTION your_dataset.function_name() . . .`
 

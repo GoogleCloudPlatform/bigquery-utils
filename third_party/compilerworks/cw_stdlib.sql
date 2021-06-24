@@ -24,7 +24,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_instr4(source STRING, search STRING, position INT64, ocurrence INT64) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION cw_instr4(source STRING, search STRING, position INT64, ocurrence INT64) RETURNS INT64 AS (
    case when position > 0 then
       (SELECT length(string_agg(x, '')) + length(search) * (ocurrence - 1) + position
        FROM unnest(split(substr(source, position), search)) as x with offset occ
@@ -38,12 +38,12 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_instr4(source STRING, search STRING, positi
    end
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_initcap(s STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_initcap(s STRING) RETURNS STRING AS (
   (SELECT STRING_AGG(CONCAT(UPPER(SUBSTR(part, 1, 1)), LOWER(SUBSTR(part, 2))), ' ')
    FROM UNNEST(SPLIT(s, ' ')) AS part)
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_otranslate(s STRING, key STRING, value STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_otranslate(s STRING, key STRING, value STRING) RETURNS STRING AS (
   (SELECT
      STRING_AGG(
        IFNULL(
@@ -59,7 +59,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_otranslate(s STRING, key STRING, value STRI
 
 
 /* Formats the interval as 'day hour:minute:second */
-CREATE OR REPLACE FUNCTION cw_udf.cw_stringify_interval (x INT64) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_stringify_interval (x INT64) RETURNS STRING AS
 (
     concat(
        CASE WHEN x >= 0 THEN '+' ELSE '-' END,
@@ -71,7 +71,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_stringify_interval (x INT64) RETURNS STRING
 );
 
 /* Internal function */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regex_mode (mode STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_regex_mode (mode STRING) RETURNS STRING
 LANGUAGE js AS """
   var m = '';
   if (mode == 'i' || mode == 'm')
@@ -83,12 +83,12 @@ LANGUAGE js AS """
 """;
 
 /* Implements regexp_substr/4 (haystack, needle, position, occurence) */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_substr_4 (h STRING, n STRING, p INT64, o INT64) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_regexp_substr_4 (h STRING, n STRING, p INT64, o INT64) RETURNS STRING AS
 (
     regexp_extract_all(substr(h, p), n)[safe_ordinal(o)]
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_substr_generic (str STRING, regexp STRING, p INT64, o INT64, mode STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_regexp_substr_generic (str STRING, regexp STRING, p INT64, o INT64, mode STRING) RETURNS STRING
 LANGUAGE js AS """
   if (str == null || regexp == null || p == null || o == null || mode == null) return null;
   var r = new RegExp(regexp, mode);
@@ -97,12 +97,12 @@ LANGUAGE js AS """
   return m[o - 1];
 """;
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_substr_5 (h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_regexp_substr_5 (h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
 (
-    cw_udf.cw_regexp_substr_generic(h, n, p, o, cw_udf.cw_regex_mode(mode))
+    cw_regexp_substr_generic(h, n, p, o, cw_regex_mode(mode))
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_2(haystack STRING, needle STRING) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION cw_regexp_instr_2(haystack STRING, needle STRING) RETURNS INT64 AS (
   CASE WHEN REGEXP_CONTAINS(haystack, needle) THEN
     LENGTH(REGEXP_REPLACE(haystack, CONCAT('(.*?)', needle, '(.*)'), '\\1')) + 1
   WHEN needle IS NULL OR haystack IS NULL THEN
@@ -111,7 +111,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_2(haystack STRING, needle STRI
   END
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_3(haystack STRING, needle STRING, start INT64) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION cw_regexp_instr_3(haystack STRING, needle STRING, start INT64) RETURNS INT64 AS (
   CASE WHEN REGEXP_CONTAINS(substr(haystack, start), needle) THEN
     LENGTH(REGEXP_REPLACE(substr(haystack, start), CONCAT('(.*?)', needle, '(.*)'), '\\1')) + 1 + start
   WHEN needle IS NULL OR haystack IS NULL or start IS NULL THEN
@@ -121,7 +121,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_3(haystack STRING, needle STRI
 );
 
 /* Implements regexp_instr/4 (haystack, needle, position, occurence) */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_4 (haystack STRING, regexp STRING, p INT64, o INT64) RETURNS INT64
+CREATE OR REPLACE FUNCTION cw_regexp_instr_4 (haystack STRING, regexp STRING, p INT64, o INT64) RETURNS INT64
 LANGUAGE js AS """
   if (haystack == null || regexp == null || o == null) return null;
   p = p -1;
@@ -143,7 +143,7 @@ LANGUAGE js AS """
     // case 'l': not supported
     // case 'x': not supported
 */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_generic (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING) RETURNS INT64
+CREATE OR REPLACE FUNCTION cw_regexp_instr_generic (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING) RETURNS INT64
 LANGUAGE js AS """
   if (haystack == null || regexp == null || p == null || o == null || returnopt == null || mode == null) return null;
   p = p -1;
@@ -162,13 +162,13 @@ LANGUAGE js AS """
     return a.index+1+Number(p)+a[0].length;
 """;
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_6 (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING) RETURNS INT64 AS
+CREATE OR REPLACE FUNCTION cw_regexp_instr_6 (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING) RETURNS INT64 AS
 (
-   cw_udf.cw_regexp_instr_generic(haystack, regexp, p, o, returnopt, cw_udf.cw_regex_mode(mode))
+   cw_regexp_instr_generic(haystack, regexp, p, o, returnopt, cw_regex_mode(mode))
 );
 
 /* Generic regexp_replace, which is the 6-args version with regexp_mode already decoded */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_replace_generic (haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_regexp_replace_generic (haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING) RETURNS STRING
 LANGUAGE js AS """
   if (haystack == null || regexp == null || replacement == null || offset == null || occurrence == null || mode == null) return null;
   replacement = replacement.replace('\\\\', '$');
@@ -192,49 +192,49 @@ LANGUAGE js AS """
   return prefix + relevantString.replace(regExp, replacement);
 """;
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_replace_4 (haystack STRING, regexp STRING, replacement STRING, offset INT64) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_regexp_replace_4 (haystack STRING, regexp STRING, replacement STRING, offset INT64) RETURNS STRING AS
 (
-   cw_udf.cw_regexp_replace_generic(haystack, regexp, replacement, offset, 0, cw_udf.cw_regex_mode(''))
+   cw_regexp_replace_generic(haystack, regexp, replacement, offset, 0, cw_regex_mode(''))
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_replace_5 (haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_regexp_replace_5 (haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64) RETURNS STRING AS
 (
-   cw_udf.cw_regexp_replace_generic(haystack, regexp, replacement, offset, occurrence, cw_udf.cw_regex_mode(''))
+   cw_regexp_replace_generic(haystack, regexp, replacement, offset, occurrence, cw_regex_mode(''))
 );
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_replace_6 (haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION cw_regexp_replace_6 (haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
 (
-   cw_udf.cw_regexp_replace_generic(haystack, regexp, replacement, p, o, cw_udf.cw_regex_mode(''))
+   cw_regexp_replace_generic(haystack, regexp, replacement, p, o, cw_regex_mode(''))
 );
 
 /* Implements regexp_instr/5 (haystack, needle, position, occurence, returnopt) */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_instr_5 (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64) RETURNS INT64 AS
+CREATE OR REPLACE FUNCTION cw_regexp_instr_5 (haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64) RETURNS INT64 AS
 (
-   cw_udf.cw_regexp_instr_generic(haystack, regexp, p, o, returnopt, cw_udf.cw_regex_mode(''))
+   cw_regexp_instr_generic(haystack, regexp, p, o, returnopt, cw_regex_mode(''))
 );
 
 /* Like presto ARRAY_MIN */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_min(arr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION cw_array_min(arr ANY TYPE) AS (
    ( SELECT MIN(x) FROM UNNEST(arr) AS x )
 );
 
 /* Similar to MEDIAN in Teradata */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_median(arr ANY TYPE) RETURNS FLOAT64 AS (
+CREATE OR REPLACE FUNCTION cw_array_median(arr ANY TYPE) RETURNS FLOAT64 AS (
   ( SELECT PERCENTILE_CONT(x, 0.5) OVER() FROM UNNEST(arr) AS x LIMIT 1 )
 );
 
 /* Like presto ARRAY_MAX */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_max(arr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION cw_array_max(arr ANY TYPE) AS (
    ( SELECT MAX(x) FROM UNNEST(arr) AS x )
 );
 
 /* Like presto ARRAY_DISTINCT */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_distinct(arr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION cw_array_distinct(arr ANY TYPE) AS (
    ARRAY( SELECT DISTINCT x FROM UNNEST(arr) AS x )
 );
 
 /* Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument */
-CREATE OR REPLACE FUNCTION cw_udf.cw_next_day(date_value DATE, day_name STRING) RETURNS DATE AS (
+CREATE OR REPLACE FUNCTION cw_next_day(date_value DATE, day_name STRING) RETURNS DATE AS (
     (WITH t AS (SELECT
        CASE lower(substr(day_name, 1, 3))
        WHEN 'sun' THEN 1
@@ -253,14 +253,14 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_next_day(date_value DATE, day_name STRING) 
 );
 
 /* Emulate teradata NVP function - extract a value from a key-value separated string */
-CREATE OR REPLACE FUNCTION cw_udf.cw_td_nvp(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_td_nvp(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64) RETURNS STRING AS (
    NULLIF(ARRAY(SELECT kv[SAFE_OFFSET(1)] FROM (
         SELECT SPLIT(pairs, valuesep) AS kv, o FROM UNNEST(SPLIT(haystack, pairsep)) AS pairs WITH OFFSET o
    ) t WHERE kv[SAFE_OFFSET(0)] = needle ORDER BY o ASC)[SAFE_ORDINAL(occurence)], '')
 );
 
 /* Emulate Presto from_base function - convert string from given base to decimal */
-CREATE OR REPLACE FUNCTION cw_udf.cw_from_base(number STRING, base INT64) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION cw_from_base(number STRING, base INT64) RETURNS INT64 AS (
     (WITH chars AS (
         SELECT IF(ch >= 48 AND ch <= 57, ch - 48, IF(ch >= 65 AND ch <= 90, ch - 65 + 10, ch - 97 + 10)) pos, offset + 1 AS idx
         FROM UNNEST(TO_CODE_POINTS(number)) AS ch WITH OFFSET
@@ -269,7 +269,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_from_base(number STRING, base INT64) RETURN
 );
 
 /* Emulate Presto to_base function - convert decimal number to number with given base */
-CREATE OR REPLACE FUNCTION cw_udf.cw_to_base(number INT64, base INT64) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_to_base(number INT64, base INT64) RETURNS STRING AS (
     (WITH chars AS (
         SELECT MOD(CAST(FLOOR(ABS(number)/POW(base, (FLOOR(LOG(ABS(number))/LOG(base)) + 1) - idx)) AS INT64), base) ch, idx
             from UNNEST(GENERATE_ARRAY(1, CAST(FLOOR(LOG(ABS(number))/LOG(base)) AS INT64) + 1)) idx
@@ -279,19 +279,19 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_to_base(number INT64, base INT64) RETURNS S
 );
 
 /* Implements Presto ARRAYS_OVERLAP */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_overlap(x ANY TYPE, y ANY TYPE) RETURNS BOOL AS(
+CREATE OR REPLACE FUNCTION cw_array_overlap(x ANY TYPE, y ANY TYPE) RETURNS BOOL AS(
     CASE WHEN EXISTS(SELECT 1 FROM UNNEST(ARRAY_CONCAT(x,y)) as z WHERE z IS NULL) THEN NULL
          ELSE EXISTS(SELECT 1 FROM UNNEST(x) as u JOIN UNNEST(y) as v ON u=v)
     END
 );
 
 /* Implements Snowflake ARRAY_COMPACT */
-CREATE OR REPLACE FUNCTION cw_udf.cw_array_compact(a ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION cw_array_compact(a ANY TYPE) AS (
     ARRAY(SELECT v FROM UNNEST(a) v WHERE v IS NOT NULL)
 );
 
 /* Kludge for interval translation - for now day->sec only! */
-CREATE OR REPLACE FUNCTION cw_udf.cw_runtime_parse_interval_seconds(ival STRING) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION cw_runtime_parse_interval_seconds(ival STRING) RETURNS INT64 AS (
     CASE WHEN ival IS NULL THEN NULL
          WHEN ARRAY_LENGTH(SPLIT(ival,' ')) <> 2 THEN NULL
          WHEN SPLIT(ival,' ')[OFFSET(1)] NOT IN ('day','DAY') THEN NULL
@@ -299,7 +299,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_runtime_parse_interval_seconds(ival STRING)
 );
 
 /* url encode a string */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_encode(path STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_url_encode(path STRING) RETURNS STRING
 LANGUAGE js AS """
   if (path == null) return null;
   try {
@@ -310,7 +310,7 @@ LANGUAGE js AS """
 """;
 
 /* url decode a string */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_decode(path STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_url_decode(path STRING) RETURNS STRING
 LANGUAGE js AS """
   if (path == null) return null;
   try {
@@ -321,19 +321,19 @@ LANGUAGE js AS """
 """;
 
 /* Extract the host from a url, return "" (empty string) if no host is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_host(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_url_extract_host(url STRING) RETURNS STRING AS (
   NET.HOST(url)
 );
 
 /* Extract the protocol from a url, return "" (empty string) if no protocol is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_protocol(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_url_extract_protocol(url STRING) RETURNS STRING AS (
   (WITH a AS (
    SELECT STRPOS(url, "://") AS v
   ) SELECT IF(a.v <= 0, "", SUBSTR(url,1,a.v-1)) FROM a)
 );
 
 /* Extract the path from a url, returns "" (empty string) if no path is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_path(url STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_url_extract_path(url STRING) RETURNS STRING
 LANGUAGE js AS """
   var queryPos = url.indexOf('?');
   if (queryPos >= 0)
@@ -354,7 +354,7 @@ LANGUAGE js AS """
 """;
 
 /* Extract the port from a url, returns null if no port is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_port(url STRING) RETURNS INT64
+CREATE OR REPLACE FUNCTION cw_url_extract_port(url STRING) RETURNS INT64
 LANGUAGE js AS """
   var protPos = url.indexOf("//");
   if (protPos >= 0)
@@ -371,22 +371,22 @@ LANGUAGE js AS """
 """;
 
 /* Extract the query from a url, returns "" (empty string) if no query is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_query(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_url_extract_query(url STRING) RETURNS STRING AS (
   COALESCE(SUBSTR(SPLIT(REGEXP_EXTRACT(url, '[^\\?]+(\\?.*)?'),'#')[OFFSET(0)],2),'')
 );
 
 /* Extract the fragment from a url, returns "" (empty string) if no fragment is found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_fragment(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_url_extract_fragment(url STRING) RETURNS STRING AS (
   COALESCE(REGEXP_EXTRACT(url,'#(.+)'),'')
 );
 
 /* Extract the value of a query param from a url, returns null if the parameter isn't found. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_url_extract_parameter(url STRING, pname STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_url_extract_parameter(url STRING, pname STRING) RETURNS STRING AS (
   SPLIT(REGEXP_EXTRACT(url, CONCAT('[?&]',pname,'=([^&]+).*$')),'#')[OFFSET(0)]
 );
 
 /* Returns the first substring matched by the regular expression `regexp` in `str`. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_extract(str STRING, regexp STRING) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_regexp_extract(str STRING, regexp STRING) RETURNS STRING
 LANGUAGE js AS """
   var r = new RegExp(regexp);
   var a = str.match(r);
@@ -394,7 +394,7 @@ LANGUAGE js AS """
 """;
 
 /* Finds the first occurrence of the regular expression `regexp` in `str` and returns the capturing group number `groupn` */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_extract_n(str STRING, regexp STRING, groupn INT64) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_regexp_extract_n(str STRING, regexp STRING, groupn INT64) RETURNS STRING
 LANGUAGE js AS """
   var r = new RegExp(regexp);
   var a = str.match(r);
@@ -407,14 +407,14 @@ LANGUAGE js AS """
 """;
 
 /* Returns the substring(s) matched by the regular expression `regexp` in `str`. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_extract_all(str STRING, regexp STRING) RETURNS ARRAY<STRING>
+CREATE OR REPLACE FUNCTION cw_regexp_extract_all(str STRING, regexp STRING) RETURNS ARRAY<STRING>
 LANGUAGE js AS """
   var r = new RegExp(regexp, "g");
   return str.match(r);
 """;
 
 /* Finds all occurrences of the regular expression `regexp` in `str` and returns the capturing group number `groupn`. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64) RETURNS ARRAY<STRING>
+CREATE OR REPLACE FUNCTION cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64) RETURNS ARRAY<STRING>
 LANGUAGE js AS """
   var r = new RegExp(regexp, 'g');
   var o = [];
@@ -428,7 +428,7 @@ LANGUAGE js AS """
 """;
 
 /* Determine if value exists in json (a string containing a JSON array). */
-CREATE OR REPLACE FUNCTION cw_udf.cw_json_array_contains_str(json STRING, needle STRING) RETURNS BOOL
+CREATE OR REPLACE FUNCTION cw_json_array_contains_str(json STRING, needle STRING) RETURNS BOOL
 LANGUAGE js AS """
   if (json == null || needle == null)
     return null;
@@ -437,7 +437,7 @@ LANGUAGE js AS """
 """;
 
 /* Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = number */
-CREATE OR REPLACE FUNCTION cw_udf.cw_json_array_contains_num(json STRING, needle FLOAT64) RETURNS BOOL
+CREATE OR REPLACE FUNCTION cw_json_array_contains_num(json STRING, needle FLOAT64) RETURNS BOOL
 LANGUAGE js AS """
   if (json == null || needle == null)
     return null;
@@ -446,7 +446,7 @@ LANGUAGE js AS """
 """;
 
 /* Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = boolean */
-CREATE OR REPLACE FUNCTION cw_udf.cw_json_array_contains_bool(json STRING, needle BOOL) RETURNS BOOL
+CREATE OR REPLACE FUNCTION cw_json_array_contains_bool(json STRING, needle BOOL) RETURNS BOOL
 LANGUAGE js AS """
   if (json == null || needle == null)
     return null;
@@ -455,7 +455,7 @@ LANGUAGE js AS """
 """;
 
 /* Returns the element at the specified index into the json_array. The index is zero-based */
-CREATE OR REPLACE FUNCTION cw_udf.cw_json_array_get(json STRING, loc FLOAT64) RETURNS STRING
+CREATE OR REPLACE FUNCTION cw_json_array_get(json STRING, loc FLOAT64) RETURNS STRING
 LANGUAGE js AS """
   if (json == null || loc == null)
     return null;
@@ -468,7 +468,7 @@ LANGUAGE js AS """
 """;
 
 /* Returns the array length of json (a string containing a JSON array) */
-CREATE OR REPLACE FUNCTION cw_udf.cw_json_array_length(json STRING) RETURNS INT64
+CREATE OR REPLACE FUNCTION cw_json_array_length(json STRING) RETURNS INT64
 LANGUAGE js AS """
   if (json == null)
     return null;
@@ -479,7 +479,7 @@ LANGUAGE js AS """
 
 
 /** Emulate Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
-CREATE OR REPLACE FUNCTION cw_udf.cw_lower_case_ascii_only(str STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_lower_case_ascii_only(str STRING) RETURNS STRING AS (
     (WITH chars AS (
         SELECT ch FROM UNNEST(TO_CODE_POINTS(str)) AS ch
     )
@@ -487,7 +487,7 @@ CREATE OR REPLACE FUNCTION cw_udf.cw_lower_case_ascii_only(str STRING) RETURNS S
 ));
 
 /** Emulate Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes). */
-CREATE OR REPLACE FUNCTION cw_udf.cw_substrb(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION cw_substrb(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
     (WITH octets AS (
         SELECT oct FROM UNNEST(TO_CODE_POINTS(CAST(str as bytes))) AS oct WITH OFFSET off WHERE (off+1) >= startpos and (off+1) < startpos+extent ORDER BY off
     )
