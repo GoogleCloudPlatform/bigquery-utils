@@ -15,8 +15,10 @@
 /*
     This assertion checks whether input date is future
 */
-function test_int_udf(colName){
-    var result_query = `\`${dataform.projectConfig.defaultDatabase}\`.${dataform.projectConfig.defaultSchema}.int(${colName})`
+function test_int_udf(inputs){
+    var result_query = `
+    \`${dataform.projectConfig.defaultDatabase}\`.${dataform.projectConfig.defaultSchema}.int(${inputs})
+    `;
     return result_query
 }
 
