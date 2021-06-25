@@ -12,28 +12,109 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function generate_test(test_name, test_cases, data_quality_function){
+function generate_test_udf_1_input(test_udf, test_cases){
+    const test_name = `${test_udf}_${uuidv4()}`
     publish(test_name)
         .type("view")
         .query(ctx => `
             SELECT
-              ${data_quality_function("test_input")} AS is_valid
+              ${get_udf_project()}.${test_udf}(
+                    test_input_1) AS udf_output
             FROM ${ctx.resolve("test_inputs")}
         `);
 
     let expected_output_select_statements = [];
     let test_input_select_statements = [];
-    for(var test_case in test_cases) {
-        test_input_select_statements.push(`SELECT ${test_case} AS test_input`);
-        expected_output_select_statements.push(`SELECT ${test_cases[test_case]} AS is_valid`);
-    };
+    test_cases.forEach(test_case => {
+        test_input_select_statements.push(`
+          SELECT
+            ${test_case.input_1} AS test_input_1,
+        `);
+        expected_output_select_statements.push(`
+          SELECT ${test_case.expected_output} AS udf_output
+        `);
+    })
+    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
+}
 
+function generate_test_udf_2_inputs(test_udf, test_cases){
+    const test_name = `${test_udf}_${uuidv4()}`
+    publish(test_name)
+        .type("view")
+        .query(ctx => `
+            SELECT
+              ${get_udf_project()}.${test_udf}(
+                    test_input_1,
+                    test_input_2) AS udf_output
+            FROM ${ctx.resolve("test_inputs")}
+        `);
+
+    let expected_output_select_statements = [];
+    let test_input_select_statements = [];
+    test_cases.forEach(test_case => {
+        test_input_select_statements.push(`
+          SELECT
+            ${test_case.input_1} AS test_input_1,
+            ${test_case.input_2} AS test_input_2,
+        `);
+        expected_output_select_statements.push(`
+          SELECT ${test_case.expected_output} AS udf_output
+        `);
+    })
+    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
+}
+
+function generate_test_udf_3_inputs(test_udf, test_cases){
+    const test_name = `${test_udf}_${uuidv4()}`
+    publish(test_name)
+        .type("view")
+        .query(ctx => `
+            SELECT
+              ${get_udf_project()}.${test_udf}(
+                    test_input_1,
+                    test_input_2,
+                    test_input_3) AS udf_output
+            FROM ${ctx.resolve("test_inputs")}
+        `);
+
+    let expected_output_select_statements = [];
+    let test_input_select_statements = [];
+    test_cases.forEach(test_case => {
+        test_input_select_statements.push(`
+          SELECT
+            ${test_case.input_1} AS test_input_1,
+            ${test_case.input_2} AS test_input_2,
+            ${test_case.input_3} AS test_input_3,
+        `);
+        expected_output_select_statements.push(`
+          SELECT ${test_case.expected_output} AS udf_output
+        `);
+    })
+    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
+}
+
+function run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements){
     test(test_name)
         .dataset(test_name)
         .input("test_inputs", `${test_input_select_statements.join(' UNION ALL\n')}`)
         .expect(`${expected_output_select_statements.join(' UNION ALL\n')}`);
 }
 
+function get_udf_project(){
+  // This function returns the
+  return `\`${dataform.projectConfig.defaultDatabase}\``
+}
+
+// Source: https://stackoverflow.com/a/2117523
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 module.exports = {
-    generate_test,
+    generate_test_udf_1_input,
+    generate_test_udf_2_inputs,
+    generate_test_udf_3_inputs,
 }
