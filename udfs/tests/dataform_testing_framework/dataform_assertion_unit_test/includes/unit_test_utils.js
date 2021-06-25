@@ -12,6 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function generate_test_udf(test_udf, test_cases){
+    let inputs_outputs = Object.keys(test_cases[0])
+    if(inputs_outputs.length == 2){
+        generate_test_udf_1_input(test_udf, test_cases)
+    } else if(inputs_outputs.length == 3){
+        generate_test_udf_2_inputs(test_udf, test_cases)
+    } else if(inputs_outputs.length == 4){
+        generate_test_udf_3_inputs(test_udf, test_cases)
+    } else if(inputs_outputs.length == 5){
+        generate_test_udf_4_inputs(test_udf, test_cases)
+    } else if(inputs_outputs.length == 6){
+        generate_test_udf_5_inputs(test_udf, test_cases)
+    }
+}
+
 function generate_test_udf_1_input(test_udf, test_cases){
     const test_name = `${test_udf}_${uuidv4()}`
     publish(test_name)
@@ -178,6 +193,7 @@ function uuidv4() {
 }
 
 module.exports = {
+    generate_test_udf,
     generate_test_udf_1_input,
     generate_test_udf_2_inputs,
     generate_test_udf_3_inputs,
