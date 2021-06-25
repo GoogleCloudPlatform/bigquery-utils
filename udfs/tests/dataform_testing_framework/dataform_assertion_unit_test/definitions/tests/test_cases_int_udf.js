@@ -16,7 +16,7 @@ const {generate_test} = unit_test_utils;
 const {test_int_udf} = udf_assertions;
 
 let test_name = "test_int_udf_with_int64_inputs";
-let test_cases = {
+let test_cases_int64_inputs = {
     /*
         Provide your own testing data following the structure
         <INPUT_TESTING_DATA> : "<EXPECTED OUTCOME>"
@@ -29,7 +29,7 @@ let test_cases = {
 };
 // The function below will generate the necessary SQL to run unit tests.
 generate_test(test_name,
-    test_cases,
+    test_cases_int64_inputs,
     test_int_udf);
 
 test_name = "test_int_udf_with_float64_inputs";
@@ -46,7 +46,7 @@ const test_cases_float64_inputs = {
 };
 // The function below will generate the necessary SQL to run unit tests.
 generate_test(test_name,
-    test_cases,
+    test_cases_float64_inputs,
     test_int_udf);
 
 test_name = "test_int_udf_with_string_inputs";
@@ -62,5 +62,5 @@ const test_cases_string_inputs = {
 };
 // The function below will generate the necessary SQL to run unit tests.
 generate_test(test_name,
-    test_cases,
+    test_cases_string_inputs,
     test_int_udf);
