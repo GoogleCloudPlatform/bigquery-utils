@@ -23,7 +23,7 @@ This function lower cases all ascii characters in string which imitates the Vert
 ```
 
 
-### [substrb(string STRING, position INT64, part INT64)](substr_of_bytes.sql)
+### [substrb(string STRING, position INT64, length INT64)](substr_of_bytes.sql)
 This function treats a string as an array of bytes and takes the substring based on the octets. The function imitates the Vertica function (substrb)[https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/String/SUBSTRB.htm]. Note that BigQuery's (substr)[https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#substr] does not treat the string a bytes.
 
 ```sql
