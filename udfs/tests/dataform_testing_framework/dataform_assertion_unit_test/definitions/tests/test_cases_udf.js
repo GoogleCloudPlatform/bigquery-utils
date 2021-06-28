@@ -114,148 +114,180 @@ generate_udf_test("fn.json_typeof", [
     expected_output: "(NULL)",
   },
 ]);
-//generate_udf_test("fn.typeof", [
-//  {
-//    input_1: "(b'test')",
-//    expected_output: "('BYTES')",
-//  },
-//  {
-//    input_1: "(b'')",
-//    expected_output: "('BYTES')",
-//  },
-//  {
-//    input_1: "('test')",
-//    expected_output: "('STRING')",
-//  },
-//  {
-//    input_1: "('')",
-//    expected_output: "('STRING')",
-//  },
-//  {
-//    input_1: "(TRUE)",
-//    expected_output: "('BOOL')",
-//  },
-//  {
-//    input_1: "(FALSE)",
-//    expected_output: "('BOOL')",
-//  },
-//  {
-//    input_1: "(NULL)",
-//    expected_output: "('NULL')",
-//  },
-//  {
-//    input_1: "(1)",
-//    expected_output: "('INT64')",
-//  },
-//  {
-//    input_1: "(-1)",
-//    expected_output: "('INT64')",
-//  },
-//  {
-//    input_1: "(0)",
-//    expected_output: "('INT64')",
-//  },
-//  {
-//    input_1: "(0.0)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(-1.0)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(1.0)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(+123e45)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(-123e45)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(12e345)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "(-12e345)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "CAST('inf' AS FLOAT64)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "CAST('-inf' AS FLOAT64)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "CAST('nan' AS FLOAT64)",
-//    expected_output: "('FLOAT64')",
-//  },
-//  {
-//    input_1: "DATE '1970-01-01'",
-//    expected_output: "('DATE')",
-//  },
-//  {
-//    input_1: "DATETIME '1970-01-01T00:00:00'",
-//    expected_output: "('DATETIME')",
-//  },
-//  {
-//    input_1: "TIME '00:00:00'",
-//    expected_output: "('TIME')",
-//  },
-//  {
-//    input_1: "TIMESTAMP '1970-01-01T00:00:00Z'",
-//    expected_output: "('TIMESTAMP')",
-//  },
-//  {
-//    input_1: "STRUCT()",
-//    expected_output: "('STRUCT')",
-//  },
-//  {
-//    input_1: "STRUCT(1)",
-//    expected_output: "('STRUCT')",
-//  },
-//  {
-//    input_1: "STRUCT(1, 2, 3)",
-//    expected_output: "('STRUCT')",
-//  },
-//  {
-//    input_1: "STRUCT<a INT64, b INT64, c INT64>(1, 2, 3)",
-//    expected_output: "('STRUCT')",
-//  },
-//  {
-//    input_1: "([])",
-//    expected_output: "('ARRAY')",
-//  },
-//  {
-//    input_1: "([1, 2, 3])",
-//    expected_output: "('ARRAY')",
-//  },
-//  {
-//    input_1: "ARRAY<INT64>[1, 2, 3]",
-//    expected_output: "('ARRAY')",
-//  },
-//  {
-//    input_1: "ST_GEOGPOINT(0, 0)",
-//    expected_output: "('GEOGRAPHY')",
-//  },
-//  {
-//    input_1: "NUMERIC '0'",
-//    expected_output: "('NUMERIC')",
-//  },
-//  {
-//    input_1: "NUMERIC '1'",
-//    expected_output: "('NUMERIC')",
-//  },
-//  {
-//    input_1: "NUMERIC '-1'",
-//    expected_output: "('NUMERIC')",
-//  },
-//]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "(b'test')",
+    expected_output: "('BYTES')",
+  },
+  {
+    input_1: "(b'')",
+    expected_output: "('BYTES')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "('test')",
+    expected_output: "('STRING')",
+  },
+  {
+    input_1: "('')",
+    expected_output: "('STRING')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "(TRUE)",
+    expected_output: "('BOOL')",
+  },
+  {
+    input_1: "(FALSE)",
+    expected_output: "('BOOL')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "(NULL)",
+    expected_output: "('NULL')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "(1)",
+    expected_output: "('INT64')",
+  },
+  {
+    input_1: "(-1)",
+    expected_output: "('INT64')",
+  },
+  {
+    input_1: "(0)",
+    expected_output: "('INT64')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "(0.0)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(-1.0)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(1.0)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(+123e45)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(-123e45)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(12e345)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "(-12e345)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "CAST('inf' AS FLOAT64)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "CAST('-inf' AS FLOAT64)",
+    expected_output: "('FLOAT64')",
+  },
+  {
+    input_1: "CAST('nan' AS FLOAT64)",
+    expected_output: "('FLOAT64')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "DATE '1970-01-01'",
+    expected_output: "('DATE')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "DATETIME '1970-01-01T00:00:00'",
+    expected_output: "('DATETIME')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "TIME '00:00:00'",
+    expected_output: "('TIME')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "TIMESTAMP '1970-01-01T00:00:00Z'",
+    expected_output: "('TIMESTAMP')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "STRUCT()",
+    expected_output: "('STRUCT')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "STRUCT(1)",
+    expected_output: "('STRUCT')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "STRUCT(1, 2, 3)",
+    expected_output: "('STRUCT')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "STRUCT<a INT64, b INT64, c INT64>(1, 2, 3)",
+    expected_output: "('STRUCT')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "([])",
+    expected_output: "('ARRAY')",
+  },
+  {
+    input_1: "([1, 2, 3])",
+    expected_output: "('ARRAY')",
+  },
+  {
+    input_1: "ARRAY<INT64>[1, 2, 3]",
+    expected_output: "('ARRAY')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "ST_GEOGPOINT(0, 0)",
+    expected_output: "('GEOGRAPHY')",
+  },
+]);
+generate_udf_test("fn.typeof", [
+  {
+    input_1: "NUMERIC '0'",
+    expected_output: "('NUMERIC')",
+  },
+  {
+    input_1: "NUMERIC '1'",
+    expected_output: "('NUMERIC')",
+  },
+  {
+    input_1: "NUMERIC '-1'",
+    expected_output: "('NUMERIC')",
+  },
+]);
 generate_udf_test("fn.url_parse", [
   {
     input_1: "CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING)",
