@@ -12,38 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function generate_test_udf(test_udf, test_cases){
-    let inputs_outputs = Object.keys(test_cases[0])
-    if(inputs_outputs.length == 2){
-        generate_test_udf_1_input(test_udf, test_cases)
-    } else if(inputs_outputs.length == 3){
-        generate_test_udf_2_inputs(test_udf, test_cases)
-    } else if(inputs_outputs.length == 4){
-        generate_test_udf_3_inputs(test_udf, test_cases)
-    } else if(inputs_outputs.length == 5){
-        generate_test_udf_4_inputs(test_udf, test_cases)
-    } else if(inputs_outputs.length == 6){
-        generate_test_udf_5_inputs(test_udf, test_cases)
-    }
-}
 
-function generate_test_udf_1_input(test_udf, test_cases){
+function generate_udf_test(test_udf, test_cases){
     const test_name = `${test_udf}_${uuidv4()}`
-    publish(test_name)
-        .type("view")
-        .query(ctx => `
-            SELECT
-              ${get_udf_project()}.${test_udf}(
-                    test_input_1) AS udf_output
-            FROM ${ctx.resolve("test_inputs")}
-        `);
-
+    create_dataform_test_view(test_name, test_udf, test_cases)
     let expected_output_select_statements = [];
     let test_input_select_statements = [];
     test_cases.forEach(test_case => {
+        const keys = Object.keys(test_case)
+        let inputs = ""
+        keys.forEach(key_name => {
+            if(key_name.startsWith("input")){
+                inputs += `${test_case[key_name]} AS test_${key_name},\n`
+            }
+        })
         test_input_select_statements.push(`
           SELECT
-            ${test_case.input_1} AS test_input_1,
+            ${inputs}
         `);
         expected_output_select_statements.push(`
           SELECT ${test_case.expected_output} AS udf_output
@@ -52,124 +37,23 @@ function generate_test_udf_1_input(test_udf, test_cases){
     run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
 }
 
-function generate_test_udf_2_inputs(test_udf, test_cases){
-    const test_name = `${test_udf}_${uuidv4()}`
+function create_dataform_test_view(test_name, test_udf, test_cases){
+    const keys = Object.keys(test_cases[0])
+    let udf_input_aliases = ""
+    keys.forEach(key_name => {
+        if(key_name.startsWith("input")){
+            udf_input_aliases += `test_${key_name},`
+        }
+    })
+    udf_input_aliases = udf_input_aliases.slice(0, udf_input_aliases.length-1);
     publish(test_name)
         .type("view")
         .query(ctx => `
             SELECT
               ${get_udf_project()}.${test_udf}(
-                    test_input_1,
-                    test_input_2) AS udf_output
+                    ${udf_input_aliases}) AS udf_output
             FROM ${ctx.resolve("test_inputs")}
         `);
-
-    let expected_output_select_statements = [];
-    let test_input_select_statements = [];
-    test_cases.forEach(test_case => {
-        test_input_select_statements.push(`
-          SELECT
-            ${test_case.input_1} AS test_input_1,
-            ${test_case.input_2} AS test_input_2,
-        `);
-        expected_output_select_statements.push(`
-          SELECT ${test_case.expected_output} AS udf_output
-        `);
-    })
-    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
-}
-
-function generate_test_udf_3_inputs(test_udf, test_cases){
-    const test_name = `${test_udf}_${uuidv4()}`
-    publish(test_name)
-        .type("view")
-        .query(ctx => `
-            SELECT
-              ${get_udf_project()}.${test_udf}(
-                    test_input_1,
-                    test_input_2,
-                    test_input_3) AS udf_output
-            FROM ${ctx.resolve("test_inputs")}
-        `);
-
-    let expected_output_select_statements = [];
-    let test_input_select_statements = [];
-    test_cases.forEach(test_case => {
-        test_input_select_statements.push(`
-          SELECT
-            ${test_case.input_1} AS test_input_1,
-            ${test_case.input_2} AS test_input_2,
-            ${test_case.input_3} AS test_input_3,
-        `);
-        expected_output_select_statements.push(`
-          SELECT ${test_case.expected_output} AS udf_output
-        `);
-    })
-    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
-}
-
-function generate_test_udf_4_inputs(test_udf, test_cases){
-    const test_name = `${test_udf}_${uuidv4()}`
-    publish(test_name)
-        .type("view")
-        .query(ctx => `
-            SELECT
-              ${get_udf_project()}.${test_udf}(
-                    test_input_1,
-                    test_input_2,
-                    test_input_3,
-                    test_input_4) AS udf_output
-            FROM ${ctx.resolve("test_inputs")}
-        `);
-
-    let expected_output_select_statements = [];
-    let test_input_select_statements = [];
-    test_cases.forEach(test_case => {
-        test_input_select_statements.push(`
-          SELECT
-            ${test_case.input_1} AS test_input_1,
-            ${test_case.input_2} AS test_input_2,
-            ${test_case.input_3} AS test_input_3,
-            ${test_case.input_4} AS test_input_4,
-        `);
-        expected_output_select_statements.push(`
-          SELECT ${test_case.expected_output} AS udf_output
-        `);
-    })
-    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
-}
-
-function generate_test_udf_5_inputs(test_udf, test_cases){
-    const test_name = `${test_udf}_${uuidv4()}`
-    publish(test_name)
-        .type("view")
-        .query(ctx => `
-            SELECT
-              ${get_udf_project()}.${test_udf}(
-                    test_input_1,
-                    test_input_2,
-                    test_input_3,
-                    test_input_4,
-                    test_input_5) AS udf_output
-            FROM ${ctx.resolve("test_inputs")}
-        `);
-
-    let expected_output_select_statements = [];
-    let test_input_select_statements = [];
-    test_cases.forEach(test_case => {
-        test_input_select_statements.push(`
-          SELECT
-            ${test_case.input_1} AS test_input_1,
-            ${test_case.input_2} AS test_input_2,
-            ${test_case.input_3} AS test_input_3,
-            ${test_case.input_4} AS test_input_4,
-            ${test_case.input_5} AS test_input_5,
-        `);
-        expected_output_select_statements.push(`
-          SELECT ${test_case.expected_output} AS udf_output
-        `);
-    })
-    run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements)
 }
 
 function run_dataform_test(test_name, test_input_select_statements, expected_output_select_statements){
@@ -193,10 +77,5 @@ function uuidv4() {
 }
 
 module.exports = {
-    generate_test_udf,
-    generate_test_udf_1_input,
-    generate_test_udf_2_inputs,
-    generate_test_udf_3_inputs,
-    generate_test_udf_4_inputs,
-    generate_test_udf_5_inputs,
+    generate_udf_test
 }
