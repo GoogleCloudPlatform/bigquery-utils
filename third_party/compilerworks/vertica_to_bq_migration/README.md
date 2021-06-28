@@ -7,7 +7,7 @@ directory will be automatically synchronized to the `bqutil` project within the
 
 ## UDFs
 
-* [lower_case_ascii_only](#lower_case_ascii_onlystring-string-position-int64-length-int64)
+* [lower_case_ascii_only](#lower_case_ascii_onlystring-string)
 * [substrb](#substrbstring-string-position-int64-length-int64)
 
 
