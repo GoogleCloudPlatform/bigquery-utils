@@ -14,7 +14,7 @@ directory will be automatically synchronized to the `bqutil` project within the
 
 
 ### [next_day(date_value DATE, day_name STRING)](../common/next_day.sql)
-This function calculates the next occurance of a specific day based off an initial date value. The function is based off of the Vertica (function)[https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/Date-Time/NEXT_DAY.htm] 
+This function calculates the next occurance of a specific day based off an initial date value. The function is based off of the Vertica [function](https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/Date-Time/NEXT_DAY.htm) 
 ```sql
    SELECT bqutil.vertica.next_day(Date('2016-04-29'),'mon'); 
    SELECT bqutil.vertica.next_day(Date('2016-04-29'),'fri');
