@@ -26,7 +26,7 @@
 
 
  /* Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument */
-CREATE OR REPLACE FUNCTION cw_udf.cw_next_day(date_value DATE, day_name STRING) RETURNS DATE AS (
+CREATE OR REPLACE FUNCTION cw_next_day(date_value DATE, day_name STRING) RETURNS DATE AS (
     (WITH t AS (SELECT
        CASE lower(substr(day_name, 1, 3))
        WHEN 'sun' THEN 1
