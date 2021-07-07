@@ -24,15 +24,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-CREATE OR REPLACE FUNCTION regexp_extract_with_occurrence_and_flags (h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
-(
-    cw_regexp_substr_generic(h, n, p, o, cw_regex_mode(mode))
-);
-
-
-
-
-
-
-
-
+/* Internal function */
+CREATE OR REPLACE FUNCTION cw_regex_mode (mode STRING) RETURNS STRING
+LANGUAGE js AS """
+  var m = '';
+  if (mode == 'i' || mode == 'm')
+    m += mode;
+  else if (mode == 'n')
+    m += 's';
+  m += 'g';
+  return m;
+""";

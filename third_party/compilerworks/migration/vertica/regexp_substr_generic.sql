@@ -24,15 +24,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-CREATE OR REPLACE FUNCTION regexp_extract_with_occurrence_and_flags (h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
-(
-    cw_regexp_substr_generic(h, n, p, o, cw_regex_mode(mode))
-);
-
-
-
-
-
-
-
-
+/* Internal function */
+CREATE OR REPLACE FUNCTION cw_regexp_substr_generic (str STRING, regexp STRING, p INT64, o INT64, mode STRING) RETURNS STRING
+LANGUAGE js AS """
+  if (str == null || regexp == null || p == null || o == null || mode == null) return null;
+  var r = new RegExp(regexp, mode);
+  var m = str.substring(p - 1).match(r);
+  if (m == null) return null;
+  return m[o - 1];
+""";
