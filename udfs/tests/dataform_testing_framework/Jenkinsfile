@@ -1,5 +1,5 @@
 pipeline {
-    agent {}
+    agent none
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
     }
@@ -13,6 +13,16 @@ pipeline {
                 dir('udfs/tests/dataform_testing_framework'){
                     sh 'bash test_udfs.sh'
                 }
+            }
+        }
+    }
+    stages {
+        stage('node_test') {
+            agent { docker {
+                image 'node:14-alpine'
+            }}
+            steps {
+                sh 'node --version'
             }
         }
     }
