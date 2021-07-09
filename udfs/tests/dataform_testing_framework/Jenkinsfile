@@ -1,0 +1,18 @@
+pipeline {
+    agent none
+    environment {
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
+    }
+    stages {
+        stage('dataform_tests') {
+            agent { docker { image 'dataformco/dataform' } }
+            steps {
+                dir('udfs/tests/dataform_testing_framework'){
+                    sh 'dataform install'
+                    sh 'dataform test dataform_udf_creation/'
+                    sh 'dataform test dataform_assertion_unit_test/'
+                }
+            }
+        }
+    }
+}
