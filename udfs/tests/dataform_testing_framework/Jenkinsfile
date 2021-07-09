@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent {}
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
     }
