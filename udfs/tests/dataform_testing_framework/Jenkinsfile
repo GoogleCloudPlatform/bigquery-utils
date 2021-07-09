@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'dataformco/dataform' } }
+    agent { docker { image 'dataformco/dataform:latest' } }
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
     }
