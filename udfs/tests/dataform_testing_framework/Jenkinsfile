@@ -1,13 +1,14 @@
 pipeline {
-    agent { docker {
-        image 'dataformco/dataform:latest'
-        args '--entrypoint='
-    }}
+    agent none
     environment {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
     }
     stages {
         stage('dataform_tests') {
+            agent { docker {
+                image 'dataformco/dataform:latest'
+                args '--entrypoint='
+            }}
             steps {
                 dir('udfs/tests/dataform_testing_framework'){
                     sh 'bash test_udfs.sh'
