@@ -47,7 +47,9 @@ copy_and_rename_sql_to_sqlx() {
 }
 
 main() {
+  echo '{"projectId": "", "location": "US"}' > .df-credentials.json
   mkdir -p dataform_udf_creation/definitions/community
+  dataform install
 
   ln -sf "$(pwd)"/dataform.json dataform_udf_creation/dataform.json
   ln -sf "$(pwd)"/package.json dataform_udf_creation/package.json
@@ -59,7 +61,6 @@ main() {
   ln -sf "$(pwd)"/node_modules/ dataform_assertion_unit_test/node_modules
   ln -sf "$(pwd)"/.df-credentials.json dataform_assertion_unit_test/.df-credentials.json
 
-  dataform install
   copy_and_rename_sql_to_sqlx ../../../udfs/community
   replace_js_udf_bucket_placeholder dataform_udf_creation/definitions/community gs://dannybq/test_bq_js_libs
   dataform run dataform_udf_creation/

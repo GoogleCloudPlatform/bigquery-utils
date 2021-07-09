@@ -2,6 +2,6 @@
     "warehouse": "bigquery",
     "defaultSchema": "fn",
     "assertionSchema": "dataform_assertions",
-    "defaultDatabase": "YOUR_PROJECT_ID",
+    "defaultDatabase": "danny-bq",
     "useRunCache": false
 }
