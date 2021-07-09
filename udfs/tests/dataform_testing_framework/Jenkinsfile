@@ -1,10 +1,10 @@
 pipeline {
     agent none
-    environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
-    }
     stages {
         stage('dataform_tests') {
+            environment {
+                GOOGLE_APPLICATION_CREDENTIALS = credentials('service_acct')
+            }
             agent { docker {
                 image 'dataformco/dataform:latest'
                 args '--entrypoint='
