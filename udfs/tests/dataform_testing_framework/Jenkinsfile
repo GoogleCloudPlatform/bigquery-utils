@@ -7,9 +7,7 @@ pipeline {
         stage('dataform_tests') {
             steps {
                 dir('udfs/tests/dataform_testing_framework'){
-                    sh 'dataform install'
-                    sh 'dataform test dataform_udf_creation/'
-                    sh 'dataform test dataform_assertion_unit_test/'
+                    sh '. test_udfs.sh'
                 }
             }
         }
