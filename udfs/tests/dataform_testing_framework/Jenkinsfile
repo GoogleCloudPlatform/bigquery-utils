@@ -7,6 +7,7 @@ pipeline {
         stage('dataform_tests') {
             steps {
                 dir('udfs/tests/dataform_testing_framework'){
+                    sh 'dataform --help'
                     sh '. test_udfs.sh'
                 }
             }
