@@ -75,7 +75,8 @@ function run_dataform_test(
 }
 
 function get_udf_project() {
-  // This function returns the
+  // This function returns the default BigQuery dataset
+  // which is specified in the dataform.json config file.
   return `\`${dataform.projectConfig.defaultDatabase}\``;
 }
 
