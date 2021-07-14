@@ -3,5 +3,5 @@
     "defaultSchema": "fn",
     "assertionSchema": "dataform_assertions",
     "defaultDatabase": "danny-bq",
-    "useRunCache": false
+    "concurrentQueryLimit": 100
 }
