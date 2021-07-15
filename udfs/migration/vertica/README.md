@@ -32,7 +32,7 @@ This function treats a string as an array of bytes and takes the substring based
    SELECT ve.substrb('something', 1, 2), substr('something', 1, 2);
 
 ç, ço, so, so
-
+```
 
 ### [upperb(string STRING)](upperb.sql)
 This function upper cases all ascii characters in string which imitates the Vertica function [lowerb](https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/String/UPPERB.htm). Note that BigQuery's [upper](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#upper) will upper case all non ascii characters.
