@@ -28,11 +28,3 @@ CREATE OR REPLACE FUNCTION regexp_extract_with_occurrence_and_flags (h STRING, n
 (
     cw_regexp_substr_generic(h, n, p, o, cw_regex_mode(mode))
 );
-
-
-
-
-
-
-
-
