@@ -33,6 +33,7 @@ replace_js_udf_bucket_placeholder() {
   while read -r file; do
     printf "Replacing variables in file %s" "$file"
     sed -i.bak "s|\${JS_BUCKET}|${js_bucket}|g" "${file}"
+    rm -f "${file}.bak"
   done <<<"$(find "${udf_dir}" -type f -name "*.sqlx")"
 }
 
@@ -40,6 +41,7 @@ copy_sql_and_rename_to_sqlx() {
   local udf_dir=$1
   local destination
   while read -r file; do
+    #bq query --dry_run --dataset_id fn --nouse_legacy_sql --headless "$(cat $file)"
     destination="dataform_udf_creation/definitions/$(basename "${file}").sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
     cp "${file}" "${destination}"
@@ -65,6 +67,7 @@ main() {
   replace_js_udf_bucket_placeholder dataform_udf_creation/definitions gs://dannybq/test_bq_js_libs
   dataform run dataform_udf_creation/
   dataform test dataform_assertion_unit_test/
+  bq rm -r -f fn
 }
 
 main

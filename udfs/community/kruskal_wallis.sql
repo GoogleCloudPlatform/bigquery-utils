@@ -1,3 +1,5 @@
+-- DELETE THE LINE BELOW IF NOT RUNNING WITH DATAFORM
+config { dependencies: ["pvalue"] }
 /*
  * Copyright 2021 Google LLC
  *

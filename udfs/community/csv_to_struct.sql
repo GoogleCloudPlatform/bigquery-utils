@@ -1,3 +1,6 @@
+-- DELETE THE LINE BELOW IF NOT RUNNING WITH DATAFORM
+config { dependencies: ["string_to_struct"] }
+
 /*
  * Copyright 2019 Google LLC
  *
