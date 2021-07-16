@@ -17,8 +17,8 @@ which mimic the behavior of proprietary functions in Vertica.
 ### [next_day(date_value DATE, day_name STRING)](../common/next_day.sql)
 This function calculates the next occurance of a specific day based off an initial date value. The function is based off of the Vertica [function](https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/Date-Time/NEXT_DAY.htm) 
 ```sql
-   SELECT bqutil.vertica.next_day(Date('2016-04-29'),'mon'); 
-   SELECT bqutil.vertica.next_day(Date('2016-04-29'),'fri');
+   SELECT next_day(Date('2016-04-29'),'mon'); 
+   SELECT next_day(Date('2016-04-29'),'fri');
 
 2016-05-02, 2016-05-06
 ```
