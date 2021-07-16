@@ -1,0 +1,57 @@
+lowerb:
+  - test:
+    input: "STUDENT"
+    expected_output: "student"
+  - test:
+    input: "Foo"
+    expected_output: "foo"
+  - test:
+    input: "ÉTUDIANT"
+    expected_output: "Étudiant"
+  - test:
+    input: "ETUDIANT"
+    expected_output: "etudiant"
+  - test:
+    input: "aBCdef GH"
+    expected_output: "abcdef gh"
+  - test:
+    input: ""
+    expected_output: ""
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
+substrb:
+  - test:
+    input: "soupçon", 5, 2
+    expected_output: "ç"
+  - test:
+    input: "foobar", 1, 2
+    expected_output: "fo"
+  - test: # Teradata casts strings into numeric
+    input: "foobar", 10, 2
+    expected_output: ""
+  - test:
+    input: (NULL), 1, 2
+    expected_output: (NULL)
+  - test:
+    input: "", 3, 4
+    expected_output: ""
+upperb:
+  - test:
+    input: "étudiant"
+    expected_output: "éTUDIANT"
+  - test:
+    input: "etudiant"
+    expected_output: "ETUDIANT"
+  - test:
+    input: "foo"
+    expected_output: "FOO"
+  - test:
+    input: "aBCdef Gh"
+    expected_output: "ABCEDF GH"
+  - test:
+    input: ""
+    expected_output: ""
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
