@@ -30,8 +30,3 @@ CREATE OR REPLACE FUNCTION regexp_substr_with_occurrence (h STRING, n STRING, p 
 (
     regexp_extract_all(substr(h, p), n)[safe_ordinal(o)]
 );
-
-
-
-
-
