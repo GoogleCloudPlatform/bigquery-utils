@@ -16,8 +16,6 @@
 
 
 /** Emulate Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
-CREATE OR REPLACE FUNCTION lowerb(str STRING) RETURNS STRING AS (
-    (SELECT CAST(lower(CAST(str AS BYTES)) as STRING))
-
-    );
-
+CREATE OR REPLACE FUNCTION ve.lowerb(str STRING) RETURNS STRING AS (
+    CAST(LOWER(CAST(str AS BYTES)) AS STRING)
+);
