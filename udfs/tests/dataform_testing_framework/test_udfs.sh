@@ -36,7 +36,7 @@ replace_js_udf_bucket_placeholder() {
   done <<<"$(find "${udf_dir}" -type f -name "*.sqlx")"
 }
 
-copy_and_rename_sql_to_sqlx() {
+copy_sql_and_rename_to_sqlx() {
   local udf_dir=$1
   local destination
   while read -r file; do
@@ -61,7 +61,7 @@ main() {
   ln -sf "$(pwd)"/node_modules/ dataform_assertion_unit_test/node_modules
   ln -sf "$(pwd)"/.df-credentials.json dataform_assertion_unit_test/.df-credentials.json
 
-  copy_and_rename_sql_to_sqlx ../../../udfs/community
+  copy_sql_and_rename_to_sqlx ../../../udfs/community
   replace_js_udf_bucket_placeholder dataform_udf_creation/definitions/community gs://dannybq/test_bq_js_libs
   dataform run dataform_udf_creation/
   dataform test dataform_assertion_unit_test/

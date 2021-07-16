@@ -3,7 +3,7 @@
     "defaultSchema": "fn",
     "assertionSchema": "dataform_assertions",
     "defaultDatabase": "danny-bq",
-    "concurrentQueryLimit": 50,
+    "concurrentQueryLimit": 100,
     "vars": {
         "community_dataset_name": "fn",
         "netezza_dataset_name": "nz",
