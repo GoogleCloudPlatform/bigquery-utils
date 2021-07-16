@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.nlp_compromise_people(str STRING)
-RETURNS ARRAY<STRING>
-LANGUAGE js AS """
-  return nlp(str).people().out('topk').map(x=>x.normal)
+CREATE OR REPLACE FUNCTION fn.levenshtein(source STRING, target STRING)
+RETURNS INT64
+LANGUAGE js
+AS
+"""
+  return js_levenshtein(source || '', target || '');
 """
 OPTIONS (
-  library="${JS_BUCKET}/compromise-v11.14.3.min.js");
+  library="gs://dannybq/test_bq_js_libs/js-levenshtein-v1.1.6.js"
+);

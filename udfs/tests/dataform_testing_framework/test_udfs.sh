@@ -41,30 +41,28 @@ copy_sql_and_rename_to_sqlx() {
   local udf_dir=$1
   local destination
   while read -r file; do
-    #bq query --dry_run --dataset_id fn --nouse_legacy_sql --headless "$(cat $file)"
-    destination="dataform_udf_creation/definitions/$(basename "${file}").sqlx"
+    destination="../../../udfs/community/$(basename "${file}").sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
-    cp "${file}" "${destination}"
+    mv "${file}" "${destination}"
   done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
 }
 
 main() {
   echo '{"projectId": "", "location": "US"}' > .df-credentials.json
-  mkdir -p dataform_udf_creation/definitions
   dataform install
 
-  ln -sf "$(pwd)"/dataform.json dataform_udf_creation/dataform.json
-  ln -sf "$(pwd)"/package.json dataform_udf_creation/package.json
-  ln -sf "$(pwd)"/node_modules/ dataform_udf_creation/node_modules
-  ln -sf "$(pwd)"/.df-credentials.json dataform_udf_creation/.df-credentials.json
+  ln -sf "$(pwd)"/dataform.json ../../../udfs/community/dataform.json
+  ln -sf "$(pwd)"/package.json ../../../udfs/community/package.json
+  ln -sf "$(pwd)"/node_modules/ ../../../udfs/community/node_modules
+  ln -sf "$(pwd)"/.df-credentials.json ../../../udfs/community/.df-credentials.json
 
   ln -sf "$(pwd)"/dataform.json dataform_assertion_unit_test/dataform.json
   ln -sf "$(pwd)"/package.json dataform_assertion_unit_test/package.json
   ln -sf "$(pwd)"/node_modules/ dataform_assertion_unit_test/node_modules
   ln -sf "$(pwd)"/.df-credentials.json dataform_assertion_unit_test/.df-credentials.json
 
-  copy_sql_and_rename_to_sqlx ../../../udfs/community
-  replace_js_udf_bucket_placeholder dataform_udf_creation/definitions gs://dannybq/test_bq_js_libs
+#  copy_sql_and_rename_to_sqlx ../../../udfs/community
+  replace_js_udf_bucket_placeholder ../../../udfs/community gs://dannybq/test_bq_js_libs
   dataform run dataform_udf_creation/
   dataform test dataform_assertion_unit_test/
   bq rm -r -f fn
