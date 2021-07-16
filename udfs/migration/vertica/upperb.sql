@@ -16,6 +16,6 @@
 
 
 /** Emulate Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
-CREATE OR REPLACE FUNCTION upperb(str STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ve.upperb(str STRING) RETURNS STRING AS (
     CAST(UPPER(CAST(str AS BYTES)) AS STRING)
 );
