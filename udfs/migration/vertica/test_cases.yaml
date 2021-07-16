@@ -48,7 +48,7 @@ upperb:
     expected_output: CAST("FOO" AS STRING)
   - test:
     input: CAST("aBCdef Gh" AS STRING)
-    expected_output: CAST("ABCEDF GH" AS STRING)
+    expected_output: CAST("ABCDEF GH" AS STRING)
   - test:
     input: CAST("" AS STRING)
     expected_output: CAST("" AS STRING)
