@@ -42,6 +42,7 @@ class TestCreateUDFs(unittest.TestCase):
         try:
             with open(udf_path) as udf_file:
                 udf_sql = udf_file.read()
+                udf_sql = utils.replace_with_js_bucket(os.getenv('_JS_BUCKET') or 'gs://bqutil-lib/bq_js_libs', udf_sql)
             # Only replace UDF datasets with a test dataset if the
             # build was triggered by a pull request or a non-main branch
             if (os.getenv('_PR_NUMBER') is not None or

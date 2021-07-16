@@ -143,6 +143,15 @@ def replace_with_null_body(udf_path):
     else:
         return None
 
+def replace_with_js_bucket(js_bucket, udf_sql):
+    """
+    Replaces the JS_BUCKET placeholder in UDFs, when present
+
+    :param js_bucket: js_bucket for the bundled js_libs files
+    :param udf_sql: SQL DDL of the UDF
+    """
+
+    return udf_sql.replace('${JS_BUCKET}', js_bucket)
 
 def replace_with_test_datasets(project_id, udf_sql):
     """
