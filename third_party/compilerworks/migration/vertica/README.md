@@ -1,9 +1,7 @@
 # Vertica to BigQuery Migration UDFs
 
 This directory contains [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
-which mimic the behavior of proprietary functions in Vertica. Each UDF within this
-directory will be automatically synchronized to the `bqutil` project within the
-`vertica` dataset for reference in queries.
+which mimic the behavior of proprietary functions in Vertica.
 
 ## UDFs
 
