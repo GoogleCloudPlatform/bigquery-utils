@@ -17,10 +17,8 @@
 
 /** Emulate Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes). */
 CREATE OR REPLACE FUNCTION substrb(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
-
-    (SELECT CAST(substr(CAST(str AS BYTES),startpos, extent) as STRING))
+    CAST(SUBSTR(CAST(str AS BYTES), startpos, extent) AS STRING)
 );
-
 
 
 
