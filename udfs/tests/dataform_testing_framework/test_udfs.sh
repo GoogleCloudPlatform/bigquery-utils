@@ -40,7 +40,7 @@ copy_sql_and_rename_to_sqlx() {
   local udf_dir=$1
   local destination
   while read -r file; do
-    destination="dataform_udf_creation/definitions/community/$(basename "${file}").sqlx"
+    destination="dataform_udf_creation/definitions/$(basename "${file}").sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
     cp "${file}" "${destination}"
   done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
@@ -48,7 +48,7 @@ copy_sql_and_rename_to_sqlx() {
 
 main() {
   echo '{"projectId": "", "location": "US"}' > .df-credentials.json
-  mkdir -p dataform_udf_creation/definitions/community
+  mkdir -p dataform_udf_creation/definitions
   dataform install
 
   ln -sf "$(pwd)"/dataform.json dataform_udf_creation/dataform.json
@@ -62,7 +62,7 @@ main() {
   ln -sf "$(pwd)"/.df-credentials.json dataform_assertion_unit_test/.df-credentials.json
 
   copy_sql_and_rename_to_sqlx ../../../udfs/community
-  replace_js_udf_bucket_placeholder dataform_udf_creation/definitions/community gs://dannybq/test_bq_js_libs
+  replace_js_udf_bucket_placeholder dataform_udf_creation/definitions gs://dannybq/test_bq_js_libs
   dataform run dataform_udf_creation/
   dataform test dataform_assertion_unit_test/
 }
