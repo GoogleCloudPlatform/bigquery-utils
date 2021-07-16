@@ -22,19 +22,19 @@ lowerb:
     expected_output: (NULL)
 substrb:
   - test:
-    input: "soupçon", 5, 2
+    input: CAST("soupçon" as STRING), 5, 2
     expected_output: "ç"
   - test:
-    input: "foobar", 1, 2
+    input: CAST("foobar" as STRING), 1, 2
     expected_output: "fo"
-  - test: # Teradata casts strings into numeric
-    input: "foobar", 10, 2
+  - test: 
+    input: CAST("foobar" as STRING), 10, 2
     expected_output: ""
   - test:
     input: (NULL), 1, 2
     expected_output: (NULL)
   - test:
-    input: "", 3, 4
+    input: CAST("" as STRING), 3, 4
     expected_output: ""
 upperb:
   - test:
