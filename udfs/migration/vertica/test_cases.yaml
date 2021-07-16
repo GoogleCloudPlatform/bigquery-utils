@@ -23,19 +23,19 @@ lowerb:
 substrb:
   - test:
     input: CAST("soupçon" as STRING), 5, 2
-    expected_output: "ç"
+    expected_output: CAST("ç" AS STRING)
   - test:
     input: CAST("foobar" as STRING), 1, 2
-    expected_output: "fo"
+    expected_output: CAST("fo" AS STRING)
   - test: 
     input: CAST("foobar" as STRING), 10, 2
-    expected_output: ""
+    expected_output: CAST("" AS STRING)
   - test:
     input: (NULL), 1, 2
     expected_output: (NULL)
   - test:
     input: CAST("" as STRING), 3, 4
-    expected_output: ""
+    expected_output: CAST("" AS STRING)
 upperb:
   - test:
     input: CAST("étudiant" as STRING)
