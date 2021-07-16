@@ -7,11 +7,23 @@ directory will be automatically synchronized to the `bqutil` project within the
 
 ## UDFs
 
+* [next_day](#next_daydate_value-date-day_name-string)
 * [regexp_extract_with_occurrence](#regexp_extract_with_occurrencehaystack-string-needle-string-position-int64-occurrence-int64)
 * [regexp_extract_with_occurrence_and_flags](#regexp_extract_with_occurrence_and_flagshaystack-string-needle-string-position-int64-occurrence-int64-mode-string)
 
 
+
+
 ## Documentation
+
+### [next_day(date_value DATE, day_name STRING)](../common/next_day.sql)
+This function calculates the next occurance of a specific day based off an initial date value. The function is based off of the Vertica [function](https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/SQLReferenceManual/Functions/Date-Time/NEXT_DAY.htm) 
+```sql
+   SELECT bqutil.vertica.next_day(Date('2016-04-29'),'mon'); 
+   SELECT bqutil.vertica.next_day(Date('2016-04-29'),'fri');
+
+2016-05-02, 2016-05-06
+```
 
 
 ### [regexp_extract_with_occurrence(haystack STRING, needle STRING, position INT64, occurrence INT64)](regexp_extract_with_occurrence.sql)
@@ -33,4 +45,5 @@ Select regexp_extract_with_occurrence_and_flags ("Blah AABBBC", "ab+c", 3, 1, ''
 
 ABBBC, null
 ```
+
 
