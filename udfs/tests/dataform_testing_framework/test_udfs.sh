@@ -40,8 +40,10 @@ replace_js_udf_bucket_placeholder() {
 copy_sql_and_rename_to_sqlx() {
   local udf_dir=$1
   local destination
+  local newfilename
   while read -r file; do
-    destination="../../../udfs/community/$(basename "${file}").sqlx"
+    newfilename=$( basename "${file}" | cut -f 1 -d '.')
+    destination="../../../udfs/community/${newfilename}.sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
     mv "${file}" "${destination}"
   done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
@@ -49,23 +51,25 @@ copy_sql_and_rename_to_sqlx() {
 
 main() {
   echo '{"projectId": "", "location": "US"}' > .df-credentials.json
-  dataform install
 
-  ln -sf "$(pwd)"/dataform.json ../../../udfs/community/dataform.json
-  ln -sf "$(pwd)"/package.json ../../../udfs/community/package.json
-  ln -sf "$(pwd)"/node_modules/ ../../../udfs/community/node_modules
-  ln -sf "$(pwd)"/.df-credentials.json ../../../udfs/community/.df-credentials.json
+  mkdir -p dataform_udfs_temp/definitions
+  ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
+  ln -sf "$(pwd)"/package.json dataform_udfs_temp/package.json
+  ln -sf "$(pwd)"/node_modules/ dataform_udfs_temp/node_modules
+  ln -sf "$(pwd)"/.df-credentials.json dataform_udfs_temp/.df-credentials.json
+  ln -sf "$(pwd)"/../../../udfs/community/ dataform_udfs_temp/definitions
 
-  ln -sf "$(pwd)"/dataform.json dataform_assertion_unit_test/dataform.json
-  ln -sf "$(pwd)"/package.json dataform_assertion_unit_test/package.json
-  ln -sf "$(pwd)"/node_modules/ dataform_assertion_unit_test/node_modules
-  ln -sf "$(pwd)"/.df-credentials.json dataform_assertion_unit_test/.df-credentials.json
+  ln -sf "$(pwd)"/dataform.json dataform_udf_unit_tests/dataform.json
+  ln -sf "$(pwd)"/package.json dataform_udf_unit_tests/package.json
+  ln -sf "$(pwd)"/node_modules/ dataform_udf_unit_tests/node_modules
+  ln -sf "$(pwd)"/.df-credentials.json dataform_udf_unit_tests/.df-credentials.json
 
 #  copy_sql_and_rename_to_sqlx ../../../udfs/community
   replace_js_udf_bucket_placeholder ../../../udfs/community gs://dannybq/test_bq_js_libs
-  dataform run dataform_udf_creation/
-  dataform test dataform_assertion_unit_test/
+  dataform run dataform_udfs_temp/
+  dataform test dataform_udf_unit_tests/
   bq rm -r -f fn
+  rm -rf dataform_udfs_temp
 }
 
 main
