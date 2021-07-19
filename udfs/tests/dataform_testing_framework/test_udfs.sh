@@ -42,7 +42,7 @@ copy_sql_and_rename_to_sqlx() {
   local destination
   local newfilename
   while read -r file; do
-    newfilename=$( basename "${file}" | cut -f 1 -d '.')
+    newfilename=$(basename "${file}" | cut -f 1 -d '.')
     destination="../../../udfs/community/${newfilename}.sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
     mv "${file}" "${destination}"
@@ -51,7 +51,7 @@ copy_sql_and_rename_to_sqlx() {
 
 main() {
   dataform install
-  echo '{"projectId": "", "location": "US"}' > .df-credentials.json
+  echo '{"projectId": "", "location": "US"}' >.df-credentials.json
   bq mk --dataset fn
   mkdir -p dataform_udfs_temp/definitions
   ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
@@ -65,7 +65,7 @@ main() {
   ln -sf "$(pwd)"/node_modules/ dataform_udf_unit_tests/node_modules
   ln -sf "$(pwd)"/.df-credentials.json dataform_udf_unit_tests/.df-credentials.json
 
-#  copy_sql_and_rename_to_sqlx ../../../udfs/community
+  #  copy_sql_and_rename_to_sqlx ../../../udfs/community
   replace_js_udf_bucket_placeholder ../../../udfs/community gs://dannybq/test_bq_js_libs
   dataform run dataform_udfs_temp/
   dataform test dataform_udf_unit_tests/
