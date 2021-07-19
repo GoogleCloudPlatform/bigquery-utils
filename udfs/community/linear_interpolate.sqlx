@@ -20,7 +20,7 @@
 -- prev: the x,y coordinate of the preceding value
 -- next: the x,y coordinate of the following value
 -- Output: the interpolated y value
-CREATE OR REPLACE FUNCTION fn.linear_interpolate(pos INT64, prev STRUCT<x INT64,y FLOAT64>, next STRUCT<x INT64,y FLOAT64>) 
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.linear_interpolate(pos INT64, prev STRUCT<x INT64,y FLOAT64>, next STRUCT<x INT64,y FLOAT64>)
 RETURNS FLOAT64 AS (
   CASE
     WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN NULL

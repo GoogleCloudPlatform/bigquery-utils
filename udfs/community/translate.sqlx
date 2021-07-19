@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.translate(
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.translate(
   expression STRING,
   characters_to_replace STRING,
   characters_to_substitute STRING) 

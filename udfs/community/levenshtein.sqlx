@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.levenshtein(source STRING, target STRING)
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.levenshtein(source STRING, target STRING)
 RETURNS INT64
 LANGUAGE js
 AS

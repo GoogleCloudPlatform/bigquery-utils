@@ -17,7 +17,7 @@
 -- Given an key and a list of structs, returns the ARRAY type value.
 -- This can be used to get an array of values for a given key from
 -- an array of structs.
-CREATE OR REPLACE FUNCTION fn.get_array_value(get_key STRING, arr ANY TYPE) AS
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.get_array_value(get_key STRING, arr ANY TYPE) AS
 (
   ARRAY(SELECT value FROM UNNEST(arr) WHERE key = get_key)
 );

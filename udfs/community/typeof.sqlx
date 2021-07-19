@@ -17,7 +17,7 @@
 -- typeof:
 -- Input: Any
 -- Output: Type of input or 'UNKNOWN' if input is unknown typed value
-CREATE OR REPLACE FUNCTION fn.typeof(input ANY TYPE)
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.typeof(input ANY TYPE)
 AS ( (
     SELECT
       CASE

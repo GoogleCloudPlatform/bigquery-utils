@@ -21,7 +21,7 @@
 -- session_gap: the duration in seconds of the [session gap](https://cloud.google.com/dataflow/docs/reference/sql/streaming-extensions#supported_argument_types_3)
 -- Output: NULL if the difference between the timestamps is smaller than the session gap, else return the row_ts to indicate the start of a new session
 CREATE OR REPLACE FUNCTION 
-fn.ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)
+${dataform.projectConfig.vars.community_dataset_name}.ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)
 AS (
  CASE
    WHEN prev_ts IS NULL THEN row_ts

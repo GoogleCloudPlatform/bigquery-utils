@@ -17,7 +17,7 @@
 -- json_typeof:
 -- Input: JSON string
 -- Output: The JSON value type of the argument or NULL if the argument is an unknown value
-CREATE OR REPLACE FUNCTION fn.json_typeof(json STRING)
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.json_typeof(json STRING)
 AS ( (
     SELECT AS VALUE
       CASE

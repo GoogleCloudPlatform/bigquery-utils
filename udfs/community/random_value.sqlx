@@ -19,13 +19,13 @@
  *
  * Usage:
  * SELECT
- *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
- *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
- *   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
+ *   bqutil.${dataform.projectConfig.vars.community_dataset_name}.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+ *   bqutil.${dataform.projectConfig.vars.community_dataset_name}.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe']),
+ *   bqutil.${dataform.projectConfig.vars.community_dataset_name}.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
  *
  * 'tino', 'julie', 'jordan'
  */
-CREATE OR REPLACE FUNCTION fn.random_value(arr ANY TYPE)
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.random_value(arr ANY TYPE)
 AS
 (
   (

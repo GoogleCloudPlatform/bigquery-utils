@@ -1,6 +1,6 @@
 {
     "warehouse": "bigquery",
-    "defaultSchema": "fn",
+    "defaultSchema": "dataform",
     "assertionSchema": "dataform_assertions",
     "defaultDatabase": "danny-bq",
     "concurrentQueryLimit": 100,

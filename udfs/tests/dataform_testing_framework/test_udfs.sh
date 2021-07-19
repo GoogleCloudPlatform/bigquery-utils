@@ -52,7 +52,7 @@ copy_sql_and_rename_to_sqlx() {
 main() {
   dataform install
   echo '{"projectId": "", "location": "US"}' > .df-credentials.json
-
+  bq mk --dataset fn
   mkdir -p dataform_udfs_temp/definitions
   ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
   ln -sf "$(pwd)"/package.json dataform_udfs_temp/package.json

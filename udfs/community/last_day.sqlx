@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.last_day(dt DATE) RETURNS DATE AS
+CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.last_day(dt DATE) RETURNS DATE AS
 (
   DATE_SUB(
     DATE_ADD(
