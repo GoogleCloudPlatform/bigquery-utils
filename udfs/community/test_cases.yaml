@@ -446,7 +446,7 @@ corr_pvalue:
 normal_cdf:
   - test:
     input: CAST(0.0 AS FLOAT64), CAST(0.0 AS FLOAT64), CAST(1.0 AS FLOAT64)
-    expectd_output: CAST(0.5 AS FLOAT64) 
+    expected_output: CAST(0.5 AS FLOAT64) 
 
 p_fisherexact:
   - test:
