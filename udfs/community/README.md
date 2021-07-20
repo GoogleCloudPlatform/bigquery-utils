@@ -13,6 +13,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
@@ -30,7 +31,6 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
-* [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
@@ -40,6 +40,7 @@ SELECT bqutil.fn.int(1.684)
 * [ts_session_group](#ts_session_grouprow_ts-timestamp-prev_ts-timestamp-session_gap-int64)
 * [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
+* [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
@@ -705,16 +706,16 @@ results:
 
 
 
-### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sql)
+### [chisquare_cdf(H FLOAT64, dof FLOAT64)](chisquare_cdf.sql)
 Takes _H_ and _dof_ and returns _p_ probability value.
 
-The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
+The [chisquare_cdf](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
 
 * Input: H FLOAT64, dof FLOAT64
 * Output: p FLOAT64
 * 
 ```sql
-SELECT `bqutils.fn.pvalue`(.3,2) AS results;
+SELECT `bqutils.fn.chisquare_cdf`(.3,2) AS results;
 ```
 
 results:
