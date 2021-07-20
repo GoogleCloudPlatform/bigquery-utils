@@ -443,9 +443,11 @@ corr_pvalue:
   - test:
     input: CAST(0.0 AS FLOAT64), CAST(50 AS INT64)
     expected_output: CAST(1.0000000078386753 AS FLOAT64)
+normal_cdf:
   - test:
-    input: CAST(1.1 AS FLOAT64), CAST(40 AS INT64)
-    expected_output: CAST(NaN  AS FLOAT64)
+    input: CAST(0.0 AS FLOAT64), CAST(0.0 AS FLOAT64), CAST(1.0 AS FLOAT64)
+    expectd_output: CAST(0.5 AS FLOAT64) 
+
 p_fisherexact:
   - test:
     input: CAST(90 AS FLOAT64), CAST(27 AS FLOAT64), CAST(17 AS FLOAT64), CAST(50 AS FLOAT64)
@@ -453,4 +455,5 @@ p_fisherexact:
 mannwhitneyu:
   - test:
     input: ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.], ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.], CAST('two-sided' AS STRING)
-    expected_output: STRUCT(CAST(0.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p) 
+    expected_output: STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p) 
+
