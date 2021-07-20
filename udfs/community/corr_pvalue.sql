@@ -9,6 +9,7 @@ var abs_r = Math['abs'](r)
 if ( abs_r < 1.0 ) {
    var t =  abs_r * Math['sqrt']( (n-2) / (1.0 - (r*r)) )
    return jstat['jStat']['ttest'](t,n-2,2);
+
 } else if (abs_r == 1.0  ) {
    return 0.0
 } else {  

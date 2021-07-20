@@ -68,6 +68,7 @@ function LynHyperGoe_appr( a, b, c, d ) {
 }
   
   var n = Math['round'](a + b + c + d);
+
   var temp = 0 ;
   var LnPrx = 0.0 ;
   var n1_ = a+b ;
@@ -88,6 +89,7 @@ function LynHyperGoe_appr( a, b, c, d ) {
         LnPrx = LnHyperGeometric( x , n1_ - x, n_1 - x, n_21 +x) ;
         if ( LnPrx <= LnPra ) { 
             temp = temp + Math['exp']( LnPrx - LnPra );
+
         }         
      }
   } else {
@@ -99,16 +101,19 @@ function LynHyperGoe_appr( a, b, c, d ) {
      for (x = min+1; x <= max; x++) {
         if (! (x % 10 == 0)  ) {
            LnPrx = LnPrx + Math['log']( ((n_1 - x +1)/x)*(n1_ -x +1)/( n_21 + x) )     ;
+
         }
         else {
            LnPrx = LynHyperGoe_appr(x, n1_-x, n_1-x, n_21+x);
         }
         if ( LnPrx <= LnPra ) { 
             temp = temp + Math['exp']( LnPrx - LnPra );
+
         }
      }
   }
   
   var LnPFET = LnPra  + Math['log']( temp ); 
   return  Math['exp']( LnPFET ) ;
+
 """;

@@ -33,7 +33,6 @@ AS (
     U1 as U,
     IF( alt='less' OR alt='greater', 1.0, 2.0 ) as factor
   FROM statistics  
- )
  SELECT struct(U, factor* fn.normal_cdf(z,0.0,1.0) as p ) 
  FROM normal_appr 
 )

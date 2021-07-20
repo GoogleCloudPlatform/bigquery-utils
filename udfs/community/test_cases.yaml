@@ -411,6 +411,10 @@ levenshtein:
 #
 # Below targets StatsLib work
 #
+jstat:
+  - test:
+    input: CAST('chisquare.cdf' AS STRING), ARRAY<FLOAT64>[0.3, 2.0]
+    expected_output: CAST(0.1392920235749422 AS FLOAT64)
 pvalue:
   - test:
     input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
@@ -443,6 +447,7 @@ normal_cdf:
   - test:
     input: CAST(0.0 AS FLOAT64), CAST(0.0 AS FLOAT64), CAST(1.0 AS FLOAT64)
     expectd_output: CAST(0.5 AS FLOAT64) 
+
 p_fisherexact:
   - test:
     input: CAST(90 AS FLOAT64), CAST(27 AS FLOAT64), CAST(17 AS FLOAT64), CAST(50 AS FLOAT64)
@@ -451,3 +456,4 @@ mannwhitneyu:
   - test:
     input: ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.], ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.], CAST('two-sided' AS STRING)
     expected_output: STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p) 
+
