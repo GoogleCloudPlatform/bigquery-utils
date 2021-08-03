@@ -129,13 +129,13 @@ main() {
   # SHORT_SHA environment variable below comes from
   # cloud build when the trigger originates from a github commit.
   export DATASET_ID=community${SHORT_SHA}
-  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../../udfs/community "${DATASET_ID}"_deploy
-  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../../udfs/community "${DATASET_ID}"_test
+  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../community "${DATASET_ID}"_deploy
+  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../community "${DATASET_ID}"_test
   clean_bq_dataset
 
   export DATASET_ID=vertica${SHORT_SHA}
-  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../../udfs/migration/vertica "${DATASET_ID}"_deploy
-  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../../udfs/migration/vertica "${DATASET_ID}"_test
+  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../migration/vertica "${DATASET_ID}"_deploy
+  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../migration/vertica "${DATASET_ID}"_test
   clean_bq_dataset
 
 }
