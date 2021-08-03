@@ -15,9 +15,12 @@
 # limitations under the License.
 
 clean(){
-    rm -rf dataform_udfs_temp_deploy
-    rm -rf dataform_udf_unit_tests
-    bq --project_id "${PROJECT_ID}" rm -r -f --dataset fn
+  rm -rf node_modules
+  rm -f package-lock.json
+  rm -f .df-credentials.json
+  rm -rf dataform_udfs_temp_deploy
+  rm -rf dataform_udf_unit_tests
+  bq --project_id "${PROJECT_ID}" rm -r -f --dataset fn
 }
 
 #######################################
