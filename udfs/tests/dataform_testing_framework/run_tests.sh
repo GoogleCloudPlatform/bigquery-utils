@@ -89,9 +89,9 @@ set_env_vars(){
 
 main() {
   set_env_vars
-  dataform install
   generate_dataform_credentials "${PROJECT_ID}" .
-  bq mk --dataset fn
+  dataform install > /dev/null 2>&1
+
   mkdir -p dataform_udfs_temp/definitions
   ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
   add_symbolic_dataform_dependencies dataform_udfs_temp
@@ -107,7 +107,6 @@ main() {
   replace_js_udf_bucket_placeholder ../../../udfs/community gs://dannybq/test_bq_js_libs
   dataform run dataform_udfs_temp/
   dataform test dataform_udf_unit_tests/
-  bq rm -r -f fn
   rm -rf dataform_udfs_temp
 }
 
