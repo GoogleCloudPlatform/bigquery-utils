@@ -113,20 +113,11 @@ test_udfs(){
   rm -rf "${dataset_id}"_test
 }
 
-set_env_vars(){
+main() {
   # For now, this build script assumes all BigQuery environments
   # live in the same location which you specify below.
   export BQ_LOCATION=US
-
-  # PROD project points to the live BigQuery environment
-  # which must be kept in sync with DDL changes.
   export PROJECT_ID=deleodanny
-  export DATASET_ID=dataform
-}
-
-
-main() {
-  set_env_vars
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
