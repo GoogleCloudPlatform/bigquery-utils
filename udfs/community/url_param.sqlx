@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.url_param(query STRING, p STRING)
+CREATE OR REPLACE FUNCTION ${self()}(query STRING, p STRING)
 RETURNS STRING
 LANGUAGE js AS """
   result = null;

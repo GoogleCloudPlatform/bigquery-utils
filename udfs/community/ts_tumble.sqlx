@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -19,7 +20,7 @@
 -- input_ts: timestamp to be divided into a [tumble window](https://cloud.google.com/dataflow/docs/reference/sql/streaming-extensions#tumble)
 -- tumble_seconds: size of the tumble window in seconds
 -- Output: the starting TIMESTAMP of the tumble winow the input_ts belongs to
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)
+CREATE OR REPLACE FUNCTION ${self()}(input_ts TIMESTAMP, tumble_seconds INT64)
 RETURNS TIMESTAMP
 AS (
   IF (

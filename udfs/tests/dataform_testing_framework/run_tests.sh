@@ -49,20 +49,58 @@ copy_sql_and_rename_to_sqlx() {
   done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
 }
 
+add_symbolic_dataform_dependencies(){
+  local target_dir=$1
+  # Create symbolic links to dataform config files and node_modules
+  # to save time and not duplicate resources
+  ln -sf "$(pwd)"/package.json "${target_dir}"/package.json
+  ln -sf "$(pwd)"/node_modules/ "${target_dir}"/node_modules
+}
+
+generate_dataform_credentials(){
+  local project_id=$1
+  local dataform_dir=$2
+  # Create an .df-credentials.json file as shown below
+  # in order to have Dataform pick up application default credentials
+  # https://cloud.google.com/docs/authentication/production#automatically
+  echo "{\"projectId\": \"${project_id}\", \"location\": \"${BQ_LOCATION}\"}" > "${dataform_dir}"/.df-credentials.json
+}
+
+generate_dataform_config_and_creds(){
+  export PROJECT_ID=$1
+  export DATASET_ID=$2
+  envsubst < dataform_dev.json > dataform.json
+  generate_dataform_credentials "${PROJECT_ID}" .
+  #redirect to null to avoid noise
+  dataform install > /dev/null 2>&1
+}
+
+set_env_vars(){
+  # For now, this build script assumes all BigQuery environments
+  # live in the same location which you specify below.
+  export BQ_LOCATION=US
+
+  # PROD project points to the live BigQuery environment
+  # which must be kept in sync with DDL changes.
+  export PROJECT_ID=danny-bq
+  export DATASET_ID=dataform
+}
+
+
 main() {
+  set_env_vars
   dataform install
-  echo '{"projectId": "", "location": "US"}' >.df-credentials.json
+  generate_dataform_credentials "${PROJECT_ID}" .
   bq mk --dataset fn
   mkdir -p dataform_udfs_temp/definitions
   ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
-  ln -sf "$(pwd)"/package.json dataform_udfs_temp/package.json
-  ln -sf "$(pwd)"/node_modules/ dataform_udfs_temp/node_modules
+  add_symbolic_dataform_dependencies dataform_udfs_temp
+
   ln -sf "$(pwd)"/.df-credentials.json dataform_udfs_temp/.df-credentials.json
   ln -sf "$(pwd)"/../../../udfs/community/ dataform_udfs_temp/definitions
 
   ln -sf "$(pwd)"/dataform.json dataform_udf_unit_tests/dataform.json
-  ln -sf "$(pwd)"/package.json dataform_udf_unit_tests/package.json
-  ln -sf "$(pwd)"/node_modules/ dataform_udf_unit_tests/node_modules
+  add_symbolic_dataform_dependencies dataform_udf_unit_tests
   ln -sf "$(pwd)"/.df-credentials.json dataform_udf_unit_tests/.df-credentials.json
 
   #  copy_sql_and_rename_to_sqlx ../../../udfs/community

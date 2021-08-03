@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -20,8 +21,7 @@
 -- period: the interval size to start a new window
 -- duration: the size of the sliding windows
 -- Output: array of windows the timestamp belongs to. Inclusive of the window_start and exclusive of the window_end 
-CREATE OR REPLACE FUNCTION 
-${dataform.projectConfig.vars.community_dataset_name}.ts_slide(ts TIMESTAMP, period INT64, duration INT64)
+CREATE OR REPLACE FUNCTION ${self()}(ts TIMESTAMP, period INT64, duration INT64)
 RETURNS ARRAY<STRUCT<window_start TIMESTAMP, window_end TIMESTAMP>>
 AS ((
   SELECT 
@@ -33,7 +33,7 @@ AS ((
     )
   FROM UNNEST(
     GENERATE_TIMESTAMP_ARRAY(
-      bqutil.${dataform.projectConfig.vars.community_dataset_name}.ts_tumble(
+      ${ref("ts_tumble")}(
         TIMESTAMP_SUB(ts, INTERVAL duration - period SECOND),
         period
       ),

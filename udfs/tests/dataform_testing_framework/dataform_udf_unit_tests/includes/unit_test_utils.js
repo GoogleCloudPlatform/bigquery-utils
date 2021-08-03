@@ -53,7 +53,7 @@ function create_dataform_test_view(test_name, test_udf, test_cases) {
     .query(
       (ctx) => `
             SELECT
-              ${get_udf_project()}.${test_udf}(
+              ${get_udf_project()}.${get_udf_dataset()}.${test_udf}(
                     ${udf_input_aliases}) AS udf_output
             FROM ${ctx.resolve("test_inputs")}
         `
@@ -78,6 +78,10 @@ function get_udf_project() {
   // This function returns the default BigQuery project
   // which is specified in the dataform.json config file.
   return `\`${dataform.projectConfig.defaultDatabase}\``;
+}
+
+function get_udf_dataset(){
+ return `\`${dataform.projectConfig.defaultSchema}\``;
 }
 
 // Source: https://stackoverflow.com/a/2117523

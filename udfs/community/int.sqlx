@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,6 +15,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.int(v ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(v ANY TYPE) AS (
   CAST(FLOOR(CAST(v AS FLOAT64)) AS INT64)
 );

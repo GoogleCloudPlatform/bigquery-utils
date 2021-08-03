@@ -14,13 +14,13 @@
 
 const {generate_udf_test} = unit_test_utils;
 
-generate_udf_test("fn.int", [
+generate_udf_test("int", [
   {
     input_1: "CAST(-1 AS STRING)",
     expected_output: "CAST(-1 AS INT64)",
   },
 ]);
-generate_udf_test("fn.int", [
+generate_udf_test("int", [
   {
     input_1: "CAST(1 AS INT64)",
     expected_output: "CAST(1 AS INT64)",
@@ -30,7 +30,7 @@ generate_udf_test("fn.int", [
     expected_output: "CAST(7 AS INT64)",
   },
 ]);
-generate_udf_test("fn.int", [
+generate_udf_test("int", [
   {
     input_1: "CAST(2.5 AS FLOAT64)",
     expected_output: "CAST(2 AS INT64)",
@@ -40,7 +40,7 @@ generate_udf_test("fn.int", [
     expected_output: "CAST(7 AS INT64)",
   },
 ]);
-generate_udf_test("fn.json_typeof", [
+generate_udf_test("json_typeof", [
   {
     input_1: "('\"\"')",
     expected_output: "('string')",
@@ -114,7 +114,7 @@ generate_udf_test("fn.json_typeof", [
     expected_output: "(NULL)",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "(b'test')",
     expected_output: "('BYTES')",
@@ -124,7 +124,7 @@ generate_udf_test("fn.typeof", [
     expected_output: "('BYTES')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "('test')",
     expected_output: "('STRING')",
@@ -134,7 +134,7 @@ generate_udf_test("fn.typeof", [
     expected_output: "('STRING')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "(TRUE)",
     expected_output: "('BOOL')",
@@ -144,13 +144,13 @@ generate_udf_test("fn.typeof", [
     expected_output: "('BOOL')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "(NULL)",
     expected_output: "('NULL')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "(1)",
     expected_output: "('INT64')",
@@ -164,7 +164,7 @@ generate_udf_test("fn.typeof", [
     expected_output: "('INT64')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "(0.0)",
     expected_output: "('FLOAT64')",
@@ -206,55 +206,55 @@ generate_udf_test("fn.typeof", [
     expected_output: "('FLOAT64')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "DATE '1970-01-01'",
     expected_output: "('DATE')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "DATETIME '1970-01-01T00:00:00'",
     expected_output: "('DATETIME')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "TIME '00:00:00'",
     expected_output: "('TIME')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "TIMESTAMP '1970-01-01T00:00:00Z'",
     expected_output: "('TIMESTAMP')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "STRUCT()",
     expected_output: "('STRUCT')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "STRUCT(1)",
     expected_output: "('STRUCT')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "STRUCT(1, 2, 3)",
     expected_output: "('STRUCT')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "STRUCT<a INT64, b INT64, c INT64>(1, 2, 3)",
     expected_output: "('STRUCT')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "([])",
     expected_output: "('ARRAY')",
@@ -268,13 +268,13 @@ generate_udf_test("fn.typeof", [
     expected_output: "('ARRAY')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "ST_GEOGPOINT(0, 0)",
     expected_output: "('GEOGRAPHY')",
   },
 ]);
-generate_udf_test("fn.typeof", [
+generate_udf_test("typeof", [
   {
     input_1: "NUMERIC '0'",
     expected_output: "('NUMERIC')",
@@ -288,7 +288,7 @@ generate_udf_test("fn.typeof", [
     expected_output: "('NUMERIC')",
   },
 ]);
-generate_udf_test("fn.url_parse", [
+generate_udf_test("url_parse", [
   {
     input_1: "CAST('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1' AS STRING)",
     input_2: " CAST('HOST' AS STRING)",
@@ -365,7 +365,7 @@ generate_udf_test("fn.url_parse", [
     expected_output: "(NULL) # NULL is a type in YAML so wrap it in parenthesis",
   },
 ]);
-generate_udf_test("fn.last_day", [
+generate_udf_test("last_day", [
   {
     input_1: '  CAST("1987-12-25" AS DATE)',
     expected_output: 'CAST("1987-12-31" AS DATE)',
@@ -383,7 +383,7 @@ generate_udf_test("fn.last_day", [
     expected_output: 'CAST("2019-02-28" AS DATE) # non-leap year',
   },
 ]);
-generate_udf_test("fn.percentage_change", [
+generate_udf_test("percentage_change", [
   {
     input_1: "CAST(0.2 AS FLOAT64)",
     input_2: " CAST(0.4 AS FLOAT64)",
@@ -430,7 +430,7 @@ generate_udf_test("fn.percentage_change", [
     expected_output: "CAST(NULL AS FLOAT64)",
   },
 ]);
-generate_udf_test("fn.percentage_difference", [
+generate_udf_test("percentage_difference", [
   {
     input_1: "CAST(0.22222222 AS FLOAT64)",
     input_2: " CAST(0.88888888 AS FLOAT64)",
@@ -482,7 +482,7 @@ generate_udf_test("fn.percentage_difference", [
     expected_output: "CAST(2.0 AS FLOAT64)",
   },
 ]);
-generate_udf_test("fn.linear_interpolate", [      {
+generate_udf_test("linear_interpolate", [      {
     "input_1": "CAST(2 AS INT64)",
     "input_2": "STRUCT(CAST(1 AS INT64) AS x, CAST(1.0 AS FLOAT64) AS y)",
     "input_3": "STRUCT(CAST(3 AS INT64) AS x, CAST(3.0 AS FLOAT64) AS y)",
@@ -495,7 +495,7 @@ generate_udf_test("fn.linear_interpolate", [      {
     "expected_output": "CAST(3.0 AS FLOAT64)",
     },
 ]);
-generate_udf_test("fn.ts_linear_interpolate", [      {
+generate_udf_test("ts_linear_interpolate", [      {
     "input_1": "CAST('2020-01-01 00:15:00' AS TIMESTAMP)",
     "input_2": "STRUCT(CAST('2020-01-01 00:00:00' AS TIMESTAMP) AS x, CAST(1.0 AS FLOAT64))",
     "input_3": "STRUCT(CAST('2020-01-01 00:30:00' AS TIMESTAMP) AS x, CAST(3.0 AS FLOAT64))",
@@ -508,7 +508,7 @@ generate_udf_test("fn.ts_linear_interpolate", [      {
     "expected_output": "CAST(1.2 AS FLOAT64)",
     },
 ]);
-generate_udf_test("fn.ts_tumble", [
+generate_udf_test("ts_tumble", [
   {
     input_1: "CAST('2020-01-01 00:17:30' AS TIMESTAMP)",
     input_2: " CAST(900 AS INT64)",
@@ -535,7 +535,7 @@ generate_udf_test("fn.ts_tumble", [
     expected_output: "(NULL)",
   },
 ]);
-generate_udf_test("fn.ts_gen_keyed_timestamps", [
+generate_udf_test("ts_gen_keyed_timestamps", [
   {
     input_1: "ARRAY<STRING>['abc']",
     input_2: " CAST(60 AS INT64)",
@@ -551,7 +551,7 @@ generate_udf_test("fn.ts_gen_keyed_timestamps", [
     expected_output: "([STRUCT(CAST('abc' AS STRING) AS series_key, CAST('2020-01-01 00:30:00' AS TIMESTAMP) AS tumble_val), STRUCT(CAST('def' AS STRING) AS series_key, CAST('2020-01-01 00:30:00' AS TIMESTAMP) AS tumble_val)])",
   },
 ]);
-generate_udf_test("fn.ts_session_group", [
+generate_udf_test("ts_session_group", [
   {
     input_1: "CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP)",
     input_2: " (NULL)",
@@ -571,7 +571,7 @@ generate_udf_test("fn.ts_session_group", [
     expected_output: "CAST('2020-01-01 01:24:01 UTC' AS TIMESTAMP)",
   },
 ]);
-generate_udf_test("fn.ts_slide", [
+generate_udf_test("ts_slide", [
   {
     input_1: "CAST('2020-01-01 01:04:59 UTC' AS TIMESTAMP)",
     input_2: " 300",
@@ -597,7 +597,7 @@ generate_udf_test("fn.ts_slide", [
     expected_output: "([STRUCT(CAST('2020-01-01 01:00:00 UTC' AS TIMESTAMP) AS window_start, CAST('2020-01-01 01:15:00 UTC' AS TIMESTAMP) AS window_end)])",
   },
 ]);
-generate_udf_test("fn.nlp_compromise_number", [
+generate_udf_test("nlp_compromise_number", [
   {
     input_1: "CAST('one hundred fifty seven' AS STRING)",
     expected_output: "CAST(157 AS NUMERIC)",
@@ -619,7 +619,7 @@ generate_udf_test("fn.nlp_compromise_number", [
     expected_output: "CAST(5000325.01 AS NUMERIC)",
   },
 ]);
-generate_udf_test("fn.nlp_compromise_people", [
+generate_udf_test("nlp_compromise_people", [
   // Below tests taken from https: "//github.com/spencermountain/compromise/blob/master/tests/people.test.js",
   {
     input_1: "CAST('Mary is in the boat. Nancy is in the boat. Fred is in the boat. Jack is too.' AS STRING)",
@@ -646,7 +646,7 @@ generate_udf_test("fn.nlp_compromise_people", [
     expected_output: "CAST(['randal kieth orton', 'dwayne the rock johnson'] AS ARRAY<STRING>)",
   },
 ]);
-generate_udf_test("fn.levenshtein", [
+generate_udf_test("levenshtein", [
   {
     input_1: "CAST('analyze' AS STRING)",
     input_2: " CAST('analyse' AS STRING)",
@@ -681,20 +681,20 @@ generate_udf_test("fn.levenshtein", [
 //
 //  Below targets StatsLib work
 //
-generate_udf_test("fn.pvalue", [
+generate_udf_test("pvalue", [
   {
     input_1: "CAST(0.3 AS FLOAT64)",
     input_2: "CAST(2 AS INT64)",
     expected_output: "CAST(0.8607079764250578 AS FLOAT64)",
   },
 ]);
-generate_udf_test("fn.kruskal_wallis", [
+generate_udf_test("kruskal_wallis", [
   {
     input_1: "(SELECT [('a',1.0), ('b',2.0), ('c',2.3), ('a',1.4), ('b',2.2), ('c',5.5), ('a',1.0), ('b',2.3), ('c',2.3), ('a',1.1), ('b',7.2), ('c',2.8)])",
     expected_output: "STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)",
   },
 ]);
-generate_udf_test("fn.linear_regression", [
+generate_udf_test("linear_regression", [
   {
     input_1: "(SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])",
     expected_output: "STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)",

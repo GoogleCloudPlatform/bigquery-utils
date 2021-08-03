@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -31,7 +32,7 @@
 * SELECT 
 *   *,
 *   COALESCE(coord.y,
-*     ${dataform.projectConfig.vars.community_dataset_name}.ts_lin_interpolate(
+*     ts_lin_interpolate(
 *       ts,
 *       LAST_VALUE(coord IGNORE NULLS)
 *         OVER (PARTITION BY key
@@ -53,12 +54,12 @@
 -- prev: the x,y coordinate of the preceding value, where the x-coordinate is a TIMESTAMP
 -- next: the x,y coordinate of the following value, where the x-coordinate is a TIMESTAMP
 -- Output: the interpolated y value
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)
+CREATE OR REPLACE FUNCTION ${self()}(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)
 RETURNS FLOAT64 AS (
   CASE
     WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN NULL
     ELSE
-      bqutil.${dataform.projectConfig.vars.community_dataset_name}.linear_interpolate(
+      ${ref("linear_interpolate")}(
           UNIX_SECONDS(pos),
           STRUCT(UNIX_SECONDS(prev.x) AS x, prev.y AS y),
           STRUCT(UNIX_SECONDS(next.x) AS x, next.y AS y)

@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,6 +15,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64) AS (
+CREATE OR REPLACE FUNCTION ${self()}(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64) AS (
   SAFE_DIVIDE(x - meanx, stddevx)
 );

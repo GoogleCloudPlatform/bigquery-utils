@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -17,7 +18,7 @@
 -- typeof:
 -- Input: Any
 -- Output: Type of input or 'UNKNOWN' if input is unknown typed value
-CREATE OR REPLACE FUNCTION ${dataform.projectConfig.vars.community_dataset_name}.typeof(input ANY TYPE)
+CREATE OR REPLACE FUNCTION ${self()}(input ANY TYPE)
 AS ( (
     SELECT
       CASE
