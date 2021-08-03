@@ -18,6 +18,8 @@ This repository is broken up into:
     *   [billing](/scripts/billing) - Example queries over the GCP billing
         export
 *   [Stored Procedures](/stored_procedures) - Example stored procedures
+*   [Third Party](/third_party) - Relevant third party libraries for BigQuery 
+    *   [compilerworks](/third_party/compilerworks) - BigQuery UDFs which mimic the behavior of proprietary functions in other databases
 *   [Tools](/tools) - Custom tooling for working with BigQuery
     *   [Cloud Functions](/tools/cloud_functions) - Cloud Functions to automate common use cases
 *   [UDFs](/udfs) - User-defined functions for common usage as well as migration
@@ -36,6 +38,7 @@ This repository is broken up into:
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
         the audit logs which can be used to power dashboards
         ([example](https://codelabs.developers.google.com/codelabs/bigquery-pricing-workshop/#0)).
+
 
 ## Public UDFs
 
