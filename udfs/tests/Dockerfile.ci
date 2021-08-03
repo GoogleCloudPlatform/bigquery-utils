@@ -1,4 +1,8 @@
 FROM python:3.8.0-slim
 COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt
-ENTRYPOINT ["pytest"]
+
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+    apt-get install -y nodejs
+
+RUN npm i -g @dataform/cli
