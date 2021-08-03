@@ -14,6 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+clean(){
+    rm -rf dataform_udfs_temp_deploy
+    rm -rf dataform_udf_unit_tests
+    bq --project_id "${PROJECT_ID}" rm -r -f --dataset fn
+}
+
 #######################################
 # Replaces all ${JS_BUCKET} placeholders
 # in javascript UDFs with user-provided
@@ -32,7 +38,7 @@ replace_js_udf_bucket_placeholder() {
   printf "Replacing UDF bucket placeholder \${JS_BUCKET} with %s\n" "${js_bucket}"
   while read -r file; do
     printf "Replacing variables in file %s" "$file"
-    sed -i.bak "s|\${JS_BUCKET}|${js_bucket}|g" "${file}"
+    sed -i "s|\${JS_BUCKET}|${js_bucket}|g" "${file}"
     rm -f "${file}.bak"
   done <<<"$(find "${udf_dir}" -type f -name "*.sqlx")"
 }
@@ -55,24 +61,44 @@ add_symbolic_dataform_dependencies(){
   # to save time and not duplicate resources
   ln -sf "$(pwd)"/package.json "${target_dir}"/package.json
   ln -sf "$(pwd)"/node_modules/ "${target_dir}"/node_modules
-}
-
-generate_dataform_credentials(){
-  local project_id=$1
-  local dataform_dir=$2
-  # Create an .df-credentials.json file as shown below
-  # in order to have Dataform pick up application default credentials
-  # https://cloud.google.com/docs/authentication/production#automatically
-  echo "{\"projectId\": \"${project_id}\", \"location\": \"${BQ_LOCATION}\"}" > "${dataform_dir}"/.df-credentials.json
+  ln -sf "$(pwd)"/includes/ "${target_dir}"/includes
 }
 
 generate_dataform_config_and_creds(){
   export PROJECT_ID=$1
   export DATASET_ID=$2
-  envsubst < dataform_dev.json > dataform.json
-  generate_dataform_credentials "${PROJECT_ID}" .
-  #redirect to null to avoid noise
-  dataform install > /dev/null 2>&1
+  local target_dir=$3
+  envsubst < dataform_template.json > "${target_dir}"/dataform.json
+  # Create an .df-credentials.json file as shown below
+  # in order to have Dataform pick up application default credentials
+  # https://cloud.google.com/docs/authentication/production#automatically
+  echo "{\"projectId\": \"${project_id}\", \"location\": \"${BQ_LOCATION}\"}" > "${target_dir}"/.df-credentials.json
+}
+
+deploy_udfs(){
+  local project_id=$1
+  local dataset_id=$2
+  local udfs_source_dir=$3
+  local udfs_target_dir=$4
+  mkdir -p "${udfs_target_dir}"/definitions
+  mv "${udfs_source_dir}"/test_cases.js "${udfs_source_dir}"/test_cases.js.ignore
+  ln -sf "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/community
+  replace_js_udf_bucket_placeholder "${udfs_source_dir}" gs://dannybq/test_bq_js_libs
+  generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
+  add_symbolic_dataform_dependencies "${udfs_target_dir}"
+  dataform run "${udfs_target_dir}"
+}
+
+test_udfs(){
+  local project_id=$1
+  local dataset_id=$2
+  local udfs_source_dir=$3
+  local udfs_target_dir=$4
+  mkdir -p "${udfs_target_dir}"/definitions
+  cp "${udfs_source_dir}"/test_cases.js.ignore "${udfs_target_dir}"/definitions/test_cases.js
+  generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
+  add_symbolic_dataform_dependencies "${udfs_target_dir}"
+  dataform test "${udfs_target_dir}"
 }
 
 set_env_vars(){
@@ -89,25 +115,15 @@ set_env_vars(){
 
 main() {
   set_env_vars
-  generate_dataform_credentials "${PROJECT_ID}" .
+  clean
+
+  # Only run 'dataform install' once, symbolic links will be used
+  # for all other Dataform project directories.
   dataform install > /dev/null 2>&1
 
-  mkdir -p dataform_udfs_temp/definitions
-  ln -sf "$(pwd)"/dataform.json dataform_udfs_temp/dataform.json
-  add_symbolic_dataform_dependencies dataform_udfs_temp
-
-  ln -sf "$(pwd)"/.df-credentials.json dataform_udfs_temp/.df-credentials.json
-  ln -sf "$(pwd)"/../../../udfs/community/ dataform_udfs_temp/definitions
-
-  ln -sf "$(pwd)"/dataform.json dataform_udf_unit_tests/dataform.json
-  add_symbolic_dataform_dependencies dataform_udf_unit_tests
-  ln -sf "$(pwd)"/.df-credentials.json dataform_udf_unit_tests/.df-credentials.json
-
-  #  copy_sql_and_rename_to_sqlx ../../../udfs/community
-  replace_js_udf_bucket_placeholder ../../../udfs/community gs://dannybq/test_bq_js_libs
-  dataform run dataform_udfs_temp/
-  dataform test dataform_udf_unit_tests/
-  rm -rf dataform_udfs_temp
+  deploy_udfs danny-bq fn "$(pwd)"/../../../udfs/community dataform_udfs_temp_deploy
+  test_udfs danny-bq fn "$(pwd)"/../../../udfs/community dataform_udf_unit_tests
+  clean
 }
 
 main
