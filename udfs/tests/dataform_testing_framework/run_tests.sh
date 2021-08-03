@@ -85,12 +85,15 @@ deploy_udfs(){
   local udfs_source_dir=$3
   local udfs_target_dir=$4
   mkdir -p "${udfs_target_dir}"/definitions
+  # Temporarily rename test_cases.js to avoid deploying this file
   mv "${udfs_source_dir}"/test_cases.js "${udfs_source_dir}"/test_cases.js.ignore
   ln -sf "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/community
   replace_js_udf_bucket_placeholder "${udfs_source_dir}" gs://dannybq/test_bq_js_libs
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   dataform run "${udfs_target_dir}"
+  # Restore test_cases.js once UDFs are deployed
+  mv "${udfs_source_dir}"/test_cases.js.ignore "${udfs_source_dir}"/test_cases.js
 }
 
 test_udfs(){
@@ -99,7 +102,7 @@ test_udfs(){
   local udfs_source_dir=$3
   local udfs_target_dir=$4
   mkdir -p "${udfs_target_dir}"/definitions
-  cp "${udfs_source_dir}"/test_cases.js.ignore "${udfs_target_dir}"/definitions/test_cases.js
+  cp "${udfs_source_dir}"/test_cases.js "${udfs_target_dir}"/definitions/test_cases.js
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   dataform test "${udfs_target_dir}"
