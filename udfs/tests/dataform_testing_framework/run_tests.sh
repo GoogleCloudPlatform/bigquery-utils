@@ -19,8 +19,9 @@ clean(){
   rm -f package-lock.json
   rm -f .df-credentials.json
   rm -r dataform.json
-  rm -rf dataform_udfs_temp_deploy
-  rm -rf dataform_udf_unit_tests
+}
+
+clean_bq_dataset(){
   bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${DATASET_ID}"
 }
 
@@ -87,13 +88,15 @@ deploy_udfs(){
   mkdir -p "${udfs_target_dir}"/definitions
   # Temporarily rename test_cases.js to avoid deploying this file
   mv "${udfs_source_dir}"/test_cases.js "${udfs_source_dir}"/test_cases.js.ignore
-  ln -sf "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/community
+  ln -sf "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
   replace_js_udf_bucket_placeholder "${udfs_source_dir}" gs://dannybq/test_bq_js_libs
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   dataform run "${udfs_target_dir}"
   # Restore test_cases.js once UDFs are deployed
   mv "${udfs_source_dir}"/test_cases.js.ignore "${udfs_source_dir}"/test_cases.js
+  # Cleanup after deploy
+  rm -rf "${dataset_id}"_deploy
 }
 
 test_udfs(){
@@ -106,6 +109,8 @@ test_udfs(){
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   dataform test "${udfs_target_dir}"
+  # Cleanup after test
+  rm -rf "${dataset_id}"_test
 }
 
 set_env_vars(){
@@ -122,7 +127,6 @@ set_env_vars(){
 
 main() {
   set_env_vars
-  clean
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
@@ -131,10 +135,16 @@ main() {
   # for all other Dataform project directories.
   dataform install > /dev/null 2>&1
 
-  deploy_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udfs_temp_deploy
-  test_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udf_unit_tests
+  export DATASET_ID=community
+  deploy_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community ${DATASET_ID}_deploy
+  test_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community ${DATASET_ID}_test
+  clean_bq_dataset
 
-  clean
+  export DATASET_ID=vertica
+  deploy_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/migration/vertica ${DATASET_ID}_deploy
+  test_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/migration/vertica ${DATASET_ID}_test
+  clean_bq_dataset
+
 }
 
 main

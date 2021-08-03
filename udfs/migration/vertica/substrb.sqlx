@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -15,7 +16,10 @@
  */
 
 
-/** Emulate Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
-CREATE OR REPLACE FUNCTION ve.lowerb(str STRING) RETURNS STRING AS (
-    CAST(LOWER(CAST(str AS BYTES)) AS STRING)
+/** Emulate Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes). */
+CREATE OR REPLACE FUNCTION ${self()}(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
+    CAST(SUBSTR(CAST(str AS BYTES), startpos, extent) AS STRING)
 );
+
+
+
