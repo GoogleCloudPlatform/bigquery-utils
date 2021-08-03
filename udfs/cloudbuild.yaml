@@ -72,88 +72,94 @@ steps:
     - ${_JS_BUCKET}
   waitFor:
     - build_bq_js_libs
-  ###########################################################
-  # Create BigQuery datasets specifically for testing
-  ###########################################################
 - name: gcr.io/$PROJECT_ID/bq_udf_ci
-  id: create_test_datasets
-  entrypoint: python3
+  id: test_udfs
+  entrypoint: bash
   args:
-    - tests/udf_test_utils.py
-    - --create-test-datasets
-  env:
-    - SHORT_SHA=${SHORT_SHA}
-    - BQ_PROJECT_ID=${PROJECT_ID}
-  ###########################################################
-  # Create UDF signatures with empty bodies to prevent
-  # UDF creation errors in next step when one UDF depends
-  # on another UDF.
-  ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
-  id: create_udf_signatures
-  entrypoint: pytest
-  args:
-    - --workers
-    - auto # 1 worker per core
-    - --tests-per-worker
-    - auto # Up to 50 tests per worker
-    - tests/create_udf_signatures.py
-  env:
-    - SHORT_SHA=${SHORT_SHA}
-    - BQ_PROJECT_ID=${PROJECT_ID}
-  waitFor:
-    - copy_js_to_gcs
-    - create_test_datasets
-  ###########################################################
-  # Create UDFs in the test datasets
-  ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
-  id: create_udfs
-  entrypoint: pytest
-  args:
-    - --workers
-    - auto # 1 worker per core
-    - --tests-per-worker
-    - auto # Up to 50 tests per worker
-    - tests/test_create_udfs.py
-  env:
-    - SHORT_SHA=${SHORT_SHA}
-    - BRANCH_NAME=${BRANCH_NAME}
-    - BQ_PROJECT_ID=${PROJECT_ID}
-  waitFor:
-    - create_udf_signatures
-  ###########################################################
-  # Run UDF Unit Tests
-  ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
-  id: run_udf_unit_tests
-  entrypoint: pytest
-  args:
-    - --workers
-    - auto # 1 worker per core
-    - --tests-per-worker
-    - auto # Up to 50 tests per worker
-    - tests/test_run_udfs.py
-  env:
-    - SHORT_SHA=${SHORT_SHA}
-    - BRANCH_NAME=${BRANCH_NAME}
-    - BQ_PROJECT_ID=${PROJECT_ID}
-  waitFor:
-    - create_udfs
-  ###########################################################
-  # Delete the test datasets that were created
-  ###########################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
-  id: delete_test_datasets
-  entrypoint: python3
-  args:
-    - tests/udf_test_utils.py
-    - --delete-test-datasets
-  env:
-    - SHORT_SHA=${SHORT_SHA}
-    - BQ_PROJECT_ID=${PROJECT_ID}
-  waitFor:
-    - run_udf_unit_tests
+    - run_tests.sh
+
+#  ###########################################################
+#  # Create BigQuery datasets specifically for testing
+#  ###########################################################
+#- name: gcr.io/$PROJECT_ID/bq_udf_ci
+#  id: create_test_datasets
+#  entrypoint: python3
+#  args:
+#    - tests/udf_test_utils.py
+#    - --create-test-datasets
+#  env:
+#    - SHORT_SHA=${SHORT_SHA}
+#    - BQ_PROJECT_ID=${PROJECT_ID}
+#  ###########################################################
+#  # Create UDF signatures with empty bodies to prevent
+#  # UDF creation errors in next step when one UDF depends
+#  # on another UDF.
+#  ###########################################################
+#- name: gcr.io/$PROJECT_ID/bq_udf_ci
+#  id: create_udf_signatures
+#  entrypoint: pytest
+#  args:
+#    - --workers
+#    - auto # 1 worker per core
+#    - --tests-per-worker
+#    - auto # Up to 50 tests per worker
+#    - tests/create_udf_signatures.py
+#  env:
+#    - SHORT_SHA=${SHORT_SHA}
+#    - BQ_PROJECT_ID=${PROJECT_ID}
+#  waitFor:
+#    - copy_js_to_gcs
+#    - create_test_datasets
+#  ###########################################################
+#  # Create UDFs in the test datasets
+#  ###########################################################
+#- name: gcr.io/$PROJECT_ID/bq_udf_ci
+#  id: create_udfs
+#  entrypoint: pytest
+#  args:
+#    - --workers
+#    - auto # 1 worker per core
+#    - --tests-per-worker
+#    - auto # Up to 50 tests per worker
+#    - tests/test_create_udfs.py
+#  env:
+#    - SHORT_SHA=${SHORT_SHA}
+#    - BRANCH_NAME=${BRANCH_NAME}
+#    - BQ_PROJECT_ID=${PROJECT_ID}
+#  waitFor:
+#    - create_udf_signatures
+#  ###########################################################
+#  # Run UDF Unit Tests
+#  ###########################################################
+#- name: gcr.io/$PROJECT_ID/bq_udf_ci
+#  id: run_udf_unit_tests
+#  entrypoint: pytest
+#  args:
+#    - --workers
+#    - auto # 1 worker per core
+#    - --tests-per-worker
+#    - auto # Up to 50 tests per worker
+#    - tests/test_run_udfs.py
+#  env:
+#    - SHORT_SHA=${SHORT_SHA}
+#    - BRANCH_NAME=${BRANCH_NAME}
+#    - BQ_PROJECT_ID=${PROJECT_ID}
+#  waitFor:
+#    - create_udfs
+#  ###########################################################
+#  # Delete the test datasets that were created
+#  ###########################################################
+#- name: gcr.io/$PROJECT_ID/bq_udf_ci
+#  id: delete_test_datasets
+#  entrypoint: python3
+#  args:
+#    - tests/udf_test_utils.py
+#    - --delete-test-datasets
+#  env:
+#    - SHORT_SHA=${SHORT_SHA}
+#    - BQ_PROJECT_ID=${PROJECT_ID}
+#  waitFor:
+#    - run_udf_unit_tests
 
 timeout: 1800s # 30 minutes
 options:
