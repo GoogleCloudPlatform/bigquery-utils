@@ -2,11 +2,11 @@ steps:
   ############################################################
   # Lint the Dockefile.ci file
   ############################################################
-- name: hadolint/hadolint
-  id: lint-ci-docker-image
-  entrypoint: /bin/hadolint
-  args:
-    - Dockerfile.ci
+#- name: hadolint/hadolint
+#  id: lint-ci-docker-image
+#  entrypoint: /bin/hadolint
+#  args:
+#    - Dockerfile.ci
   ############################################################
   # Create ci image with all python dependencies installed
   ############################################################
