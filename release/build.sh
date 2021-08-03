@@ -193,7 +193,7 @@ function build() {
 
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
-  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/; then
+  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
     build_udf_testing_image
   fi
 
