@@ -18,6 +18,7 @@ clean(){
   rm -rf node_modules
   rm -f package-lock.json
   rm -f .df-credentials.json
+  rm -r dataform.json
   rm -rf dataform_udfs_temp_deploy
   rm -rf dataform_udf_unit_tests
   bq --project_id "${PROJECT_ID}" rm -r -f --dataset fn
@@ -120,12 +121,15 @@ main() {
   set_env_vars
   clean
 
+  # Create an empty dataform.json file because Dataform requires
+  # this file's existence when installing dependencies.
+  touch dataform.json
   # Only run 'dataform install' once, symbolic links will be used
   # for all other Dataform project directories.
   dataform install > /dev/null 2>&1
 
-  deploy_udfs danny-bq fn "$(pwd)"/../../../udfs/community dataform_udfs_temp_deploy
-  test_udfs danny-bq fn "$(pwd)"/../../../udfs/community dataform_udf_unit_tests
+  deploy_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udfs_temp_deploy
+  test_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udf_unit_tests
   clean
 }
 

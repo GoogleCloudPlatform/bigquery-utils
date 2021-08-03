@@ -1,16 +1,6 @@
 {
     "warehouse": "bigquery",
-    "defaultSchema": "dataform",
-    "assertionSchema": "dataform_assertions",
-    "defaultDatabase": "danny-bq",
-    "concurrentQueryLimit": 100,
-    "vars": {
-        "community_dataset_name": "fn",
-        "netezza_dataset_name": "nz",
-        "oracle_dataset_name": "or",
-        "redshift_dataset_name": "rs",
-        "snowflake_dataset_name": "sf",
-        "teradata_dataset_name": "td",
-        "vertica_dataset_name": "ve"
-    }
+    "defaultSchema": "${DATASET_ID}",
+    "defaultDatabase": "${PROJECT_ID}",
+    "concurrentQueryLimit": 100
 }
