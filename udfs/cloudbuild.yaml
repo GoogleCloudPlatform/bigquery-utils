@@ -77,6 +77,8 @@ steps:
   entrypoint: bash
   args:
     - run_tests.sh
+  env:
+    - SHORT_SHA=${SHORT_SHA}
 
 #  ###########################################################
 #  # Create BigQuery datasets specifically for testing
