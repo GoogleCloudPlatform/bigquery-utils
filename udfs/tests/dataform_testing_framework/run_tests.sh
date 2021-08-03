@@ -21,7 +21,7 @@ clean(){
   rm -r dataform.json
   rm -rf dataform_udfs_temp_deploy
   rm -rf dataform_udf_unit_tests
-  bq --project_id "${PROJECT_ID}" rm -r -f --dataset fn
+  bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${DATASET_ID}"
 }
 
 #######################################
@@ -115,7 +115,7 @@ set_env_vars(){
 
   # PROD project points to the live BigQuery environment
   # which must be kept in sync with DDL changes.
-  export PROJECT_ID=danny-bq
+  export PROJECT_ID=deleodanny
   export DATASET_ID=dataform
 }
 
@@ -133,6 +133,7 @@ main() {
 
   deploy_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udfs_temp_deploy
   test_udfs ${PROJECT_ID} ${DATASET_ID} "$(pwd)"/../../../udfs/community dataform_udf_unit_tests
+
   clean
 }
 
