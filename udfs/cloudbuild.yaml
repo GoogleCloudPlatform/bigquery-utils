@@ -74,7 +74,7 @@ steps:
     - build_bq_js_libs
 - name: gcr.io/$PROJECT_ID/bq_udf_ci
   id: test_udfs
-  dir: tests
+  dir: tests/dataform_testing_framework
   entrypoint: bash
   args:
     - run_tests.sh
