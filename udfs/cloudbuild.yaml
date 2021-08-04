@@ -50,7 +50,7 @@ steps:
   ###########################################################
   # Build (via webpack) all js libraries for BigQuery UDFs
   ###########################################################
-- name: node
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
   id: build_bq_js_libs
   entrypoint: npm
   args:
@@ -62,7 +62,7 @@ steps:
   ###########################################################
   # Copy all libs to GCS bucket
   ###########################################################
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
   id: copy_js_to_gcs
   entrypoint: gsutil
   args:
