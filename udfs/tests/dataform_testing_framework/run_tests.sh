@@ -129,8 +129,10 @@ main() {
     cat ../../dir_to_dataset_map.yaml
     # Get the list of directory names which contain UDFs
     datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
+
   for dataset_id in ${datasets}; do
     printf "Testing UDFs for dataset: %s_test_%s\n" "${dataset_id}" "${SHORT_SHA}"
+
     # SHORT_SHA environment variable below comes from
     # cloud build when the trigger originates from a github commit.
     if [[ $dataset_id == 'community' ]]; then
@@ -140,6 +142,7 @@ main() {
       deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_deploy
       test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_test
     fi
+
     # Remove testing directories to keep consecutive local runs clean
     rm -rf "${dataset_id}"_deploy
     rm -rf "${dataset_id}"_test
