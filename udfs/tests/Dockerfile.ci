@@ -4,6 +4,5 @@ RUN pip3 install --no-cache-dir -r requirements.txt \
  && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
  && apt-get install -y nodejs \
  && apt-get install -y gettext \
- && PATH=/usr/bin/dataform:$PATH \
  && npm i -g @dataform/cli
 CMD ["bash"]
