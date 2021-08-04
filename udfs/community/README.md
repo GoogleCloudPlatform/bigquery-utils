@@ -30,6 +30,7 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
+* [pi](#pi)
 * [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
@@ -274,7 +275,7 @@ Row | source      | target      | distance
 Interpolate the current positions value from the preceding and folllowing coordinates
 
 ```sql
-SELECT 
+SELECT
   bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(10 AS x, 10.0 AS y)),
   bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(20 AS x, 10.0 AS y))
 ```
@@ -357,6 +358,14 @@ results:
 |-----|-----|---------|-----|
 | 1.2 | 1.0 |  0.6667 | 2.0 |
 
+### [pi()](pi.sql)
+Returns the value of pi.
+
+```sql
+SELECT bqutil.fn.pi() this_is_pi
+
+3.141592653589793
+```
 
 ### [radians(x ANY TYPE)](radians.sql)
 Convert values into radian.
@@ -393,7 +402,7 @@ SELECT
 
 
 ### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
-For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value.
 ```sql
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
@@ -405,7 +414,7 @@ Generate a timestamp array associated with each key
 
 ```sql
 SELECT *
-FROM 
+FROM
   UNNEST(bqutil.fn.ts_gen_keyed_timestamps(['abc', 'def'], 60, TIMESTAMP '2020-01-01 00:30:00', TIMESTAMP '2020-01-01 00:31:00))
 ```
 
@@ -415,14 +424,14 @@ FROM
 | def        | 2020-01-01 00:30:00 UTC |
 | abc        | 2020-01-01 00:31:00 UTC |
 | def        | 2020-01-01 00:31:00 UTC |
-  
+
 
 ### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sql)
 Interpolate the positions value using timestamp seconds as the x-axis
 
 ```sql
 select bqutil.fn.ts_linear_interpolate(
-  TIMESTAMP '2020-01-01 00:30:00', 
+  TIMESTAMP '2020-01-01 00:30:00',
   STRUCT(TIMESTAMP '2020-01-01 00:29:00' AS x, 1.0 AS y),
   STRUCT(TIMESTAMP '2020-01-01 00:31:00' AS x, 3.0 AS y)
 )
@@ -460,7 +469,7 @@ FROM (
       LAG(ts) OVER (PARTITION BY key ORDER BY ts ASC),
       300
     ) AS session_group
-  FROM ticks 
+  FROM ticks
 )
 ```
 
@@ -517,7 +526,7 @@ SELECT
   fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 60) As min_1
 ```
 
-| min_15                  | min_10                  |                         |       
+| min_15                  | min_10                  |                         |
 |-------------------------|-------------------------|-------------------------|
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
@@ -627,8 +636,8 @@ returns:
 
 # StatsLib: Statistical UDFs
 
-This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions) 
-that extend BigQuery and enable more specialized Statistical Analysis usage patterns. 
+This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
+that extend BigQuery and enable more specialized Statistical Analysis usage patterns.
 Each UDF detailed below will be automatically synchronized to the `fn` dataset
 within the `bqutil` project for reference in your queries.
 
@@ -684,11 +693,11 @@ results:
 ### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sql)
 Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
 
-The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables). 
+The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables).
 
 * Input: array: struct <X FLOAT64, Y FLOAT64>
 * Output: struct<a FLOAT64,b FLOAT64, r FLOAT64>
-* 
+*
 ```sql
 DECLARE data ARRAY<STRUCT<X STRING, Y FLOAT64>>;
 set data = [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)];
@@ -712,7 +721,7 @@ The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is 
 
 * Input: H FLOAT64, dof FLOAT64
 * Output: p FLOAT64
-* 
+*
 ```sql
 SELECT `bqutils.fn.pvalue`(.3,2) AS results;
 ```
@@ -723,4 +732,3 @@ results:
 | results         	|
 |-------------------|
 |0.8607079764250578 |
-
