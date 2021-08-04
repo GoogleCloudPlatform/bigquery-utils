@@ -21,11 +21,6 @@ clean(){
   rm -r dataform.json
 }
 
-clean_bq_datasets(){
-  bq --project_id "${PROJECT_ID}" rm -r -f --dataset community"${SHORT_SHA}"
-  bq --project_id "${PROJECT_ID}" rm -r -f --dataset vertica"${SHORT_SHA}"
-}
-
 #######################################
 # Replaces all ${JS_BUCKET} placeholders
 # in javascript UDFs with user-provided
@@ -94,14 +89,14 @@ deploy_udfs(){
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   if ! dataform run "${udfs_target_dir}"; then
+    # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
     bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}"
     printf "FAILURE: Encountered an error when running UDF tests for dataset: %s\n\n" "${dataset_id}"
+    # TODO: Remove below comment before deploying
+    # exit 1
   fi
   # Restore test_cases.js once UDFs are deployed
   mv "${udfs_source_dir}"/test_cases.js.ignore "${udfs_source_dir}"/test_cases.js
-  # Cleanup after deploy
-  rm -rf "${dataset_id}"_deploy
-
 }
 
 test_udfs(){
@@ -114,8 +109,6 @@ test_udfs(){
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   dataform test "${udfs_target_dir}"
-  # Cleanup after test
-  rm -rf "${dataset_id}"_test
 }
 
 main() {
@@ -147,6 +140,9 @@ main() {
       deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_deploy
       test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_test
     fi
+    # Remove testing directories to keep consecutive local runs clean
+    rm -rf "${dataset_id}"_deploy
+    rm -rf "${dataset_id}"_test
   done
 }
 
