@@ -28,7 +28,7 @@ steps:
   # Install npm packages based off the package.json file
   # created in the previous step.
   ###########################################################
-- name: node
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
   id: install_npm_packages
   entrypoint: npm
   args:
