@@ -134,7 +134,7 @@ function build_udfs() {
     # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
     printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
     local datasets
-    datasets=$(sed -n '/:/p' < udfs/dir_to_dataset_map.yaml | sed 's/.*: //g')
+    datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
     for dataset in ${datasets}; do
       printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
       bq --headless --synchronous_mode rm -r -f "${dataset}_test_${SHORT_SHA}"

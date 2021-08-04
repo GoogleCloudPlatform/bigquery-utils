@@ -21,8 +21,9 @@ clean(){
   rm -r dataform.json
 }
 
-clean_bq_dataset(){
-  bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${DATASET_ID}"
+clean_bq_datasets(){
+  bq --project_id "${PROJECT_ID}" rm -r -f --dataset community"${SHORT_SHA}"
+  bq --project_id "${PROJECT_ID}" rm -r -f --dataset vertica"${SHORT_SHA}"
 }
 
 #######################################
@@ -65,8 +66,8 @@ add_symbolic_dataform_dependencies(){
   # Create symbolic links to dataform config files and node_modules
   # to save time and not duplicate resources
   ln -sf "$(pwd)"/package.json "${target_dir}"/package.json
-  ln -sf "$(pwd)"/node_modules/ "${target_dir}"/node_modules
-  ln -sf "$(pwd)"/includes/ "${target_dir}"/includes
+  ln -sfn "$(pwd)"/node_modules/ "${target_dir}"/node_modules
+  ln -sfn "$(pwd)"/includes/ "${target_dir}"/includes
 }
 
 generate_dataform_config_and_creds(){
@@ -88,15 +89,19 @@ deploy_udfs(){
   mkdir -p "${udfs_target_dir}"/definitions
   # Temporarily rename test_cases.js to avoid deploying this file
   mv "${udfs_source_dir}"/test_cases.js "${udfs_source_dir}"/test_cases.js.ignore
-  ln -sf "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
+  ln -sfn "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
   replace_js_udf_bucket_placeholder "${udfs_source_dir}" gs://dannybq/test_bq_js_libs
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
-  dataform run "${udfs_target_dir}"
+  if ! dataform run "${udfs_target_dir}"; then
+    bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}"
+    printf "FAILURE: Encountered an error when running UDF tests for dataset: %s\n\n" "${dataset_id}"
+  fi
   # Restore test_cases.js once UDFs are deployed
   mv "${udfs_source_dir}"/test_cases.js.ignore "${udfs_source_dir}"/test_cases.js
   # Cleanup after deploy
   rm -rf "${dataset_id}"_deploy
+
 }
 
 test_udfs(){
@@ -118,6 +123,7 @@ main() {
   # live in the same location which you specify below.
   export BQ_LOCATION=US
   export PROJECT_ID=danny-bq
+  export SHORT_SHA=
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
@@ -126,18 +132,22 @@ main() {
   # for all other Dataform project directories.
   dataform install > /dev/null 2>&1
 
-  # SHORT_SHA environment variable below comes from
-  # cloud build when the trigger originates from a github commit.
-  export DATASET_ID=community${SHORT_SHA}
-  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../community "${DATASET_ID}"_deploy
-  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../community "${DATASET_ID}"_test
-  clean_bq_dataset
-
-  export DATASET_ID=vertica${SHORT_SHA}
-  deploy_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../migration/vertica "${DATASET_ID}"_deploy
-  test_udfs ${PROJECT_ID} "${DATASET_ID}" "$(pwd)"/../../migration/vertica "${DATASET_ID}"_test
-  clean_bq_dataset
-
+  local datasets
+    cat ../../dir_to_dataset_map.yaml
+    # Get the list of directory names which contain UDFs
+    datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
+  for dataset_id in ${datasets}; do
+    printf "Testing UDFs for dataset: %s_test_%s\n" "${dataset_id}" "${SHORT_SHA}"
+    # SHORT_SHA environment variable below comes from
+    # cloud build when the trigger originates from a github commit.
+    if [[ $dataset_id == 'community' ]]; then
+      deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../community "${dataset_id}"_deploy
+      test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../community "${dataset_id}"_test
+    else
+      deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_deploy
+      test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_test
+    fi
+  done
 }
 
 main
