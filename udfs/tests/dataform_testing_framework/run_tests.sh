@@ -115,8 +115,12 @@ main() {
   # For now, this build script assumes all BigQuery environments
   # live in the same location which you specify below.
   export BQ_LOCATION=US
-  export PROJECT_ID=danny-bq
-  export SHORT_SHA=
+
+  # Uncomment and set env variables below if testing locally.
+  # These variables will come from cloud build env
+  #
+  # export PROJECT_ID=
+  # export SHORT_SHA=
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
