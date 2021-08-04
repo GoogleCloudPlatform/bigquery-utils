@@ -5,4 +5,3 @@ RUN pip3 install --no-cache-dir -r requirements.txt \
  && apt-get install -y nodejs \
  && apt-get install -y gettext \
  && npm i -g @dataform/cli
-CMD ["bash"]
