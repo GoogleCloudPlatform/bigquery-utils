@@ -117,7 +117,7 @@ main() {
   # For now, this build script assumes all BigQuery environments
   # live in the same location which you specify below.
   export BQ_LOCATION=US
-  export PROJECT_ID=deleodanny
+  export PROJECT_ID=danny-bq
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
