@@ -69,7 +69,8 @@ generate_dataform_config_and_creds(){
   export PROJECT_ID=$1
   export DATASET_ID=$2
   local target_dir=$3
-  envsubst < dataform_template.json > "${target_dir}"/dataform.json
+  sed "s|\${PROJECT_ID}|${PROJECT_ID}|g" dataform_template.json \
+  | sed "s|\${DATASET_ID}|${DATASET_ID}|g" > "${target_dir}"/dataform.json
   # Create an .df-credentials.json file as shown below
   # in order to have Dataform pick up application default credentials
   # https://cloud.google.com/docs/authentication/production#automatically
