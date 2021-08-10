@@ -66,11 +66,11 @@ add_symbolic_dataform_dependencies(){
 }
 
 generate_dataform_config_and_creds(){
-  export PROJECT_ID=$1
-  export DATASET_ID=$2
+  local project_id=$1
+  local dataset_id=$2
   local target_dir=$3
-  sed "s|\${PROJECT_ID}|${PROJECT_ID}|g" dataform_template.json \
-  | sed "s|\${DATASET_ID}|${DATASET_ID}|g" > "${target_dir}"/dataform.json
+  sed "s|\${PROJECT_ID}|${project_id}|g" dataform_template.json \
+  | sed "s|\${DATASET_ID}|${dataset_id}|g" > "${target_dir}"/dataform.json
   # Create an .df-credentials.json file as shown below
   # in order to have Dataform pick up application default credentials
   # https://cloud.google.com/docs/authentication/production#automatically
@@ -79,14 +79,15 @@ generate_dataform_config_and_creds(){
 
 deploy_udfs(){
   local project_id=$1
-  local dataset_id=$2
-  local udfs_source_dir=$3
-  local udfs_target_dir=$4
+  local js_bucket=$2
+  local dataset_id=$3
+  local udfs_source_dir=$4
+  local udfs_target_dir=$5
   mkdir -p "${udfs_target_dir}"/definitions
   # Temporarily rename test_cases.js to avoid deploying this file
   mv "${udfs_source_dir}"/test_cases.js "${udfs_source_dir}"/test_cases.js.ignore
   ln -sfn "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
-  replace_js_udf_bucket_placeholder "${udfs_source_dir}" gs://dannybq/test_bq_js_libs
+  replace_js_udf_bucket_placeholder "${udfs_source_dir}" "${js_bucket}"
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
   if ! dataform run "${udfs_target_dir}"; then
@@ -117,11 +118,12 @@ main() {
   # live in the same location which you specify below.
   export BQ_LOCATION=US
 
-  # Uncomment and set env variables below if testing locally.
+  # Uncomment and set local variables below if testing locally.
   # These variables will come from cloud build env
   #
-  # export PROJECT_ID=
-  # export SHORT_SHA=
+  # local PROJECT_ID=
+  # local JS_BUCKET=
+  # local SHORT_SHA=
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
@@ -136,16 +138,37 @@ main() {
     datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
 
   for dataset_id in ${datasets}; do
-    printf "Testing UDFs for dataset: %s_test_%s\n" "${dataset_id}" "${SHORT_SHA}"
+    printf "Testing UDFs for dataset: %s%s\n" "${dataset_id}" "${SHORT_SHA}"
 
     # SHORT_SHA environment variable below comes from
     # cloud build when the trigger originates from a github commit.
     if [[ $dataset_id == 'community' ]]; then
-      deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../community "${dataset_id}"_deploy
-      test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../community "${dataset_id}"_test
+      # Deploy all UDFs in community folder into
+      deploy_udfs \
+        "${PROJECT_ID}" \
+        "${JS_BUCKET}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../"${dataset_id}" \
+        "${dataset_id}"_deploy
+      # Run unit tests for all UDFs in community folder
+      test_udfs \
+        "${PROJECT_ID}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../community \
+        "${dataset_id}"_test
     else
-      deploy_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_deploy
-      test_udfs ${PROJECT_ID} "${dataset_id}" "$(pwd)"/../../migration/"${dataset_id}" "${dataset_id}"_test
+      deploy_udfs \
+        "${PROJECT_ID}" \
+        "${JS_BUCKET}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../migration/"${dataset_id}" \
+        "${dataset_id}"_deploy
+      # Run unit tests for all UDFs in migration folder
+      test_udfs \
+        "${PROJECT_ID}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../migration/"${dataset_id}" \
+        "${dataset_id}"_test
     fi
 
     # Remove testing directories to keep consecutive local runs clean
