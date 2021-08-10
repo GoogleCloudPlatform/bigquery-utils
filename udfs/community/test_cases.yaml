@@ -410,7 +410,7 @@ levenshtein:
     expected_output: CAST(10 AS INT64)
 pi:
   - test:
-    input: null
+    input: (NULL)
     expected_output: CAST(3.141592653589793 AS FLOAT64)
 
 #
