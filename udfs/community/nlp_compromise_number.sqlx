@@ -21,4 +21,4 @@ LANGUAGE js AS """
   return nlp(str).values(0).toNumber().out()
 """
 OPTIONS (
-  library="gs://dannybq/test_bq_js_libs/compromise-v11.14.3.min.js");
+  library="${JS_BUCKET}/compromise-v11.14.3.min.js");

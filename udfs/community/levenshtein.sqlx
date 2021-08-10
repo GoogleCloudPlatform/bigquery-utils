@@ -23,5 +23,5 @@ AS
   return js_levenshtein(source || '', target || '');
 """
 OPTIONS (
-  library="gs://dannybq/test_bq_js_libs/js-levenshtein-v1.1.6.js"
+  library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"
 );
