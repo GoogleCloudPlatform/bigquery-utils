@@ -408,7 +408,6 @@ levenshtein:
   - test:
     input: CAST('Connecticut' AS STRING), CAST('CT' AS STRING)
     expected_output: CAST(10 AS INT64)
-
 #
 # Below targets StatsLib work
 #
