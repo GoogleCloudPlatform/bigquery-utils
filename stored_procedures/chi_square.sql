@@ -4,20 +4,19 @@
 -- TODO: return struct rather than record (?)
 -- @return RECORD <FLOAT64 chi_square, FLOAT64 degrees_freedom>
 
--- TODO: check math (this isn't correct), use group by for performance
+-- TODO: Use group by for scalability/performance; break into several statements
 CREATE OR REPLACE PROCEDURE bqutil.procedure.chi_square (table_name STRING, independent_var STRING, dependent_var STRING )
 BEGIN
 EXECUTE IMMEDIATE """
     WITH contingency_table AS (
         SELECT DISTINCT
-            @independent_var as independent_var,
-            @dependent_var as dependent_var,
-            COUNT(*) OVER(PARTITION BY @independent_var, @dependent_var) as count,
-            COUNT(*) OVER(PARTITION BY @independent_var) independent_total,
-            COUNT(*) OVER(PARTITION BY @dependent_var) dependent_total,
+            """ || independent_var || """ as independent_var,
+            """ || dependent_var || """ as dependent_var,
+            COUNT(*) OVER(PARTITION BY """ || independent_var || """, """ || dependent_var || """) as count,
+            COUNT(*) OVER(PARTITION BY """ || independent_var || """) independent_total,
+            COUNT(*) OVER(PARTITION BY """ || dependent_var || """) dependent_total,
             COUNT(*) OVER() as total
-        FROM
-            """ || table_name || """ AS t0
+        FROM """ || table_name || """ AS t0
     ),
     expected_table AS (
         SELECT
@@ -34,7 +33,7 @@ EXECUTE IMMEDIATE """
     INNER JOIN expected_table
         ON expected_table.independent_var = contingency_table.independent_var
         AND expected_table.dependent_var = contingency_table.dependent_var
-""" USING table_name as table_name, independent_var as independent_var, dependent_var as dependent_var;
+""";
 END;
 
 -- a unit test of chi_square
