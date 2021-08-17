@@ -415,7 +415,7 @@ jstat:
   - test:
     input: CAST('chisquare.cdf' AS STRING), ARRAY<FLOAT64>[0.3, 2.0]
     expected_output: CAST(0.1392920235749422 AS FLOAT64)
-pvalue:
+chisquare_cdf:
   - test:
     input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
     expected_output: CAST(0.8607079764250578 AS FLOAT64)
@@ -456,4 +456,10 @@ mannwhitneyu:
   - test:
     input: ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.], ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.], CAST('two-sided' AS STRING)
     expected_output: STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p) 
-
+t_test:
+  - test:
+    input: ARRAY<FLOAT64>[13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0], ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0]
+    expected_output: STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INT64) AS dof) 
+#
+# Please enter new tests above this section if they are not related to STATSLIB.
+#
