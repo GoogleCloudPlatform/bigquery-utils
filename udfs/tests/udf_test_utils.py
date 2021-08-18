@@ -210,7 +210,7 @@ def generate_js_libs_package_json():
             "build-all-libs": "concurrently \"npm:webpack-*\""
         },
         "dependencies": {
-            f'{lib_name}-v{version}': f'npm:{lib_name}@^{version}'
+            f'{lib_name}-v{version}': f'npm:{lib_name}@{version}'
             for lib_name in js_libs_dict
             for version in js_libs_dict.get(lib_name).get('versions')
         },
