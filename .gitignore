@@ -28,3 +28,4 @@ hs_err_pid*
 .vscode
 .idea/
 target/
+udfs/tests/run.sh

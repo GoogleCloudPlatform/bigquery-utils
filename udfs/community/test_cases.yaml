@@ -411,7 +411,11 @@ levenshtein:
 #
 # Below targets StatsLib work
 #
-pvalue:
+jstat:
+  - test:
+    input: CAST('chisquare.cdf' AS STRING), ARRAY<FLOAT64>[0.3, 2.0]
+    expected_output: CAST(0.1392920235749422 AS FLOAT64)
+chisquare_cdf:
   - test:
     input: CAST(0.3 AS FLOAT64), CAST(2 AS INT64)
     expected_output: CAST(0.8607079764250578 AS FLOAT64)
@@ -423,4 +427,39 @@ linear_regression:
   - test:
     input: (SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])
     expected_output: STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)
-    
+corr_pvalue:
+  - test:
+    input: CAST(0.9 AS FLOAT64), CAST(25 AS INT64)
+    expected_output: CAST(1.443229117741041E-9 AS FLOAT64)
+  - test:
+    input: CAST(-0.5 AS FLOAT64), CAST(40 AS INT64)
+    expected_output: CAST(0.0010423414457657223 AS FLOAT64)
+  - test:
+    input: CAST(1.0 AS FLOAT64), CAST(50 AS INT64)
+    expected_output: CAST(0.0 AS FLOAT64)
+  - test:
+    input: CAST(-1.0 AS FLOAT64), CAST(50 AS INT64)
+    expected_output: CAST(0.0  AS FLOAT64)
+  - test:
+    input: CAST(0.0 AS FLOAT64), CAST(50 AS INT64)
+    expected_output: CAST(1.0000000078386753 AS FLOAT64)
+normal_cdf:
+  - test:
+    input: CAST(0.0 AS FLOAT64), CAST(0.0 AS FLOAT64), CAST(1.0 AS FLOAT64)
+    expected_output: CAST(0.5 AS FLOAT64) 
+
+p_fisherexact:
+  - test:
+    input: CAST(90 AS FLOAT64), CAST(27 AS FLOAT64), CAST(17 AS FLOAT64), CAST(50 AS FLOAT64)
+    expected_output: CAST(8.046828829103659E-12 AS FLOAT64)
+mannwhitneyu:
+  - test:
+    input: ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.], ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.], CAST('two-sided' AS STRING)
+    expected_output: STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p) 
+t_test:
+  - test:
+    input: ARRAY<FLOAT64>[13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0], ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0]
+    expected_output: STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INT64) AS dof) 
+#
+# Please enter new tests above this section if they are not related to STATSLIB.
+#

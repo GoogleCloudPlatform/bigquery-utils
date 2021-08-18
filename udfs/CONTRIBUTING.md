@@ -58,6 +58,11 @@ the pull request can ensure a successful review process.
 Please follow these instructions to confirm that your test cases work as
 expected.
 
+> **WARNING:** Some UDFs require the use of Javascript libraries. The unit tests on 
+> these UDFs will fail during local testing if the JS libraries are not 
+> created locally. You can ignore these failures if you don't care about Javascript libraries. 
+> Or, **to avoid these failures**, follow the steps [here](js_libs/README.md#testing-js_libs-locally)
+
 1.  Change into the bigquery_utils [udfs/](./) directory:
     *   `cd udfs/`
 

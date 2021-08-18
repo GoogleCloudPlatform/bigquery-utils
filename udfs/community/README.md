@@ -13,6 +13,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
@@ -41,6 +42,7 @@ SELECT bqutil.fn.int(1.684)
 * [ts_session_group](#ts_session_grouprow_ts-timestamp-prev_ts-timestamp-session_gap-int64)
 * [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
+* [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
@@ -714,16 +716,16 @@ results:
 
 
 
-### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sql)
+### [chisquare_cdf(H FLOAT64, dof FLOAT64)](chisquare_cdf.sql)
 Takes _H_ and _dof_ and returns _p_ probability value.
 
-The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
+The [chisquare_cdf](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
 
 * Input: H FLOAT64, dof FLOAT64
 * Output: p FLOAT64
 *
 ```sql
-SELECT `bqutils.fn.pvalue`(.3,2) AS results;
+SELECT `bqutils.fn.chisquare_cdf`(.3,2) AS results;
 ```
 
 results:
@@ -732,3 +734,27 @@ results:
 | results         	|
 |-------------------|
 |0.8607079764250578 |
+
+-----
+### [t_test(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sql)
+
+Runs the Student's T-test. Well known test to compare populations. Example taken from here: [Sample](https://www.jmp.com/en_ch/statistics-knowledge-portal/t-test/two-sample-t-test.html)
+
+Sample Query:
+
+```SQL
+DECLARE pop1 ARRAY<FLOAT64>;
+DECLARE pop2 ARRAY<FLOAT64>;
+
+SET pop1 = [13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0];
+SET pop2 = [22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0] ;
+
+SELECT `bqutils.fn.t_test`(pop1, pop2) AS actual_result_rows;
+
+```
+
+Results:
+
+| Row	| actual_result_rows.t_value | actual_result_rows.dof|
+|-----|----------------------------|-----------------------|
+| 1	| 2.8957935572829476 | 21
