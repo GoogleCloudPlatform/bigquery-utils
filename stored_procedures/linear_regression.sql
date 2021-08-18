@@ -3,7 +3,7 @@
 -- @param STRING dependent_var name of the column in our table that represents our dependent variable
 -- @return STRUCT<a FLOAT64, b FLOAT64, r FLOAT64>
 
-CREATE OR REPLACE PROCEDURE bqutil.procedure.linear_regression (table_name STRING, independent_var STRING, dependent_var STRING )
+CREATE OR REPLACE PROCEDURE bqutil.procedure.linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )
 BEGIN
 EXECUTE IMMEDIATE """
     WITH results AS (
@@ -31,11 +31,12 @@ EXECUTE IMMEDIATE """
         FROM sums
       )
       SELECT STRUCT(a, b, r) FROM results;
-""";
+""" INTO result;
 END;
 
 -- a unit test of linear_regression
 BEGIN
+  DECLARE result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64>;
   CREATE TEMP TABLE iris (sepal_length FLOAT64, sepal_width FLOAT64, petal_length FLOAT64, petal_width FLOAT64, species STRING)
   AS
   SELECT 5.1 AS sepal_length,
@@ -194,6 +195,10 @@ BEGIN
      UNION ALL SELECT 5.9,3.0,5.1,1.8,'virginica';
 
 
-  CALL bqutil.procedure.linear_regression('iris', 'sepal_width', 'petal_width');
---   TODO: print assertion that result is what we expect
+  CALL bqutil.procedure.linear_regression('iris', 'sepal_width', 'petal_width', result);
+
+  -- We round to 11 decimals here because there appears to be some inconsistency in the function, likely due to floating point errors and the order of aggregation
+  ASSERT ROUND(result.a, 11) = 3.11519268710;
+  ASSERT ROUND(result.b, 11) = -0.62754617565;
+  ASSERT ROUND(result.r, 11) = -0.35654408961;
 END;
