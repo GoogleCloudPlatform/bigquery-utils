@@ -43,7 +43,7 @@ class CreateUDFSignatures(unittest.TestCase):
     def setUpClass(cls):
         cls._client = bigquery.Client(project=os.getenv('BQ_PROJECT_ID'))
 
-    @parameterized.expand(utils.get_all_udf_paths())
+    @parameterized.expand(utils.get_all_udf_paths(),skip_on_empty=True)
     def test_create_udf_signature(self, udf_path):
         client = self._client
         udf_signature = utils.replace_with_null_body(udf_path)

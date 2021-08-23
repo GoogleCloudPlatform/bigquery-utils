@@ -15,8 +15,8 @@
 # limitations under the License.
 
 export SHORT_SHA=local_test
-python3 tests/udf_test_utils.py --create-test-datasets
-python3 -m pytest --workers 100 tests/create_udf_signatures.py "$@"
-python3 -m pytest --workers 100 tests/test_create_udfs.py "$@"
-python3 -m pytest --workers 100 tests/test_run_udfs.py "$@"
-python3 tests/udf_test_utils.py --delete-test-datasets
+python3 udf_test_utils.py --create-test-datasets
+python3 -m pytest create_udf_signatures.py "$@"
+python3 -m pytest test_create_udfs.py "$@"
+python3 -m pytest test_run_udfs.py "$@"
+python3 udf_test_utils.py --delete-test-datasets
