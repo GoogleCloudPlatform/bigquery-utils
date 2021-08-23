@@ -50,7 +50,7 @@ copy_sql_and_rename_to_sqlx() {
   local newfilename
   while read -r file; do
     newfilename=$(basename "${file}" | cut -f 1 -d '.')
-    destination="../../../udfs/community/${newfilename}.sqlx"
+    destination="../../../community/${newfilename}.sqlx"
     printf "Copying file %s to %s\n" "$file" "$destination"
     mv "${file}" "${destination}"
   done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
@@ -121,9 +121,9 @@ main() {
   # Uncomment and set local variables below if testing locally.
   # These variables will come from cloud build env
   #
-  # local PROJECT_ID=
-  # local JS_BUCKET=
-  # local SHORT_SHA=
+   local PROJECT_ID="mschaszberger-sandbox"
+   local JS_BUCKET="gs://test_bq_js_libs"
+   local SHORT_SHA=""
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
@@ -133,9 +133,9 @@ main() {
   dataform install > /dev/null 2>&1
 
   local datasets
-    cat ../../dir_to_dataset_map.yaml
-    # Get the list of directory names which contain UDFs
-    datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
+  cat ../../dir_to_dataset_map.yaml
+  # Get the list of directory names which contain UDFs
+  datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
 
   for dataset_id in ${datasets}; do
     printf "Testing UDFs for dataset: %s%s\n" "${dataset_id}" "${SHORT_SHA}"
