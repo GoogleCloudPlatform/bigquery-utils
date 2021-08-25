@@ -49,7 +49,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## Documentation
 
-### [csv_to_struct(strList STRING)](csv_to_struct.sql)
+### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
 Take a list of comma separated key-value pairs and creates a struct.
 Input:
 strList: string that has map in the format a:b,c:d....
@@ -84,7 +84,7 @@ results:
 
 
 
-### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
+### [find_in_set(str STRING, strList STRING)](find_in_set.sqlx)
 Returns the first occurance of str in strList where strList is a comma-delimited string.
 Returns null if either argument is null.
 Returns 0 if the first argument contains any commas.
@@ -117,7 +117,7 @@ results:
 
 
 
-### [freq_table(arr ANY TYPE)](freq_table.sql)
+### [freq_table(arr ANY TYPE)](freq_table.sqlx)
 Construct a frequency table (histogram) of an array of elements.
 Frequency table is represented as an array of STRUCT(value, freq)
 
@@ -137,7 +137,7 @@ results:
 
 
 
-### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
+### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sqlx)
 Given a key and a map, returns the ARRAY type value.
 This is same as get_value except it returns an ARRAY type.
 This can be used when the map has multiple values for a given key.
@@ -164,7 +164,7 @@ results:
 
 
 
-### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
+### [get_value(k STRING, arr ANY TYPE)](get_value.sqlx)
 Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
 
 ```sql
@@ -188,7 +188,7 @@ results:
 
 
 
-### [int(v ANY TYPE)](int.sql)
+### [int(v ANY TYPE)](int.sqlx)
 Convience wrapper which can be used to convert values to integers in place of
 the native `CAST(x AS INT64)`.
 
@@ -204,7 +204,7 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 
-### [json_typeof(json string)](json_typeof.sql)
+### [json_typeof(json string)](json_typeof.sqlx)
 
 Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
 
@@ -223,7 +223,7 @@ object, array, string, number, boolean, boolean, null
 ```
 
 
-### [last_day(dt DATE)](last_day.sql)
+### [last_day(dt DATE)](last_day.sqlx)
 
 Get the date representing the last day of the month.
 
@@ -241,7 +241,7 @@ results:
 | 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
 
 
-### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sql)
+### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sqlx)
 Returns an integer number indicating the degree of similarity between two strings (0=identical, 1=single character difference, etc.)
 
 ```sql
@@ -271,7 +271,7 @@ Row | source      | target      | distance
 > This function is based on the [Levenshtein distance algorithm](https://en.wikipedia.org/wiki/Levenshtein_distance) which determines the minimum number of single-character edits (insertions, deletions or substitutions) required to change one source string into another target one.
 
 
-### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sql)
+### [linear_interpolate(pos INT64, prev STRUCT<x INT64, y FLOAT64>, next STRUCT<x INT64, y FLOAT64>)](linear_interpolate.sqlx)
 Interpolate the current positions value from the preceding and folllowing coordinates
 
 ```sql
@@ -287,7 +287,7 @@ results:
 | 2.0 | 1.0 |
 
 
-### [median(arr ANY TYPE)](median.sql)
+### [median(arr ANY TYPE)](median.sqlx)
 Get the median of an array of numbers.
 
 ```sql
@@ -299,7 +299,7 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
 ```
 
 
-### [nlp_compromise_number(str STRING)](nlp_compromise_number.sql)
+### [nlp_compromise_number(str STRING)](nlp_compromise_number.sqlx)
 Parse numbers from text.
 
 ```sql
@@ -313,7 +313,7 @@ SELECT bqutil.fn.nlp_compromise_number('one hundred fifty seven')
 ```
 
 
-### [nlp_compromise_people(str STRING)](nlp_compromise_people.sql)
+### [nlp_compromise_people(str STRING)](nlp_compromise_people.sqlx)
 Extract names out of text.
 
 ```sql
@@ -325,7 +325,7 @@ SELECT bqutil.fn.nlp_compromise_people(
 ```
 
 
-### [percentage_change(val1 FLOAT64, val2 FLOAT64)](percentage_change.sql)
+### [percentage_change(val1 FLOAT64, val2 FLOAT64)](percentage_change.sqlx)
 Calculate the percentage change (increase/decrease) between two numbers.
 
 ```sql
@@ -342,7 +342,7 @@ results:
 | 1.0 | 2.0 |  -0.5 |  -1.125 |
 
 
-### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sql)
+### [percentage_difference(val1 FLOAT64, val2 FLOAT64)](percentage_difference.sqlx)
 Calculate the percentage difference between two numbers.
 
 ```sql
@@ -358,7 +358,7 @@ results:
 |-----|-----|---------|-----|
 | 1.2 | 1.0 |  0.6667 | 2.0 |
 
-### [pi()](pi.sql)
+### [pi()](pi.sqlx)
 Returns the value of pi.
 
 ```sql
@@ -367,7 +367,7 @@ SELECT bqutil.fn.pi() this_is_pi
 3.141592653589793
 ```
 
-### [radians(x ANY TYPE)](radians.sql)
+### [radians(x ANY TYPE)](radians.sqlx)
 Convert values into radian.
 
 ```sql
@@ -377,7 +377,7 @@ SELECT bqutil.fn.radians(180) is_this_pi
 ```
 
 
-### [random_int(min ANY TYPE, max ANY TYPE)](random_int.sql)
+### [random_int(min ANY TYPE, max ANY TYPE)](random_int.sqlx)
 Generate random integers between the min and max values.
 
 ```sql
@@ -388,7 +388,7 @@ ORDER BY 1
 ```
 
 
-### [random_value(arr ANY TYPE)](random_value.sql)
+### [random_value(arr ANY TYPE)](random_value.sqlx)
 Returns a random value from an array.
 
 ```sql
@@ -401,7 +401,7 @@ SELECT
 ```
 
 
-### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
+### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sqlx)
 For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value.
 ```sql
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
@@ -409,7 +409,7 @@ SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 most tin
 ```
 
-### [ts_gen_keyed_timestamps(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts TIMESTAMP)](ts_gen_keyed_timestamps.sql)
+### [ts_gen_keyed_timestamps(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts TIMESTAMP)](ts_gen_keyed_timestamps.sqlx)
 Generate a timestamp array associated with each key
 
 ```sql
@@ -426,7 +426,7 @@ FROM
 | def        | 2020-01-01 00:31:00 UTC |
 
 
-### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sql)
+### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sqlx)
 Interpolate the positions value using timestamp seconds as the x-axis
 
 ```sql
@@ -441,7 +441,7 @@ select bqutil.fn.ts_linear_interpolate(
 |-----|
 | 2.0 |
 
-### [ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)](ts_session_group.sql)
+### [ts_session_group(row_ts TIMESTAMP, prev_ts TIMESTAMP, session_gap INT64)](ts_session_group.sqlx)
 Function to compare two timestamp as being within the same session window. A timestamp in the same session window as its previous timestamp will evaluate as NULL, otherwise the current row's timestamp is returned.  The "LAST_VALUE(ts IGNORE NULLS)" window function can then be used to stamp all rows with the starting timestamp for the session window.
 
 ```sql
@@ -482,7 +482,7 @@ FROM (
 | abc | 5.0   | 2020-01-01 01:24:01 UTC | 2020-01-01 01:24:01 UTC |
 
 
-### [ts_slide(ts TIMESTAMP, period INT64, duration INT64)](ts_slide.sql)
+### [ts_slide(ts TIMESTAMP, period INT64, duration INT64)](ts_slide.sqlx)
 Calculate the sliding windows the ts parameter belongs to.
 
 ```sql
@@ -516,7 +516,7 @@ FROM ticks
 
 
 
-### [ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)](ts_tumble.sql)
+### [ts_tumble(input_ts TIMESTAMP, tumble_seconds INT64)](ts_tumble.sqlx)
 Calculate the [tumbling window](https://cloud.google.com/dataflow/docs/concepts/streaming-pipelines#tumbling-windows) the input_ts belongs in
 
 ```sql
@@ -531,7 +531,7 @@ SELECT
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
 
-### [typeof(input ANY TYPE)](typeof.sql)
+### [typeof(input ANY TYPE)](typeof.sqlx)
 
 Return the type of input or 'UNKNOWN' if input is unknown typed value.
 
@@ -546,7 +546,7 @@ STRING, BINARY, FLOAT64, STRUCT
 ```
 
 
-### [url_keys(query STRING)](url_keys.sql)
+### [url_keys(query STRING)](url_keys.sqlx)
 Get an array of url param keys.
 
 ```sql
@@ -557,7 +557,7 @@ SELECT bqutil.fn.url_keys(
 ```
 
 
-### [url_param(query STRING, p STRING)](url_param.sql)
+### [url_param(query STRING, p STRING)](url_param.sqlx)
 Get the value of a url param key.
 
 ```sql
@@ -568,7 +568,7 @@ SELECT bqutil.fn.url_param(
 ```
 
 
-### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sql)
+### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sqlx)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
@@ -590,7 +590,7 @@ results:
 
 
 
-### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
+### [y4md_to_date(y4md STRING)](y4md_to_date.sqlx)
 Convert a STRING formatted as a YYYYMMDD to a DATE
 
 ```sql
@@ -600,7 +600,7 @@ SELECT bqutil.fn.y4md_to_date('20201220')
 ```
 
 
-### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sql)
+### [zeronorm(x ANY TYPE, meanx FLOAT64, stddevx FLOAT64)](zeronorm.sqlx)
 Normalize a variable so that it has zero mean and unit variance.
 
 ```sql
@@ -653,7 +653,7 @@ SELECT bqutil.fn.int(1.684)
 
 ## Documentation
 
-### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sql)
+### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sqlx)
 Takes an array of struct where each struct (point) represents a measurement, with a group label and a measurement value
 
 The [Kruskal–Wallis test by ranks](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_one-way_analysis_of_variance), Kruskal–Wallis H test (named after William Kruskal and W. Allen Wallis), or one-way ANOVA on ranks is a non-parametric method for testing whether samples originate from the same distribution. It is used for comparing two or more independent samples of equal or different sample sizes. It extends the Mann–Whitney U test, which is used for comparing only two groups. The parametric equivalent of the Kruskal–Wallis test is the one-way analysis of variance (ANOVA).
@@ -690,7 +690,7 @@ results:
 
 
 
-### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sql)
+### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sqlx)
 Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
 
 The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables).
@@ -714,7 +714,7 @@ results:
 
 
 
-### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sql)
+### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sqlx)
 Takes _H_ and _dof_ and returns _p_ probability value.
 
 The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is NULL Hypothesis probability of the Kruskal-Wallis (KW) test. This is obtained to be the CDF of the chisquare with the _H_ value and the Degrees of Freedom (_dof_) of the KW problem.
