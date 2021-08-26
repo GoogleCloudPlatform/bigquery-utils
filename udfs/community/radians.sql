@@ -15,5 +15,5 @@
  */
 
 CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  ACOS(-1) * x / 180
+  bqutil.fn.pi() * x / 180
 );

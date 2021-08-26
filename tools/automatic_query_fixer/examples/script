@@ -1,0 +1,7 @@
+-m ua  -p "sql-gravity-internship" -q "./examples/semantic_error1.sql"
+
+-m ua  -p "sql-gravity-internship" -q "./examples/semantic_error2.sql"
+
+-m ua  -p "sql-gravity-internship" -q "./examples/semantic_error3.sql"
+
+-m ua  -p "sql-gravity-internship" -q "./examples/syntax_error.sql"

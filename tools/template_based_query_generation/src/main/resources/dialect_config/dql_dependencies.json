@@ -9,71 +9,41 @@
     {
       "node": "DQL_SELECT",
       "neighbors": [
-        "DQL_FROM",
-        "DQL_WHERE",
-        "DQL_GROUP",
-        "DQL_HAVING",
-        "DQL_ORDER",
-        "DQL_LIMIT",
-        "FEATURE_SINK"
+        "DQL_FROM"
       ]
     },
     {
       "node": "DQL_FROM",
       "neighbors": [
         "DQL_WHERE",
-        "DQL_GROUP",
         "DQL_HAVING",
-        "DQL_ORDER",
+        "DQL_ORDER_BY",
         "DQL_LIMIT",
+        "DQL_OFFSET",
         "FEATURE_SINK"
       ]
     },
     {
       "node": "DQL_WHERE",
       "neighbors": [
-        "DQL_GROUP",
         "DQL_HAVING",
-        "DQL_ORDER",
+        "DQL_ORDER_BY",
         "DQL_LIMIT",
-        "FEATURE_SINK"
-      ]
-    },
-    {
-      "node": "DQL_GROUP",
-      "neighbors": [
-        "DQL_HAVING",
-        "DQL_ORDER",
-        "DQL_LIMIT",
+        "DQL_OFFSET",
         "FEATURE_SINK"
       ]
     },
     {
       "node": "DQL_HAVING",
       "neighbors": [
-        "DQL_ORDER",
+        "DQL_ORDER_BY",
         "DQL_LIMIT",
+        "DQL_OFFSET",
         "FEATURE_SINK"
       ]
     },
     {
-      "node": "DQL_ORDER",
-      "neighbors": [
-        "DQL_ASC",
-        "DQL_DESC",
-        "DQL_LIMIT",
-        "FEATURE_SINK"
-      ]
-    },
-    {
-      "node": "DQL_ASC",
-      "neighbors": [
-        "DQL_LIMIT",
-        "FEATURE_SINK"
-      ]
-    },
-    {
-      "node": "DQL_DESC",
+      "node": "DQL_ORDER_BY",
       "neighbors": [
         "DQL_LIMIT",
         "FEATURE_SINK"

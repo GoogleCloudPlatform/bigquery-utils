@@ -1,54 +1,81 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import {ResultJson} from './resultJson';
+import {QueryBreakdownRunner} from './query_breakdown_runner';
 
+/**
+ * extension.ts contains the main code for the extension. It deals with the logic of
+ * what happens when the extension is activated
+ */
+
+// colors for the highlight
 const decorationTypeParseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#21bf2b',
+  backgroundColor: '#137333',
 });
 
 const decorationTypeUnparseable = vscode.window.createTextEditorDecorationType({
-  backgroundColor: '#8f1713',
+  backgroundColor: '#4285F4',
 });
 
-const json = [
-  {
-    error_position: {startLine: 1, startColumn: 1, endLine: 1, endColumn: 4	},
-    error_type: 'DELETION',
-    replacedFrom: null,
-    replacedTo: null,
-  },
-  {
-    error_position: {startLine: 2, startColumn: 1, endLine: 2, endColumn: 4},
-    error_type: 'DELETION',
-    replacedFrom: null,
-    replacedTo: null,
-  },
-  {
-    error_position: {startLine: 2, startColumn: 28, endLine: 2, endColumn: 31},
-    error_type: 'REPLACEMENT',
-    replacedFrom: 'BLAH',
-    replacedTo: 'BY',
-  },
-];
+// variable to keep track of results of backend
+let json: ResultJson[];
 
 // this method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
+  const execPath = path.join(
+    __filename,
+    '..',
+    '..',
+    'resources',
+    'query_breakdown',
+    'bin',
+    'query_breakdown.jar'
+  );
   // The command has been defined in the package.json file
   const disposable = vscode.commands.registerCommand(
     'vscode-query-breakdown.run',
-    () => {
+    async () => {
       // Display a message box to the user
       vscode.window.showInformationMessage(
         'vscode_query_breakdown is running!'
       );
-      const currentEditor = vscode.window.activeTextEditor;
-      if (!currentEditor) {
-        vscode.window.showInformationMessage(
-          'there is no editor open currently'
-        );
-        return;
-      }
 
-      // highlights and creates hovers for queries
-      decorate(currentEditor);
+      // Display that progress is being made (the tool is running)
+      vscode.window.withProgress(
+        {
+          location: vscode.ProgressLocation.Notification,
+          title: 'Finding Unparsable Components',
+          cancellable: true,
+        },
+        async (progress, token) => {
+          const runner = new QueryBreakdownRunner(execPath);
+          const currentEditor = vscode.window.activeTextEditor;
+          if (currentEditor) {
+            // get results from the backend
+            json = await runner.execute(
+              currentEditor.document.uri.fsPath,
+              progress,
+              token
+            );
+            if (!json) {
+              vscode.window.showInformationMessage(
+                'There was an error in fetching results from the backend'
+              );
+            } else if (json.length === 0) {
+              vscode.window.showInformationMessage(
+                'The entire query can be parsed without error'
+              );
+            } else {
+              // highlights and creates hovers for queries
+              decorate(currentEditor);
+            }
+          } else {
+            vscode.window.showInformationMessage(
+              'there is no editor open currently'
+            );
+          }
+        }
+      );
     }
   );
 
@@ -60,15 +87,14 @@ function decorate(editor: vscode.TextEditor) {
   const decorationParseableArray: vscode.DecorationOptions[] = [];
 
   // parses through the json objects
-  for (let i = 0; i < json.length; i++) {
+  for (let i = 0; i < json.length - 2; i++) {
     // finds error position
     const errorRange = new vscode.Range(
       json[i].error_position.startLine - 1,
       json[i].error_position.startColumn - 1,
       json[i].error_position.endLine - 1,
-	  json[i].error_position.endColumn
-	);
-	console.log(json[i].error_position.endColumn)
+      json[i].error_position.endColumn
+    );
     // deletion case
     if (json[i].error_type === 'DELETION') {
       const deletionMessage = new vscode.MarkdownString('Deleted');
@@ -102,7 +128,13 @@ function decorate(editor: vscode.TextEditor) {
   // sets the decorations
   editor.setDecorations(decorationTypeParseable, decorationParseableArray);
   editor.setDecorations(decorationTypeUnparseable, decorationUnparseableArray);
-}
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+  vscode.window.showInformationMessage(
+    'Percentage of Parseable Components: ' +
+      json[json.length - 2].performance +
+      '%'
+  );
+  vscode.window.showInformationMessage(
+    'Runtime: ' + json[json.length - 1].runtime + ' seconds'
+  );
+}

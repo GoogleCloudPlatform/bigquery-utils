@@ -4,6 +4,7 @@ import com.google.cloud.bigquery.utils.queryfixer.QueryPositionConverter;
 import com.google.cloud.bigquery.utils.queryfixer.entity.IToken;
 import com.google.cloud.bigquery.utils.queryfixer.util.StringUtil;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
@@ -29,6 +30,28 @@ public class QueryTokenProcessor {
     }
 
     return null;
+  }
+
+  /**
+   * return a pair of tokens which is closed to a specific position at a query. The left returned
+   * token is left to the position, and the right returned token is at or right to the position.
+   *
+   * @param query the input query
+   * @param line the line of the position.
+   * @param column the column of the position
+   * @return a pair of tokens.
+   */
+  public Pair<IToken, IToken> getNearbyTokens(String query, int line, int column) {
+    IToken previous = null;
+
+    for (IToken token : getAllTokens(query)) {
+      if (token.getEndRow() >= line && token.getEndColumn() >= column) {
+        return Pair.of(previous, token);
+      }
+      previous = token;
+    }
+
+    return Pair.of(previous, previous);
   }
 
   /**
