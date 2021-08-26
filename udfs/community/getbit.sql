@@ -18,9 +18,7 @@
 -- Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 0 
 -- Output: value of the bit (0 or 1) at the specified position.
 CREATE OR REPLACE FUNCTION fn.getbit(target_arg INT64, target_bit_arg INT64) AS 
-(
-  (
+((
     SELECT
       (target_arg & 1 << target_bit_arg) >> target_bit_arg
-  )
-);
+));
