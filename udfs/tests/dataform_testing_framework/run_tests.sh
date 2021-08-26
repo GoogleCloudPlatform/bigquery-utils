@@ -43,18 +43,6 @@ replace_js_udf_bucket_placeholder() {
   done <<<"$(find "${udf_dir}" -type f -name "*.sqlx")"
 }
 
-copy_sql_and_rename_to_sqlx() {
-  local udf_dir=$1
-  local destination
-  local newfilename
-  while read -r file; do
-    newfilename=$(basename "${file}" | cut -f 1 -d '.')
-    destination="../../../udfs/community/${newfilename}.sqlx"
-    printf "Copying file %s to %s\n" "$file" "$destination"
-    mv "${file}" "${destination}"
-  done <<<"$(find "${udf_dir}" -type f -name "*.sql")"
-}
-
 add_symbolic_dataform_dependencies(){
   local target_dir=$1
   # Create symbolic links to dataform config files and node_modules
@@ -124,8 +112,8 @@ main() {
 
   # Uncomment and set local variables below if testing locally.
   # These variables will come from cloud build env
-   local PROJECT_ID=danny-bq
-   local SHORT_SHA=hello
+  # local PROJECT_ID=
+  # local SHORT_SHA=
 
   if [[ -z "${PROJECT_ID}" ]]; then
     printf "You must set environment variable PROJECT_ID.\n"
@@ -144,9 +132,8 @@ main() {
   dataform install > /dev/null 2>&1
 
   local datasets
-    cat ../../dir_to_dataset_map.yaml
-    # Get the list of directory names which contain UDFs
-    datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
+  # Get the list of directory names which contain UDFs
+  datasets=$(sed 's/:.*//g' < ../../dir_to_dataset_map.yaml)
 
   for dataset_id in ${datasets}; do
     # Get the short-hand version of the dataset_id
