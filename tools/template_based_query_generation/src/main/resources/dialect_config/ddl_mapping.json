@@ -1,0 +1,52 @@
+{
+  "features": [
+    {
+      "feature": "DDL_CREATE",
+      "dialectMap": {
+        "postgres": "CREATE",
+        "bigQuery": "CREATE",
+        "mySql": "CREATE"
+      }
+    },
+    {
+      "feature": "DDL_PARTITION",
+      "dialectMap": {
+        "postgres": "PARTITION BY",
+        "bigQuery": "PARTITION BY",
+        "mySql": "PARTITION BY"
+      }
+    },
+    {
+      "feature": "DDL_CLUSTER",
+      "dialectMap": {
+        "postgres": "COLLATE",
+        "bigQuery": "CLUSTER BY",
+        "mySql": "COLLATE"
+      }
+    },
+    {
+      "feature": "DDL_TABLE",
+      "dialectMap": {
+        "postgres": "TABLE",
+        "bigQuery": "TABLE",
+        "mySql": "TABLE"
+      }
+    },
+    {
+      "feature": "DDL_TABLE_IF_NOT_EXISTS",
+      "dialectMap": {
+        "postgres": "TABLE IF NOT EXISTS",
+        "bigQuery": "TABLE IF NOT EXISTS",
+        "mySql": "TABLE IF NOT EXISTS"
+      }
+    },
+    {
+      "feature": "DDL_OR_REPLACE_TABLE",
+      "dialectMap": {
+        "postgres": "TABLE",
+        "bigQuery": "OR REPLACE TABLE",
+        "mySql": "TABLE"
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+lowerb:
+  - test:
+    input: CAST("STUDENT" AS STRING)
+    expected_output: CAST("student" AS STRING)
+  - test:
+    input: CAST("Foo" AS STRING)
+    expected_output: CAST("foo" AS STRING)
+  - test:
+    input: CAST("ÉTUDIANT" AS STRING)
+    expected_output: CAST("Étudiant" AS STRING)
+  - test:
+    input: CAST("ETUDIANT" AS STRING)
+    expected_output: CAST("etudiant" AS STRING)
+  - test:
+    input: CAST("aBCdef GH" AS STRING)
+    expected_output: CAST("abcdef gh" AS STRING)
+  - test:
+    input: CAST("" AS STRING)
+    expected_output: CAST("" AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
+substrb:
+  - test:
+    input: CAST("soupçon" AS STRING), 5, 2
+    expected_output: CAST("ç" AS STRING)
+  - test:
+    input: CAST("foobar" AS STRING), 1, 2
+    expected_output: CAST("fo" AS STRING)
+  - test: 
+    input: CAST("foobar" AS STRING), 10, 2
+    expected_output: CAST("" AS STRING)
+  - test:
+    input: (NULL), 1, 2
+    expected_output: (NULL)
+  - test:
+    input: CAST("" AS STRING), 3, 4
+    expected_output: CAST("" AS STRING)
+upperb:
+  - test:
+    input: CAST("étudiant" AS STRING)
+    expected_output: CAST("éTUDIANT" AS STRING)
+  - test:
+    input: CAST("etudiant" AS STRING)
+    expected_output: CAST("ETUDIANT" AS STRING)
+  - test:
+    input: CAST("foo" AS STRING)
+    expected_output: CAST("FOO" AS STRING)
+  - test:
+    input: CAST("aBCdef Gh" AS STRING)
+    expected_output: CAST("ABCDEF GH" AS STRING)
+  - test:
+    input: CAST("" AS STRING)
+    expected_output: CAST("" AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)

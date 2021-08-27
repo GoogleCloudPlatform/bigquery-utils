@@ -1,0 +1,12 @@
+-r requirements.txt
+yapf
+pytest
+flake8
+isort>=5.6.4
+mypy
+pylint
+pytest-parallel
+pytest-cov
+google-cloud-pubsub>=2.2.0
+pytest-mock
+pytest-repeat

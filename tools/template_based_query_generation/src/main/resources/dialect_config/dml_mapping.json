@@ -1,0 +1,36 @@
+{
+  "features": [
+    {
+      "feature": "DML_INSERT",
+      "dialectMap": {
+        "postgres": "INSERT",
+        "bigQuery": "INSERT",
+        "mySql": "INSERT"
+      }
+    },
+    {
+      "feature": "DML_DELETE",
+      "dialectMap": {
+        "postgres": "DELETE",
+        "bigQuery": "DELETE",
+        "mySql": "DELETE FROM"
+      }
+    },
+    {
+      "feature": "DML_VALUES",
+      "dialectMap": {
+        "postgres": "VALUES",
+        "bigQuery": "VALUES",
+        "mySql": "VALUES"
+      }
+    },
+    {
+      "feature": "DML_WHERE",
+      "dialectMap": {
+        "postgres": "WHERE",
+        "bigQuery": "WHERE",
+        "mySql": "WHERE"
+      }
+    }
+  ]
+}

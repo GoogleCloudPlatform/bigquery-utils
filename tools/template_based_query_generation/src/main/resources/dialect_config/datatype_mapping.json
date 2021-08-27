@@ -1,0 +1,132 @@
+{
+  "dataTypeMaps": [
+    {
+      "dataType": "SMALLINT",
+      "dialectMap": {
+        "postgres": "SMALLINT",
+        "bigQuery": "INT64",
+        "mySql": "SMALLINT"
+      }
+    },
+    {
+      "dataType": "INTEGER",
+      "dialectMap": {
+        "postgres": "INTEGER",
+        "bigQuery": "INT64",
+        "mySql": "INTEGER"
+        }
+    },
+    {
+      "dataType": "BIGINT",
+      "dialectMap": {
+        "postgres": "BIGINT",
+        "bigQuery": "INT64",
+        "mySql": "BIGINT"
+      }
+    },
+    {
+      "dataType": "DECIMAL",
+      "dialectMap": {
+        "postgres": "DECIMAL",
+        "bigQuery": "NUMERIC",
+        "mySql": "DECIMAL"
+      }
+    },
+    {
+      "dataType": "NUMERIC",
+      "dialectMap": {
+        "postgres": "NUMERIC",
+        "bigQuery": "NUMERIC",
+        "mySql": "NUMERIC"
+      }
+    },
+    {
+      "dataType": "REAL",
+      "dialectMap": {
+        "postgres": "REAL",
+        "bigQuery": "FLOAT64",
+        "mySql": "REAL"
+      }
+    },
+    {
+      "dataType": "BIGREAL",
+      "dialectMap": {
+        "postgres": "DOUBLE PRECISION",
+        "bigQuery": "FLOAT64",
+        "mySql": "DOUBLE PRECISION"
+      }
+    },
+    {
+      "dataType": "SMALLSERIAL",
+      "dialectMap": {
+        "postgres": "SMALLSERIAL",
+        "bigQuery": "INT64",
+        "mySql": "SERIAL"
+      }
+    },
+    {
+      "dataType": "SERIAL",
+      "dialectMap": {
+        "postgres": "SERIAL",
+        "bigQuery": "INT64",
+        "mySql": "SERIAL"
+      }
+    },
+    {
+      "dataType": "BIGSERIAL",
+      "dialectMap": {
+        "postgres": "BIGSERIAL",
+        "bigQuery": "INT64",
+        "mySql": "SERIAL"
+      }
+    },
+    {
+      "dataType": "BOOL",
+      "dialectMap": {
+        "postgres": "BOOLEAN",
+        "bigQuery": "BOOL",
+        "mySql": "BOOLEAN"
+      }
+    },
+    {
+      "dataType": "STR",
+      "dialectMap": {
+        "postgres": "VARCHAR",
+        "bigQuery": "STRING",
+        "mySql": "VARCHAR"
+      }
+    },
+    {
+      "dataType": "BYTES",
+      "dialectMap": {
+        "postgres": "BIT VARYING",
+        "bigQuery": "BYTES",
+        "mySql": "BIT"
+      }
+    },
+    {
+      "dataType": "DATE",
+      "dialectMap": {
+        "postgres": "DATE",
+        "bigQuery": "DATE",
+        "mySql": "DATE"
+      }
+    },
+    {
+      "dataType": "TIME",
+      "dialectMap": {
+        "postgres": "TIME",
+        "bigQuery": "TIME",
+        "mySql": "TIME"
+      }
+    },
+    {
+      "dataType": "TIMESTAMP",
+      "dialectMap": {
+        "postgres": "TIMESTAMP",
+        "bigQuery": "TIMESTAMP",
+        "mySql": "TIMESTAMP"
+      }
+    }
+  ]
+}

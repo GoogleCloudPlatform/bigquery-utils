@@ -14,19 +14,147 @@
 #
 
 steps:
-###########################################################
-# Step 1: Run UDF Unit Tests
-###########################################################
-- name: python:3.8.0-slim
-  entrypoint: 'bash'
-  args: ['udfs/tests/run.sh', '--pip_install_before_run']
-  env: ['SHORT_SHA=$SHORT_SHA']
-###########################################################
-# Step 2: Deploy if all tests pass
-###########################################################
+  ############################################################
+  # Dynamically create the package.json file based off the libs
+  # specified in the js_libs/js_libs.yaml file.
+  ############################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: generate_js_libs_package_json
+  entrypoint: python3
+  args:
+    - tests/udf_test_utils.py
+    - --generate-js-libs-package-json
+  ###########################################################
+  # Install npm packages based off the package.json file
+  # created in the previous step.
+  ###########################################################
+- name: node
+  id: install_npm_packages
+  entrypoint: npm
+  args:
+    - install
+  ############################################################
+  # Dynamically create webpack config files needed by webpack
+  # to build npm packages into single .js files which will be
+  # hosted on GCS and used by BigQuery UDFs.
+  ############################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: generate_webpack_configs
+  entrypoint: python3
+  args:
+    - tests/udf_test_utils.py
+    - --generate-webpack-configs
+  waitFor:
+    - install_npm_packages
+    - generate_js_libs_package_json
+  ###########################################################
+  # Build (via webpack) all js libraries for BigQuery UDFs
+  ###########################################################
+- name: node
+  id: build_bq_js_libs
+  entrypoint: npm
+  args:
+    - run-script
+    - build-all-libs
+  waitFor:
+    - generate_webpack_configs
+    - install_npm_packages
+  ###########################################################
+  # Copy all libs to GCS bucket
+  ###########################################################
 - name: gcr.io/google.com/cloudsdktool/cloud-sdk
-  entrypoint: 'bash'
-  args: ['release/build.sh', '$BRANCH_NAME', '$_PR_NUMBER']
+  id: copy_js_to_gcs
+  entrypoint: gsutil
+  args:
+    - '-m'
+    - cp
+    - js_builds/*
+    - ${_JS_BUCKET}
+  waitFor:
+    - build_bq_js_libs
+  ###########################################################
+  # Create BigQuery datasets specifically for testing
+  ###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: create_test_datasets
+  entrypoint: python3
+  args:
+    - tests/udf_test_utils.py
+    - --create-test-datasets
+  env:
+    - SHORT_SHA=${SHORT_SHA}
+    - BQ_PROJECT_ID=${PROJECT_ID}
+  ###########################################################
+  # Create UDF signatures with empty bodies to prevent
+  # UDF creation errors in next step when one UDF depends
+  # on another UDF.
+  ###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: create_udf_signatures
+  entrypoint: pytest
+  args:
+    - --workers
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
+    - tests/create_udf_signatures.py
+  env:
+    - SHORT_SHA=${SHORT_SHA}
+    - BQ_PROJECT_ID=${PROJECT_ID}
+  waitFor:
+    - copy_js_to_gcs
+    - create_test_datasets
+  ###########################################################
+  # Create UDFs in the test datasets
+  ###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: create_udfs
+  entrypoint: pytest
+  args:
+    - --workers
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
+    - tests/test_create_udfs.py
+  env:
+    - SHORT_SHA=${SHORT_SHA}
+    - BRANCH_NAME=${BRANCH_NAME}
+    - BQ_PROJECT_ID=${PROJECT_ID}
+  waitFor:
+    - create_udf_signatures
+  ###########################################################
+  # Run UDF Unit Tests
+  ###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: run_udf_unit_tests
+  entrypoint: pytest
+  args:
+    - --workers
+    - auto # 1 worker per core
+    - --tests-per-worker
+    - auto # Up to 50 tests per worker
+    - tests/test_run_udfs.py
+  env:
+    - SHORT_SHA=${SHORT_SHA}
+    - BRANCH_NAME=${BRANCH_NAME}
+    - BQ_PROJECT_ID=${PROJECT_ID}
+  waitFor:
+    - create_udfs
+  ###########################################################
+  # Delete the test datasets that were created
+  ###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
+  id: delete_test_datasets
+  entrypoint: python3
+  args:
+    - tests/udf_test_utils.py
+    - --delete-test-datasets
+  env:
+    - SHORT_SHA=${SHORT_SHA}
+    - BQ_PROJECT_ID=${PROJECT_ID}
+  waitFor:
+    - run_udf_unit_tests
 
+timeout: 1800s # 30 minutes
 options:
-  machineType: 'N1_HIGHCPU_8'
+  machineType: N1_HIGHCPU_32
