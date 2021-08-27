@@ -686,7 +686,7 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
-### [week_number_of_month(date_expression ANY TYPE)](week_number_of_month.sql)
+### [week_of_month(date_expression ANY TYPE)](week_of_month.sql)
 Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
 
 ```sql
