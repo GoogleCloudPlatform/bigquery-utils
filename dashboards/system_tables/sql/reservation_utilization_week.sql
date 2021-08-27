@@ -70,10 +70,16 @@ SELECT
   jbo.reservation_id,
   -- Slot usage is calculated by aggregating total_slot_ms for all jobs
   -- in the last week and dividing by the number of milliseconds in a week
-  SUM(jbo.total_slot_ms) / (1000 * 60 * 60 * 24 * 7) AS average_weekly_slot_usage,
+  SAFE_DIVIDE(SUM(jbo.total_slot_ms), (1000 * 60 * 60 * 24 * 7)) AS average_weekly_slot_usage,
   AVG(rsc.slot_capacity) AS average_reservation_capacity,
-  (SUM(jbo.total_slot_ms) / (1000 * 60 * 60 * 24 * 7)) / AVG(rsc.slot_capacity)
-    AS reservation_utilization,
+  SAFE_DIVIDE(
+      SAFE_DIVIDE(
+          SUM(jbo.total_slot_ms),
+          1000 * 60 * 60 * 24 * 7
+      ),
+      AVG(rsc.slot_capacity)
+  ) AS reservation_utilization,
+
   lsc.slot_capacity AS latest_capacity
 FROM
   `region-{region_name}`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
