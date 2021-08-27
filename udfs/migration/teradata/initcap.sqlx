@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -13,10 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-CREATE OR REPLACE FUNCTION td.decode1(expr ANY TYPE, s1 ANY TYPE, r1 ANY TYPE, def ANY TYPE) AS
-((
-  CASE 
-    WHEN expr = s1 OR (expr IS NULL AND s1 IS NULL) THEN r1
-    ELSE def
-  END 
-))
+
+CREATE OR REPLACE FUNCTION ${self()}(str_expr STRING) AS (
+  (
+    SELECT
+      STRING_AGG(CONCAT(UPPER(SUBSTR(w,1,1)), LOWER(SUBSTR(w,2))), ' ' ORDER BY pos)
+    FROM
+      UNNEST(SPLIT(str_expr, ' ')) w WITH OFFSET pos
+  )
+);
