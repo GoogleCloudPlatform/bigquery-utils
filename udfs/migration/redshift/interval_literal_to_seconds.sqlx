@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION rs.interval_literal_to_seconds(interval_literal STRING) 
+CREATE OR REPLACE FUNCTION ${self()}(interval_literal STRING)
 AS ( 
   /* For intervals in Redshift, there are 360 days in a year. */ 
   (

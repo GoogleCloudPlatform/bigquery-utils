@@ -40,9 +40,7 @@ generate_udf_test("ascii", [
         expected_output: "(NULL)"
     }
 ]);
-//TODO: try numbers outside of ascii character, edge cases (outside of lower and upper bound)
-//lowest and highest number of ascii range and one in the middle
-//OK if tests fail
+
 generate_udf_test("chr", [
     {
         input_1: "CAST(99 AS INT64)",
@@ -70,14 +68,6 @@ generate_udf_test("chr", [
     }
 ]);
 
-generate_udf_test("decode1", [
-    {
-        input_1: "(NULL)",
-        expected_output: "(NULL)"
-    }
-]);
-
-//TODO: only check months that end in 28, 30, 31, null
 generate_udf_test("last_day", [
     {
         input_1: "DATE('2019-10-18')",

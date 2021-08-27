@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -20,7 +21,7 @@
 -- Input:
 -- integer_expr: INT64
 -- Output: NUMERIC
-CREATE OR REPLACE FUNCTION sf.factorial(integer_expr INT64) AS (
+CREATE OR REPLACE FUNCTION ${self()}(integer_expr INT64) AS (
   (
     SELECT 
       ARRAY<NUMERIC>[ 
