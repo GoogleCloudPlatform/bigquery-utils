@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION fn.day_occurrence_of_month(date_expression ANY TYPE) 
       IF(
       	EXTRACT(DAYOFWEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
       	  > EXTRACT(DAYOFWEEK FROM date_expression),
-        bqutil.fn.week_number_of_month(date_expression),
-        bqutil.fn.week_number_of_month(date_expression) + 1)
+        bqutil.fn.week_of_month(date_expression),
+        bqutil.fn.week_of_month(date_expression) + 1)
   )
 );
