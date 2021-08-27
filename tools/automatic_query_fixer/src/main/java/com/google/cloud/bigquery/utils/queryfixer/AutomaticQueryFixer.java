@@ -12,6 +12,11 @@ import com.google.cloud.bigquery.utils.queryfixer.tokenizer.CalciteTokenizer;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.QueryTokenProcessor;
 import com.google.cloud.bigquery.utils.queryfixer.tokenizer.Tokenizer;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * The entity to perform fixing logic. It uses dry-run to identify an error, extracts a fixer based
  * on the error, fix the error, and return the fix result.
@@ -32,7 +37,7 @@ public class AutomaticQueryFixer {
   public FixResult fix(String query) {
     BigQueryException exception = service.catchExceptionFromDryRun(query);
     if (exception == null) {
-      return FixResult.noError();
+      return FixResult.noError(query);
     }
 
     BigQuerySqlError sqlError = errorFactory.getError(exception);
@@ -46,6 +51,66 @@ public class AutomaticQueryFixer {
     }
 
     return fixer.fix();
+  }
+
+  /**
+   * The query fixer continuously fixes the query based on the dry-run message. It will
+   * automatically apply the {@link com.google.cloud.bigquery.utils.queryfixer.entity.FixOption} to
+   * fix the query. If multiple options are available, the first option will be chosen. It will be
+   * terminated only when the latest {@link FixResult} has NO_ERROR or FAILURE status, or the newly
+   * fixed query was identical to the one fixed before (i.e. A cycle exists).
+   *
+   * @param query query to fix
+   * @return List of fix results that represent all the fixes applied to this query.
+   */
+  public List<FixResult> autoFix(String query) {
+    List<FixResult> results = new ArrayList<>();
+    // A set to store all the fixed queries. It is used to detect whether a cycle exists when
+    // automatically fixing queries.
+    Set<String> fixedQueries = new HashSet<>();
+
+    while (true) {
+      if (fixedQueries.contains(query)) {
+        results.add(FixResult.infiniteLoop(query));
+        break;
+      }
+
+      FixResult result = fix(query);
+      fixedQueries.add(query);
+      results.add(result);
+
+      // result.getOptions().isEmpty() is equivalent to the status equals NO_ERROR or FAILURE.
+      if (result.getOptions() == null || result.getOptions().isEmpty()) {
+        break;
+      }
+      query = result.getOptions().get(0).getFixedQuery();
+    }
+    return results;
+  }
+
+  public List<FixResult> autoFixUntilUncertainOptions(String query) {
+    List<FixResult> results = new ArrayList<>();
+    // A set to store all the fixed queries. It is used to detect whether a cycle exists when
+    // automatically fixing queries.
+    Set<String> fixedQueries = new HashSet<>();
+
+    while (true) {
+      if (fixedQueries.contains(query)) {
+        results.add(FixResult.infiniteLoop(query));
+        break;
+      }
+
+      FixResult result = fix(query);
+      fixedQueries.add(query);
+      results.add(result);
+
+      // If there is no fix options or multiple of them, break the loop.
+      if (result.getOptions() == null || result.getOptions().size() != 1) {
+        break;
+      }
+      query = result.getOptions().get(0).getFixedQuery();
+    }
+    return results;
   }
 
   private QueryTokenProcessor buildQueryTokenProcessor() {

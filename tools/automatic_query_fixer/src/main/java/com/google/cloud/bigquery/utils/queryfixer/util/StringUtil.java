@@ -1,12 +1,10 @@
 package com.google.cloud.bigquery.utils.queryfixer.util;
 
+import lombok.NonNull;
 import lombok.Value;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /** A utility class to provide static helper methods regarding String. */
@@ -18,12 +16,14 @@ public class StringUtil {
    *
    * @param dict dictionary of words
    * @param target target word
+   * @param caseSensitive whether considering case sensitive.
    * @return a list of Strings and their edit distance to the target.
    */
-  public static SimilarStrings findSimilarWords(Collection<String> dict, String target) {
+  public static SimilarStrings findMostSimilarWords(
+      Collection<String> dict, String target, boolean caseSensitive) {
     List<Pair<Integer, String>> distanceWordPairs =
         dict.stream()
-            .map(word -> Pair.of(editDistance(word, target), word))
+            .map(word -> Pair.of(editDistance(word, target, caseSensitive), word))
             .collect(Collectors.toList());
 
     if (distanceWordPairs.isEmpty()) {
@@ -41,7 +41,47 @@ public class StringUtil {
     return new SimilarStrings(words, minDistance);
   }
 
-  private static int editDistance(String word1, String word2) {
+  /**
+   * Find all the similar words that are within a certain edit distance from the target string.
+   *
+   * @param dict a set of candidate words
+   * @param target target string to compare with
+   * @param maxEditDistance max edit distance to consider similarity
+   * @param caseSensitive whether considering case sensitive.
+   * @return a list of similar strings
+   */
+  public static List<String> findSimilarWords(
+      @NonNull Collection<String> dict,
+      @NonNull String target,
+      int maxEditDistance,
+      boolean caseSensitive) {
+    List<Pair<Integer, String>> distanceWordPairs =
+        dict.stream()
+            .map(word -> Pair.of(editDistance(word, target, caseSensitive), word))
+            .filter(pair -> pair.getLeft() <= maxEditDistance)
+            .collect(Collectors.toList());
+
+    if (distanceWordPairs.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    return distanceWordPairs.stream().map(Pair::getRight).collect(Collectors.toList());
+  }
+
+  /**
+   * Compute the edit distance between two strings.
+   *
+   * @param word1 a string.
+   * @param word2 another string.
+   * @param caseSensitive whether considering case sensitive.
+   * @return the edit distance between word1 and word2.
+   */
+  public static int editDistance(String word1, String word2, boolean caseSensitive) {
+    if (!caseSensitive) {
+      word1 = word1.toLowerCase();
+      word2 = word2.toLowerCase();
+    }
+
     int len1 = word1.length();
     int len2 = word2.length();
 
@@ -98,6 +138,10 @@ public class StringUtil {
   public static class SimilarStrings {
     List<String> strings;
     int distance;
+
+    public boolean isEmpty() {
+      return strings.isEmpty();
+    }
 
     public static SimilarStrings empty() {
       return new SimilarStrings(new ArrayList<>(), -1);

@@ -1,0 +1,7 @@
+netezza: nz
+oracle: or
+redshift: rs
+snowflake: sf
+teradata: td
+vertica: ve
+community: fn

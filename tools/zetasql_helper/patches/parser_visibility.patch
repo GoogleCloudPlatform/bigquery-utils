@@ -1,0 +1,11 @@
+--- zetasql/parser/BUILD
++++ zetasql/parser/BUILD
+@@ -17,7 +17,7 @@ load("//bazel:bison.bzl", "genyacc")
+ load("//bazel:flex.bzl", "genlex")
+ 
+ package(
+-    default_visibility = ["//:__subpackages__"],
++    default_visibility = ["//visibility:public"],
+ )
+ 
+ genrule(

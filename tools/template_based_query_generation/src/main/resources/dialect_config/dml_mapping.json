@@ -2,101 +2,35 @@
   "features": [
     {
       "feature": "DML_INSERT",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "INSERT",
-            "bigQuery": "INSERT"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "insert_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        },
-        {
-          "dialectMap": {
-            "postgres": "INSERT INTO",
-            "bigQuery": "INSERT INTO"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "insert_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "INSERT",
+        "bigQuery": "INSERT",
+        "mySql": "INSERT"
+      }
     },
     {
       "feature": "DML_DELETE",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "DELETE",
-            "bigQuery": "DELETE"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "table_name",
-              "required": true,
-              "count": 1
-            }
-          ]
-        },
-        {
-          "dialectMap": {
-            "postgres": "DELETE FROM",
-            "bigQuery": "DELETE FROM"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "table_name",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "DELETE",
+        "bigQuery": "DELETE",
+        "mySql": "DELETE FROM"
+      }
     },
     {
       "feature": "DML_VALUES",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "VALUES",
-            "bigQuery": "VALUES"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "values_exp",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "VALUES",
+        "bigQuery": "VALUES",
+        "mySql": "VALUES"
+      }
     },
     {
       "feature": "DML_WHERE",
-      "allMappings": [
-        {
-          "dialectMap": {
-            "postgres": "WHERE",
-            "bigQuery": "WHERE"
-          },
-          "tokenInfos": [
-            {
-              "tokenType": "condition",
-              "required": true,
-              "count": 1
-            }
-          ]
-        }
-      ]
+      "dialectMap": {
+        "postgres": "WHERE",
+        "bigQuery": "WHERE",
+        "mySql": "WHERE"
+      }
     }
   ]
 }

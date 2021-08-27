@@ -1,0 +1,157 @@
+# Copyright 2021 Google LLC.
+# This software is provided as-is, without warranty or representation
+# for any use or purpose.
+# Your use of it is subject to your agreement with Google.
+
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+steps:
+- name: 'hadolint/hadolint'
+  dir: '${_BUILD_DIR}'
+  entrypoint: '/bin/hadolint'
+  args:
+    - '--config'
+    - '.hadolint.yaml'
+    - 'Dockerfile.ci'
+  id: 'lint-ci-docker-image'
+- name: 'gcr.io/kaniko-project/executor:latest'
+  dir: '${_BUILD_DIR}'
+  waitFor:
+    - 'lint-ci-docker-image'
+  args:
+    - '--dockerfile=Dockerfile.ci'
+    - '--destination=gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+    - '--cache=true'
+    - '--context=dir:///workspace/${_BUILD_DIR}'
+  id: 'build-ci-image'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'isort'
+  waitFor:
+  - 'build-ci-image'
+  args:
+    - '--check-only'
+    - '.'
+  id: 'isort'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'flake8'
+  waitFor:
+  - 'build-ci-image'
+  id: 'flake8'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'yapf'
+  waitFor:
+    - 'build-ci-image'
+  args:
+    - '-ir'
+    - '.'
+  id: 'yapf'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'pylint'
+  waitFor:
+  - 'build-ci-image'
+  args:
+    - 'gcs_ocn_bq_ingest/'
+  id: 'pylint-main'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'mypy'
+  waitFor:
+  - 'build-ci-image'
+  args:
+    - 'gcs_ocn_bq_ingest/'
+  id: 'mypy-main'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  entrypoint: 'mypy'
+  waitFor:
+  - 'build-ci-image'
+  args:
+  - 'tests/'
+  id: 'mypy-tests'
+- name: 'hashicorp/terraform'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - '-'
+  args:
+    - 'init'
+    - '--upgrade=true'
+  id: 'terraform-init'
+- name: 'hashicorp/terraform'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - 'terraform-init'
+  args:
+    - 'validate'
+  id: 'terraform-validate'
+- name: 'hashicorp/terraform'
+  dir: '${_BUILD_DIR}/terraform_module/gcs_ocn_bq_ingest_function'
+  waitFor:
+    - 'terraform-validate'
+  args:
+    - 'fmt'
+    - '-check'
+  id: 'terraform-fmt'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  waitFor:
+    - 'build-ci-image'
+    - 'isort'
+    - 'flake8'
+    - 'pylint-main'
+    - 'mypy-main'
+    - 'mypy-tests'
+    - 'terraform-fmt'
+  entrypoint: /bin/sh
+  args:
+    - '-c'
+    # pip installing again to get GCB to recognize mocker from pytest-mock
+    - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m "not IT"'
+  # GCB sometimes get stuck on this step and is doomed to not recover.
+  # This is usually remedied by just re-running the build.
+  # adding this unit-test step level timeout so we can fail sooner and retry.
+  timeout: 15s
+  id: 'unit-test'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  waitFor:
+    - 'build-ci-image'
+    - 'unit-test'
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - 'pip install -r requirements-dev.txt && python3 -m pytest tests -m IT'
+  id: 'integration-test'
+- name: 'gcr.io/$PROJECT_ID/gcs_event_based_ingest_ci'
+  dir: '${_BUILD_DIR}'
+  env:
+  - 'TF_VAR_project_id=$PROJECT_ID'
+  - 'TF_VAR_region=$_REGION'
+  - 'TF_VAR_short_sha=$SHORT_SHA'
+  waitFor:
+    - 'integration-test'
+    - 'build-ci-image'
+  entrypoint: /bin/sh
+  args:
+  - '-c'
+  - 'python3 -m pytest -vvv e2e'
+  id: 'e2e-test'
+timeout: '3600s'
+options:
+  machineType: 'N1_HIGHCPU_32'
+substitutions:
+  '_BUILD_DIR': 'tools/cloud_functions/gcs_event_based_ingest'
+  '_REGION': 'us-central1'
