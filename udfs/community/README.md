@@ -50,7 +50,7 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
-* [week_number_of_month](#week_number_of_monthdate_expression-any-type)
+* [week_of_month](#week_of_monthdate_expression-any-type)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
