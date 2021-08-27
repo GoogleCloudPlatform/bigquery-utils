@@ -293,6 +293,26 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
+week_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(0 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(1 AS INT64)
+day_occurrence_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(2 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(2 AS INT64)
 getbit:
   - test:
     input: CAST(23 AS INT64), CAST(2 AS INT64)
@@ -457,4 +477,4 @@ kruskal_wallis:
 linear_regression:
   - test:
     input: (SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])
-    expected_output: STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)    
+    expected_output: STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)
