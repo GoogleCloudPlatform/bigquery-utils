@@ -313,6 +313,13 @@ day_occurrence_of_month:
   - test:
     input: CAST("2020-07-10" AS DATE)
     expected_output: CAST(2 AS INT64)
+getbit:
+  - test:
+    input: CAST(23 AS INT64), CAST(2 AS INT64)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST(23 AS INT64), CAST(3 AS INT64)
+    expected_output: CAST(0 AS INT64)
 to_binary:
   - test:
     input: CAST(123456 AS INT64)
