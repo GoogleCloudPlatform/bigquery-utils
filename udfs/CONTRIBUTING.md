@@ -17,9 +17,9 @@ The following is a set of guidelines for contributing a UDF to this repository.
         [migration](/udfs/migration) directory. Otherwise, place it in the
         [community](/udfs/community) directory.
 1.  Add test cases for your UDFs.
-    *   Edit the `test_cases.yaml` file to include test inputs and expected
+    *   Edit the `test_cases.js` file to include test inputs and expected
         outputs for the function. (take a look at the
-        [community test_cases.yaml](community/test_cases.yaml) file as an
+        [community test_cases.js](community/test_cases.js) file as an
         example)
     *   Make sure test cases provide full coverage of the function's expected
         behavior. For example, if integers are the expected input, please
@@ -34,7 +34,7 @@ The following is a set of guidelines for contributing a UDF to this repository.
 ### Test your UDF
 
 1.  Test your UDF locally using the test cases you added to the
-    `test_cases.yaml` file. Please follow the instructions in the
+    `test_cases.js` file. Please follow the instructions in the
     [Testing UDFs Locally section](#testing-udfs-locally) to automatically test
     all inputs for the expected outputs using the function.
 

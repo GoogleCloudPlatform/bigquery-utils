@@ -4,7 +4,7 @@ steps:
   ############################################################
 - name: hadolint/hadolint
   id: lint-ci-docker-image
-  entrypoint: /bin/hadolint
+  entrypoint: hadolint
   args:
     - Dockerfile.ci
   ############################################################
@@ -19,7 +19,7 @@ steps:
   waitFor:
     - lint-ci-docker-image
   ############################################################
-  # Run yapf linter/formatter on all python assests
+  # Run yapf linter/formatter on all python assets
   ############################################################
 - name: gcr.io/$PROJECT_ID/bq_udf_ci
   id: yapf
