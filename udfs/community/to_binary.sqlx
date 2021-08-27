@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -14,17 +15,15 @@
  * limitations under the License.
  */
 
--- from_hex:
--- Input: STRING representing a number in hexadecimal form
--- Output: INT64 number in decimal form
-CREATE OR REPLACE FUNCTION fn.from_hex(value STRING) AS 
+-- to_binary:
+-- Input: INT64 number
+-- Output: STRING representing the input number in binary form
+CREATE OR REPLACE FUNCTION ${self()}(x INT64) AS
 (
   (
     SELECT 
-      SUM(
-      	CAST(
-      	  CONCAT('0x', SUBSTR(value, byte * 2 + 1, 2)) 
-      	    AS INT64) << ((LENGTH(value) - (byte + 1) * 2) * 4))
-    FROM UNNEST(GENERATE_ARRAY(1, LENGTH(value) / 2)) WITH OFFSET byte
+      STRING_AGG(CAST(x >> bit & 0x1 AS STRING), '' ORDER BY bit DESC)
+    FROM 
+      UNNEST(GENERATE_ARRAY(0, 63)) AS bit
   )
 );

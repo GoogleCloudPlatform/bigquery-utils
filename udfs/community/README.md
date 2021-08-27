@@ -141,7 +141,7 @@ results:
 |         |    1000    |     1     |
 
 
-### [from_binary(value STRING)](from_binary.sql)
+### [from_binary(value STRING)](from_binary.sqlx)
 Returns a number in decimal form from its binary representation.
 
 ```sql
@@ -162,7 +162,7 @@ results:
 | 1111111111111111111111111111111111111111111111111111110000010111 |      -1001 |
 
 
-### [from_hex(value STRING)](from_hex.sql)
+### [from_hex(value STRING)](from_hex.sqlx)
 Returns a number in decimal form from its hexadecimal representation.
 
 ```sql
@@ -209,7 +209,7 @@ results:
 | ["bbb"] | ["aaa","AAA"] | ["ccc"] |
 
 
-### [getbit(target_arg INT64, target_bit_arg INT64)](getbit.sql)
+### [getbit(target_arg INT64, target_bit_arg INT64)](getbit.sqlx)
 Given an INTEGER value, returns the value of a bit at a specified position. The position of the bit starts from 0.
 
 ```sql
@@ -454,7 +454,7 @@ SELECT
 'tino', 'julie', 'jordan'
 ```
 
-### [to_binary(x INT64)](to_binary.sql)
+### [to_binary(x INT64)](to_binary.sqlx)
 Returns a binary representation of a number.
 
 ```sql
@@ -475,7 +475,7 @@ results:
 |      -1001 | 1111111111111111111111111111111111111111111111111111110000010111 |
 
 
-### [to_hex(x INT64)](to_hex.sql)
+### [to_hex(x INT64)](to_hex.sqlx)
 Returns a hexadecimal representation of a number.
 
 ```sql

@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -14,15 +15,15 @@
  * limitations under the License.
  */
 
--- to_binary:
+-- to_hex:
 -- Input: INT64 number
--- Output: STRING representing the input number in binary form
-CREATE OR REPLACE FUNCTION fn.to_binary(x INT64) AS 
+-- Output: STRING representing the input number in hexadecimal form
+CREATE OR REPLACE FUNCTION ${self()}(x INT64) AS
 (
   (
     SELECT 
-      STRING_AGG(CAST(x >> bit & 0x1 AS STRING), '' ORDER BY bit DESC)
+      STRING_AGG(FORMAT('%02x', x >> (byte * 8) & 0xff), '' ORDER BY byte DESC)
     FROM 
-      UNNEST(GENERATE_ARRAY(0, 63)) AS bit
+      UNNEST(GENERATE_ARRAY(0, 7)) AS byte
   )
 );

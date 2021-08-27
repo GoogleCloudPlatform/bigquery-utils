@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2020 Google LLC
  *
@@ -14,11 +15,17 @@
  * limitations under the License.
  */
 
--- gitbit: Given an INTEGER value, returns the value of a bit at a specified position.
--- Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 0 
--- Output: value of the bit (0 or 1) at the specified position.
-CREATE OR REPLACE FUNCTION fn.getbit(target_arg INT64, target_bit_arg INT64) AS 
-((
-    SELECT
-      (target_arg & 1 << target_bit_arg) >> target_bit_arg
-));
+-- from_hex:
+-- Input: STRING representing a number in hexadecimal form
+-- Output: INT64 number in decimal form
+CREATE OR REPLACE FUNCTION ${self()}(value STRING) AS
+(
+  (
+    SELECT 
+      SUM(
+      	CAST(
+      	  CONCAT('0x', SUBSTR(value, byte * 2 + 1, 2)) 
+      	    AS INT64) << ((LENGTH(value) - (byte + 1) * 2) * 4))
+    FROM UNNEST(GENERATE_ARRAY(1, LENGTH(value) / 2)) WITH OFFSET byte
+  )
+);
