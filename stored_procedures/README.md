@@ -18,7 +18,7 @@ CALL bqutil.procedure.GetNextIds(10, next_ids);
 
 ## Documentation
 
-### [GetNextIds(id_count INT64, OUT next_ids ARRAY<INT64>)](GetNextIds.sql)
+### [GetNextIds(id_count INT64, OUT next_ids ARRAY<INT64>)](get_next_id.sql)
 Generates next ids and inserts them into a sample table. This implementation prevents against race condition.
 ```sql
 BEGIN

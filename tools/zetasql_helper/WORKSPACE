@@ -1,0 +1,67 @@
+workspace(name = "zetasql_helper")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+
+http_archive(
+    name = "com_google_zetasql",
+    strip_prefix = "zetasql-2020.07.01",
+    urls = [
+        "https://github.com/google/zetasql/archive/2020.07.01.tar.gz",
+    ],
+    patches = [
+        "//patches:parser_visibility.patch",
+        "//patches:resolver_visibility.patch",
+    ],
+)
+
+
+load("@com_google_zetasql//bazel:zetasql_deps_step_1.bzl", "zetasql_deps_step_1")
+
+zetasql_deps_step_1()
+
+load("@com_google_zetasql//bazel:zetasql_deps_step_2.bzl", "zetasql_deps_step_2")
+
+zetasql_deps_step_2()
+
+load("@com_google_zetasql//bazel:zetasql_deps_step_3.bzl", "zetasql_deps_step_3")
+
+zetasql_deps_step_3()
+
+load("@com_google_zetasql//bazel:zetasql_deps_step_4.bzl", "zetasql_deps_step_4")
+
+zetasql_deps_step_4()
+
+
+# Download Java dependencies for the client
+RULES_JVM_EXTERNAL_TAG = "2.8"
+RULES_JVM_EXTERNAL_SHA = "79c9850690d7614ecdb72d68394f994fef7534b292c4867ce5e7dec0aa7bdfad"
+http_archive(
+    name = "rules_jvm_external",
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
+)
+
+load("@rules_jvm_external//:defs.bzl", "maven_install")
+
+JAVA_GRPC_VERSION = "1.18.0"
+maven_install(
+    artifacts = [
+        "io.grpc:grpc-netty-shaded:" + JAVA_GRPC_VERSION,
+        "io.grpc:grpc-protobuf:" + JAVA_GRPC_VERSION,
+        "io.grpc:grpc-stub:" + JAVA_GRPC_VERSION,
+#        "org.apache.tomcat:annotations-api:6.0.53",
+        "org.projectlombok:lombok:1.18.12",
+        # docker java
+        "com.github.docker-java:docker-java-core:3.2.5",
+        "com.github.docker-java:docker-java-api:3.2.5",
+        "com.github.docker-java:docker-java-transport-httpclient5:3.2.5",
+        "com.github.docker-java:docker-java-transport:3.2.5",
+    ],
+    repositories = [
+        "https://jcenter.bintray.com/",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+

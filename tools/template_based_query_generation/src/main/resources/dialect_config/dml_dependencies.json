@@ -1,0 +1,35 @@
+{
+  "dependencies": [
+    {
+      "node": "DML_FEATURE_ROOT",
+      "neighbors": [
+        "DML_INSERT",
+        "DML_DELETE"
+      ]
+    },
+    {
+      "node": "DML_INSERT",
+      "neighbors": [
+        "DML_VALUES"
+      ]
+    },
+    {
+      "node": "DML_VALUES",
+      "neighbors": [
+        "FEATURE_SINK"
+      ]
+    },
+    {
+      "node": "DML_DELETE",
+      "neighbors": [
+        "DML_WHERE"
+      ]
+    },
+    {
+      "node": "DML_WHERE",
+      "neighbors": [
+        "FEATURE_SINK"
+      ]
+    }
+  ]
+}
