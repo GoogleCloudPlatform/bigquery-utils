@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,6 +15,9 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.ascii(string_expr STRING) AS (
-  TO_CODE_POINTS(string_expr)[OFFSET(0)]
+CREATE OR REPLACE FUNCTION ${self()}(string_expr STRING, length_expr INT64) AS (
+  CASE
+    WHEN length_expr < 0 THEN ERROR('The length argument to RIGHT must be a positive integer!')
+    ELSE SUBSTR(string_expr, -1 * length_expr, length_expr)
+  END
 );

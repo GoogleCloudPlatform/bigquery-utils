@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2019 Google LLC
  *
@@ -14,6 +15,6 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION td.nvl(expr1 ANY TYPE, expr2 ANY TYPE) AS (
-  IFNULL(expr1, expr2)
+CREATE OR REPLACE FUNCTION ${self()}(date_expr DATE) AS (
+  fn.last_day(date_expr)
 );
