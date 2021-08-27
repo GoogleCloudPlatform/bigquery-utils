@@ -691,8 +691,8 @@ Returns the number of weeks from the beginning of the month to the specified dat
 
 ```sql
 SELECT 
-  bqutil.fn.week_number_of_month(DATE '2020-07-01'), 
-  bqutil.fn.week_number_of_month(DATE '2020-07-08');
+  bqutil.fn.week_of_month(DATE '2020-07-01'), 
+  bqutil.fn.week_of_month(DATE '2020-07-08');
   
 0 1  
 ```
