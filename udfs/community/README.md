@@ -15,6 +15,7 @@ SELECT bqutil.fn.int(1.684)
 
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
+* [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
 * [from_binary](#from_binaryvalue-string)
@@ -101,6 +102,16 @@ SELECT
   
 1 2  
 ```
+
+### [degrees(x ANY TYPE)](degrees.sql)
+Convert radians values into degrees.
+
+```sql
+SELECT bqutil.fn.degrees(3.141592653589793) is_this_pi
+
+180.0
+```
+
 
 ### [find_in_set(str STRING, strList STRING)](find_in_set.sql)
 Returns the first occurance of str in strList where strList is a comma-delimited string.
@@ -435,7 +446,7 @@ SELECT bqutil.fn.pi() this_is_pi
 ```
 
 ### [radians(x ANY TYPE)](radians.sql)
-Convert values into radian.
+Convert degree values into radian.
 
 ```sql
 SELECT bqutil.fn.radians(180) is_this_pi
