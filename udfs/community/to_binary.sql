@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+-- to_binary:
+-- Input: INT64 number
+-- Output: STRING representing the input number in binary form
+CREATE OR REPLACE FUNCTION fn.to_binary(x INT64) AS 
+(
+  (
+    SELECT 
+      STRING_AGG(CAST(x >> bit & 0x1 AS STRING), '' ORDER BY bit DESC)
+    FROM 
+      UNNEST(GENERATE_ARRAY(0, 63)) AS bit
+  )
 );

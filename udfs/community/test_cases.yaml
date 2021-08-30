@@ -293,6 +293,61 @@ percentage_difference:
   - test:
     input: CAST(1.0 AS FLOAT64), CAST(1000000000 AS INT64)
     expected_output: CAST(2.0 AS FLOAT64)
+week_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(0 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(1 AS INT64)
+day_occurrence_of_month:
+  - test:
+    input: CAST("2020-07-03" AS DATE)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST("2020-07-08" AS DATE)
+    expected_output: CAST(2 AS INT64)
+  - test:
+    input: CAST("2020-07-10" AS DATE)
+    expected_output: CAST(2 AS INT64)
+getbit:
+  - test:
+    input: CAST(23 AS INT64), CAST(2 AS INT64)
+    expected_output: CAST(1 AS INT64)
+  - test:
+    input: CAST(23 AS INT64), CAST(3 AS INT64)
+    expected_output: CAST(0 AS INT64)
+to_binary:
+  - test:
+    input: CAST(123456 AS INT64)
+    expected_output: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
+from_binary:
+  - test:
+    input: CAST('0000000000000000000000000000000000000000000000011110001001000000' AS STRING)
+    expected_output: CAST(123456 AS INT64)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
+to_hex:
+  - test:
+    input: CAST(123456 AS INT64)
+    expected_output: CAST('000000000001e240' AS STRING)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
+from_hex:
+  - test:
+    input: CAST('000000000001e240' AS STRING)
+    expected_output: CAST(123456 AS INT64)
+  - test:
+    input: (NULL)
+    expected_output: (NULL)
 linear_interpolate:
   - test:
     input: CAST(2 AS INT64), STRUCT(CAST(1 AS INT64) AS x, CAST(1.0 AS FLOAT64) AS y), STRUCT(CAST(3 AS INT64) AS x, CAST(3.0 AS FLOAT64) AS y)
@@ -423,4 +478,3 @@ linear_regression:
   - test:
     input: (SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])
     expected_output: STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)
-    

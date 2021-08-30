@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+-- from_binary:
+-- Input: STRING representing a number in binary form
+-- Output: INT64 number in decimal form
+CREATE OR REPLACE FUNCTION fn.from_binary(value STRING) AS 
+(
+  (
+    SELECT 
+      SUM(CAST(char AS INT64) << (LENGTH(value) - 1 - bit))
+    FROM 
+      UNNEST(SPLIT(value, '')) AS char WITH OFFSET bit
+  )
 );

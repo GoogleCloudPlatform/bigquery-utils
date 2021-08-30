@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+-- week_of_month: Returns the number of weeks from the beginning of the month to the specified date
+-- Input: date_expression DATE or TIMESTAMP
+-- Output: The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week
+CREATE OR REPLACE FUNCTION fn.week_of_month(date_expression ANY TYPE) AS 
+(
+  (
+    SELECT 
+      EXTRACT(WEEK FROM date_expression) 
+      - EXTRACT(WEEK FROM DATE_TRUNC(CAST(date_expression AS DATE), MONTH))
+  )
 );
+    

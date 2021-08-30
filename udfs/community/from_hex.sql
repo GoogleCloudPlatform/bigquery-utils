@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2020 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+-- from_hex:
+-- Input: STRING representing a number in hexadecimal form
+-- Output: INT64 number in decimal form
+CREATE OR REPLACE FUNCTION fn.from_hex(value STRING) AS 
+(
+  (
+    SELECT 
+      SUM(
+      	CAST(
+      	  CONCAT('0x', SUBSTR(value, byte * 2 + 1, 2)) 
+      	    AS INT64) << ((LENGTH(value) - (byte + 1) * 2) * 4))
+    FROM UNNEST(GENERATE_ARRAY(1, LENGTH(value) / 2)) WITH OFFSET byte
+  )
 );

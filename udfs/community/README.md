@@ -14,10 +14,14 @@ SELECT bqutil.fn.int(1.684)
 ## UDFs
 
 * [csv_to_struct](#csv_to_structstrlist-string)
+* [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
+* [from_binary](#from_binaryvalue-string)
+* [from_hex](#from_hexvalue-string)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
+* [getbit](#getbittarget_arg-int64-target_bit_arg-int64)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
@@ -31,10 +35,13 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
+* [pi](#pi)
 * [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_value](#random_valuearr-any-type)
+* [to_binary](#to_binaryx-int64)
+* [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
 * [ts_gen_keyed_timestamps](#ts_gen_keyed_timestampskeys-arraystring-tumble_seconds-int64-min_ts-timestamp-max_ts-timestamp)
 * [ts_linear_interpolate](#ts_linear_interpolatepos-timestamp-prev-structx-timestamp-y-float64-next-structx-timestamp-y-float64)
@@ -45,6 +52,8 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [week_of_month](#week_of_monthdate_expression-any-type)
+* [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
@@ -83,6 +92,15 @@ results:
 | a   | b     |
 
 
+### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sql)
+Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
+```sql
+SELECT 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'), 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-08');
+  
+1 2  
+```
 
 ### [degrees(x ANY TYPE)](degrees.sql)
 Convert radians values into degrees.
@@ -146,6 +164,47 @@ results:
 |         |    1000    |     1     |
 
 
+### [from_binary(value STRING)](from_binary.sql)
+Returns a number in decimal form from its binary representation.
+
+```sql
+SELECT 
+  bqutil.fn.to_binary(x) AS binary,
+  bqutil.fn.from_binary(bqutil.fn.to_binary(x)) AS x
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|                              binary                              |     x      |
+|------------------------------------------------------------------|------------|
+| 0000000000000000000000000000000000000000000000000000000000000001 |          1 |
+| 0000000000000000000000000000000000000000000000011110001001000000 |     123456 |
+| 0000000000000000000000000000001001001100101100000001011011101010 | 9876543210 |
+| 1111111111111111111111111111111111111111111111111111110000010111 |      -1001 |
+
+
+### [from_hex(value STRING)](from_hex.sql)
+Returns a number in decimal form from its hexadecimal representation.
+
+```sql
+SELECT 
+  bqutil.fn.to_hex(x) AS hex, 
+  bqutil.fn.from_hex(bqutil.fn.to_hex(x)) AS x
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|       hex        |     x      |
+|------------------|------------|
+| 0000000000000001 |          1 |
+| 000000000001e240 |     123456 |
+| 000000024cb016ea | 9876543210 |
+| fffffffffffffc17 |      -1001 |
+
 
 ### [get_array_value(k STRING, arr ANY TYPE)](get_array_value.sql)
 Given a key and a map, returns the ARRAY type value.
@@ -173,6 +232,14 @@ results:
 | ["bbb"] | ["aaa","AAA"] | ["ccc"] |
 
 
+### [getbit(target_arg INT64, target_bit_arg INT64)](getbit.sql)
+Given an INTEGER value, returns the value of a bit at a specified position. The position of the bit starts from 0.
+
+```sql
+SELECT bqutil.fn.getbit(23, 2), bqutil.fn.getbit(23, 3), bqutil.fn.getbit(null, 1)
+
+1 0 NULL
+```
 
 ### [get_value(k STRING, arr ANY TYPE)](get_value.sql)
 Given a key and a list of key-value maps in the form [{'key': 'a', 'value': 'aaa'}], returns the SCALAR type value.
@@ -285,7 +352,7 @@ Row | source      | target      | distance
 Interpolate the current positions value from the preceding and folllowing coordinates
 
 ```sql
-SELECT 
+SELECT
   bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(10 AS x, 10.0 AS y)),
   bqutil.fn.linear_interpolate(2, STRUCT(0 AS x, 0.0 AS y), STRUCT(20 AS x, 10.0 AS y))
 ```
@@ -368,6 +435,14 @@ results:
 |-----|-----|---------|-----|
 | 1.2 | 1.0 |  0.6667 | 2.0 |
 
+### [pi()](pi.sql)
+Returns the value of pi.
+
+```sql
+SELECT bqutil.fn.pi() this_is_pi
+
+3.141592653589793
+```
 
 ### [radians(x ANY TYPE)](radians.sql)
 Convert degree values into radian.
@@ -402,9 +477,49 @@ SELECT
 'tino', 'julie', 'jordan'
 ```
 
+### [to_binary(x INT64)](to_binary.sql)
+Returns a binary representation of a number.
+
+```sql
+SELECT 
+  x, 
+  bqutil.fn.to_binary(x) AS binary
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+
+|     x      |                              binary                              |
+|------------|------------------------------------------------------------------|
+|          1 | 0000000000000000000000000000000000000000000000000000000000000001 |
+|     123456 | 0000000000000000000000000000000000000000000000011110001001000000 |
+| 9876543210 | 0000000000000000000000000000001001001100101100000001011011101010 |
+|      -1001 | 1111111111111111111111111111111111111111111111111111110000010111 |
+
+
+### [to_hex(x INT64)](to_hex.sql)
+Returns a hexadecimal representation of a number.
+
+```sql
+SELECT 
+  x, 
+  bqutil.fn.to_hex(x) AS hex
+FROM 
+  UNNEST([1, 123456, 9876543210, -1001]) AS x;
+```
+
+results:
+|     x      |       hex        | 
+|------------|------------------|
+|          1 | 0000000000000001 |
+|     123456 | 000000000001e240 |
+| 9876543210 | 000000024cb016ea |
+|      -1001 | fffffffffffffc17 |
+
 
 ### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
-For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value. 
+For a given expression, replaces all occurrences of specified characters with specified substitutes. Existing characters are mapped to replacement characters by their positions in the `characters_to_replace` and `characters_to_substitute` arguments. If more characters are specified in the `characters_to_replace` argument than in the `characters_to_substitute` argument, the extra characters from the `characters_to_replace` argument are omitted in the return value.
 ```sql
 SELECT bqutil.fn.translate('mint tea', 'inea', 'osin')
 
@@ -416,7 +531,7 @@ Generate a timestamp array associated with each key
 
 ```sql
 SELECT *
-FROM 
+FROM
   UNNEST(bqutil.fn.ts_gen_keyed_timestamps(['abc', 'def'], 60, TIMESTAMP '2020-01-01 00:30:00', TIMESTAMP '2020-01-01 00:31:00))
 ```
 
@@ -426,14 +541,14 @@ FROM
 | def        | 2020-01-01 00:30:00 UTC |
 | abc        | 2020-01-01 00:31:00 UTC |
 | def        | 2020-01-01 00:31:00 UTC |
-  
+
 
 ### [ts_linear_interpolate(pos TIMESTAMP, prev STRUCT<x TIMESTAMP, y FLOAT64>, next STRUCT<x TIMESTAMP, y FLOAT64>)](ts_linear_interpolation.sql)
 Interpolate the positions value using timestamp seconds as the x-axis
 
 ```sql
 select bqutil.fn.ts_linear_interpolate(
-  TIMESTAMP '2020-01-01 00:30:00', 
+  TIMESTAMP '2020-01-01 00:30:00',
   STRUCT(TIMESTAMP '2020-01-01 00:29:00' AS x, 1.0 AS y),
   STRUCT(TIMESTAMP '2020-01-01 00:31:00' AS x, 3.0 AS y)
 )
@@ -471,7 +586,7 @@ FROM (
       LAG(ts) OVER (PARTITION BY key ORDER BY ts ASC),
       300
     ) AS session_group
-  FROM ticks 
+  FROM ticks
 )
 ```
 
@@ -528,7 +643,7 @@ SELECT
   fn.ts_tumble(TIMESTAMP '2020-01-01 00:17:30', 60) As min_1
 ```
 
-| min_15                  | min_10                  |                         |       
+| min_15                  | min_10                  |                         |
 |-------------------------|-------------------------|-------------------------|
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
@@ -591,6 +706,16 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
+### [week_of_month(date_expression ANY TYPE)](week_of_month.sql)
+Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
+
+```sql
+SELECT 
+  bqutil.fn.week_of_month(DATE '2020-07-01'), 
+  bqutil.fn.week_of_month(DATE '2020-07-08');
+  
+0 1  
+```
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sql)
 Convert a STRING formatted as a YYYYMMDD to a DATE
@@ -638,8 +763,8 @@ returns:
 
 # StatsLib: Statistical UDFs
 
-This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions) 
-that extend BigQuery and enable more specialized Statistical Analysis usage patterns. 
+This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
+that extend BigQuery and enable more specialized Statistical Analysis usage patterns.
 Each UDF detailed below will be automatically synchronized to the `fn` dataset
 within the `bqutil` project for reference in your queries.
 
@@ -695,11 +820,11 @@ results:
 ### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sql)
 Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
 
-The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables). 
+The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a linear approach to modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables).
 
 * Input: array: struct <X FLOAT64, Y FLOAT64>
 * Output: struct<a FLOAT64,b FLOAT64, r FLOAT64>
-* 
+*
 ```sql
 DECLARE data ARRAY<STRUCT<X STRING, Y FLOAT64>>;
 set data = [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)];
@@ -723,7 +848,7 @@ The [pvalue](https://jstat.github.io/distributions.html#jStat.chisquare.cdf) is 
 
 * Input: H FLOAT64, dof FLOAT64
 * Output: p FLOAT64
-* 
+*
 ```sql
 SELECT `bqutils.fn.pvalue`(.3,2) AS results;
 ```
@@ -734,4 +859,3 @@ results:
 | results         	|
 |-------------------|
 |0.8607079764250578 |
-

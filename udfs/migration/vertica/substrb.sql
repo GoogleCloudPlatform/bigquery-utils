@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+
+/** Emulate Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes). */
+CREATE OR REPLACE FUNCTION ve.substrb(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
+    CAST(SUBSTR(CAST(str AS BYTES), startpos, extent) AS STRING)
 );
+
+
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION fn.radians(x ANY TYPE) AS (
-  bqutil.fn.pi() * x / 180
+
+/** Emulate Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
+CREATE OR REPLACE FUNCTION ve.upperb(str STRING) RETURNS STRING AS (
+    CAST(UPPER(CAST(str AS BYTES)) AS STRING)
 );
