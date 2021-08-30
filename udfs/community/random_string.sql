@@ -18,14 +18,14 @@
 -- Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
 -- Input: random string length INT64
 -- Output: random string of specified length 
-CREATE OR REPLACE FUNCTION fn.random_string(length INT64) AS 
+CREATE OR REPLACE FUNCTION fn.random_string(length INT64) AS
 ((
-    SELECT 
-      STRING_AGG([
-        'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-        'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-        '1','2','3','4','5','6','7','8','9','0'][offset(bqutil.fn.random_int(0, 62))], '')
-    FROM 
-      UNNEST(GENERATE_ARRAY(1, length, 1))
+  SELECT 
+    STRING_AGG([
+      'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+      'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+      '1','2','3','4','5','6','7','8','9','0'][offset(bqutil.fn.random_int(0, 62))], '')
+  FROM 
+    UNNEST(GENERATE_ARRAY(1, length, 1))
 ));
 
