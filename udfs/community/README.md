@@ -39,6 +39,7 @@ SELECT bqutil.fn.int(1.684)
 * [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
+* [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
@@ -516,6 +517,19 @@ results:
 |     123456 | 000000000001e240 |
 | 9876543210 | 000000024cb016ea |
 |      -1001 | fffffffffffffc17 |
+
+
+### [random_string(length INT64)](random_string.sql)
+Returns a random string of specified length. Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
+
+```sql
+SELECT
+  bqutil.fn.random_string(5),
+  bqutil.fn.random_string(7),
+  bqutil.fn.random_string(10)
+
+'mb3AP' 'aQG5XYB' '0D5WFVQuq6'
+```
 
 
 ### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sql)
