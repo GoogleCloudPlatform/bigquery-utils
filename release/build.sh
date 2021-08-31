@@ -223,9 +223,11 @@ function deploy_udfs() {
 
   replace_js_udf_bucket_placeholder
 
+  # For prod deploys, do not set SHORT_SHA so that BQ dataset
+  # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \
-    --config="${UDF_DIR}"/cloudbuild_deploy.yaml \
-    --substitutions BRANCH_NAME="${BRANCH_NAME}",_JS_BUCKET="${_JS_BUCKET}"
+    --config="${UDF_DIR}"/cloudbuild.yaml \
+    --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}"
 }
 
 #######################################

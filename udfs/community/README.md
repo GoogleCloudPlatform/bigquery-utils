@@ -14,6 +14,8 @@ SELECT bqutil.fn.int(1.684)
 ## UDFs
 
 * [csv_to_struct](#csv_to_structstrlist-string)
+* [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
+* [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
 * [from_binary](#from_binaryvalue-string)
@@ -37,6 +39,7 @@ SELECT bqutil.fn.int(1.684)
 * [pvalue](#pvalueh-float64-dof-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
+* [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
@@ -50,6 +53,8 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [week_of_month](#week_of_monthdate_expression-any-type)
+* [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
@@ -87,6 +92,25 @@ results:
 | c   | d     |
 | a   | b     |
 
+
+### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
+Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
+```sql
+SELECT 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'), 
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-08');
+  
+1 2  
+```
+
+### [degrees(x ANY TYPE)](degrees.sqlx)
+Convert radians values into degrees.
+
+```sql
+SELECT bqutil.fn.degrees(3.141592653589793) is_this_pi
+
+180.0
+```
 
 
 ### [find_in_set(str STRING, strList STRING)](find_in_set.sqlx)
@@ -422,7 +446,7 @@ SELECT bqutil.fn.pi() this_is_pi
 ```
 
 ### [radians(x ANY TYPE)](radians.sqlx)
-Convert values into radian.
+Convert degree values into radian.
 
 ```sql
 SELECT bqutil.fn.radians(180) is_this_pi
@@ -493,6 +517,19 @@ results:
 |     123456 | 000000000001e240 |
 | 9876543210 | 000000024cb016ea |
 |      -1001 | fffffffffffffc17 |
+
+
+### [random_string(length INT64)](random_string.sqlx)
+Returns a random string of specified length. Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
+
+```sql
+SELECT
+  bqutil.fn.random_string(5),
+  bqutil.fn.random_string(7),
+  bqutil.fn.random_string(10)
+
+'mb3AP' 'aQG5XYB' '0D5WFVQuq6'
+```
 
 
 ### [translate(expression STRING, characters_to_replace STRING, characters_to_substitute STRING)](translate.sqlx)
@@ -683,6 +720,16 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
+### [week_of_month(date_expression ANY TYPE)](week_of_month.sqlx)
+Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
+
+```sql
+SELECT 
+  bqutil.fn.week_of_month(DATE '2020-07-01'), 
+  bqutil.fn.week_of_month(DATE '2020-07-08');
+  
+0 1  
+```
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sqlx)
 Convert a STRING formatted as a YYYYMMDD to a DATE

@@ -41,7 +41,7 @@ SELECT
   total_bytes_processed,
   -- Average slot utilization per job is calculated by dividing
   -- total_slot_ms by the millisecond duration of the job
-  total_slot_ms / (TIMESTAMP_DIFF(end_time, start_time, MILLISECOND)) AS avg_slots
+  SAFE_DIVIDE(total_slot_ms, (TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))) AS avg_slots
 FROM
   `region-{region_name}`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 ORDER BY

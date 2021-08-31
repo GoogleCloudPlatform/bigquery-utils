@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2019 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export SHORT_SHA=local_test
-python3 tests/udf_test_utils.py --create-test-datasets
-python3 -m pytest --workers 100 tests/create_udf_signatures.py "$@"
-python3 -m pytest --workers 100 tests/test_create_udfs.py "$@"
-python3 -m pytest --workers 100 tests/test_run_udfs.py "$@"
-python3 tests/udf_test_utils.py --delete-test-datasets
+
+if [[ -n "${JS_BUCKET}" ]]; then
+  gcloud builds submit . --substitutions SHORT_SHA=_test_env,_JS_BUCKET="${JS_BUCKET}"
+else
+  printf "Set env variable JS_BUCKET to your own GCS bucket where Javascript libraries can be deployed.\n"
+  printf "For example, run the following to set JS_BUCKET:\n export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/LIBS"
+fi

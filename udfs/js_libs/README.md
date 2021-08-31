@@ -18,6 +18,7 @@ CREATE FUNCTION myFunc(a FLOAT64, b STRING)
   """;
   ```
 
-**Note: When your UDF makes a call to the javascript library,
- make sure to convert any dashes '-' to underscores '_' in the javascript library name.** (e.g. LIBRARY-NAME in example
- above is invoked as LIBRARY_NAME in the UDF body.)
+> Note: When your UDF makes a call to the javascript library,
+> make sure to convert any dashes '-' to underscores '_' in the javascript 
+> library name. (e.g. LIBRARY-NAME in example above is invoked as LIBRARY_NAME
+> in the UDF body.)
