@@ -2,3 +2,5 @@ google-cloud-bigquery>=2.6.1
 google-cloud-storage>=1.34.0
 google-cloud-error-reporting>=1.1.0
 cachetools
+types-cachetools
+types-pytz

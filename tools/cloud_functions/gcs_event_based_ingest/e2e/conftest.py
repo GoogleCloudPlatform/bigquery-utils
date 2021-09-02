@@ -87,8 +87,6 @@ def dest_dataset(request, bq, monkeypatch):
                                f".{random_dataset}")
     dataset.location = "US"
     bq.create_dataset(dataset)
-    monkeypatch.setenv("BQ_LOAD_STATE_TABLE",
-                       f"{dataset.dataset_id}.serverless_bq_loads")
     print(f"created dataset {dataset.dataset_id}")
 
     def teardown():

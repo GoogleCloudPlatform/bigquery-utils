@@ -18,7 +18,6 @@
 """
 import distutils.util
 import os
-import re
 
 import google.api_core.client_info
 import google.cloud.exceptions
@@ -62,6 +61,9 @@ BASE_LOAD_JOB_CONFIG = {
     "labels": DEFAULT_JOB_LABELS,
 }
 
+BQ_LOAD_CONFIG_FILENAME = "load.json"
+BQ_EXTERNAL_TABLE_CONFIG_FILENAME = "external.json"
+
 # https://cloud.google.com/bigquery/quotas#load_jobs
 # 15TB per BQ load job (soft limit).
 DEFAULT_MAX_BATCH_BYTES = str(15 * 10**12)
@@ -75,23 +77,22 @@ DEFAULT_JOB_PREFIX = "gcf-ingest-"
 
 # yapf: disable
 DEFAULT_DESTINATION_REGEX = (
-    r"^(?P<dataset>[\w\-\._0-9]+)/"   # dataset (required)
-    r"(?P<table>[\w\-_0-9]+)/?"       # table name (required)
+    r"^(?P<dataset>[\w\-\.]+)/"   # dataset (required)
+    r"(?P<table>[\w\-]+)/?"       # table name (required)
     # break up historical v.s. incremental to separate prefixes (optional)
     r"(?:historical|incremental)?/?"
-    r"(?P<partition>\$[0-9]+)?/?"     # partition decorator (optional)
-    r"(?:"                            # [begin] yyyy/mm/dd/hh/ group (optional)
-    r"(?P<yyyy>[0-9]{4})/?"           # partition year (yyyy) (optional)
-    r"(?P<mm>[0-9]{2})?/?"            # partition month (mm) (optional)
-    r"(?P<dd>[0-9]{2})?/?"            # partition day (dd)  (optional)
-    r"(?P<hh>[0-9]{2})?/?"            # partition hour (hh) (optional)
-    r")?"                             # [end]yyyy/mm/dd/hh/ group (optional)
-    r"(?P<batch>[\w\-_0-9]+)?/"       # batch id (optional)
+    r"(?P<partition>\$[\d]+)?/?"  # partition decorator (optional)
+    r"(?:"                        # [begin] yyyy/mm/dd/hh/ group (optional)
+    r"(?P<yyyy>[\d]{4})/?"        # partition year (yyyy) (optional)
+    r"(?P<mm>[\d]{2})?/?"         # partition month (mm) (optional)
+    r"(?P<dd>[\d]{2})?/?"         # partition day (dd)  (optional)
+    r"(?P<hh>[\d]{2})?/?"         # partition hour (hh) (optional)
+    r")?"                         # [end]yyyy/mm/dd/hh/ group (optional)
+    r"(?P<batch>[\w\-]+)?/"       # batch id (optional)
 )
 # yapf: enable
 
-DESTINATION_REGEX = re.compile(
-    os.getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX))
+DESTINATION_REGEX = os.getenv("DESTINATION_REGEX", DEFAULT_DESTINATION_REGEX)
 
 CLIENT_INFO = google.api_core.client_info.ClientInfo(
     user_agent="google-pso-tool/bq-severless-loader")
@@ -115,6 +116,11 @@ ACTION_FILENAMES = {
     START_BACKFILL_FILENAME,
 }
 
+SPECIAL_GCS_DIRECTORY_NAMES = {
+    '_config',  # Directory which holds external.json and load.json config files
+    '_backlog',  # Directory used to backfill data
+}
+
 RESTART_BUFFER_SECONDS = int(os.getenv("RESTART_BUFFER_SECONDS", "30"))
 
 ORDER_PER_TABLE = bool(
@@ -136,4 +142,13 @@ BQ_DML_STATEMENT_TYPES = {
 }
 
 # https://cloud.google.com/bigquery/docs/running-jobs#generate-jobid
-NON_BQ_JOB_ID_REGEX = re.compile(r'[^0-9a-zA-Z_\-]+')
+NON_BQ_JOB_ID_REGEX = r'[^0-9a-zA-Z_\-]+'
+
+# When set to True, ordered backlog loads will wait for a new _BACKFILL file to
+# be dropped under the table prefix
+WAIT_FOR_VALIDATION = bool(
+    distutils.util.strtobool(os.getenv("WAIT_FOR_VALIDATION", "False")))
+
+# Do not set to a large value. Keep below 10 retries.
+MAX_RETRIES_ON_BIGQUERY_ERROR = int(
+    os.getenv("MAX_RETRIES_ON_BIGQUERY_ERROR", "3"))
