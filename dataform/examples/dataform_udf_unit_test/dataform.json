@@ -1,0 +1,6 @@
+{
+  "warehouse": "bigquery",
+  "defaultSchema": "fn",
+  "defaultDatabase": "bqutil",
+  "concurrentQueryLimit": 100
+}
