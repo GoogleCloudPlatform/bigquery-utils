@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function generate_udf_test(test_udf, test_cases) {
-    const test_name = `${test_udf}_${uuidv4()}`;
-    create_dataform_test_view(test_name, test_udf, test_cases);
+function generate_udf_test(udf_name, test_cases) {
+    const test_name = `${udf_name}_${uuidv4()}`;
+    create_dataform_test_view(test_name, udf_name, test_cases);
     let expected_output_select_statements = [];
     let test_input_select_statements = [];
     test_cases.forEach((test_case) => {

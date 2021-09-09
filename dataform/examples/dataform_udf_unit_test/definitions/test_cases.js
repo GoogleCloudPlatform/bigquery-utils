@@ -365,24 +365,6 @@ generate_udf_test("url_parse", [
         expected_output: `(NULL) # NULL is a type in YAML so wrap it in parenthesis`
     },
 ]);
-generate_udf_test("last_day", [
-    {
-        input_1: `CAST("1987-12-25" AS DATE)`,
-        expected_output: `CAST("1987-12-31" AS DATE)`
-    },
-    {
-        input_1: `CAST("1998-09-04" AS DATE)`,
-        expected_output: `CAST("1998-09-30" AS DATE)`
-    },
-    {
-        input_1: `CAST("2020-02-21" AS DATE)`,
-        expected_output: `CAST("2020-02-29" AS DATE) # leap year`
-    },
-    {
-        input_1: `CAST("2019-02-21" AS DATE)`,
-        expected_output: `CAST("2019-02-28" AS DATE) # non-leap year`
-    },
-]);
 generate_udf_test("percentage_change", [
     {
         input_1: `CAST(0.2 AS FLOAT64)`,
