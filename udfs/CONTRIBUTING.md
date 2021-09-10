@@ -22,7 +22,7 @@ The following is a set of guidelines for contributing a UDF to this repository.
       [community test_cases.js](community/test_cases.js) file as an example)
       > Note: If your UDF accepts inputs of different data types, you'll have to
       > create a separate generate_udf_test() invocation for each group of
-      > inputs sharing identical data types. For example, the test cases in 
+      > inputs sharing identical data types. For example, the test cases in
       > [community test_cases.js](community/test_cases.js) for the
       > [int() UDF](community/int.sqlx) are split into three invocations of
       > generate_udf_test() since the test inputs can be grouped into the
@@ -42,10 +42,47 @@ The following is a set of guidelines for contributing a UDF to this repository.
 
 ### Test your UDF
 
-1. Test your UDF locally using the test cases you added to the
-   `test_cases.js` file. Please follow the instructions in the
-   [Testing UDFs Locally section](#testing-udfs-locally) to automatically test
-   all inputs for the expected outputs using the function.
+The UDF testing framework in this repo will run on Cloud Build and perform the
+following:
+
+* Create BigQuery datasets for hosting the UDFs
+* Deploy all UDFs in the BigQuery datasets
+* Run all UDF unit tests in BigQuery
+* Delete all BigQuery datasets and UDFs when finished
+
+Please follow these instructions to run the testing framework which will confirm
+that your UDFs behave as expected.
+
+1. Change into the bigquery_utils [udfs/](./) directory:
+   ```bash
+   cd udfs/
+   ```
+
+1. Authenticate using the Cloud SDK and set the GCP project in which you'll test
+   your UDF(s):
+
+   ```bash 
+   gcloud init
+   ```
+
+1. Grant your Cloud Build service account the BigQuery Job User role
+   ```bash
+   
+   gcloud projects add-iam-policy-binding \
+     $(gcloud config get-value project) \
+     --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \
+     --role=roles/bigquery.user
+   ```
+
+1. Run the UDF unit tests in Cloud Build by running the following:
+
+   ```bash
+   export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/STORE/JS_LIBS
+   bash run_unit_tests.sh
+   ```
+
+1. If all the tests pass, submit your pull request to proceed to the code review
+   process.
 
 ### Submit a Pull Request
 
@@ -53,37 +90,13 @@ The following is a set of guidelines for contributing a UDF to this repository.
    see the section on [Code Reviews](#code-reviews) for more information.
 
 > Note: Your pull request, and any following commits, will trigger a testing
-> pipeline that will run unit tests on your submitted function as well as all 
+> pipeline that will run unit tests on your submitted function as well as all
 > the other existing functions. This is done by a Cloud Build Trigger which runs
 > a Bash script. This Bash script unit tests the functions, running the
 > contributed UDFs in BigQuery with the given input to check that it results in
 > the expected output. If these tests pass, this will indicate to the reviewer
 > that the functions work as expected. So testing these functions locally before
 > submitting the pull request can ensure a successful review process.
-
-## Testing your UDFs
-
-Please follow these instructions to confirm that your test cases work as
-expected.
-
-1. Change into the bigquery_utils [udfs/](./) directory:
-    * `cd udfs/`
-
-1. The test framework in this repo will create BigQuery datasets in your
-   configured GCP project in order to test your UDF, and will delete them when
-   finished testing. Authenticate using the Cloud SDK and set the GCP project in
-   which you'll test your UDF(s):
-
-    * `gcloud auth login`
-    * `gcloud config set project YOUR_PROJECT_ID`
-
-1. Run the UDF unit tests in Cloud Build by running the following:
-
-    * `export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/STORE/JS_LIBS`
-    * `bash run_unit_tests.sh`
-
-1. If all the tests pass, submit your pull request to proceed to the code review
-   process.
 
 ## Contributor License Agreement
 

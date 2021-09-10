@@ -13,43 +13,23 @@ SELECT bqutil.td.nullifzero(0)
 
 ## UDFs
 
-* [ascii](#asciistring_expr-string)
-* [chr](#chrint_expr-int64)
+* [ascii (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#ascii)
+* [chr (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#chr)
 * [decode](#decode-function)
 * [index](#indexstring_expr1-string-string_expr2-string)
-* [initcap](#initcapstr_expr-string)
-* [instr](#instrhaystack-string-needle-string-position-int64-occurrence-int64)
-* [last_day](#last_daydate_expr-date)
-* [left](#leftstring_expr-string-length_expr-int64)
+* [initcap (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#initcap)
+* [instr (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#instr)
+* [last_day (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
+* [left (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#left)
 * [months_between](#months_betweendate_expr1-date-date_expr2-date)
 * [nullifzero](#nullifzeroexpr-any-type)
 * [nvl](#nvlexpr1-any-type-expr2-any-type)
 * [nvl2](#nvl2expr1-any-type-expr2-any-type-expr3-any-type)
 * [otranslate](#otranslatesource_string-string-from_string-string-to_string-string)
-* [right](#rightstring_expr-string-length_expr-int64)
+* [right (now a native function)](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#right)
 * [zeroifnull](#zeroifnullexpr-any-type)
 
 ## Documentation
-
-### [ascii(string_expr STRING)](ascii.sqlx)
-Returns the decimal representation of the first character in the `string_expr`. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/qSvGNudIWmkd0nY_HkZ8~w)
-```sql
-SELECT bqutil.td.ascii('y')
-
-121
-```
-
-
-### [chr(int_expr INT64)](chr.sqlx)
-Returns the Latin ASCII character of `int_expr`. [Teradata docs](https://docs.teradata.com/reader/756LNiPSFdY~4JcCCcR5Cw/FUQ2~FCYkt6QoamvY1G4Cg)
-```sql
-SELECT bqutil.td.chr(66)
-  , bqutil.td.chr(255)
-  , bqutil.td.chr(511)
-
-'B', 'ÿ', 'ÿ'
-```
-
 
 ### Decode function
 Decode function compares expression `expr` with search parameters (`s1`,`s2`,...,`sN`) and returns n-th match from result parameters (`r1`,`r2`,...,`rN`).
@@ -107,42 +87,6 @@ SELECT bqutil.td.index('BigQuery', 'Query')
 ```
 
 
-### [initcap(str_expr STRING)](initcap.sqlx)
-Returns the string with the first character in each word in uppercase and all other characters in lowercase. Words are delimited by white space or characters that are not alphanumeric. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/UEPvXHHzWqddlheTJxjyEQ)
-```sql
-SELECT bqutil.td.initcap('aaa bbb ccc ddd')
-
-'Aaa Bbb Ccc Ddd'
-```
-
-
-### [instr(haystack STRING, needle STRING, position INT64, occurrence INT64)](instr.sqlx)
-Returns the position of the needle in the haystack argument. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/rrqCW37EQIIs_DS6JLvMbg)
-```sql
-SELECT bqutil.td.instr("Hello world!", "world", 0, 1)
-
-6
-```
-
-
-### [last_day(date_expr DATE)](last_day.sqlx)
-Returns the date of the last day in the month of the `date_expr`. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/UYSHIofb6DaOFRBng8e3mQ)
-```sql
-SELECT bqutil.td.last_day('2019-07-05')
-
-2019-07-31
-```
-
-
-### [left(string_expr STRING, length_expr INT64)](left.sqlx)
-Returns the leftmost number of characters in `string_expr` specified by the `length_expr` parameter. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/Ef3DAn9emz~W57YSCkoEOQ)
-```sql
-SELECT bqutil.td.left('Test String', 6)
-
-'Test S'
-```
-
-
 ### [months_between(date_expr1 DATE, date_expr2 DATE)](months_between.sqlx)
 Returns the number of months between `date_expr1` and `date_expr2`. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/ZrhSoO_oe_0dW9lkeueH1Q)
 ```sql
@@ -190,15 +134,6 @@ Returns `source_string` with every occurrence of each character in `from_string`
 SELECT bqutil.td.otranslate('Thin and Thick', 'Thk', 'Sp')
 
 'Spin and Spic'
-```
-
-
-### [right(string_expr STRING, length_expr INT64)](right.sqlx)
-Returns the rightmost number of characters in `string_expr` specified by the `length_expr` parameter. [Teradata docs](https://docs.teradata.com/reader/1DcoER_KpnGTfgPinRAFUw/4bAyNUOB6_VOuvSVrDRqDQ)
-```sql
-SELECT bqutil.td.right('Test String', 6)
-
-'String'
 ```
 
 

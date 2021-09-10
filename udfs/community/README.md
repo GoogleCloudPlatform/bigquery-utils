@@ -26,7 +26,7 @@ SELECT bqutil.fn.int(1.684)
 * [int](#intv-any-type)
 * [json_typeof](#json_typeofjson-string)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
-* [last_day](#lastdaydt-date)
+* [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
 * [levenshtein](#levenshteinsource-string-target-string-returns-int64)
 * [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
@@ -299,25 +299,6 @@ SELECT
 
 object, array, string, number, boolean, boolean, null
 ```
-
-
-### [last_day(dt DATE)](last_day.sqlx)
-
-Get the date representing the last day of the month.
-
-```sql
-SELECT bqutil.fn.last_day(DATE("1987-12-25"))
-  , bqutil.fn.last_day(DATE("1998-09-04"))
-  , bqutil.fn.last_day(DATE("2020-02-21")) -- leap year
-  , bqutil.fn.last_day(DATE("2019-02-21")) -- non-leap year
-```
-
-results:
-
-|     f0_    |     f1_    |     f2_    |     f3_    |
-|------------|------------|------------|------------|
-| 1987-12-31 | 1998-09-30 | 2020-02-29 | 2019-02-28 |
-
 
 ### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sqlx)
 Returns an integer number indicating the degree of similarity between two strings (0=identical, 1=single character difference, etc.)
