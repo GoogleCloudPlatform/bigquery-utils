@@ -1,3 +1,4 @@
+
 // Copyright 2021 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +19,12 @@ function generate_udf_test(udf_name, test_cases) {
     let expected_output_select_statements = [];
     let test_input_select_statements = [];
     test_cases.forEach((test_case) => {
-        let inputs = "";
+        let udf_positional_inputs = [];
         test_case.inputs.forEach((input, index) => {
-           inputs += `${input} AS test_input_${index},\n`;
+            udf_positional_inputs.push(`${input} AS test_input_${index}`);
         });
-        test_input_select_statements.push(`
-          SELECT ${inputs}
-        `);
-        expected_output_select_statements.push(`
-          SELECT ${test_case.expected_output} AS udf_output
-        `);
+        test_input_select_statements.push(`\n  SELECT ${udf_positional_inputs.join(', ')}`);
+        expected_output_select_statements.push(`SELECT ${test_case.expected_output} AS udf_output`);
     });
     run_dataform_test(
         test_name,
@@ -40,18 +37,15 @@ function create_dataform_test_view(test_name, udf_name, test_cases) {
     const inputs = Object.keys(test_cases[0].inputs);
     let udf_input_aliases = [];
     inputs.forEach((input, index) => {
-       udf_input_aliases.push(`test_input_${index}`);
+        udf_input_aliases.push(`test_input_${index}`);
     });
     udf_input_aliases = udf_input_aliases.join(',');
+    const udf_invocation_str = `${get_udf_project_and_dataset(udf_name)}${udf_name}(${udf_input_aliases})`;
     publish(test_name)
         .type("view")
         .query(
-            (ctx) => `
-            SELECT
-              ${get_udf_project_and_dataset(udf_name)}${udf_name}(
-                    ${udf_input_aliases}) AS udf_output
-            FROM ${ctx.resolve("test_inputs")}
-        `
+            (ctx) => `SELECT ${udf_invocation_str} AS udf_output\n` +
+                `FROM ${ctx.resolve("test_inputs")}`
         );
 }
 
@@ -64,9 +58,9 @@ function run_dataform_test(
         .dataset(test_name)
         .input(
             "test_inputs",
-            `${test_input_select_statements.join(" UNION ALL\n")}`
+            `${test_input_select_statements.join("\n  UNION ALL")}`
         )
-        .expect(`${expected_output_select_statements.join(" UNION ALL\n")}`);
+        .expect(`${expected_output_select_statements.join("\nUNION ALL\n")}`);
 }
 
 function get_udf_project_and_dataset(udf_name) {
@@ -79,11 +73,11 @@ function get_udf_project_and_dataset(udf_name) {
         // No periods in udf_name means project and dataset must be added
         // for a fully-qualified UDF invocation.
         return `\`${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}\`.`;
-    } else if (matches.length === 1){
+    } else if (matches.length === 1) {
         // Only one period in udf_name means the project must be added
         // for a fully-qualified UDF invocation.
         return `\`${dataform.projectConfig.defaultDatabase}\`.`;
-    } else if (matches.length === 2){
+    } else if (matches.length === 2) {
         // Two periods in the udf_name means the user has already provided
         // both project and dataset. No change is necessary.
         return '';
