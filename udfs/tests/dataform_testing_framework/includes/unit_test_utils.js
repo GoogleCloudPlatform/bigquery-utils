@@ -39,7 +39,7 @@ function generate_udf_test(udf_name, test_cases) {
   );
 }
 
-function create_dataform_test_view(test_name, test_udf, test_cases) {
+function create_dataform_test_view(test_name, udf_name, test_cases) {
   const keys = Object.keys(test_cases[0]);
   let udf_input_aliases = "";
   keys.forEach((key_name) => {
@@ -53,7 +53,7 @@ function create_dataform_test_view(test_name, test_udf, test_cases) {
     .query(
       (ctx) => `
             SELECT
-              ${get_udf_project_and_dataset()}.${test_udf}(
+              ${get_udf_project_and_dataset(udf_name)}${udf_name}(
                     ${udf_input_aliases}) AS udf_output
             FROM ${ctx.resolve("test_inputs")}
         `
@@ -74,10 +74,25 @@ function run_dataform_test(
     .expect(`${expected_output_select_statements.join(" UNION ALL\n")}`);
 }
 
-function get_udf_project_and_dataset() {
-  // This function returns the default BigQuery project and
-  // dataset which are specified in the dataform.json config file.
-  return `\`${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}\``;
+function get_udf_project_and_dataset(udf_name) {
+  // This function returns either a missing project_id or dataset_id
+  // from the user-provided udf_name. Any missing IDs are added using data
+  // from the dataform.json config file.
+  const regexp = /\./g; // Check for periods in udf_name
+  const matches = udf_name.matchAll(regexp)
+  if (matches.length === 0) {
+    // No periods in udf_name means project and dataset must be added
+    // for a fully-qualified UDF invocation.
+    return `\`${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}\`.`;
+  } else if (matches.length === 1){
+    // Only one period in udf_name means the project must be added
+    // for a fully-qualified UDF invocation.
+    return `\`${dataform.projectConfig.defaultDatabase}\`.`;
+  } else if (matches.length === 2){
+    // Two periods in the udf_name means the user has already provided
+    // both project and dataset. No change is necessary.
+    return '';
+  }
 }
 
 // Source: https://stackoverflow.com/a/2117523
