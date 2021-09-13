@@ -329,7 +329,7 @@ generate_udf_test("url_parse", [
             `CAST("rpc://facebook.com/" AS STRING)`,
             `CAST("PATH" AS STRING)`
         ],
-        expected_output: `(NULL) # NULL is a type in YAML so wrap it in parenthesis`
+        expected_output: `NULL`
     },
     {
         inputs: [
@@ -343,7 +343,7 @@ generate_udf_test("url_parse", [
             `CAST("rpc://facebook.com/" AS STRING)`,
             `CAST("QUERY" AS STRING)`
         ],
-        expected_output: `(NULL) # NULL is a type in YAML so wrap it in parenthesis`
+        expected_output: `NULL`
     },
     {
         inputs: [
@@ -364,7 +364,7 @@ generate_udf_test("url_parse", [
             `CAST("rpc://facebook.com/" AS STRING)`,
             `CAST("REF" AS STRING)`
         ],
-        expected_output: `(NULL) # NULL is a type in YAML so wrap it in parenthesis`
+        expected_output: `NULL`
     },
     {
         inputs: [
@@ -392,7 +392,7 @@ generate_udf_test("url_parse", [
             `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
             `CAST("PROTOCOL" AS STRING)`
         ],
-        expected_output: `(NULL) # NULL is a type in YAML so wrap it in parenthesis`
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("percentage_change", [
@@ -598,7 +598,7 @@ generate_udf_test("ts_tumble", [
             `CAST("2020-01-01 00:17:30" AS TIMESTAMP)`,
             `CAST(0 AS INT64)`
         ],
-        expected_output: `(NULL)`
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("ts_gen_keyed_timestamps", [
@@ -625,7 +625,7 @@ generate_udf_test("ts_session_group", [
     {
         inputs: [
             `CAST("2020-01-01 01:04:59 UTC" AS TIMESTAMP)`,
-            `(NULL)`,
+            `NULL`,
             `300`
         ],
         expected_output: `CAST("2020-01-01 01:04:59 UTC" AS TIMESTAMP)`
@@ -636,7 +636,7 @@ generate_udf_test("ts_session_group", [
             `CAST("2020-01-01 01:04:59 UTC" AS TIMESTAMP)`,
             `300`
         ],
-        expected_output: `(NULL)`
+        expected_output: `NULL`
     },
     {
         inputs: [
@@ -796,8 +796,8 @@ generate_udf_test("to_binary", [
         expected_output: `CAST("0000000000000000000000000000000000000000000000011110001001000000" AS STRING)`
     },
     {
-        inputs: [`(NULL)`],
-        expected_output: `(NULL)`
+        inputs: [`NULL`],
+        expected_output: `NULL`
     }
 ]);
 generate_udf_test("from_binary", [
@@ -806,8 +806,8 @@ generate_udf_test("from_binary", [
         expected_output: `CAST(123456 AS INT64)`
     },
     {
-        inputs: [`(NULL)`],
-        expected_output: `(NULL)`
+        inputs: [`NULL`],
+        expected_output: `NULL`
     }
 ]);
 generate_udf_test("to_hex", [
@@ -816,8 +816,8 @@ generate_udf_test("to_hex", [
         expected_output: `CAST("000000000001e240" AS STRING)`
     },
     {
-        inputs: [`(NULL)`],
-        expected_output: `(NULL)`
+        inputs: [`NULL`],
+        expected_output: `NULL`
     }
 ]);
 generate_udf_test("from_hex", [
@@ -826,8 +826,8 @@ generate_udf_test("from_hex", [
         expected_output: `CAST(123456 AS INT64)`
     },
     {
-        inputs: [`(NULL)`],
-        expected_output: `(NULL)`
+        inputs: [`NULL`],
+        expected_output: `NULL`
     }
 ]);
 generate_udf_test("week_of_month", [
