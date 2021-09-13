@@ -268,7 +268,7 @@ main() {
 
     if [[ -n "${SHORT_SHA}" ]]; then
       printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${dataset_id}" "${SHORT_SHA}"
-      bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}"
+      bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${short_dataset_id}${SHORT_SHA}"
     fi
   done
 }
