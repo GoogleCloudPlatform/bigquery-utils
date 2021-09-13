@@ -16,89 +16,99 @@ const {generate_udf_test} = unit_test_utils;
 
 generate_udf_test("lowerb", [
     {
-        input_1: `CAST("STUDENT" AS STRING)`,
+        inputs: [`CAST("STUDENT" AS STRING)`],
         expected_output: `CAST("student" AS STRING)`
     },
     {
-        input_1: `CAST("Foo" AS STRING)`,
+        inputs: [`CAST("Foo" AS STRING)`],
         expected_output: `CAST("foo" AS STRING)`
     },
     {
-        input_1: `CAST("ÉTUDIANT" AS STRING)`,
+        inputs: [`CAST("ÉTUDIANT" AS STRING)`],
         expected_output: `CAST("Étudiant" AS STRING)`
     },
     {
-        input_1: `CAST("ETUDIANT" AS STRING)`,
+        inputs: [`CAST("ETUDIANT" AS STRING)`],
         expected_output: `CAST("etudiant" AS STRING)`
     },
     {
-        input_1: `CAST("aBCdef GH" AS STRING)`,
+        inputs: [`CAST("aBCdef GH" AS STRING)`],
         expected_output: `CAST("abcdef gh" AS STRING)`
     },
     {
-        input_1: `CAST("" AS STRING)`,
+        inputs: [`CAST("" AS STRING)`],
         expected_output: `CAST("" AS STRING)`
     },
     {
-        input_1: `NULL`,
+        inputs: [`NULL`],
         expected_output: `NULL`
     },
 ]);
 generate_udf_test("substrb", [
     {
-        input_1: `CAST("soupçon" AS STRING)`,
-        input_2: `CAST(5 AS INT64)`,
-        input_3: `CAST(2 AS INT64)`,
+        inputs: [
+            `CAST("soupçon" AS STRING)`,
+            `CAST(5 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
         expected_output: `CAST("ç" AS STRING)`
     },
     {
-        input_1: `CAST("foobar" AS STRING)`,
-        input_2: `CAST(1 AS INT64)`,
-        input_3: `CAST(2 AS INT64)`,
+        inputs: [
+            `CAST("foobar" AS STRING)`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
         expected_output: `CAST("fo" AS STRING)`
     },
     {
-        input_1: `CAST("foobar" AS STRING)`,
-        input_2: `CAST(10 AS INT64)`,
-        input_3: `CAST(2  AS INT64)`,
+        inputs: [
+            `CAST("foobar" AS STRING)`,
+            `CAST(10 AS INT64)`,
+            `CAST(2  AS INT64)`
+        ],
         expected_output: `CAST("" AS STRING)`
     },
     {
-        input_1: `NULL`,
-        input_2: `CAST(1 AS INT64)`,
-        input_3: `CAST(2 AS INT64)`,
+        inputs: [
+            `NULL`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
         expected_output: `NULL`
     },
     {
-        input_1: `CAST("" AS STRING)`,
-        input_2: `CAST(3 AS INT64)`,
-        input_3: `CAST(4 AS INT64)`,
+        inputs: [
+            `CAST("" AS STRING)`,
+            `CAST(3 AS INT64)`,
+            `CAST(4 AS INT64)`
+        ],
         expected_output: `CAST("" AS STRING)`
     },
 ]);
 generate_udf_test("upperb", [
     {
-        input_1: `CAST("étudiant" AS STRING)`,
+        inputs: [`CAST("étudiant" AS STRING)`],
         expected_output: `CAST("éTUDIANT" AS STRING)`
     },
     {
-        input_1: `CAST("etudiant" AS STRING)`,
+        inputs: [`CAST("etudiant" AS STRING)`],
         expected_output: `CAST("ETUDIANT" AS STRING)`
     },
     {
-        input_1: `CAST("foo" AS STRING)`,
+        inputs: [`CAST("foo" AS STRING)`],
         expected_output: `CAST("FOO" AS STRING)`
     },
     {
-        input_1: `CAST("aBCdef Gh" AS STRING)`,
+        inputs: [`CAST("aBCdef Gh" AS STRING)`],
         expected_output: `CAST("ABCDEF GH" AS STRING)`
     },
     {
-        input_1: `CAST("" AS STRING)`,
+        inputs: [`CAST("" AS STRING)`],
         expected_output: `CAST("" AS STRING)`
     },
     {
-        input_1: `NULL`,
+        inputs: [`NULL`],
         expected_output: `NULL`
     },
 ]);

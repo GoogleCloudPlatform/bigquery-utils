@@ -16,67 +16,79 @@ const { generate_udf_test } = unit_test_utils;
 
 generate_udf_test("nullifzero", [
     {
-        input_1: `CAST(-1 AS INT64)`,
+        inputs: [`CAST(-1 AS INT64)`],
         expected_output: `CAST(-1 AS INT64)`
     },
     {
-        input_1: `CAST(1 AS INT64)`,
+        inputs: [`CAST(1 AS INT64)`],
         expected_output: `CAST(1 AS INT64)`
     },
     {
-        input_1: `CAST(0 AS INT64)`,
+        inputs: [`CAST(0 AS INT64)`],
         expected_output: `NULL`
     }
 ]);
 generate_udf_test("nullifzero", [
     {
-        input_1: `CAST(0.0 AS FLOAT64)`,
+        inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `NULL`
     },
     {
-        input_1: `CAST(1.1 AS FLOAT64)`,
+        inputs: [`CAST(1.1 AS FLOAT64)`],
         expected_output: `CAST(1.1 AS FLOAT64)`
     },
     {
-        input_1: `NULL`,
+        inputs: [`NULL`],
         expected_output: `NULL`
     }
 ]);
 generate_udf_test("nullifzero", [
     {
-        input_1: `CAST(0 AS STRING)`,
+        inputs: [`CAST(0 AS STRING)`],
         expected_output: `NULL`
     },
 ]);
 generate_udf_test("nvl", [
     {
-        input_1: `CAST(-1 AS INT64)`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `CAST(-1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(-1 AS INT64)`
     },
     {
-        input_1: `CAST(0 AS INT64)`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `CAST(0 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(0 AS INT64)`
     },
     {
-        input_1: `NULL`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `NULL`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(1 AS INT64)`
     },
     {
-        input_1: `CAST(2 AS INT64)`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `CAST(2 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(2 AS INT64)`
     },
     {
-        input_1: `CAST(3 AS INT64)`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `CAST(3 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(3 AS INT64)`
     },
     {
-        input_1: `CAST(4 AS INT64)`,
-        input_2: `CAST(1 AS INT64)`,
+        inputs: [
+            `CAST(4 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
         expected_output: `CAST(4 AS INT64)`
     }
 ]);

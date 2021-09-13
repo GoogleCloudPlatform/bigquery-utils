@@ -16,19 +16,19 @@ const {generate_udf_test} = unit_test_utils;
 
 generate_udf_test("factorial", [
     {
-        input_1: `CAST(0 AS INT64)`,
+        inputs: [`CAST(0 AS INT64)`],
         expected_output: `CAST(1.0 AS NUMERIC)`
     },
     {
-        input_1: `CAST(1 AS INT64)`,
+        inputs: [`CAST(1 AS INT64)`],
         expected_output: `CAST(1.0 AS NUMERIC)`
     },
     {
-        input_1: `CAST(5 AS INT64)`,
+        inputs: [`CAST(5 AS INT64)`],
         expected_output: `CAST(120.0 AS NUMERIC)`
     },
     {
-        input_1: `CAST(10 AS INT64)`,
+        inputs: [`CAST(10 AS INT64)`],
         expected_output: `CAST(3628800.0 AS NUMERIC)`
     }
 ]);

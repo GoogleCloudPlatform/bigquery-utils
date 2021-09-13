@@ -18,12 +18,9 @@ function generate_udf_test(udf_name, test_cases) {
   let expected_output_select_statements = [];
   let test_input_select_statements = [];
   test_cases.forEach((test_case) => {
-    const keys = Object.keys(test_case);
     let inputs = "";
-    keys.forEach((key_name) => {
-      if (key_name.startsWith("input")) {
-        inputs += `${test_case[key_name]} AS test_${key_name},\n`;
-      }
+    test_case.inputs.forEach((input, index) => {
+      inputs += `${input} AS test_input_${index},\n`;
     });
     test_input_select_statements.push(`
           SELECT ${inputs}
@@ -33,45 +30,43 @@ function generate_udf_test(udf_name, test_cases) {
         `);
   });
   run_dataform_test(
-    test_name,
-    test_input_select_statements,
-    expected_output_select_statements
+      test_name,
+      test_input_select_statements,
+      expected_output_select_statements
   );
 }
 
 function create_dataform_test_view(test_name, udf_name, test_cases) {
-  const keys = Object.keys(test_cases[0]);
-  let udf_input_aliases = "";
-  keys.forEach((key_name) => {
-    if (key_name.startsWith("input")) {
-      udf_input_aliases += `test_${key_name},`;
-    }
+  const inputs = Object.keys(test_cases[0].inputs);
+  let udf_input_aliases = [];
+  inputs.forEach((input, index) => {
+    udf_input_aliases.push(`test_input_${index}`);
   });
-  udf_input_aliases = udf_input_aliases.slice(0, udf_input_aliases.length - 1);
+  udf_input_aliases = udf_input_aliases.join(',');
   publish(test_name)
-    .type("view")
-    .query(
-      (ctx) => `
+      .type("view")
+      .query(
+          (ctx) => `
             SELECT
               ${get_udf_project_and_dataset(udf_name)}${udf_name}(
                     ${udf_input_aliases}) AS udf_output
             FROM ${ctx.resolve("test_inputs")}
         `
-    );
+      );
 }
 
 function run_dataform_test(
-  test_name,
-  test_input_select_statements,
-  expected_output_select_statements
+    test_name,
+    test_input_select_statements,
+    expected_output_select_statements
 ) {
   test(test_name)
-    .dataset(test_name)
-    .input(
-      "test_inputs",
-      `${test_input_select_statements.join(" UNION ALL\n")}`
-    )
-    .expect(`${expected_output_select_statements.join(" UNION ALL\n")}`);
+      .dataset(test_name)
+      .input(
+          "test_inputs",
+          `${test_input_select_statements.join(" UNION ALL\n")}`
+      )
+      .expect(`${expected_output_select_statements.join(" UNION ALL\n")}`);
 }
 
 function get_udf_project_and_dataset(udf_name) {
@@ -99,7 +94,7 @@ function get_udf_project_and_dataset(udf_name) {
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+        v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
