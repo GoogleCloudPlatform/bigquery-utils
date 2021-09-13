@@ -79,7 +79,7 @@ function get_udf_project_and_dataset(udf_name) {
   // from the user-provided udf_name. Any missing IDs are added using data
   // from the dataform.json config file.
   const regexp = /\./g; // Check for periods in udf_name
-  const matches = udf_name.matchAll(regexp)
+  const matches = [...udf_name.matchAll(regexp)];
   if (matches.length === 0) {
     // No periods in udf_name means project and dataset must be added
     // for a fully-qualified UDF invocation.
