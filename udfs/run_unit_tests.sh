@@ -16,7 +16,7 @@
 
 
 if [[ -n "${JS_BUCKET}" ]]; then
-  gcloud builds submit . --substitutions SHORT_SHA=_test_env,_JS_BUCKET="${JS_BUCKET}"
+  gcloud builds submit . --substitutions _BQ_LOCATION="${BQ_LOCATION}",SHORT_SHA=_test_env,_JS_BUCKET="${JS_BUCKET}"
 else
   printf "Set env variable JS_BUCKET to your own GCS bucket where Javascript libraries can be deployed.\n"
   printf "For example, run the following to set JS_BUCKET:\n export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/LIBS\n"

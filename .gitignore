@@ -28,3 +28,8 @@ hs_err_pid*
 .vscode
 .idea/
 target/
+
+# Dataform files
+.df-credentials.json
+node_modules/
+package-lock.json

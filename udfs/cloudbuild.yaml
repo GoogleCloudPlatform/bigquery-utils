@@ -75,6 +75,7 @@ steps:
     - deploy_and_run_tests.sh
   env:
     - PROJECT_ID=${PROJECT_ID}
+    - BQ_LOCATION=${_BQ_LOCATION}
     - SHORT_SHA=${SHORT_SHA}
     - JS_BUCKET=${_JS_BUCKET}
 

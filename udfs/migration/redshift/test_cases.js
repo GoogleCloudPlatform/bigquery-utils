@@ -82,8 +82,7 @@ generate_udf_test("split_part", [
             `CAST(2 AS INT64)`
         ],
         expected_output: `CAST("02" AS STRING)`
-    }
-    ,
+    },
     {
         inputs: [
             `CAST("2020-02-01" AS STRING)`,
@@ -91,8 +90,7 @@ generate_udf_test("split_part", [
             `CAST(3 AS INT64)`
         ],
         expected_output: `CAST("01" AS STRING)`
-    }
-    ,
+    },
     {
         inputs: [
             `CAST("2020-02-01" AS STRING)`,
@@ -101,5 +99,4 @@ generate_udf_test("split_part", [
         ],
         expected_output: `CAST("" AS STRING)`
     }
-])
-;
+]);

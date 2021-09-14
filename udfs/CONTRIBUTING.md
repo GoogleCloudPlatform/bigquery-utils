@@ -9,9 +9,7 @@ The following is a set of guidelines for contributing a UDF to this repository.
 
 ### Add your UDF
 
-1. Add your UDFs (**one** UDF per file) and a
-   [Contributor License Agreement](#contributor-license-agreement) to the
-   appropriate directory.
+1. Add your UDFs (**one** UDF per file) to the appropriate directory.
     * If your function replicates logic from some other data warehouse UDF,
       place it in the relevant sub-directory in the
       [migration](/udfs/migration) directory. Otherwise, place it in the
@@ -65,9 +63,10 @@ that your UDFs behave as expected.
    gcloud init
    ```
 
-1. Grant your Cloud Build service account the BigQuery Job User role
+1. Enable the Cloud Build API and grant the default Cloud Build service account
+   the BigQuery Job User role
    ```bash
-   
+   gcloud services enable cloudbuild.googleapis.com && \
    gcloud projects add-iam-policy-binding \
      $(gcloud config get-value project) \
      --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \

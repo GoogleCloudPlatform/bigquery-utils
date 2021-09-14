@@ -37,7 +37,7 @@ replace_js_udf_bucket_placeholder() {
     else
       printf "No SQLX files found in %s\n" "${udf_dir}"
     fi
-  done <<<"$(find "${udf_dir}" -type f -name "*.sqlx")"
+  done <<< "$(find "${udf_dir}" -type f -name "*.sqlx")"
 }
 
 #######################################
@@ -151,12 +151,18 @@ deploy_udfs() {
 }
 
 #######################################
-# description
+# Execute all unit tests provided in a test_cases.js file.
+# The following steps are taken:
+#   - test_cases.js file is copied from the specified udfs_source_dir into udfs_target_dir
+#   - Dataform config/creds files (dataform.json and .df-credentials.json) are created
+#   - Symbolic links to Dataform dependencies are created
+#   - "dataform test" command is executed to test all UDFs
+#   - Any error in testing will terminate with the deletion of the BigQuery testing dataset
 # Arguments:
-#   1
-#   2
-#   3
-#   4
+#   project_id - BQ project in which UDFs to be unit tested exist
+#   dataset_id - BQ dataset in which UDFs to be unit tested exist
+#   udfs_source_dir - Directory which holds the test_cases.js file to be run
+#   udfs_target_dir - Temp directory in which test_cases.js will be copied and then run
 #######################################
 test_udfs() {
   local project_id=$1
@@ -194,13 +200,14 @@ test_udfs() {
 #  None
 #######################################
 main() {
-  # For now, this build script assumes all BigQuery environments
-  # live in the same location which you specify below.
-  export BQ_LOCATION=US
 
   if [[ -z "${PROJECT_ID}" ]]; then
     printf "You must set environment variable PROJECT_ID.\n"
     exit 1
+  elif [[ -z "${JS_BUCKET}" ]]; then
+    printf "No value set for environment variable BQ_LOCATION.\n"
+    export BQ_LOCATION=US
+    printf "Defaulting BQ_LOCATION to %s\n" ${BQ_LOCATION}
   elif [[ -z "${JS_BUCKET}" ]]; then
     printf "No value set for environment variable JS_BUCKET.\n"
     export JS_BUCKET=gs://bqutil-lib/bq_js_libs # bucket used by bqutil project

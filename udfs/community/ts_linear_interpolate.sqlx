@@ -16,7 +16,7 @@ config { hasOutput: true }
  */
 
 /*
-* wrap ${dataform.projectConfig.vars.community_dataset_name}.linear_interpolate to handle time series interpolation
+* wrap fn.linear_interpolate to handle time series interpolation
 * 
 * Example usage: use value if exists, otherwise attempt linear interpolation, else fill with zero
 * 
@@ -32,7 +32,7 @@ config { hasOutput: true }
 * SELECT 
 *   *,
 *   COALESCE(coord.y,
-*     ts_lin_interpolate(
+*     bqutil.fn.ts_linear_interpolate(
 *       ts,
 *       LAST_VALUE(coord IGNORE NULLS)
 *         OVER (PARTITION BY key
