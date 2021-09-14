@@ -16,87 +16,87 @@ const {generate_udf_test} = unit_test_utils;
 
 generate_udf_test("initcap", [
     {
-        inputs: [`CAST('hello world' AS STRING)`],
-        expected_output: `CAST('Hello World' AS STRING)`
+        inputs: [`'hello world'`],
+        expected_output: `'Hello World'`
     },
     {
-        inputs: [`CAST('ALL CAPS' AS STRING)`],
-        expected_output: `CAST('All Caps' AS STRING)`
+        inputs: [`'ALL CAPS'`],
+        expected_output: `'All Caps'`
     },
     {
-        inputs: [`CAST("does comma's behavior affect anything?" AS STRING)`],
-        expected_output: `CAST("Does Comma'S Behavior Affect Anything?" AS STRING)`
+        inputs: [`"does comma's behavior affect anything?"`],
+        expected_output: `"Does Comma'S Behavior Affect Anything?"`
     },
     {
-        inputs: [`CAST('All non-musical theatre' AS STRING)`],
-        expected_output: `CAST('All Non-Musical Theatre' AS STRING)`
+        inputs: [`'All non-musical theatre'`],
+        expected_output: `'All Non-Musical Theatre'`
     },
     {
-        inputs: [`CAST('All symphony, concerto, and choir concerts' AS STRING)`],
-        expected_output: `CAST('All Symphony, Concerto, And Choir Concerts' AS STRING)`
+        inputs: [`'All symphony, concerto, and choir concerts'`],
+        expected_output: `'All Symphony, Concerto, And Choir Concerts'`
     },
     {
-        inputs: [`CAST("À vaillant coeur rien d’impossible" AS STRING)`],
-        expected_output: `CAST("À Vaillant Coeur Rien D’Impossible" AS STRING)`
+        inputs: [`"À vaillant coeur rien d’impossible"`],
+        expected_output: `"À Vaillant Coeur Rien D’Impossible"`
     },
     {
-        inputs: [`CAST('640 k!ouGht tO BE enough~for_anyONE' AS STRING)`],
-        expected_output: `CAST('640 K!Ought To Be Enough~For_Anyone' AS STRING)`
+        inputs: [`'640 k!ouGht tO BE enough~for_anyONE'`],
+        expected_output: `'640 K!Ought To Be Enough~For_Anyone'`
     },
     {
-        inputs: [`CAST('Simplicity & élÉgance are unpopular because they require hard-work&discipline' AS STRING)`],
-        expected_output: `CAST('Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline' AS STRING)`
+        inputs: [`'Simplicity & élÉgance are unpopular because they require hard-work&discipline'`],
+        expected_output: `'Simplicity & Élégance Are Unpopular Because They Require Hard-Work&Discipline'`
     },
     {
-        inputs: [`CAST("one+one is   '(two-one)*[two]'" AS STRING)`],
-        expected_output: `CAST("One+One Is   '(Two-One)*[Two]'" AS STRING)`
+        inputs: [`"one+one is   '(two-one)*[two]'"`],
+        expected_output: `"One+One Is   '(Two-One)*[Two]'"`
     },
     {
-        inputs: [`CAST('<lorem>ipsum@GMAIL.COM' AS STRING)`],
-        expected_output: `CAST('<Lorem>Ipsum@Gmail.Com' AS STRING)`
+        inputs: [`'<lorem>ipsum@GMAIL.COM'`],
+        expected_output: `'<Lorem>Ipsum@Gmail.Com'`
     }
 ]);
 generate_udf_test("translate", [
     {
         inputs: [
-            `CAST('Etiam.laoreet.libero@sodalesMaurisblandit.edu' AS STRING)`,
-            `CAST('@' AS STRING)`,
-            `CAST('.' AS STRING)`
+            `'Etiam.laoreet.libero@sodalesMaurisblandit.edu'`,
+            `'@'`,
+            `'.'`
         ],
-        expected_output: `CAST('Etiam.laoreet.libero.sodalesMaurisblandit.edu' AS STRING)`
+        expected_output: `'Etiam.laoreet.libero.sodalesMaurisblandit.edu'`
     }
 ]);
 generate_udf_test("split_part", [
     {
         inputs: [
-            `CAST("2020-02-01" AS STRING)`,
-            `CAST("-" AS STRING)`,
+            `"2020-02-01"`,
+            `"-"`,
             `CAST(1 AS INT64)`
         ],
-        expected_output: `CAST("2020" AS STRING)`
+        expected_output: `"2020"`
     },
     {
         inputs: [
-            `CAST("2020-02-01" AS STRING)`,
-            `CAST("-" AS STRING)`,
+            `"2020-02-01"`,
+            `"-"`,
             `CAST(2 AS INT64)`
         ],
-        expected_output: `CAST("02" AS STRING)`
+        expected_output: `"02"`
     },
     {
         inputs: [
-            `CAST("2020-02-01" AS STRING)`,
-            `CAST("-" AS STRING)`,
+            `"2020-02-01"`,
+            `"-"`,
             `CAST(3 AS INT64)`
         ],
-        expected_output: `CAST("01" AS STRING)`
+        expected_output: `"01"`
     },
     {
         inputs: [
-            `CAST("2020-02-01" AS STRING)`,
-            `CAST("-" AS STRING)`,
+            `"2020-02-01"`,
+            `"-"`,
             `CAST(5 AS INT64)`
         ],
-        expected_output: `CAST("" AS STRING)`
+        expected_output: `""`
     }
 ]);

@@ -16,7 +16,7 @@ const {generate_udf_test} = unit_test_utils;
 
 generate_udf_test("int", [
     {
-        inputs: [`CAST(-1 AS STRING)`],
+        inputs: [`"-1"`],
         expected_output: `CAST(-1 AS INT64)`
     },
 ]);
@@ -43,11 +43,11 @@ generate_udf_test("int", [
 generate_udf_test("json_typeof", [
     {
         inputs: [`'""'`],
-        expected_output: `CAST("string" AS STRING)`
+        expected_output: `"string"`
     },
     {
         inputs: [`'"test"'`],
-        expected_output: `CAST("string" AS STRING)`
+        expected_output: `"string"`
     },
     {
         inputs: [`"true"`],
@@ -291,106 +291,106 @@ generate_udf_test("typeof", [
 generate_udf_test("url_parse", [
     {
         inputs: [
-            `CAST("http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("HOST" AS STRING)`
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"HOST"`
         ],
-        expected_output: `CAST("facebook.com" AS STRING)`
+        expected_output: `"facebook.com"`
     },
     {
         inputs: [
-            `CAST("rpc://facebook.com/" AS STRING)`,
-            `CAST("HOST" AS STRING)`
+            `"rpc://facebook.com/"`,
+            `"HOST"`
         ],
-        expected_output: `CAST("facebook.com" AS STRING)`
+        expected_output: `"facebook.com"`
     },
     {
         inputs: [
-            `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("HOST" AS STRING)`
+            `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"HOST"`
         ],
-        expected_output: `CAST("subdomain.facebook.com" AS STRING)`
+        expected_output: `"subdomain.facebook.com"`
     },
     {
         inputs: [
-            `CAST("http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("PATH" AS STRING)`
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"PATH"`
         ],
-        expected_output: `CAST("path1/p.php" AS STRING)`
+        expected_output: `"path1/p.php"`
     },
     {
         inputs: [
-            `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("PATH" AS STRING)`
+            `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"PATH"`
         ],
-        expected_output: `CAST("path1/p.php" AS STRING)`
+        expected_output: `"path1/p.php"`
     },
     {
         inputs: [
-            `CAST("rpc://facebook.com/" AS STRING)`,
-            `CAST("PATH" AS STRING)`
-        ],
-        expected_output: `NULL`
-    },
-    {
-        inputs: [
-            `CAST("http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("QUERY" AS STRING)`
-        ],
-        expected_output: `CAST("k1=v1&k2=v2#Ref1" AS STRING)`
-    },
-    {
-        inputs: [
-            `CAST("rpc://facebook.com/" AS STRING)`,
-            `CAST("QUERY" AS STRING)`
+            `"rpc://facebook.com/"`,
+            `"PATH"`
         ],
         expected_output: `NULL`
     },
     {
         inputs: [
-            `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("QUERY" AS STRING)`
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"QUERY"`
         ],
-        expected_output: `CAST("k1=v1&k2=v2#Ref1" AS STRING)`
+        expected_output: `"k1=v1&k2=v2#Ref1"`
     },
     {
         inputs: [
-            `CAST("http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("REF" AS STRING)`
-        ],
-        expected_output: `CAST("Ref1" AS STRING)`
-    },
-    {
-        inputs: [
-            `CAST("rpc://facebook.com/" AS STRING)`,
-            `CAST("REF" AS STRING)`
+            `"rpc://facebook.com/"`,
+            `"QUERY"`
         ],
         expected_output: `NULL`
     },
     {
         inputs: [
-            `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("REF" AS STRING)`
+            `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"QUERY"`
         ],
-        expected_output: `CAST("Ref1" AS STRING)`
+        expected_output: `"k1=v1&k2=v2#Ref1"`
     },
     {
         inputs: [
-            `CAST("http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("PROTOCOL" AS STRING)`
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"REF"`
         ],
-        expected_output: `CAST("http" AS STRING)`
+        expected_output: `"Ref1"`
     },
     {
         inputs: [
-            `CAST("rpc://facebook.com/" AS STRING)`,
-            `CAST("PROTOCOL" AS STRING)`
+            `"rpc://facebook.com/"`,
+            `"REF"`
         ],
-        expected_output: `CAST("rpc" AS STRING)`
+        expected_output: `NULL`
     },
     {
         inputs: [
-            `CAST("subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1" AS STRING)`,
-            `CAST("PROTOCOL" AS STRING)`
+            `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"REF"`
+        ],
+        expected_output: `"Ref1"`
+    },
+    {
+        inputs: [
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"PROTOCOL"`
+        ],
+        expected_output: `"http"`
+    },
+    {
+        inputs: [
+            `"rpc://facebook.com/"`,
+            `"PROTOCOL"`
+        ],
+        expected_output: `"rpc"`
+    },
+    {
+        inputs: [
+            `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"PROTOCOL"`
         ],
         expected_output: `NULL`
     },
@@ -609,7 +609,7 @@ generate_udf_test("ts_gen_keyed_timestamps", [
             `CAST("2020-01-01 00:30:00" AS TIMESTAMP)`,
             `CAST("2020-01-01 00:31:00" AS TIMESTAMP)`
         ],
-        expected_output: `([STRUCT(CAST("abc" AS STRING) AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val), STRUCT(CAST("abc" AS STRING) AS series_key, CAST("2020-01-01 00:31:00" AS TIMESTAMP) AS tumble_val)])`
+        expected_output: `([STRUCT("abc" AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val), STRUCT("abc" AS series_key, CAST("2020-01-01 00:31:00" AS TIMESTAMP) AS tumble_val)])`
     },
     {
         inputs: [
@@ -618,7 +618,7 @@ generate_udf_test("ts_gen_keyed_timestamps", [
             `CAST("2020-01-01 00:30:00" AS TIMESTAMP)`,
             `CAST("2020-01-01 00:30:30" AS TIMESTAMP)`
         ],
-        expected_output: `([STRUCT(CAST("abc" AS STRING) AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val), STRUCT(CAST("def" AS STRING) AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val)])`
+        expected_output: `([STRUCT("abc" AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val), STRUCT("def" AS series_key, CAST("2020-01-01 00:30:00" AS TIMESTAMP) AS tumble_val)])`
     },
 ]);
 generate_udf_test("ts_session_group", [
@@ -683,93 +683,93 @@ generate_udf_test("ts_slide", [
 ]);
 generate_udf_test("nlp_compromise_number", [
     {
-        inputs: [`CAST("one hundred fifty seven" AS STRING)`],
+        inputs: [`"one hundred fifty seven"`],
         expected_output: `CAST(157 AS NUMERIC)`
     },
     {
-        inputs: [`CAST("three point 5" AS STRING)`],
+        inputs: [`"three point 5"`],
         expected_output: `CAST(3.5 AS NUMERIC)`
     },
     {
-        inputs: [`CAST("2 hundred" AS STRING)`],
+        inputs: [`"2 hundred"`],
         expected_output: `CAST(200 AS NUMERIC)`
     },
     {
-        inputs: [`CAST("minus 8" AS STRING)`],
+        inputs: [`"minus 8"`],
         expected_output: `CAST(-8 AS NUMERIC)`
     },
     {
-        inputs: [`CAST("5 million 3 hundred 25 point zero 1" AS STRING)`],
+        inputs: [`"5 million 3 hundred 25 point zero 1"`],
         expected_output: `CAST(5000325.01 AS NUMERIC)`
     },
 ]);
 generate_udf_test("nlp_compromise_people", [
     // Below tests taken from https://github.com/spencermountain/compromise/blob/master/tests/people.test.js,
     {
-        inputs: [`CAST("Mary is in the boat. Nancy is in the boat. Fred is in the boat. Jack is too." AS STRING)`],
+        inputs: [`"Mary is in the boat. Nancy is in the boat. Fred is in the boat. Jack is too."`],
         expected_output: `CAST(["mary", "nancy", "fred", "jack"] AS ARRAY<STRING>)`
     },
     {
-        inputs: [`CAST("jean jacket. jean Slkje" AS STRING)`],
+        inputs: [`"jean jacket. jean Slkje"`],
         expected_output: `CAST(["jean slkje"] AS ARRAY<STRING>)`
     },
     {
-        inputs: [`CAST("The Bill was passed by James MacCarthur" AS STRING)`],
+        inputs: [`"The Bill was passed by James MacCarthur"`],
         expected_output: `CAST(["james maccarthur"] AS ARRAY<STRING>)`
     },
     {
-        inputs: [`CAST("Rod MacDonald bought a Rod" AS STRING)`],
+        inputs: [`"Rod MacDonald bought a Rod"`],
         expected_output: `CAST(["rod macdonald"] AS ARRAY<STRING>)`
     },
     {
-        inputs: [`CAST("Matt 'the doctor' Smith lasted three seasons." AS STRING)`],
+        inputs: [`"Matt 'the doctor' Smith lasted three seasons."`],
         expected_output: `CAST(["matt the doctor smith"] AS ARRAY<STRING>)`
     },
     {
-        inputs: [`CAST("Randal Kieth Orton and Dwayne 'the rock' Johnson had a really funny fight." AS STRING)`],
+        inputs: [`"Randal Kieth Orton and Dwayne 'the rock' Johnson had a really funny fight."`],
         expected_output: `CAST(["randal kieth orton", "dwayne the rock johnson"] AS ARRAY<STRING>)`
     },
 ]);
 generate_udf_test("levenshtein", [
     {
         inputs: [
-            `CAST("analyze" AS STRING)`,
-            `CAST("analyse" AS STRING)`
+            `"analyze"`,
+            `"analyse"`
         ],
         expected_output: `CAST(1 AS INT64)`
     },
     {
         inputs: [
-            `CAST("opossum" AS STRING)`,
-            `CAST("possum" AS STRING)`
+            `"opossum"`,
+            `"possum"`
         ],
         expected_output: `CAST(1 AS INT64)`
     },
     {
         inputs: [
-            `CAST("potatoe" AS STRING)`,
-            `CAST("potatoe" AS STRING)`
+            `"potatoe"`,
+            `"potatoe"`
         ],
         expected_output: `CAST(0 AS INT64)`
     },
     {
         inputs: [
-            `CAST("while" AS STRING)`,
-            `CAST("whilst" AS STRING)`
+            `"while"`,
+            `"whilst"`
         ],
         expected_output: `CAST(2 AS INT64)`
     },
     {
         inputs: [
-            `CAST("aluminum" AS STRING)`,
-            `CAST("alumininium" AS STRING)`
+            `"aluminum"`,
+            `"alumininium"`
         ],
         expected_output: `CAST(3 AS INT64)`
     },
     {
         inputs: [
-            `CAST("Connecticut" AS STRING)`,
-            `CAST("CT" AS STRING)`
+            `"Connecticut"`,
+            `"CT"`
         ],
         expected_output: `CAST(10 AS INT64)`
     },
@@ -793,7 +793,7 @@ generate_udf_test("getbit", [
 generate_udf_test("to_binary", [
     {
         inputs: [`CAST(123456 AS INT64)`],
-        expected_output: `CAST("0000000000000000000000000000000000000000000000011110001001000000" AS STRING)`
+        expected_output: `"0000000000000000000000000000000000000000000000011110001001000000"`
     },
     {
         inputs: [`NULL`],
@@ -802,7 +802,7 @@ generate_udf_test("to_binary", [
 ]);
 generate_udf_test("from_binary", [
     {
-        inputs: [`CAST("0000000000000000000000000000000000000000000000011110001001000000" AS STRING)`],
+        inputs: [`"0000000000000000000000000000000000000000000000011110001001000000"`],
         expected_output: `CAST(123456 AS INT64)`
     },
     {
@@ -813,7 +813,7 @@ generate_udf_test("from_binary", [
 generate_udf_test("to_hex", [
     {
         inputs: [`CAST(123456 AS INT64)`],
-        expected_output: `CAST("000000000001e240" AS STRING)`
+        expected_output: `"000000000001e240"`
     },
     {
         inputs: [`NULL`],
@@ -822,7 +822,7 @@ generate_udf_test("to_hex", [
 ]);
 generate_udf_test("from_hex", [
     {
-        inputs: [`CAST("000000000001e240" AS STRING)`],
+        inputs: [`"000000000001e240"`],
         expected_output: `CAST(123456 AS INT64)`
     },
     {

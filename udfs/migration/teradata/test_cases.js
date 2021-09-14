@@ -44,7 +44,7 @@ generate_udf_test("nullifzero", [
 ]);
 generate_udf_test("nullifzero", [
     {
-        inputs: [`CAST(0 AS STRING)`],
+        inputs: [`"0"`],
         expected_output: `NULL`
     },
 ]);
