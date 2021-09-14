@@ -282,7 +282,7 @@ main() {
     printf "Finished cleaning temp directories %s and %s\n" "${dataset_id}"_deploy "${dataset_id}"_test
 
     if [[ -n "${SHORT_SHA}" ]]; then
-      printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${dataset_id}" "${SHORT_SHA}"
+      printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${short_dataset_id}${SHORT_SHA}" "${SHORT_SHA}"
       bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${short_dataset_id}${SHORT_SHA}"
     fi
   done
