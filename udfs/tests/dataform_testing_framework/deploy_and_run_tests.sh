@@ -204,7 +204,7 @@ main() {
   if [[ -z "${PROJECT_ID}" ]]; then
     printf "You must set environment variable PROJECT_ID.\n"
     exit 1
-  elif [[ -z "${JS_BUCKET}" ]]; then
+  elif [[ -z "${BQ_LOCATION}" ]]; then
     printf "No value set for environment variable BQ_LOCATION.\n"
     export BQ_LOCATION=US
     printf "Defaulting BQ_LOCATION to %s\n" ${BQ_LOCATION}
