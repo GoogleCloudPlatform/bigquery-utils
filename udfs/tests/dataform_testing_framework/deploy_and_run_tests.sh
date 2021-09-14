@@ -138,7 +138,10 @@ deploy_udfs() {
   printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
   if ! dataform run "${udfs_target_dir}"; then
     # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
-    bq --project_id "${project_id}" rm -r -f --dataset "${dataset_id}"
+    # If SHORT_SHA is not null, then we know a test dataset was used.
+    if [[ -n "${SHORT_SHA}" ]]; then
+      bq --project_id "${project_id}" rm -r -f --dataset "${dataset_id}"
+    fi
     printf "FAILURE: Encountered an error when deploying UDFs in dataset: %s\n\n" "${dataset_id}"
     exit 1
   fi
@@ -176,8 +179,11 @@ test_udfs() {
     generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
     add_symbolic_dataform_dependencies "${udfs_target_dir}"
     if ! dataform test "${udfs_target_dir}"; then
-      # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
-      bq --project_id "${project_id}" rm -r -f --dataset "${dataset_id}"
+      # If any error occurs when testing, delete BigQuery testing dataset before exiting with status code 1.
+      # If SHORT_SHA is not null, then we know a test dataset was used.
+      if [[ -n "${SHORT_SHA}" ]]; then
+        bq --project_id "${project_id}" rm -r -f --dataset "${dataset_id}"
+      fi
       rm -rf "${dataset_id}"_test
       printf "FAILURE: Encountered an error when running UDF tests for dataset: %s\n\n" "${dataset_id}"
       exit 1
