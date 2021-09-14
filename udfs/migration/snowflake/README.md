@@ -18,7 +18,7 @@ SELECT bqutil.sf.factorial(0)
 
 ## Documentation
 
-### [factorial(integer_expr INT64)](factorial.sql)
+### [factorial(integer_expr INT64)](factorial.sqlx)
 Computes the factorial of its input. The input argument must be an integer expression in the range of `0` to `27`. Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/factorial.html)
 ```sql
 SELECT bqutil.sf.factorial(10)

@@ -1,0 +1,37 @@
+config { hasOutput: true }
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
+    WITH H_raw AS(
+        WITH sums AS 
+        (
+            WITH rank_data AS 
+            (
+                SELECT d.factor AS f, d.val AS v, RANK() OVER(ORDER BY d.val) AS r
+                FROM UNNEST(data) AS d 
+            ) #rank_data
+            SELECT     
+                SUM(r) * (SUM(r) / COUNT(*)) AS sumranks, COUNT(*) AS n
+            FROM rank_data
+            GROUP BY f
+        ) # sums
+        SELECT 12.00 /(SUM(n) *(SUM(n) + 1)) * SUM(sumranks) -(3.00 *(SUM(n) + 1)) AS H, 
+                      COUNT(n) -1 AS DoF
+        FROM sums
+    ) # H_raw
+    SELECT struct(H AS H, ${ref("pvalue")}(H, DoF) AS p, DoF AS DoF) FROM H_raw
+));
