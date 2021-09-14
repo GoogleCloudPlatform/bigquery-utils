@@ -204,11 +204,13 @@ main() {
   if [[ -z "${PROJECT_ID}" ]]; then
     printf "You must set environment variable PROJECT_ID.\n"
     exit 1
-  elif [[ -z "${BQ_LOCATION}" ]]; then
+  fi
+  if [[ -z "${BQ_LOCATION}" ]]; then
     printf "No value set for environment variable BQ_LOCATION.\n"
     export BQ_LOCATION=US
     printf "Defaulting BQ_LOCATION to %s\n" ${BQ_LOCATION}
-  elif [[ -z "${JS_BUCKET}" ]]; then
+  fi
+  if [[ -z "${JS_BUCKET}" ]]; then
     printf "No value set for environment variable JS_BUCKET.\n"
     export JS_BUCKET=gs://bqutil-lib/bq_js_libs # bucket used by bqutil project
     printf "Defaulting JS_BUCKET to %s\n" ${JS_BUCKET}
