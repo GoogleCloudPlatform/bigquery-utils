@@ -53,7 +53,7 @@ def external_query(  # pylint: disable=too-many-arguments
     This hinges on a SQL query defined in GCS at _config/*.sql and
     an external table definition
     _config/{constants.BQ_EXTERNAL_TABLE_CONFIG_FILENAME} (otherwise will assume
-    CSV external table)
+    PARQUET external table)
     """
     external_table_config = read_gcs_file_if_exists(
         gcs_client,
