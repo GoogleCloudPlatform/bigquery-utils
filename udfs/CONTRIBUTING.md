@@ -71,6 +71,10 @@ that your UDFs behave as expected.
      $(gcloud config get-value project) \
      --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \
      --role=roles/bigquery.user
+   gcloud projects add-iam-policy-binding \
+     $(gcloud config get-value project) \
+     --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \
+     --role=roles/bigquery.dataEditor
    ```
 
 1. Run the UDF unit tests in Cloud Build by running the following:
