@@ -115,20 +115,20 @@ generate_dataform_config_and_creds() {
 deploy_udfs() {
   local project_id=$1
   local js_bucket=$2
-  local dataset_id=$3
-  local short_dataset_id=$4
+  local udf_dir=$3
+  local dataset_id=$4
   local udfs_source_dir=$5
   local udfs_target_dir=$6
   mkdir -p "${udfs_target_dir}"/definitions
   # Copy all UDF sources into the target dir to avoid modifying the source itself.
   # Option -L is used to copy actual files to which symlinks point.
-  cp -RL "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
+  cp -RL "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${udf_dir}"
 
   # Remove test_cases.js avoid deploying this file
-  rm -f "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js
+  rm -f "${udfs_target_dir}"/definitions/"${udf_dir}"/test_cases.js
 
-  replace_js_udf_bucket_placeholder "${udfs_target_dir}"/definitions/"${dataset_id}" "${js_bucket}"
-  generate_dataform_config_and_creds "${project_id}" "${short_dataset_id}" "${udfs_target_dir}"
+  replace_js_udf_bucket_placeholder "${udfs_target_dir}"/definitions/"${udf_dir}" "${js_bucket}"
+  generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
 
   printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
@@ -138,7 +138,7 @@ deploy_udfs() {
     if [[ -n "${SHORT_SHA}" ]]; then
       bq --project_id "${project_id}" rm -r -f --dataset "${dataset_id}"
     fi
-    printf "FAILURE: Encountered an error when deploying UDFs in dataset: %s\n\n" "${dataset_id}"
+    printf "FAILURE: Encountered an error when deploying UDFs in dataset: %s\n\n" "${udf_dir}"
     exit 1
   fi
 }
@@ -219,61 +219,61 @@ main() {
   # for all other Dataform project directories.
   dataform install >/dev/null 2>&1
 
-  local datasets
+  local udf_dirs
   # Get the list of directory names which contain UDFs
-  datasets=$(sed 's/:.*//g' <../../dir_to_dataset_map.yaml)
+  udf_dirs=$(sed 's/:.*//g' <../../dir_to_dataset_map.yaml)
 
-  for dataset_id in ${datasets}; do
+  for udf_dir in ${udf_dirs}; do
     # Get the short-hand version of the dataset_id
     # which is mapped in dir_to_dataset_map.yaml
-    local short_dataset_id
-    short_dataset_id=$(sed -rn "s/${dataset_id}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
+    local dataset_id
+    dataset_id=$(sed -rn "s/${udf_dir}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
     printf "*************** "
-    printf "Testing UDFs in BigQuery dataset: %s%s" "${short_dataset_id}" "${SHORT_SHA}"
+    printf "Testing UDFs in BigQuery dataset: %s%s" "${dataset_id}" "${SHORT_SHA}"
     printf " ***************\n"
 
     # SHORT_SHA environment variable below comes from
     # cloud build when the trigger originates from a github commit.
-    if [[ $dataset_id == 'community' ]]; then
+    if [[ $udf_dir == 'community' ]]; then
       # Deploy all UDFs in the community folder
       deploy_udfs \
         "${PROJECT_ID}" \
         "${JS_BUCKET}" \
-        "${dataset_id}" \
-        "${short_dataset_id}${SHORT_SHA}" \
-        "$(pwd)"/../../"${dataset_id}" \
-        "${dataset_id}"_deploy
+        "${udf_dir}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../"${udf_dir}" \
+        "${udf_dir}"_deploy
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${PROJECT_ID}" \
-        "${short_dataset_id}${SHORT_SHA}" \
+        "${dataset_id}${SHORT_SHA}" \
         "$(pwd)"/../../community \
-        "${dataset_id}"_test
+        "${udf_dir}"_test
     else # Deploy all UDFs in the migration folder
       deploy_udfs \
         "${PROJECT_ID}" \
         "${JS_BUCKET}" \
-        "${dataset_id}" \
-        "${short_dataset_id}${SHORT_SHA}" \
-        "$(pwd)"/../../migration/"${dataset_id}" \
-        "${dataset_id}"_deploy
+        "${udf_dir}" \
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../migration/"${udf_dir}" \
+        "${udf_dir}"_deploy
       # Run unit tests for all UDFs in migration folder
       test_udfs \
         "${PROJECT_ID}" \
-        "${short_dataset_id}${SHORT_SHA}" \
-        "$(pwd)"/../../migration/"${dataset_id}" \
-        "${dataset_id}"_test
+        "${dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../migration/"${udf_dir}" \
+        "${udf_dir}"_test
     fi
 
-    printf "Finished testing UDFs in BigQuery dataset: %s%s\n" "${short_dataset_id}" "${SHORT_SHA}"
+    printf "Finished testing UDFs in BigQuery dataset: %s%s\n" "${dataset_id}" "${SHORT_SHA}"
     # Remove testing directories to keep consecutive local runs clean
-    rm -rf "${dataset_id}"_deploy
-    rm -rf "${dataset_id}"_test
-    printf "Finished cleaning temp directories %s and %s\n" "${dataset_id}"_deploy "${dataset_id}"_test
+    rm -rf "${udf_dir}"_deploy
+    rm -rf "${udf_dir}"_test
+    printf "Finished cleaning temp directories %s and %s\n" "${udf_dir}"_deploy "${udf_dir}"_test
 
     if [[ -n "${SHORT_SHA}" ]]; then
-      printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${short_dataset_id}${SHORT_SHA}" "${SHORT_SHA}"
-      bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${short_dataset_id}${SHORT_SHA}"
+      printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${dataset_id}${SHORT_SHA}" "${SHORT_SHA}"
+      bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}${SHORT_SHA}"
     fi
   done
 }
