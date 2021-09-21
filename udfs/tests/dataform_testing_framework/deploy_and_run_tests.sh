@@ -121,19 +121,15 @@ deploy_udfs() {
   local udfs_target_dir=$6
   mkdir -p "${udfs_target_dir}"/definitions
   # Copy all UDF sources into the target dir to avoid modifying the source itself
-  cp -r "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
+  cp -rL "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
 
-  if [[ -f "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js ]]; then
-    # Temporarily rename test_cases.js to avoid deploying this file
-    mv "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js \
-      "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js.ignore
-  else
-    printf "No test_cases.js file found.\n"
-  fi
+  # Remove test_cases.js avoid deploying this file
+  rm -f "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js
 
   replace_js_udf_bucket_placeholder "${udfs_target_dir}"/definitions/"${dataset_id}" "${js_bucket}"
   generate_dataform_config_and_creds "${project_id}" "${short_dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
+  ls -la "${udfs_target_dir}"/definitions/"${dataset_id}"
 
   printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
   if ! dataform run "${udfs_target_dir}"; then
@@ -144,12 +140,6 @@ deploy_udfs() {
     fi
     printf "FAILURE: Encountered an error when deploying UDFs in dataset: %s\n\n" "${dataset_id}"
     exit 1
-  fi
-
-  if [[ -f "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js.ignore ]]; then
-    # Restore test_cases.js once UDFs are deployed
-    mv "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js.ignore \
-      "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js
   fi
 }
 
