@@ -37,7 +37,7 @@ publicly shared datasets. Queries can then reference the shared UDFs via
    ```
 
 1. Enable the Cloud Build API and grant the default Cloud Build service account
-   the BigQuery Job User role
+   the BigQuery Job User and Data Editor roles
    ```bash
    gcloud services enable cloudbuild.googleapis.com && \
    gcloud projects add-iam-policy-binding \
