@@ -82,8 +82,7 @@ BigQuery project.
 
    ```bash
    # Deploy to US
-   export BQ_LOCATION=US && \
-   ./deploy.sh
+   export BQ_LOCATION=US && bash deploy.sh
    ```
    > Note: Deploy to a different location by setting `BQ_LOCATION` to your own
    > desired value.

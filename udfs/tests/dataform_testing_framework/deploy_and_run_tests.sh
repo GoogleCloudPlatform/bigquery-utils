@@ -120,8 +120,9 @@ deploy_udfs() {
   local udfs_source_dir=$5
   local udfs_target_dir=$6
   mkdir -p "${udfs_target_dir}"/definitions
-  # Copy all UDF sources into the target dir to avoid modifying the source itself
-  cp -rL "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
+  # Copy all UDF sources into the target dir to avoid modifying the source itself.
+  # Option -L is used to copy actual files to which symlinks point.
+  cp -RL "${udfs_source_dir}"/ "${udfs_target_dir}"/definitions/"${dataset_id}"
 
   # Remove test_cases.js avoid deploying this file
   rm -f "${udfs_target_dir}"/definitions/"${dataset_id}"/test_cases.js
@@ -129,7 +130,6 @@ deploy_udfs() {
   replace_js_udf_bucket_placeholder "${udfs_target_dir}"/definitions/"${dataset_id}" "${js_bucket}"
   generate_dataform_config_and_creds "${project_id}" "${short_dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
-  ls -la "${udfs_target_dir}"/definitions/"${dataset_id}"
 
   printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
   if ! dataform run "${udfs_target_dir}"; then
