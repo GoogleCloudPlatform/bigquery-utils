@@ -52,8 +52,11 @@ publicly shared datasets. Queries can then reference the shared UDFs via
 1. Deploy the UDFs by submitting the following:
 
    ```bash
+   # Deploy to US
    gcloud builds submit . --config=deploy.yaml --substitutions _BQ_LOCATION=US
    ```
+   > Note: Deploy to a different location by setting `_BQ_LOCATION` to your own
+   > desired value.
 
 ### Deploy with your own machine
 
@@ -78,10 +81,12 @@ BigQuery project.
    UDFs:
 
    ```bash
-   export PROJECT_ID=$(gcloud config get-value project)
-   export BQ_LOCATION=US
+   # Deploy to US
+   export BQ_LOCATION=US && \
    ./deploy.sh
    ```
+   > Note: Deploy to a different location by setting `BQ_LOCATION` to your own
+   > desired value.
 
 ### Deploy with bq command-line tool or BigQuery Console
 
