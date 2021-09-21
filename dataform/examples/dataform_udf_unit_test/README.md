@@ -4,7 +4,7 @@
 
 1. Clone this repo
     1. **Automatic Clone**: Click below\
-       [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fdanieldeleo%2Fbigquery-utils.git&cloudshell_workspace=dataform/examples/dataform_udf_unit_test&cloudshell_tutorial=README.md&cloudshell_git_branch=dataform_examples) \
+       [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/editor?cloudshell_git_repo=https%3A%2F%2Fgithub.com%2Fdanieldeleo%2Fbigquery-utils.git&cloudshell_workspace=dataform/examples/dataform_udf_unit_test&cloudshell_tutorial=tutorial.md&cloudshell_git_branch=dataform_examples) \
        (clicking will automatically clone this repo in your Cloud Shell, open
        the dataform udf testing example directory, and launch a tutorial)
 
