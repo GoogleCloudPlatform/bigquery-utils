@@ -16,7 +16,7 @@ install Dataform and run the commands to get this example up and running. Follow
 
 ### 1. Install the Dataform CLI tool in the Cloud Shell terminal:
 ```bash
-npm i -g @dataform/cli
+npm i -g @dataform/cli && dataform install
 ```
 
 ### 2. Generate the Dataform credentials file by running the following:

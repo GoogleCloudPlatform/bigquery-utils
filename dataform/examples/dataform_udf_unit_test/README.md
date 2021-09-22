@@ -17,7 +17,7 @@
        ```
 1. Install Dataform CLI tool
     ```bash
-    npm i -g @dataform/cli
+    npm i -g @dataform/cli && dataform install
     ```
 1. Generate the Dataform credentials file by running the following:
    ```bash
