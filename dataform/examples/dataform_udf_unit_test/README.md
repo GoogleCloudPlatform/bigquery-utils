@@ -39,13 +39,13 @@
 1. While you’re still in the example directory, copy the unit_test_utils.js file to your Dataform project directory. Then, \
    change into your newly created Dataform project directory and create your credentials file (.df-credentials.json):
    ```bash
-   cp unit_test_utils.js $DATAFORM_DIR/includes/
+   cp includes/unit_test_utils.js $DATAFORM_DIR/includes/
    cd $DATAFORM_DIR
    dataform init-creds bigquery
    ```
 1. Create a new test_cases.js  file:
    ```bash
-   echo "const {generate_udf_test} = unit_test_utils;" > $DATAFORM_DIR/definitions/test_cases.js
+   echo "const {generate_udf_test} = unit_test_utils;" > definitions/test_cases.js
    ```
 1. Add a new invocation of the generate_udf_test() function for the UDF you want to test.
    1. This function takes as arguments the string representing the name of the UDF you are going to test and an array of\
