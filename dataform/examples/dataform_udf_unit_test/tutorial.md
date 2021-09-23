@@ -29,12 +29,7 @@ dataform init-creds bigquery
 
 > Note: You will be prompted to select the following:
 >  * Your dataset location **(select ‘US’)**
->  * Your authentication method **(select Application Default Credentials)**.\
->    If you’re not running in the Cloud Shell, make sure to authenticate your 
->    environment using gcloud as shown below:
->    ```
->    gcloud auth application-default login
->    ```
+>  * Your authentication method **(select Application Default Credentials)**.
 >  * Your billing project ID (select the project in which you’ll run your queries).
 
 ### 3. Execute the unit tests by running the following Dataform command:
