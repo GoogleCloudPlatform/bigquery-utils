@@ -30,7 +30,7 @@
 
 ## How to modify the example for your own UDFs
 
-1. Create environment variables for the path to your Dataform directory and your
+1. While you’re still in the dataform_udf_unit_test directory, create environment variables for the name of your Dataform directory and your
    BigQuery project ID, then create your \
    Dataform project using these environment variables:
    ```bash
