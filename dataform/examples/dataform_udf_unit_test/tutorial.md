@@ -73,7 +73,7 @@ cd $DATAFORM_DIR
 dataform init-creds bigquery
 ```
 
-### 5. Create a new `test_cases.js` file:
+### 5. Create a new `test_cases.js` file inside the `definitions/` directory:
 
 ```bash
 echo "const {generate_udf_test} = unit_test_utils;" > definitions/test_cases.js
@@ -82,7 +82,7 @@ echo "const {generate_udf_test} = unit_test_utils;" > definitions/test_cases.js
 **Note**: This is the main file you'll be editing. You will be supplying the
 input(s) and expected outputs of your UDFs in this file.
 
-### 6. Open the `test_cases.js` file in the Cloud Editor (or shell) and add a new invocation of the generate_udf_test() function for each UDF you want to test:
+### 6. Edit your new `definitions/test_cases.js` file in the Cloud Editor (or shell) by adding a new invocation of the generate_udf_test() function for each UDF you want to test:
 
 ```
 generate_udf_test("YOUR_UDF_NAME", [  
