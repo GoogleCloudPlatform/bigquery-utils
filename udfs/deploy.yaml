@@ -1,6 +1,6 @@
 # Google Cloud Build script to deploy bqutils UDFs in your own project
 #
-# This build script is used to unit test the BigQuery UDFs for every
+# This build script is used to unit test.sql the BigQuery UDFs for every
 # change pushed to the udfs/ directory.
 #
 # Manual Execution:

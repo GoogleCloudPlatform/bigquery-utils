@@ -27,6 +27,18 @@ publicly shared datasets. Queries can then reference the shared UDFs via
 
 ## Deploying the UDFs
 
+All UDFs within this repository are maintained in SQLX format. This format is
+used to enable testing and deployment of the UDFs with
+the [Dataform CLI tool](https://docs.dataform.co/dataform-cli). \
+The Dataform CLI is a useful tool for deploying the UDFs because it:
+
+* Enables unit testing the UDFs
+* Automatically identifies dependencies between UDFs and then creates them in
+  the correct order.
+* Easily deploys the UDFs across different environments (dev, test, prod)
+
+The following sections cover a few methods of deploying the UDFs. 
+
 ### Deploy with Cloud Build (Recommended)
 
 1. Authenticate using the Cloud SDK and set the BigQuery project in which you'll
@@ -56,7 +68,9 @@ publicly shared datasets. Queries can then reference the shared UDFs via
    gcloud builds submit . --config=deploy.yaml --substitutions _BQ_LOCATION=US
    ```
    > Note: Deploy to a different location by setting `_BQ_LOCATION` to your own
-   > desired value.
+   > desired value.\
+   > [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
+   > for a list of supported locations.
 
 ### Deploy with your own machine
 
@@ -85,7 +99,9 @@ BigQuery project.
    export BQ_LOCATION=US && bash deploy.sh
    ```
    > Note: Deploy to a different location by setting `BQ_LOCATION` to your own
-   > desired value.
+   > desired value.\
+   > [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
+   > for a list of supported locations.
 
 ### Deploy with bq command-line tool or BigQuery Console
 
