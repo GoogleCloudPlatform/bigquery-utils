@@ -30,15 +30,15 @@
 
 ## How to modify the example for your own UDFs
 
-1. While you’re still in the dataform_udf_unit_test directory, create environment variables for the name of your Dataform directory and your
-   BigQuery project ID, then create your \
+1. From within the [`dataform_udf_unit_test/`](/dataform/examples/dataform_udf_unit_test) directory, create environment variables for your new Dataform directory and the
+   BigQuery project ID in which your UDFs are stored; then create your \
    Dataform project using these environment variables:
    ```bash
    DATAFORM_DIR=<name-of-your-Dataform-project>
    PROJECT_ID=<your-bigquery-project-id>
    dataform init bigquery $DATAFORM_DIR --default-database $PROJECT_ID
    ```
-1. While you’re still in the example directory, copy the unit_test_utils.js file
+1. Copy the [unit_test_utils.js](includes/unit_test_utils.js) file
    to your Dataform project directory. Then, \
    change into your newly created Dataform project directory and create your
    credentials file (.df-credentials.json):
@@ -52,20 +52,16 @@
    echo "const {generate_udf_test} = unit_test_utils;" > definitions/test_cases.js
    ```
 1. Add a new invocation of the generate_udf_test() function for the UDF you want
-   to test.
-    1. This function takes as arguments the string representing the name of the
-       UDF you are going to test and an array of\
-       Javascript objects where each object holds the input(s) and expected
-       output for a test case.
-    2. You can either use the fully qualified UDF name (ex: bqutil.fn.url_parse)
-       or just the UDF name (ex: url_parse). \
-       If you provide just the UDF name, the function will use the
-       defaultDatabase and defaultSchema values from your dataform.json file.
-    3. If your UDF accepts inputs of different data types, you will need to
-       group your test cases by input data types and\
-       create a separate invocation of generate_udf_test case for each group of
-       test cases. Refer to the json_typeof UDF\
-       in the test_cases.js for an example of this implementation.
+   to test. The `generate_udf_test()` function takes the following two positional arguments:
+
+   1. The first argument is a string representing the name of the UDF you will
+   test. You can either use the fully qualified UDF name (ex:
+   `bqutil.fn.url_parse`) or just the UDF name (ex: `url_parse`). If you provide
+   just the UDF name, the function will use the `defaultDatabase` and
+   `defaultSchema` values from your `dataform.json` file.
+
+   1. The second argument is an array of Javascript objects where each object holds
+   the UDF positional inputs and expected output for a test case.
    ```bash
    generate_udf_test()("YOUR_UDF_NAME", [  
       { // JS Object for test case #1
