@@ -44,9 +44,7 @@ To learn how to modify this example to unit test your own UDFs, click **Next**.
 
 ## Run Your Own UDF Unit Tests
 
-### 1. Create environment variables for the path to your Dataform directory and your BigQuery project ID:
-
-Dataform project using these environment variables:
+### 1. While you’re still in the dataform_udf_unit_test directory, create environment variables for the name of your Dataform directory and your BigQuery project ID:
 
 ```bash
 DATAFORM_DIR=<name-of-your-Dataform-project>
