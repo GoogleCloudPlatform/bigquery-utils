@@ -1,0 +1,6 @@
+{
+    "warehouse": "bigquery",
+    "defaultSchema": "${DATASET_ID}",
+    "defaultDatabase": "${PROJECT_ID}",
+    "concurrentQueryLimit": 100
+}

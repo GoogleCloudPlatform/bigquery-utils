@@ -130,11 +130,11 @@ function build_udfs() {
   # Delete test datasets when finished
   if ! gcloud builds submit "${UDF_DIR}"/ \
     --config="${UDF_DIR}"/cloudbuild.yaml \
-    --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}" ; then
+    --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
     # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
     printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
     local datasets
-    datasets=$(sed -n '/:/p' < udfs/dir_to_dataset_map.yaml | sed 's/.*: //g')
+    datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
     for dataset in ${datasets}; do
       printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
       bq --headless --synchronous_mode rm -r -f "${dataset}_test_${SHORT_SHA}"
@@ -193,7 +193,7 @@ function build() {
 
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
-  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/; then
+  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
     build_udf_testing_image
   fi
 
@@ -223,9 +223,11 @@ function deploy_udfs() {
 
   replace_js_udf_bucket_placeholder
 
+  # For prod deploys, do not set SHORT_SHA so that BQ dataset
+  # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \
-    --config="${UDF_DIR}"/cloudbuild_deploy.yaml \
-    --substitutions BRANCH_NAME="${BRANCH_NAME}",_JS_BUCKET="${_JS_BUCKET}"
+    --config="${UDF_DIR}"/cloudbuild.yaml \
+    --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 
 #######################################

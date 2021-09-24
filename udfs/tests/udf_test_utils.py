@@ -15,18 +15,12 @@
 import argparse
 import glob
 
-import os
 from pathlib import Path
-import re
 import json
 
 from yaml import load
 from yaml import SafeLoader
 
-from google.cloud import bigquery
-
-
-DATASET_SUFFIX = f'_test_{os.getenv("SHORT_SHA")}'
 # Some javascript libraries have issues with webpack's auto
 # minifier and therefore must be placed in the set below
 # to instruct webpack to not minify them.
@@ -70,24 +64,6 @@ def get_all_npm_package_config_paths(node_modules_path):
     return npm_package_config_paths
 
 
-def load_test_cases(udf_path, udf_name):
-    """
-    For a given path to a UDF, return any test cases for that
-    UDF.
-
-    :param udf_path: Path to a .sql file containing UDF DDL
-    :param udf_name: Name of the UDF
-    :return: Iterable containing all test cases for the UDF
-    """
-    udf_parent_dir = Path(udf_path).parent
-    yaml_test_data_path = udf_parent_dir / 'test_cases.yaml'
-    if yaml_test_data_path.is_file():
-        with open(yaml_test_data_path, 'r') as yaml_file:
-            return load(yaml_file, Loader=SafeLoader).get(udf_name)
-    else:
-        return None
-
-
 def get_js_libs_from_yaml():
     """
     Get all npm package names from the /udfs/js_libs/js_libs.yaml
@@ -103,100 +79,6 @@ def get_js_libs_from_yaml():
         return None
 
 
-def extract_udf_name(udf_path):
-    """
-    Parse out the name of the UDF from the SQL DDL
-
-    :param udf_path: Path to the UDF DDL .sql file
-    :return: Name of the UDF
-    """
-    with open(udf_path) as udf_file:
-        udf_sql = udf_file.read()
-    udf_sql = udf_sql.replace('\n', ' ')
-    pattern = re.compile(r'FUNCTION\s*`?(\w+.)?(\w+)`?\s*\(')
-    match = pattern.search(udf_sql)
-    if match:
-        udf_name = match[2]
-        return udf_name
-    else:
-        return None
-
-
-def replace_with_null_body(udf_path):
-    """
-    For a given path to a UDF DDL file, parse the SQL and return
-    the UDF with the body entirely replaced with NULL.
-
-    :param udf_path: Path to the UDF DDL .sql file
-    :return: Input UDF DDL with a NULL body
-    """
-    with open(udf_path) as udf_file:
-        udf_sql = udf_file.read()
-    udf_sql = udf_sql.replace('\n', ' ')
-    pattern = re.compile(r'FUNCTION\s+(`?.+?`?.*?\).*?\s+)AS')
-    match = pattern.search(udf_sql)
-    if match:
-        udf_signature = match[1].replace('LANGUAGE js', '')
-        udf_null_body = (f'CREATE FUNCTION IF NOT EXISTS {udf_signature}'
-                         f' AS (NULL)')
-        return udf_null_body
-    else:
-        return None
-
-
-def replace_with_test_datasets(project_id, udf_sql):
-    """
-    For a given path to a UDF DDL file, parse the SQL and return the UDF
-    with the dataset name changed with an added suffix for testing. The suffix
-    value is defined in the global variable, DATASET_SUFFIX, and includes the
-    commit's SHORT_SHA to prevent different commits from interfering
-    with UDF builds.
-
-    :param project_id: Project in which to create the UDF
-    :param udf_sql: SQL DDL of the UDF
-    :return: Same SQL DDL as input udf_sql but replaced with testing dataset
-    """
-    udf_sql_with_test_dataset = re.sub(
-        r'(\w+\.)?(?P<bq_dataset>\w+)(?P<udf_name>\.\w+)\(',
-        f'`{project_id}.\\g<bq_dataset>{DATASET_SUFFIX}\\g<udf_name>`(',
-        udf_sql)
-    if udf_sql_with_test_dataset == udf_sql:
-        # Replacement failed, return None to prevent overwriting prod dataset
-        return None
-    else:
-        return udf_sql_with_test_dataset
-
-
-def get_test_bq_dataset(udf_path):
-    """
-    For a given path to a UDF DDL file, return the BigQuery dataset name in
-    which to test the UDF. The test dataset name is the same as production
-    but with the suffix, _test_$SHORT_SHA, appended. The $SHORT_SHA value comes
-    from the commit which triggered the build.
-    :param udf_path: Path to the UDF DDL .sql file
-    :return: Name of test dataset
-    """
-    udf_parent_dir_name = Path(udf_path).parent.name
-    if os.getenv('SHORT_SHA') is not None:
-        bq_dataset = get_dir_to_dataset_mappings().get(udf_parent_dir_name)
-        return f'{bq_dataset}{DATASET_SUFFIX}'
-    else:
-        return None
-
-
-def delete_datasets(client):
-    for dataset in get_dir_to_dataset_mappings().values():
-        dataset = f'{dataset}{DATASET_SUFFIX}'
-        client.delete_dataset(dataset, delete_contents=True, not_found_ok=True)
-
-
-def create_datasets(client, dataset_suffix=None):
-    for dataset in get_dir_to_dataset_mappings().values():
-        if dataset_suffix:
-            dataset = f'{dataset}{dataset_suffix}'
-        client.create_dataset(dataset, exists_ok=True)
-
-
 def generate_js_libs_package_json():
     """
     This dynamically generates the main package.json which will be used to build
@@ -210,7 +92,7 @@ def generate_js_libs_package_json():
             "build-all-libs": "concurrently \"npm:webpack-*\""
         },
         "dependencies": {
-            f'{lib_name}-v{version}': f'npm:{lib_name}@^{version}'
+            f'{lib_name}-v{version}': f'npm:{lib_name}@{version}'
             for lib_name in js_libs_dict
             for version in js_libs_dict.get(lib_name).get('versions')
         },
@@ -224,7 +106,8 @@ def generate_js_libs_package_json():
     for lib_name in js_libs_dict:
         for version in js_libs_dict.get(lib_name).get('versions'):
             js_libs_package_dict.get('scripts').update({
-                f'webpack-{lib_name}-v{version}': f'webpack --config {lib_name}-v{version}-webpack.config.js'
+                f'webpack-{lib_name}-v{version}':
+                    f'webpack --config {lib_name}-v{version}-webpack.config.js'
             })
 
     with open('./package.json', 'w') as js_libs_package_json:
@@ -285,18 +168,6 @@ def main():
     parser = argparse.ArgumentParser(
         description='Utils Class to support testing BigQuery UDFs')
     parser.add_argument(
-        '--create-prod-datasets',
-        help='Create prod datasets used for UDF function testing.',
-        action='store_true')
-    parser.add_argument(
-        '--create-test-datasets',
-        help='Create test datasets used for UDF function testing.',
-        action='store_true')
-    parser.add_argument(
-        '--delete-test-datasets',
-        help='Delete test datasets used for UDF function testing.',
-        action='store_true')
-    parser.add_argument(
         '--generate-js-libs-package-json',
         help='Generate package.json file necessary for building '
         'javascript libs for BigQuery UDFs',
@@ -308,15 +179,7 @@ def main():
         action='store_true')
     args = parser.parse_args()
 
-    bq_project_id = os.getenv('BQ_PROJECT_ID')
-    if args.create_prod_datasets:
-        create_datasets(bigquery.Client(project=bq_project_id))
-    elif args.create_test_datasets:
-        create_datasets(bigquery.Client(project=bq_project_id),
-                        dataset_suffix=DATASET_SUFFIX)
-    elif args.delete_test_datasets:
-        delete_datasets(bigquery.Client(project=bq_project_id))
-    elif args.generate_js_libs_package_json:
+    if args.generate_js_libs_package_json:
         generate_js_libs_package_json()
     elif args.generate_webpack_configs:
         generate_webpack_configs()
