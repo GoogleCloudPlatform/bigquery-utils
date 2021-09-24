@@ -82,7 +82,7 @@ echo "const {generate_udf_test} = unit_test_utils;" > definitions/test_cases.js
 **Note**: This is the main file you'll be editing. You will be supplying the
 input(s) and expected outputs of your UDFs in this file.
 
-### 6. Add a new invocation of the generate_udf_test() function for the UDF you want to test:
+### 6. Open the `test_cases.js` file in the Cloud Editor (or shell) and add a new invocation of the generate_udf_test() function for each UDF you want to test:
 
 ```
 generate_udf_test("YOUR_UDF_NAME", [  
@@ -99,16 +99,16 @@ generate_udf_test("YOUR_UDF_NAME", [
 ]);
 ```
 
-i. This function takes as arguments the string representing the name of the UDF
-you are going to test and an array of Javascript objects where each object holds
-the input(s) and expected output for a test case.
+The `generate_udf_test()` function takes the following two positional arguments:
 
-ii. You can either use the fully qualified UDF name (ex: bqutil.fn.url_parse) or
-just the UDF name (ex: url_parse).
+1. The first argument is a string representing the name of the UDF you will
+   test. You can either use the fully qualified UDF name (ex:
+   `bqutil.fn.url_parse`) or just the UDF name (ex: `url_parse`). If you provide
+   just the UDF name, the function will use the `defaultDatabase` and
+   `defaultSchema` values from your `dataform.json` file.
 
-iii. If your UDF accepts inputs of different data types, you will need to group
-your test cases by input data types with separate invocations
-of `generate_udf_test().`
+1. The second argument is an array of Javascript objects where each object holds
+   the UDF positional inputs and expected output for a test case.
 
 ### 7. Finally, run your tests to see if your UDF behaves as expected:
 
