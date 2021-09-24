@@ -54,7 +54,7 @@ DATAFORM_DIR=<name-of-your-Dataform-project>
 PROJECT_ID=<your-bigquery-project-id>
 ```
 
-### 2. Create your Dataform project:
+### 2. Create your Dataform project using the environment variables you set up in the previous step:
 
 ```bash
 dataform init bigquery $DATAFORM_DIR --default-database $PROJECT_ID
