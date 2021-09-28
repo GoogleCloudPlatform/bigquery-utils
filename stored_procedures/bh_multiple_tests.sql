@@ -4,10 +4,10 @@
 -- @param STRING pvalue_table_name : the name of the table with the p values that need to be adjusted
 -- @param STRING pvalue_column_name : the name of the column with p values.
 -- @param INT Nrows : Number of tests (equal to number of rows of the input table)
-CREATE OR REPLACE PROCEDURE bqutil.procedure.bh_multiple_tests (pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64)
+CREATE OR REPLACE PROCEDURE bqutil.procedure.bh_multiple_tests (pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )
 BEGIN
    EXECUTE IMMEDIATE format("""
-   CREATE TEMP TABLE bh_multiple_tests_results AS
+   CREATE TEMP TABLE %s AS
    WITH padjusted_data AS (
        WITH ranked_data AS (
            SELECT *, ( DENSE_RANK() OVER( ORDER BY %s) ) AS jrank
@@ -23,7 +23,9 @@ BEGIN
    )
    SELECT * EXCEPT (p_adj, jrank), IF( p_adj > 1.0 , 1.0, p_adj) AS p_adj
    FROM padjusted_data
-   ORDER BY jrank""", pvalue_column_name, pvalue_table_name, n_rows, pvalue_column_name );
+   ORDER BY jrank""", temp_table_name, pvalue_column_name, pvalue_table_name, n_rows, pvalue_column_name );
+
+   EXECUTE IMMEDIATE format("""SELECT * FROM %s""", temp_table_name);
 END;
 
 -- a unit test of bh_multiple_tests
@@ -39,7 +41,7 @@ BEGIN
       UNION ALL SELECT 0.074
       UNION ALL SELECT 0.205;
 
-   CALL bqutil.procedure.bh_multiple_tests('Pvalues','pval',8);
+   CALL bqutil.procedure.bh_multiple_tests('Pvalues','pval',8, 'bh_multiple_tests_results');
 
    # Table Output
    # pval   p_adj
