@@ -97,28 +97,27 @@ def external_query(  # pylint: disable=too-many-arguments
     job_config = bigquery.QueryJobConfig(
         table_definitions={"temp_ext": external_config}, use_legacy_sql=False)
 
-    if table:
-        # drop partition decorator if present.
-        table_id = table.table_id.split("$")[0]
-        # similar syntax to str.format but doesn't require escaping braces
-        # elsewhere in query (e.g. in a regex)
-        rendered_query = query.replace(
-            "{dest_dataset}", f"`{table.project}`.{table.dataset_id}").replace(
-                "{dest_table}", table_id)
-        job: bigquery.QueryJob = bq_client.query(rendered_query,
-                                                 job_config=job_config,
-                                                 job_id=job_id)
-        logging.log_bigquery_job(
-            job, table, f"Submitted asynchronous query job: {job.job_id}")
-        start_poll_for_errors = time.monotonic()
-        # Check if job failed quickly
-        while time.monotonic(
-        ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
-            job.reload(client=bq_client)
-            if job.state == "DONE":
-                check_for_bq_job_and_children_errors(bq_client, job, table)
-                return
-            time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
+    # drop partition decorator if present.
+    table_id = table.table_id.split("$")[0]
+    # similar syntax to str.format but doesn't require escaping braces
+    # elsewhere in query (e.g. in a regex)
+    rendered_query = query.replace(
+        "{dest_dataset}", f"`{table.project}`.{table.dataset_id}").replace(
+            "{dest_table}", table_id)
+    job: bigquery.QueryJob = bq_client.query(rendered_query,
+                                             job_config=job_config,
+                                             job_id=job_id)
+    logging.log_bigquery_job(
+        job, table, f"Submitted asynchronous query job: {job.job_id}")
+    start_poll_for_errors = time.monotonic()
+    # Check if job failed quickly
+    while time.monotonic(
+    ) - start_poll_for_errors < constants.WAIT_FOR_JOB_SECONDS:
+        job.reload(client=bq_client)
+        if job.state == "DONE":
+            check_for_bq_job_and_children_errors(bq_client, job, table)
+            return
+        time.sleep(constants.JOB_POLL_INTERVAL_SECONDS)
 
 
 def compact_source_uris_with_wildcards(source_uris: List[str]):
