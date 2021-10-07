@@ -9,87 +9,97 @@ The following is a set of guidelines for contributing a UDF to this repository.
 
 ### Add your UDF
 
-1.  Add your UDFs (**one** UDF per file) and a
-    [Contributor License Agreement](#contributor-license-agreement) to the
-    appropriate directory.
-    *   If your function replicates logic from some other data warehouse UDF,
-        place it in the relevant sub-directory in the
-        [migration](/udfs/migration) directory. Otherwise, place it in the
-        [community](/udfs/community) directory.
-1.  Add test cases for your UDFs.
-    *   Edit the `test_cases.yaml` file to include test inputs and expected
-        outputs for the function. (take a look at the
-        [community test_cases.yaml](community/test_cases.yaml) file as an
-        example)
-    *   Make sure test cases provide full coverage of the function's expected
-        behavior. For example, if integers are the expected input, please
-        provide test cases with the following inputs: negative numbers, zero,
-        positive numbers, and null values.
-1.  Describe what your UDF does.
-    *   Edit the `README.md` in the associated sub-directory to include a
-        description of the function and make sure your function is listed in
-        alphabetical order amongst the other functions in the `README.md`.
-    *   Make sure the same description is placed as a comment in your UDF file.
+1. Add your UDFs (**one** UDF per file) to the appropriate directory.
+    * If your function replicates logic from some other data warehouse UDF,
+      place it in the relevant sub-directory in the
+      [migration](/udfs/migration) directory. Otherwise, place it in the
+      [community](/udfs/community) directory.
+1. Add test cases for your UDFs.
+    * Edit the `test_cases.js` file to include test inputs and expected outputs
+      for the function. (take a look at the
+      [community test_cases.js](community/test_cases.js) file as an example)
+      > Note: If your UDF accepts inputs of different data types, you'll have to
+      > create a separate generate_udf_test() invocation for each group of
+      > inputs sharing identical data types. For example, the test cases in
+      > [community test_cases.js](community/test_cases.js) for the
+      > [int() UDF](community/int.sqlx) are split into three invocations of
+      > generate_udf_test() since the test inputs can be grouped into the
+      > following three groups of identical data types:
+      >   * STRING
+      >   * INT64
+      >   * FLOAT64
+    * Make sure test cases provide full coverage of the function's expected
+      behavior. For example, if integers are the expected input, please provide
+      test cases with the following inputs: negative numbers, zero, positive
+      numbers, and null values.
+1. Describe what your UDF does.
+    * Edit the `README.md` in the associated sub-directory to include a
+      description of the function and make sure your function is listed in
+      alphabetical order amongst the other functions in the `README.md`.
+    * Make sure the same description is placed as a comment in your UDF file.
 
 ### Test your UDF
 
-1.  Test your UDF locally using the test cases you added to the
-    `test_cases.yaml` file. Please follow the instructions in the
-    [Testing UDFs Locally section](#testing-udfs-locally) to automatically test
-    all inputs for the expected outputs using the function.
+The UDF testing framework in this repo will run on Cloud Build and perform the
+following:
+
+* Create BigQuery datasets for hosting the UDFs
+* Deploy all UDFs in the BigQuery datasets
+* Run all UDF unit tests in BigQuery
+* Delete all BigQuery datasets and UDFs when finished
+
+Please follow these instructions to run the testing framework which will confirm
+that your UDFs behave as expected.
+
+1. Change into the bigquery_utils [udfs/](./) directory:
+   ```bash
+   cd udfs/
+   ```
+
+1. Authenticate using the Cloud SDK and set the GCP project in which you'll test
+   your UDF(s):
+
+   ```bash 
+   gcloud init
+   ```
+
+1. Enable the Cloud Build API and grant the default Cloud Build service account
+   the BigQuery Job User role
+   ```bash
+   gcloud services enable cloudbuild.googleapis.com && \
+   gcloud projects add-iam-policy-binding \
+     $(gcloud config get-value project) \
+     --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \
+     --role=roles/bigquery.user && \
+   gcloud projects add-iam-policy-binding \
+     $(gcloud config get-value project) \
+     --member=serviceAccount:$(gcloud projects describe $(gcloud config get-value project) --format="value(projectNumber)")"@cloudbuild.gserviceaccount.com" \
+     --role=roles/bigquery.dataEditor
+   ```
+
+1. Run the UDF unit tests in Cloud Build by running the following:
+
+   ```bash
+   export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/STORE/JS_LIBS
+   bash run_unit_tests.sh
+   ```
+
+1. If all the tests pass, submit your pull request to proceed to the code review
+   process.
 
 ### Submit a Pull Request
 
-1.  Submit a pull request and we will review the code as soon as possible.
-    Please see the section on [Code Reviews](#code-reviews) for more
-    information.
+1. Submit a pull request and we will review the code as soon as possible. Please
+   see the section on [Code Reviews](#code-reviews) for more information.
 
-Note: Your pull request, and any following commits, will trigger a testing
-pipeline that will run unit tests on your submitted function as well as all the
-other existing functions. This is done by a Cloud Build Trigger which runs a
-Bash script. This Bash script unit tests the functions, running the contributed
-UDFs in BigQuery with the given input to check that it results in the expected
-output. If these tests pass, this will indicate to the reviewer that the
-functions work as expected. So testing these functions locally before submitting
-the pull request can ensure a successful review process.
-
-## Testing UDFs Locally
-
-Please follow these instructions to confirm that your test cases work as
-expected.
-
-1.  Change into the bigquery_utils [udfs/](./) directory:
-    *   `cd udfs/`
-
-1.  Create a Python virtual environment and activate it:
-
-    *   `python3 -m venv venv`
-    *   `source venv/bin/activate`
-    *   `pip install -r tests/requirements.txt`
-
-1.  The test framework in this repo will create BigQuery datasets in your
-    configured GCP project in order to test your UDF, and will delete them when
-    finished testing. Authenticate using the Cloud SDK and set the GCP project
-    in which you'll test your UDF(s):
-
-    *   `gcloud auth login`
-    *   `gcloud config set project YOUR_PROJECT_ID`
-
-1.  Test your UDF by invoking the `run.sh` script and passing the pytest 
-    [`-k` argument](https://docs.pytest.org/en/stable/example/markers.html#using-k-expr-to-select-tests-based-on-their-name)
-    followed by the name of your UDF in lower case.
-
-    *   `bash tests/run.sh -k url_parse`
-        *   Note: If your UDF name exists in multiple directories, you can add
-            the UDF's parent directory as a prefix \
-            `bash tests/run.sh -k community_url_parse`
-
-1.  Run all tests by invoking the `run.sh` script with no arguments
-
-    *   `bash tests/run.sh`
-
-1.  If all the tests pass, submit your pull request to proceed to the code
-    review process.
+> Note: Your pull request, and any following commits, will trigger a testing
+> pipeline that will run unit tests on your submitted function as well as all
+> the other existing functions. This is done by a Cloud Build Trigger which runs
+> a Bash script. This Bash script unit tests the functions, running the
+> contributed UDFs in BigQuery with the given input to check that it results in
+> the expected output. If these tests pass, this will indicate to the reviewer
+> that the functions work as expected. So testing these functions locally before
+> submitting the pull request can ensure a successful review process.
 
 ## Contributor License Agreement
 
@@ -113,4 +123,5 @@ information on using pull requests.
 ## Community Guidelines
 
 This project follows
-[Google's Open Source Community Guidelines](https://opensource.google.com/conduct/).
+[Google's Open Source Community Guidelines](https://opensource.google.com/conduct/)
+.
