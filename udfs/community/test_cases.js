@@ -40,6 +40,26 @@ generate_udf_test("int", [
         expected_output: `CAST(7 AS INT64)`
     },
 ]);
+generate_udf_test("json_extract_keys", [
+    {
+        inputs: [`'{"foo" : "cat", "bar": "dog", "hat": "rat"}'`],
+        expected_output: `["foo", "bar", "hat"]`
+    },
+    {
+        inputs: [`'{"int" : 1}'`],
+        expected_output: `["int"]`
+    },
+]);
+generate_udf_test("json_extract_values", [
+    {
+        inputs: [`'{"foo" : "cat", "bar": "dog", "hat": "rat"}'`],
+        expected_output: `["cat", "dog", "rat"]`
+    },
+    {
+        inputs: [`'{"int" : 1}'`],
+        expected_output: `["1"]`
+    },
+]);
 generate_udf_test("json_typeof", [
     {
         inputs: [`'""'`],
