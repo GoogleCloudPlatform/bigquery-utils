@@ -4,3 +4,4 @@ google-cloud-error-reporting>=1.1.0
 cachetools
 types-cachetools
 types-pytz
+pytz

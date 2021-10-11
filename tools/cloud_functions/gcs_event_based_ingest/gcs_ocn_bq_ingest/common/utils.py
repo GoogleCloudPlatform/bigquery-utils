@@ -36,7 +36,6 @@ import google.api_core
 import google.api_core.client_info
 import google.api_core.exceptions
 import google.cloud.exceptions
-# pylint in cloud build is being flaky about this import discovery.
 from google.cloud import bigquery
 from google.cloud import storage
 
@@ -107,8 +106,8 @@ def external_query(  # pylint: disable=too-many-arguments
     job: bigquery.QueryJob = bq_client.query(rendered_query,
                                              job_config=job_config,
                                              job_id=job_id)
-    logging.log_bigquery_job(
-        job, table, f"Submitted asynchronous query job: {job.job_id}")
+    logging.log_bigquery_job(job, table,
+                             f"Submitted asynchronous query job: {job.job_id}")
     start_poll_for_errors = time.monotonic()
     # Check if job failed quickly
     while time.monotonic(

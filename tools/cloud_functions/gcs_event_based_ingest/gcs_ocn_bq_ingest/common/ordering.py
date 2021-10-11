@@ -26,8 +26,6 @@ from typing import Dict, Optional, Tuple
 import google.api_core
 import google.api_core.exceptions
 import pytz
-# pylint in cloud build is being flaky about this import discovery.
-# pylint: disable=no-name-in-module
 from google.cloud import bigquery
 from google.cloud import storage
 
@@ -128,28 +126,30 @@ def backlog_subscriber(gcs_client: Optional[storage.Client],
                 lock_contents.get('table'))
             # is this a lock placed by this cloud function.
             # the else will handle a manual _bqlock
-            if job_id and job_id.startswith(os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)):
+            if job_id and job_id.startswith(
+                    os.getenv('JOB_PREFIX', constants.DEFAULT_JOB_PREFIX)):
                 # To keep track of retry attempts between cloud
                 # function invocations, the retry count state is
                 # kept in the _bqlock lock file.
                 if lock_contents.get('retry_attempt_cnt'):
                     retry_attempt_cnt: int = int(
                         lock_contents['retry_attempt_cnt'])
-                    last_job_done = wait_on_last_job(
-                        gcs_client, bq_client, lock_blob, backfill_blob,
-                        job_id, table, polling_timeout,
-                        retry_attempt_cnt)
+                    last_job_done = wait_on_last_job(gcs_client, bq_client,
+                                                     lock_blob, backfill_blob,
+                                                     job_id, table,
+                                                     polling_timeout,
+                                                     retry_attempt_cnt)
                 else:
-                    last_job_done = wait_on_last_job(
-                        gcs_client, bq_client, lock_blob, backfill_blob,
-                        job_id, table, polling_timeout, 0)
+                    last_job_done = wait_on_last_job(gcs_client, bq_client,
+                                                     lock_blob, backfill_blob,
+                                                     job_id, table,
+                                                     polling_timeout, 0)
             else:
-                print(
-                    f"sleeping for {polling_timeout} seconds because"
-                    f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
-                    f"manual lock contents: {lock_contents}. "
-                    "This will be an infinite loop until the manual lock is "
-                    "released. ")
+                print(f"sleeping for {polling_timeout} seconds because"
+                      f"found manual lock gs://{bkt.name}/{lock_blob.name} with"
+                      f"manual lock contents: {lock_contents}. "
+                      "This will be an infinite loop until the manual lock is "
+                      "released. ")
                 time.sleep(polling_timeout)
                 continue
         else:  # this condition handles absence of _bqlock file
