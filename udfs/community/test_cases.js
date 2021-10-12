@@ -881,7 +881,7 @@ generate_udf_test("day_occurrence_of_month", [
 //
 //  Below targets StatsLib work
 //
-generate_udf_test("pvalue", [
+generate_udf_test("chisquare_cdf", [
     {
         inputs: [
             `CAST(0.3 AS FLOAT64)`,
