@@ -29,3 +29,64 @@ END;
 
 IDs are: [99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 ```
+
+### [chi_square(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>)](chi_square.sql)
+Performs a chi-square statistical test from an input table. It generates a structure containg the chi-square statistics, the degrees of freedom, and the pvalue of the test.
+```sql
+ BEGIN
+    DECLARE result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>;
+
+    CREATE TEMP TABLE categorical (animal STRING, toy STRING) AS
+        SELECT 'dog' AS animal, 'ball' as toy
+        UNION ALL SELECT 'dog', 'ball'
+        UNION ALL SELECT 'dog', 'ball'
+        UNION ALL SELECT 'dog', 'ball'
+        UNION ALL SELECT 'dog', 'yarn'
+        UNION ALL SELECT 'dog', 'yarn'
+        UNION ALL SELECT 'cat', 'ball'
+        UNION ALL SELECT 'cat', 'yarn'
+        UNION ALL SELECT 'cat', 'yarn'
+        UNION ALL SELECT 'cat', 'yarn'
+        UNION ALL SELECT 'cat', 'yarn'
+        UNION ALL SELECT 'cat', 'yarn'
+        UNION ALL SELECT 'cat', 'yarn';
+
+  CALL bqutil.procedure.chi_square('categorical', 'animal', 'toy', result);
+  SELECT result ;
+END
+```
+Output:
+| result.x  | result.dof | result.p |
+|---|---|---|
+| 3.7452380952380966 | 1.0  |  0.052958181867438725 |
+
+### [bh_multiple_tests( pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )](bh_multiple_tests.sql)
+Adjust p values using the Benjamini-Hochberg multipletests method, additional details in doi:10.1098/rsta.2009.0127
+
+```sql
+BEGIN
+   CREATE TEMP TABLE Pvalues AS
+      SELECT 0.001 as pval
+      UNION ALL SELECT 0.008
+      UNION ALL SELECT 0.039
+      UNION ALL SELECT 0.041
+      UNION ALL SELECT 0.042
+      UNION ALL SELECT 0.06
+      UNION ALL SELECT 0.074
+      UNION ALL SELECT 0.205;
+
+   CALL bqutil.procedure.bh_multiple_tests('Pvalues','pval',8, 'bh_multiple_tests_results');
+   SELECT * FROM bh_multiple_tests_results;
+END;
+```
+Output:
+| pval | pval_adj |
+|---|---|
+| 0.008 | 0.032 |
+| 0.039 | 0.06720000000000001 |
+| 0.041 | 0.06720000000000001 |
+| 0.042 | 0.06720000000000001 |
+| 0.06 | 0.08 |
+| 0.074 | 0.08457142857142856 |
+| 0.205 | 0.205 |
+   
