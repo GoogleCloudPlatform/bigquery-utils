@@ -94,6 +94,7 @@ module "data_ingester_service_account" {
   project_roles = [
     "${var.project_id}=>roles/bigquery.jobUser",
     "${var.project_id}=>roles/storage.admin",
+    "${var.project_id}=>roles/errorreporting.writer",
   ]
 }
 

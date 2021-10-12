@@ -43,6 +43,10 @@ class DestinationRegexMatchException(OneLineException):
     default)"""
 
 
+class HiveSourceUriPrefixRegexMatchException(OneLineException):
+    """Exception to indicate that a hive source uri prefix could not be found."""
+
+
 class UnexpectedTriggerException(OneLineException):
     """Exception to indicate the cloud function was triggered with an unexpected
     payload."""
