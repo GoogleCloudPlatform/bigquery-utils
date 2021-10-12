@@ -1,0 +1,37 @@
+config { hasOutput: true }
+
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+-- corr_pvalue:
+-- Input:
+--     r: correlation value, n : number of samples
+-- Output: The p value of the correlation 
+CREATE OR REPLACE FUNCTION ${self()}(r FLOAT64, n INT64 ) 
+RETURNS FLOAT64 
+LANGUAGE js AS """
+var abs_r = Math['abs'](r)
+if ( abs_r < 1.0 ) {
+   var t =  abs_r * Math['sqrt']( (n-2) / (1.0 - (r*r)) )
+   return jstat['jStat']['ttest'](t,n-2,2);
+
+} else if (abs_r == 1.0  ) {
+   return 0.0
+} else {  
+   return NaN 
+}
+"""
+OPTIONS (library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]);

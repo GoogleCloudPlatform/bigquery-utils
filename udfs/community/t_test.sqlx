@@ -1,5 +1,7 @@
+config { hasOutput: true }
+
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +16,7 @@
  * limitations under the License.
  */
 
+
 -- Student's T-Test
 -- Input:
 	-- pop1, array of FLOAT64, values from first group
@@ -22,7 +25,7 @@
         -- Struct of t_value and DOF
 
 
-CREATE OR REPLACE FUNCTION fn.t_test(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) AS ((
+CREATE OR REPLACE FUNCTION ${self()}(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) AS ((
 
     WITH pop1 AS (
         SELECT AVG(p1) x1, STDDEV(p1) st1, COUNT(p1) AS n1 FROM UNNEST(pop1) AS p1
