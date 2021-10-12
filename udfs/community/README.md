@@ -24,6 +24,8 @@ SELECT bqutil.fn.int(1.684)
 * [getbit](#getbittarget_arg-int64-target_bit_arg-int64)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
+* [json_extract_keys](#json_extract_keys)
+* [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
@@ -96,11 +98,11 @@ results:
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
 Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
 ```sql
-SELECT 
-  bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'), 
+SELECT
+  bqutil.fn.day_occurrence_of_month(DATE '2020-07-01'),
   bqutil.fn.day_occurrence_of_month(DATE '2020-07-08');
-  
-1 2  
+
+1 2
 ```
 
 ### [degrees(x ANY TYPE)](degrees.sqlx)
@@ -169,10 +171,10 @@ results:
 Returns a number in decimal form from its binary representation.
 
 ```sql
-SELECT 
+SELECT
   bqutil.fn.to_binary(x) AS binary,
   bqutil.fn.from_binary(bqutil.fn.to_binary(x)) AS x
-FROM 
+FROM
   UNNEST([1, 123456, 9876543210, -1001]) AS x;
 ```
 
@@ -190,10 +192,10 @@ results:
 Returns a number in decimal form from its hexadecimal representation.
 
 ```sql
-SELECT 
-  bqutil.fn.to_hex(x) AS hex, 
+SELECT
+  bqutil.fn.to_hex(x) AS hex,
   bqutil.fn.from_hex(bqutil.fn.to_hex(x)) AS x
-FROM 
+FROM
   UNNEST([1, 123456, 9876543210, -1001]) AS x;
 ```
 
@@ -281,6 +283,31 @@ SELECT bqutil.fn.int(1) int1
 
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
+### [json_extract_keys()](json_extract_keys.sqlx)
+Returns all keys in the input JSON as an array of string
+
+```sql
+SELECT bqutil.fn.json_extract_keys(
+  '{"foo" : "cat", "bar": "dog", "hat": "rat"}'
+) AS keys_array
+
+foo
+bar
+hat
+```
+
+### [json_extract_values()](json_extract_values.sqlx)
+Returns all values in the input JSON as an array of string
+
+```sql
+SELECT bqutil.fn.json_extract_values(
+  '{"foo" : "cat", "bar": "dog", "hat": "rat"}'
+) AS keys_array
+
+cat
+dog
+rat
+```
 
 ### [json_typeof(json string)](json_typeof.sqlx)
 
@@ -463,10 +490,10 @@ SELECT
 Returns a binary representation of a number.
 
 ```sql
-SELECT 
-  x, 
+SELECT
+  x,
   bqutil.fn.to_binary(x) AS binary
-FROM 
+FROM
   UNNEST([1, 123456, 9876543210, -1001]) AS x;
 ```
 
@@ -484,15 +511,15 @@ results:
 Returns a hexadecimal representation of a number.
 
 ```sql
-SELECT 
-  x, 
+SELECT
+  x,
   bqutil.fn.to_hex(x) AS hex
-FROM 
+FROM
   UNNEST([1, 123456, 9876543210, -1001]) AS x;
 ```
 
 results:
-|     x      |       hex        | 
+|     x      |       hex        |
 |------------|------------------|
 |          1 | 0000000000000001 |
 |     123456 | 000000000001e240 |
@@ -705,11 +732,11 @@ results:
 Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
 
 ```sql
-SELECT 
-  bqutil.fn.week_of_month(DATE '2020-07-01'), 
+SELECT
+  bqutil.fn.week_of_month(DATE '2020-07-01'),
   bqutil.fn.week_of_month(DATE '2020-07-08');
-  
-0 1  
+
+0 1
 ```
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sqlx)
