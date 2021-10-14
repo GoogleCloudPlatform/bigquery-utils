@@ -283,6 +283,19 @@ SELECT bqutil.fn.int(1) int1
 
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
+### [jaccard()](jaccard.sqlx)
+Accepts two string and returns the distance using Jaccard algorithm. 
+```sql
+SELECT
+       bqutil.fn.jaccard('thanks', 'thaanks'),
+       bqutil.fn.jaccard('thanks', 'thanxs'),
+       bqutil.fn.jaccard('bad demo', 'abd demo'),
+       bqutil.fn.jaccard('edge case', 'no match'),
+       bqutil.fn.jaccard('Special. Character?', 'special character'),
+       bqutil.fn.jaccard('', ''),
+1, 0.71, 1.0, 0.25, 0.67, 0.0
+```
+
 ### [json_extract_keys()](json_extract_keys.sqlx)
 Returns all keys in the input JSON as an array of string
 
