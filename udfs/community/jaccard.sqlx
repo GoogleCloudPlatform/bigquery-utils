@@ -21,7 +21,6 @@ LANGUAGE js AS r"""
   let intersectSize = 0;
 
   if(a && b) {
-
     // Split word into characters, and make characters unique
     const sa = [...new Set(String(a).split(''))]
     const sb = [...new Set(String(b).split(''))]
