@@ -902,3 +902,24 @@ generate_udf_test("linear_regression", [
         expected_output: `STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)`
     },
 ]);
+//
+// End of StatsLib work tests
+//
+generate_udf_test("jaccard", [
+    {
+        inputs: [`"thanks"`, `"thaanks"`],
+        expected_output: `CAST(1.0 AS FLOAT64)`
+    },
+    {
+        inputs: [`"thanks"`, `"thanxs"`],
+        expected_output: `CAST(0.71 AS FLOAT64)`
+    },
+    {
+        inputs: [`"bad demo"`, `"abd demo"`],
+        expected_output: `CAST(1.0 AS FLOAT64)`
+    },
+    {
+        inputs: [`"edge case"`, `"no match"`],
+        expected_output: `CAST(0.25 AS FLOAT64)`
+    },
+]);
