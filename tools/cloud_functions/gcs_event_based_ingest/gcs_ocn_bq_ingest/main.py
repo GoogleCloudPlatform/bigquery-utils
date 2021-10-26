@@ -66,7 +66,7 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         if basename_object_id not in constants.ACTION_FILENAMES:
             action_filenames = constants.ACTION_FILENAMES
             if constants.START_BACKFILL_FILENAME is None:
-                action_filenames.remove(None)
+                action_filenames.discard(None)
             print(f"No-op. This notification was not for a "
                   f"{action_filenames} file.")
             return
@@ -74,8 +74,8 @@ def main(event: Dict, context):  # pylint: disable=unused-argument
         gcs_client = lazy_gcs_client()
         bq_client = lazy_bq_client()
 
-        enforce_ordering = (constants.ORDER_PER_TABLE
-                            or utils.look_for_config_in_parents(
+        enforce_ordering = (constants.ORDER_PER_TABLE or
+                            utils.look_for_config_in_parents(
                                 gcs_client, f"gs://{bucket_id}/{object_id}",
                                 "ORDERME") is not None)
 
@@ -116,33 +116,34 @@ def triage_event(gcs_client: Optional[storage.Client],
     bkt = event_blob.bucket
     basename_object_id = os.path.basename(event_blob.name)
 
+    print(f"Received object notification for gs://{event_blob.bucket.name}/"
+          f"{event_blob.name}")
     # pylint: disable=no-else-raise
     if enforce_ordering:
         # For SUCCESS files in a backlog directory, ensure that subscriber
         # is running.
-        if (basename_object_id == constants.SUCCESS_FILENAME
-                and "/_backlog/" in event_blob.name):
+        if (basename_object_id == constants.SUCCESS_FILENAME and
+                "/_backlog/" in event_blob.name):
             print(f"This notification was for "
                   f"gs://{bkt.name}/{event_blob.name} a "
                   f"{constants.SUCCESS_FILENAME} in a "
                   "/_backlog/ directory. "
                   f"Watiting {constants.ENSURE_SUBSCRIBER_SECONDS} seconds to "
                   "ensure that subscriber is running.")
-            ordering.subscriber_monitor(gcs_client, bkt, event_blob.name)
+            ordering.subscriber_monitor(gcs_client, bkt, event_blob)
             return
-        if (constants.START_BACKFILL_FILENAME
-                and basename_object_id == constants.START_BACKFILL_FILENAME):
-            print(f"notification for gs://{event_blob.bucket.name}/"
-                  f"{event_blob.name}")
+        if (constants.START_BACKFILL_FILENAME and
+                basename_object_id == constants.START_BACKFILL_FILENAME):
             # This will be the first backfill file.
             ordering.start_backfill_subscriber_if_not_running(
-                gcs_client, bkt, utils.get_table_prefix(event_blob.name))
+                gcs_client, bkt, utils.get_table_prefix(gcs_client, event_blob))
             return
         if basename_object_id == constants.SUCCESS_FILENAME:
             ordering.backlog_publisher(gcs_client, event_blob)
             return
         if basename_object_id == constants.BACKFILL_FILENAME:
-            if (event_blob.name != f"{utils.get_table_prefix(event_blob.name)}/"
+            if (event_blob.name !=
+                    f"{utils.get_table_prefix(gcs_client, event_blob)}/"
                     f"{constants.BACKFILL_FILENAME}"):
                 raise RuntimeError(
                     f"recieved notification for gs://{event_blob.bucket.name}/"
@@ -152,6 +153,7 @@ def triage_event(gcs_client: Optional[storage.Client],
             ordering.backlog_subscriber(gcs_client, bq_client, event_blob,
                                         function_start_time)
             return
+        print(f"ERROR CAUSED BY: {basename_object_id}")
         raise RuntimeError(f"gs://{event_blob.bucket.name}/"
                            f"{event_blob.name} could not be triaged.")
     else:  # Default behavior submit job as soon as success file lands.

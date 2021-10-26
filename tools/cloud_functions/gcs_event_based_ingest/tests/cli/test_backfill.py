@@ -13,11 +13,10 @@
 # limitations under the License.
 """integrtion tests for gcs_ocn_bq_ingest"""
 import os
-import time
 
 import backfill
 import pytest
-from google.cloud import bigquery
+from tests import utils as test_utils
 
 TEST_DIR = os.path.realpath(os.path.dirname(__file__) + "/..")
 LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
@@ -26,7 +25,7 @@ LOAD_JOB_POLLING_TIMEOUT = 20  # seconds
 @pytest.mark.IT
 @pytest.mark.CLI
 def test_backfill(bq, gcs_partitioned_data, gcs_truncating_load_config,
-                  gcs_bucket, dest_dataset, dest_partitioned_table, mock_env):
+                  gcs_bucket, dest_partitioned_table):
     """
     This is an adaptation of test_load_job_partitioned but instead uses the
     backfill CLI code path to execute the cloud function's main method in
@@ -38,13 +37,11 @@ def test_backfill(bq, gcs_partitioned_data, gcs_truncating_load_config,
     partitions despite having WRITE_TRUNCATE disposition because the destination
     table should target only a particular partition with a decorator.
     """
-    if not gcs_truncating_load_config.exists():
-        raise EnvironmentError(
-            "the test is not configured correctly the load.json is missing")
-    # load each partition.
-    for gcs_data in gcs_partitioned_data:
-        if not gcs_data.exists():
-            raise EnvironmentError("test data objects must exist")
+    test_utils.check_blobs_exist(
+        gcs_truncating_load_config,
+        "the test is not configured correctly the load.json is missing")
+    test_utils.check_blobs_exist(gcs_partitioned_data,
+                                 "test data objects must exist")
 
     expected_num_rows = 0
     for part in [
@@ -59,32 +56,4 @@ def test_backfill(bq, gcs_partitioned_data, gcs_truncating_load_config,
         "--mode=LOCAL",
     ])
     backfill.main(args)
-    bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)
-
-
-def bq_wait_for_rows(bq_client: bigquery.Client, table: bigquery.Table,
-                     expected_num_rows: int):
-    """
-  polls tables.get API for number of rows until reaches expected value or
-  times out.
-
-  This is mostly an optimization to speed up the test suite without making it
-  flaky.
-  """
-
-    start_poll = time.monotonic()
-    actual_num_rows = 0
-    while time.monotonic() - start_poll < LOAD_JOB_POLLING_TIMEOUT:
-        bq_table: bigquery.Table = bq_client.get_table(table)
-        actual_num_rows = bq_table.num_rows
-        if actual_num_rows == expected_num_rows:
-            return
-        if actual_num_rows > expected_num_rows:
-            raise AssertionError(
-                f"{table.project}.{table.dataset_id}.{table.table_id} has"
-                f"{actual_num_rows} rows. expected {expected_num_rows} rows.")
-    raise AssertionError(
-        f"Timed out after {LOAD_JOB_POLLING_TIMEOUT} seconds waiting for "
-        f"{table.project}.{table.dataset_id}.{table.table_id} to "
-        f"reach {expected_num_rows} rows."
-        f"last poll returned {actual_num_rows} rows.")
+    test_utils.bq_wait_for_rows(bq, dest_partitioned_table, expected_num_rows)

@@ -43,6 +43,25 @@ def gcs() -> storage.Client:
     return storage.Client()
 
 
+@pytest.fixture
+def mock_env(gcs, monkeypatch):
+    """
+    environment variable mocks
+
+    All tests use this fixture; it is specified in the
+    pyest.ini file as:
+      [pytest]
+      usefixtures = mock_env
+    For more information on module-wide fixtures, see:
+    https://docs.pytest.org/en/stable/fixture.html#use-fixtures-in-classes-and-modules-with-usefixtures
+    """
+    # Infer project from the gcs client application default credentials.
+    monkeypatch.setenv("GCP_PROJECT", gcs.project)
+    monkeypatch.setenv("FUNCTION_NAME", "e2e-test")
+    monkeypatch.setenv("FUNCTION_TIMEOUT_SEC", "540")
+    monkeypatch.setenv("BQ_PROJECT", gcs.project)
+
+
 @pytest.fixture(scope='module')
 def terraform_infra(request):
 
@@ -87,8 +106,6 @@ def dest_dataset(request, bq, monkeypatch):
                                f".{random_dataset}")
     dataset.location = "US"
     bq.create_dataset(dataset)
-    monkeypatch.setenv("BQ_LOAD_STATE_TABLE",
-                       f"{dataset.dataset_id}.serverless_bq_loads")
     print(f"created dataset {dataset.dataset_id}")
 
     def teardown():

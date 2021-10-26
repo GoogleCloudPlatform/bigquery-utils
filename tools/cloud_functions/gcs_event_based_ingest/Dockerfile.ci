@@ -11,7 +11,7 @@ RUN apt-get update \
 WORKDIR /ci
 COPY requirements.txt requirements-dev.txt ./
 COPY scripts/install_terraform.sh ./
-RUN ./install_terraform.sh
-RUN pip3 install --no-cache-dir -r requirements-dev.txt
+RUN ./install_terraform.sh \
+    && pip3 install --no-cache-dir -r requirements-dev.txt
 ENTRYPOINT ["python3", "-m", "pytest"]
 
