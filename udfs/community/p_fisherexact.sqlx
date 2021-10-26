@@ -82,7 +82,6 @@ function LynHyperGoe_appr( a, b, c, d ) {
      else {temp = temp - lnfact(d);}
      
      return( temp );
-     
 }
   
   var n = Math['round'](a + b + c + d);
