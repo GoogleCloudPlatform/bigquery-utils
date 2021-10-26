@@ -125,7 +125,6 @@ function LynHyperGoe_appr( a, b, c, d ) {
         }
         if ( LnPrx <= LnPra ) { 
             temp = temp + Math['exp']( LnPrx - LnPra );
-
         }
      }
   }
