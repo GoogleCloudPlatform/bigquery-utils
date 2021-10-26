@@ -106,7 +106,6 @@ function LynHyperGoe_appr( a, b, c, d ) {
         LnPrx = LnHyperGeometric( x , n1_ - x, n_1 - x, n_21 +x) ;
         if ( LnPrx <= LnPra ) { 
             temp = temp + Math['exp']( LnPrx - LnPra );
-
         }         
      }
   } else {
