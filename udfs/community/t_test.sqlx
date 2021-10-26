@@ -19,10 +19,10 @@ config { hasOutput: true }
 
 -- Student's T-Test
 -- Input:
-	-- pop1, array of FLOAT64, values from first group
-	-- pop2, array of FLOAT64, values from second group
+--     pop1, array of FLOAT64, values from first group
+--     pop2, array of FLOAT64, values from second group
 -- Output: 
-        -- Struct of t_value and DOF
+--     Struct of t_value and DOF
 
 
 CREATE OR REPLACE FUNCTION ${self()}(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) AS ((
