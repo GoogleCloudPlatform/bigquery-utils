@@ -902,17 +902,48 @@ generate_udf_test("linear_regression", [
         expected_output: `STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)`
     },
 ]);
+generate_udf_test("corr_pvalue", [
+    {
+	inputs: [
+                `CAST(0.9 AS FLOAT64)`,
+                `CAST(25 AS INT64)`
+	],
+	expected_output: `CAST(1.443229117741041E-9 AS FLOAT64)`
+    },
+    {
+        inputs: [
+                `CAST(-0.5 AS FLOAT64)`,
+                `CAST(40 AS INT64)`
+        ],
+        expected_output: `CAST(0.0010423414457657223 AS FLOAT64)`
+    },
+    {
+        inputs: [
+                `CAST(1.0 AS FLOAT64)`,
+                `CAST(50 AS INT64)`
+        ],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
 generate_udf_test("p_fisherexact", [
     {
-        inputs: [`(SELECT CAST(90 AS FLOAT64), CAST(27 AS FLOAT64), CAST(17 AS FLOAT64), CAST(50 AS FLOAT64))`],
+        inputs: [
+		`CAST(90 AS FLOAT64)`, 
+		`CAST(27 AS FLOAT64)`, 
+		`CAST(17 AS FLOAT64)`, 
+		`CAST(50 AS FLOAT64)`
+	],
         expected_output: `CAST(8.046828829103659E-12 AS FLOAT64)`
     },
 ]); 
 generate_udf_test("mannwhitneyu", [
     {
-        inputs: [`(SELECT ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.], ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.], CAST('two-sided' AS STRING))`],
-    
-    expected_output: `STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p)`
+        inputs: [
+		`(SELECT ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.])`,
+		`(SELECT ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.])`, 
+		`CAST('two-sided' AS STRING)`
+	],
+	expected_output: `STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p)`
     },
 ]); 
 //
