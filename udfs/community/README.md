@@ -14,6 +14,7 @@ SELECT bqutil.fn.int(1.684)
 ## UDFs
 
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
+* [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
@@ -34,6 +35,7 @@ SELECT bqutil.fn.int(1.684)
 * [levenshtein](#levenshteinsource-string-target-string-returns-int64)
 * [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
+* [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -41,6 +43,7 @@ SELECT bqutil.fn.int(1.684)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [pi](#pi)
 * [pvalue](#pvalueh-float64-dof-float64)
+* [p_fisherexact](#p_fisherexacta-float64-b-float64-c-float64-d-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
@@ -813,11 +816,47 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
-
-* [kruskal_wallis](#kruskal_wallisarrstructfactor-string-val-float64)
+* [corr_pvalue](#corr_pvaluer-float64-n-int64)
+* [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
+* [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
+* [pvalue](#pvalueh-float64-dof-float64)
+* [p_fisherexact](#p_fisherexacta-float64-b-float64-c-float64-d-float64)
+* [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
+* [t_test](#t_testarrayarray)
 
 ## Documentation
 
+### [corr_pvalue(r FLOAT64, n INT64)](corr_pvalue.sqlx)
+The returns the p value of the computed correlation coefficient based on the t-distribution.
+Input:
+r: correlation value.
+n: number of samples.
+Output:
+The p value of the correlation coefficient.
+```sql
+WITH test_cases AS (
+    SELECT  0.9 AS r, 25 n
+    UNION ALL 
+    SELECT -0.5, 40
+    UNION ALL 
+    SELECT 1.0, 50
+    UNION ALL 
+    SELECT -1.0, 50
+)
+SELECT bqutil.fn.corr_pvalue(r,n) AS p
+FROM test_cases
+```
+
+results:
+
+| p |
+|-----|
+| 1.443229117741041E-9 |
+| 0.0010423414457657223 |
+| 0.0 |
+| 0.0 |
+-----
+  
 ### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sqlx)
 Takes an array of struct where each struct (point) represents a measurement, with a group label and a measurement value
 
@@ -852,8 +891,7 @@ results:
 | results.H	| results.p	| results.DoF	|
 |-----------|-----------|-------------|
 | 3.4230769 | 0.1805877 | 2           |
-
-
+-----
 
 ### [linear_regression(ARRAY(STRUCT(STRUCT(X FLOAT64, Y FLOAT64))](linear_regression.sqlx)
 Takes an array of STRUCT X, Y and returns _a, b, r_ where _Y = a*X + b_, and _r_ is the "goodness of fit measure.
@@ -875,9 +913,7 @@ results:
 | results.a          	| results.b	         | results.r	       |
 |---------------------|--------------------|-------------------|
 | -0.4353361094588436 | 0.5300416418798544 | 0.632366563565354 |
-
-
-
+-----
 
 ### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sqlx)
 Takes _H_ and _dof_ and returns _p_ probability value.
@@ -897,6 +933,56 @@ results:
 | results         	|
 |-------------------|
 |0.8607079764250578 |
+-----
+
+### [p_fisherexact(a FLOAT64, b FLOAT64, c FLOAT64, d FLOAT64)](p_fisherexact.sqlx)
+Computes the p value of the Fisher exact test (https://en.wikipedia.org/wiki/Fisher%27s_exact_test), implemented in JavaScript.
+
+- **Input:** a,b,c,d : values of 2x2 contingency table ([ [ a, b ] ;[ c , d ] ] (type FLOAT64).
+- **Output:** The p value of the test (type: FLOAT64)
+
+Example
+```SQL
+WITH mydata as (
+SELECT
+    90.0        as a,
+    27.0        as b,
+    17.0        as c,
+    50.0  as d
+)
+SELECT
+    `bqutils.fn.p_fisherexact`(a,b,c,d) as pvalue
+FROM
+   mydata
+```
+
+Output:
+| pvalue |
+|---|
+| 8.046828829103659E-12 | 
+-----
+
+### [mannwhitneyu(x ARRAY<FLOAT64>, y ARRAY<FLOAT64>, alt STRING)](mannwhitneyu.sqlx)
+Computes the U statistics and the p value of the Mann–Whitney U test (https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test). This test is also called the Mann–Whitney–Wilcoxon (MWW), Wilcoxon rank-sum test, or Wilcoxon–Mann–Whitney test
+
+- **Input:** x,y :arrays of samples, both should be one-dimensional (type: ARRAY<FLOAT64> ), alt: defines the alternative hypothesis, the following options are available: 'two-sided', 'less', and 'greater'.
+- **Output:** structure of the type struct<U FLOAT64, p FLOAT64> where U is the statistic and p is the p value of the test.
+
+Example
+```
+WITH mydata AS (
+  SELECT
+    [2, 4, 6, 2, 3, 7, 5, 1.] AS x,
+    [8, 10, 11, 14, 20, 18, 19, 9. ] AS y
+)
+SELECT `bqutils.fn.mannwhitneyu`(y, x, 'two-sided') AS test
+FROM mydata
+```
+
+Output:
+| test.U | test.p |
+|---|---|
+| 0.0 | 9.391056991171487E-4 | 
 
 -----
 ### [t_test(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sql)
