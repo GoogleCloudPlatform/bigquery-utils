@@ -35,7 +35,7 @@ SELECT bqutil.fn.int(1.684)
 * [levenshtein](#levenshteinsource-string-target-string-returns-int64)
 * [linear_interpolate](#linear_interpolatepos-int64-prev-structx-int64-y-float64-next-structx-int64-y-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
-* mannwhitneyu
+* [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
@@ -43,7 +43,7 @@ SELECT bqutil.fn.int(1.684)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [pi](#pi)
 * [pvalue](#pvalueh-float64-dof-float64)
-* p_fisherexact
+* [p_fisherexact](#p_fisherexacta-float64-b-float64-c-float64-d-float64)
 * [radians](#radiansx-any-type)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
@@ -817,12 +817,12 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
-* [kruskal_wallis](#kruskal_wallisarrstructfactor-string-val-float64)
-* linear_regression
-* pvalue
-* p_fisherexact
-* mannwhitneyu
-* t_test
+* [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
+* [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
+* [pvalue](#pvalueh-float64-dof-float64)
+* [p_fisherexact](#p_fisherexacta-float64-b-float64-c-float64-d-float64)
+* [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
+* [t_test](t_testarrayarray)
 
 ## Documentation
 
