@@ -822,7 +822,7 @@ SELECT bqutil.fn.int(1.684)
 * [pvalue](#pvalueh-float64-dof-float64)
 * [p_fisherexact](#p_fisherexacta-float64-b-float64-c-float64-d-float64)
 * [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
-* [t_test](t_testarrayarray)
+* [t_test](#t_testarrayarray)
 
 ## Documentation
 
