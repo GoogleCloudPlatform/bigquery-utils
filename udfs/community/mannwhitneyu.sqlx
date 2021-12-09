@@ -55,3 +55,4 @@ AS (
  SELECT struct(U, factor* ${ref("normal_cdf")}(z,0.0,1.0) as p ) 
  FROM normal_appr 
 ));
+
