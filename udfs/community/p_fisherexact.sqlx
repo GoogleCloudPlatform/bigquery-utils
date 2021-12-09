@@ -130,3 +130,4 @@ function LynHyperGoe_appr( a, b, c, d ) {
   var LnPFET = LnPra  + Math['log']( temp ); 
   return  Math['exp']( LnPFET ) ;
 """;
+
