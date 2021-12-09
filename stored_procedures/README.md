@@ -15,6 +15,9 @@ CALL bqutil.procedure.GetNextIds(10, next_ids);
 ## Stored Procedures
 
 * [GetNextIds](#GetNextIds)
+* [chi_square](#chi_square)
+* [Benjamini-Hochberg multipletests](#bh_multiple_tests)
+* [Linear Regression](#linear_regression)
 
 ## Documentation
 
@@ -90,3 +93,42 @@ Output:
 | 0.074 | 0.08457142857142856 |
 | 0.205 | 0.205 |
    
+### [linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )](linear_regression.sql)
+Run a standard linear regression on table data. Expects a table and two columns: the independent variable and the dependent variable. The output is a STRUCT with the slope (`a`), the intercept (`b`) and the correlation value (`r`).
+
+> Input data
+
+The unit test for this procedure builds a TEMP table to contain the classic [Iris flower data set](https://en.wikipedia.org/wiki/Iris_flower_data_set). This dataset contains 150 data points, not all shown below. The sample call demonstrates how to access the output.
+
+```sql
+-- a unit test of linear_regression
+BEGIN
+  DECLARE result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64>;
+  CREATE TEMP TABLE iris (sepal_length FLOAT64, sepal_width FLOAT64, petal_length FLOAT64, petal_width FLOAT64, species STRING)
+  AS
+  SELECT 5.1 AS sepal_length,
+       3.5 AS sepal_width,
+       1.4 AS petal_length,
+       0.2 AS petal_width,
+       'setosa' AS species
+     UNION ALL SELECT 4.9,3.0,1.4,0.2,'setosa'
+     UNION ALL SELECT 4.7,3.2,1.3,0.2,'setosa'
+     ...
+     UNION ALL SELECT 6.5,3.0,5.2,2.0,'virginica'
+     UNION ALL SELECT 6.2,3.4,5.4,2.3,'virginica'
+     UNION ALL SELECT 5.9,3.0,5.1,1.8,'virginica';
+```
+
+```sql
+CALL bqutil.procedure.linear_regression('iris', 'sepal_width', 'petal_width', result);
+
+  -- We round to 11 decimals here because there appears to be some inconsistency in the function, likely due to floating point errors and the order of aggregation
+  ASSERT ROUND(result.a, 11) = 3.11519268710;
+  ASSERT ROUND(result.b, 11) = -0.62754617565;
+  ASSERT ROUND(result.r, 11) = -0.35654408961;
+END;
+```
+
+Output:
+
+`This assertion was successful`
