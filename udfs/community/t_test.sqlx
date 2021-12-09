@@ -45,3 +45,4 @@ CREATE OR REPLACE FUNCTION ${self()}(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) A
             n1 + n2 - 2 AS dof)
     FROM pop1 CROSS JOIN pop2
 ));
+
