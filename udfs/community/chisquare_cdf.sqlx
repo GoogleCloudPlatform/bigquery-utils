@@ -24,3 +24,4 @@ LANGUAGE js AS """
 OPTIONS ( 
     library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]
 );
+
