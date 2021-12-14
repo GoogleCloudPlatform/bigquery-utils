@@ -10,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import java.text.DecimalFormat;
 import org.json.simple.JSONObject;
@@ -39,9 +37,6 @@ import org.json.simple.JSONObject;
  */
 public class Main {
   public static void main(String[] args) {
-    // deals with slf4j logger errors from calcite parser
-    Logger.getRootLogger().setLevel(Level.OFF);
-
     // starts the timer for runtime measurement
     long start = System.nanoTime();
 
