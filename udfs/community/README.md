@@ -39,7 +39,6 @@ SELECT bqutil.fn.int(1.684)
 * [median](#medianarr-any-type)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
-* [normal_cdf](#normal_cdfarrayarray)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [pi](#pi)
@@ -986,7 +985,56 @@ Output:
 | 0.0 | 9.391056991171487E-4 | 
 
 -----
-### [normal_cdf(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sql)
+### [t_test(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sqlx)
+
+Runs the Student's T-test. Well known test to compare populations. Example taken from here: [Sample](https://www.jmp.com/en_ch/statistics-knowledge-portal/t-test/two-sample-t-test.html)
+
+Sample Query:
+
+```SQL
+DECLARE pop1 ARRAY<FLOAT64>;
+DECLARE pop2 ARRAY<FLOAT64>;
+
+SET pop1 = [13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0];
+SET pop2 = [22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0] ;
+
+SELECT `bqutils.fn.t_test`(pop1, pop2) AS actual_result_rows;
+
+```
+
+Results:
+
+| Row	| actual_result_rows.t_value | actual_result_rows.dof|
+|-----|----------------------------|-----------------------|
+| 1	| 2.8957935572829476 | 21
+
+-----
+### [t_test(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sqlx)
+
+Runs the Student's T-test. Well known test to compare populations. Example taken from here: [Sample](https://www.jmp.com/en_ch/statistics-knowledge-portal/t-test/two-sample-t-test.html)
+
+Sample Query:
+
+```SQL
+DECLARE pop1 ARRAY<FLOAT64>;
+DECLARE pop2 ARRAY<FLOAT64>;
+
+SET pop1 = [13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0];
+SET pop2 = [22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0] ;
+
+SELECT `bqutils.fn.t_test`(pop1, pop2) AS actual_result_rows;
+
+```
+
+Results:
+
+| Row	| actual_result_rows.t_value | actual_result_rows.dof|
+|-----|----------------------------|-----------------------|
+| 1	| 2.8957935572829476 | 21
+
+
+-----
+### [normal_cdf(x FLOAT64, mean FLOAT64, stdev FLOAT64)](normal_cdf.sqlx)
 
 Returns the value of x in the cdf of the Normal distribution with parameters mean and std (standard deviation).
 
@@ -1001,4 +1049,3 @@ Results:
 | Row	| normal_cdf |
 |-----|-------------------|
 | 1	| 0.3820885778110474 |
- 
