@@ -936,6 +936,15 @@ generate_udf_test("p_fisherexact", [
         expected_output: `CAST(8.046828829103659E-12 AS FLOAT64)`
     },
 ]); 
+generate_udf_test("t_test", [
+    {
+        inputs: [
+		`(SELECT ARRAY<FLOAT64>[13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0])`,
+		`(SELECT ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0])` 
+	],
+	expected_output: `STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INTEGER) AS dof)`
+    },
+]); 
 generate_udf_test("mannwhitneyu", [
     {
         inputs: [
@@ -944,6 +953,17 @@ generate_udf_test("mannwhitneyu", [
 		`CAST('two-sided' AS STRING)`
 	],
 	expected_output: `STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p)`
+    },
+]); 
+//
+generate_udf_test("normal_cdf", [
+    {
+        inputs: [
+		`CAST(1.1 AS FLOAT64)`,
+		`CAST(1.7 AS FLOAT64)`,
+		`CAST(2.0 AS FLOAT64)`
+	],
+	expected_output: `CAST(0.3820885778110474 AS FLOAT64)`
     },
 ]); 
 //
