@@ -993,7 +993,7 @@ Returns the value of x in the cdf of the Normal distribution with parameters mea
 Sample Query:
 
 ```SQL
-SELECT `bigquery-utils-stat.fn.normal_cdf`(1.1, 1.7, 2.0) as normal_cdf;
+SELECT `bqutils.fn.normal_cdf`(1.1, 1.7, 2.0) as normal_cdf;
 ```
 
 Results:
