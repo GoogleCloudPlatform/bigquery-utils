@@ -33,5 +33,6 @@ CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<factor STRING, val FLOAT6
                       COUNT(n) -1 AS DoF
         FROM sums
     ) # H_raw
-    SELECT struct(H AS H, ${ref("pvalue")}(H, DoF) AS p, DoF AS DoF) FROM H_raw
+    SELECT struct(H AS H, ${ref("chisquare_cdf")}(H, DoF) AS p, DoF AS DoF) FROM H_raw
 ));
+

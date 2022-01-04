@@ -1,0 +1,48 @@
+config { hasOutput: true }
+
+/*
+ * Copyright 2021 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+-- Student's T-Test
+-- Input:
+--     pop1, array of FLOAT64, values from first group
+--     pop2, array of FLOAT64, values from second group
+-- Output: 
+--     Struct of t_value and DOF
+
+
+CREATE OR REPLACE FUNCTION ${self()}(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) AS ((
+    WITH pop1 AS (
+        SELECT 
+            AVG(p1) x1,
+            STDDEV(p1) st1,
+            COUNT(p1) AS n1 
+        FROM UNNEST(pop1) AS p1
+    ), pop2 as (
+        SELECT 
+            AVG(p2) x2,
+            STDDEV(p2) st2,
+            COUNT(p2) AS n2
+        FROM UNNEST(pop2) AS p2
+    )
+    SELECT
+        STRUCT(
+            ABS(x1 - x2) / Sqrt((st1 * st1 / n1) + (st2 * st2 / n2)) AS t_value,
+            n1 + n2 - 2 AS dof)
+    FROM pop1 CROSS JOIN pop2
+));
+
