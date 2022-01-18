@@ -923,7 +923,7 @@ The [chisquare_cdf](https://jstat.github.io/distributions.html#jStat.chisquare.c
 
 * Input: H FLOAT64, dof FLOAT64
 * Output: p FLOAT64
-*
+
 ```sql
 SELECT `bqutils.fn.chisquare_cdf`(.3,2) AS results;
 ```
