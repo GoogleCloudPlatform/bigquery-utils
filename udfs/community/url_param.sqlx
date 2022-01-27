@@ -15,11 +15,12 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(query STRING, p STRING)
+CREATE OR REPLACE FUNCTION ${self()}(url STRING, p STRING)
 RETURNS STRING
 LANGUAGE js AS """
   result = null;
   try {
+    query = url.split("?")[1].split("#")[0];
     if(query) {
       params = query.split('&').forEach(function(part) {
         item = part.split('=');

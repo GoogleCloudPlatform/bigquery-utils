@@ -418,6 +418,13 @@ generate_udf_test("url_parse", [
 generate_udf_test("url_param", [
     {
         inputs: [
+            `NULL`,
+            `"k1"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
             `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
             `"k1"`
         ],
