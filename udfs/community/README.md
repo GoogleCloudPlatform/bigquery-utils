@@ -62,6 +62,7 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
+* [url_trim_query](#url_trim_query)
 * [week_of_month](#week_of_monthdate_expression-any-type)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
@@ -291,7 +292,7 @@ SELECT bqutil.fn.int(1) int1
 Note that CAST(x AS INT64) rounds the number, while this function truncates it. In many cases, that's the behavior users expect.
 
 ### [jaccard()](jaccard.sqlx)
-Accepts two string and returns the distance using Jaccard algorithm. 
+Accepts two string and returns the distance using Jaccard algorithm.
 ```sql
 SELECT
        bqutil.fn.jaccard('thanks', 'thaanks'),
@@ -748,6 +749,20 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
+### [url_trim_query(urlString STRING, keys ARRAY<STRING>)](url_trim_query.sqlx)
+
+Returns trimed query URL from input URL. The remove query is specified arguments.
+
+```sql
+SELECT bqutil.fn.url_trim_query("https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123", ["utm_id", "gclid"])
+UNION ALL SELECT bqutil.fn.url_trim_query("https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123", ["utm_id", "gclid", "goods_id"])
+```
+
+results:
+- https://www.example.com/index.html?goods_id=G1002
+- https://www.example.com/index.html
+
+
 ### [week_of_month(date_expression ANY TYPE)](week_of_month.sqlx)
 Returns the number of weeks from the beginning of the month to the specified date. The result is an INTEGER value between 1 and 5, representing the nth occurrence of the week in the month. The value 0 means the partial week.
 
@@ -837,11 +852,11 @@ The p value of the correlation coefficient.
 ```sql
 WITH test_cases AS (
     SELECT  0.9 AS r, 25 n
-    UNION ALL 
+    UNION ALL
     SELECT -0.5, 40
-    UNION ALL 
+    UNION ALL
     SELECT 1.0, 50
-    UNION ALL 
+    UNION ALL
     SELECT -1.0, 50
 )
 SELECT bqutil.fn.corr_pvalue(r,n) AS p
@@ -857,7 +872,7 @@ results:
 | 0.0 |
 | 0.0 |
 -----
-  
+
 ### [kruskal_wallis(ARRAY(STRUCT(factor STRING, val FLOAT64))](kruskal_wallis.sqlx)
 Takes an array of struct where each struct (point) represents a measurement, with a group label and a measurement value
 
@@ -960,7 +975,7 @@ FROM
 Output:
 | pvalue |
 |---|
-| 8.046828829103659E-12 | 
+| 8.046828829103659E-12 |
 -----
 
 ### [mannwhitneyu(x ARRAY<FLOAT64>, y ARRAY<FLOAT64>, alt STRING)](mannwhitneyu.sqlx)
@@ -983,7 +998,7 @@ FROM mydata
 Output:
 | test.U | test.p |
 |---|---|
-| 0.0 | 9.391056991171487E-4 | 
+| 0.0 | 9.391056991171487E-4 |
 
 -----
 ### [t_test(ARRAY<FLOAT64>,ARRAY<FLOAT64>)](t_test.sqlx)
