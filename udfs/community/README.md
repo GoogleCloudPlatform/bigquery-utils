@@ -754,13 +754,23 @@ results:
 Returns trimed query URL from input URL. The remove query is specified arguments.
 
 ```sql
-SELECT bqutil.fn.url_trim_query("https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123", ["utm_id", "gclid"])
-UNION ALL SELECT bqutil.fn.url_trim_query("https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123", ["utm_id", "gclid", "goods_id"])
+SELECT bqutil.fn.url_trim_query(
+  "https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123",
+  ["utm_id", "gclid"]
+)
+UNION ALL SELECT bqutil.fn.url_trim_query(
+  "https://www.example.com/index.html?goods_id=G1002&utm_id=ads&gclid=abc123",
+  ["utm_id", "gclid", "goods_id"]
+)
 ```
 
 results:
-- https://www.example.com/index.html?goods_id=G1002
-- https://www.example.com/index.html
+
+|     f0_      |
+|--------------|
+| https://www.example.com/index.html?goods_id=G1002 |
+| https://www.example.com/index.html |
+
 
 
 ### [week_of_month(date_expression ANY TYPE)](week_of_month.sqlx)
