@@ -455,8 +455,36 @@ generate_udf_test("url_param", [
 generate_udf_test("url_trim_query", [
     {
         inputs: [
-            `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
-            `["utm_id"]`
+            `NULL`,
+            `["hellp"]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `[]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `NULL`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123&hello=world"`,
+          `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?hello=world"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
+          `["utm_id"]`
         ],
         expected_output: `"https://www.example.com/abc/index.html?id=12345"`
     },
@@ -467,6 +495,7 @@ generate_udf_test("url_trim_query", [
         ],
         expected_output: `"https://www.example.com/abc/index.html"`
     },
+
     {
         inputs: [
             `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,

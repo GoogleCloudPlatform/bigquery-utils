@@ -15,22 +15,23 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(url STRING, keys ARRAY<STRING>)
-RETURNS STRING
-LANGUAGE js AS """
-  result = url;
-  if (url.indexOf("?") >= 0) {
-    result = url.split("?")[0];
-    hash = url.split("?")[1].split("#")[1];
-    queries = url.split("?")[1].split("#")[0].split("&").filter((query) => {
-      return !keys.includes(query.split("=")[0]);
-    });
-    if (queries.length >= 1) {
-      result += "?" + queries.join("&");
-    }
-    if (hash) {
-      result += "#" + hash;
-    }
-  }
-  return result;
-""";
+CREATE OR REPLACE FUNCTION ${self()}(url STRING, keys_to_trim ARRAY<STRING>) AS ((
+SELECT
+    url_base || IF(keys IS NULL, '', '?' || keys) || IF(url_hash IS NULL, '', '#' || url_hash)
+FROM(
+    SELECT
+        url_base,
+        url_hash,
+        STRING_AGG(
+            IF(LOWER(SPLIT(url_key, '=')[SAFE_OFFSET(0)]) NOT IN(SELECT LOWER(key) FROM UNNEST(keys_to_trim) AS key),
+                url_key,
+                NULL),
+            '&') AS keys
+    FROM(
+        SELECT
+            SPLIT(url, '?')[SAFE_OFFSET(0)] AS url_base,
+            SPLIT(url, '#')[SAFE_OFFSET(1)] AS url_hash,
+            IFNULL(SPLIT(SPLIT(SPLIT(url, '?')[SAFE_OFFSET(1)], '#')[SAFE_OFFSET(0)], '&'), [CAST(NULL AS STRING)]) AS url_keys
+    ), UNNEST(url_keys) AS url_key
+    GROUP BY 1,2)
+));
