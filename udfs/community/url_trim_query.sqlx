@@ -1,0 +1,37 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(url STRING, keys_to_trim ARRAY<STRING>) AS ((
+SELECT
+    url_base || IF(keys IS NULL, '', '?' || keys) || IF(url_hash IS NULL, '', '#' || url_hash)
+FROM(
+    SELECT
+        url_base,
+        url_hash,
+        STRING_AGG(
+            IF(LOWER(SPLIT(url_key, '=')[SAFE_OFFSET(0)]) NOT IN(SELECT LOWER(key) FROM UNNEST(keys_to_trim) AS key),
+                url_key,
+                NULL),
+            '&') AS keys
+    FROM(
+        SELECT
+            SPLIT(url, '?')[SAFE_OFFSET(0)] AS url_base,
+            SPLIT(url, '#')[SAFE_OFFSET(1)] AS url_hash,
+            IFNULL(SPLIT(SPLIT(SPLIT(url, '?')[SAFE_OFFSET(1)], '#')[SAFE_OFFSET(0)], '&'), [CAST(NULL AS STRING)]) AS url_keys
+    ), UNNEST(url_keys) AS url_key
+    GROUP BY 1,2)
+));

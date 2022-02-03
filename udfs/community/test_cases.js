@@ -452,6 +452,71 @@ generate_udf_test("url_param", [
         expected_output: `NULL`
     },
 ]);
+generate_udf_test("url_trim_query", [
+    {
+        inputs: [
+            `NULL`,
+            `["hello"]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `[]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `NULL`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123&hello=world"`,
+          `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?hello=world"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
+          `["utm_id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?id=12345"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
+          `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,
+            `["utm_id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?id=12345#hash"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,
+            `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html#hash"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `["gclid"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+]);
 generate_udf_test("percentage_change", [
     {
         inputs: [
