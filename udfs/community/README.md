@@ -62,7 +62,7 @@ SELECT bqutil.fn.int(1.684)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
-* [url_trim_query](#url_trim_queryurlstring-string-keys-array)
+* [url_trim_query](#url_trim_queryurl-string-keys_to_trim-array)
 * [week_of_month](#week_of_monthdate_expression-any-type)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
@@ -749,9 +749,11 @@ results:
 | facebook.com | NULL        | NULL             | NULL | rpc  |
 
 
-### [url_trim_query(urlString STRING, keys ARRAY<STRING>)](url_trim_query.sqlx)
+### [url_trim_query(url STRING, keys_to_trim ARRAY<STRING>)](url_trim_query.sqlx)
 
-Returns trimed query URL from input URL. The remove query is specified arguments.
+Returns a URL with specified keys removed from the
+[URL's query component](https://en.wikipedia.org/wiki/Query_string).
+The keys to be removed are provided as an ARRAY<STRING> input argument.
 
 ```sql
 SELECT bqutil.fn.url_trim_query(

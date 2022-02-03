@@ -456,7 +456,7 @@ generate_udf_test("url_trim_query", [
     {
         inputs: [
             `NULL`,
-            `["hellp"]`
+            `["hello"]`
         ],
         expected_output: `NULL`
     },
@@ -495,7 +495,6 @@ generate_udf_test("url_trim_query", [
         ],
         expected_output: `"https://www.example.com/abc/index.html"`
     },
-
     {
         inputs: [
             `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,
@@ -517,7 +516,7 @@ generate_udf_test("url_trim_query", [
         ],
         expected_output: `"https://www.example.com/abc/index.html"`
     },
-])
+]);
 generate_udf_test("percentage_change", [
     {
         inputs: [
