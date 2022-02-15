@@ -14,31 +14,41 @@
  * limitations under the License.
  */
 
--- @param STRING table_name table (or subquery) that contains the data
--- @param STRING pop1_variable name of the column in our table that represents the initial observation variable
--- @param STRING pop2_variable name of the column in our table that represents the final (paired) observation variable
+-- @param STRING pop1_table table name (or subquery) that contains the first population
+-- @param STRING pop1_variable name of the measurement column in our first table
+-- @param STRING pop2_table table name (or subquery) that contains the second population
+-- @param STRING pop2_variable name of the measurement column in our second table
 -- @return STRUCT<t_value FLOAT64, dof FLOAT64, p_value FLOAT64>
 
-CREATE OR REPLACE PROCEDURE bqutil.procedure.t_test_paired (table_name STRING, pop1_variable STRING, pop2_variable STRING, OUT result STRUCT<t_value FLOAT64, dof FLOAT64, p_value FLOAT64> )
+CREATE OR REPLACE PROCEDURE bqutil.procedure.t_test(pop1_table STRING, pop1_variable STRING, pop2_table STRING, pop2_variable STRING, OUT result STRUCT<t_value FLOAT64, dof FLOAT64, p_value FLOAT64> )
 BEGIN
 EXECUTE IMMEDIATE """
-    WITH source_data AS (
-        SELECT
-            """ || pop1_variable || """ AS val1,
-            """ || pop2_variable || """ as val2
-        FROM """ || table_name || """
+    WITH pop1 AS (
+        SELECT `""" || pop1_variable || """` AS value
+        FROM """ || pop1_table ||"""
+    ), pop2 as (
+        SELECT `""" || pop2_variable || """` AS value
+        FROM """ || pop2_table || """
     )
     SELECT STRUCT(
-        mean / ( std / SQRT(N) ) AS  t_value,
-        n-1 AS dof,
-        bqutil.fn.pvalue(mean / ( std / SQRT(N) ), n-1) AS p_value
+        ABS(x1 - x2) / Sqrt((st1 * st1 / n1) + (st2 * st2 / n2)) AS t_value,
+        n1 + n2 - 2 AS dof,
+        bqutil.fn.pvalue(ABS(x1 - x2) / Sqrt((st1 * st1 / n1) + (st2 * st2 / n2)), n1 + n2 - 2) AS p_value
     )
     FROM (
         SELECT
-            AVG( source_data.val1 - source_data.val2 ) as mean,
-            STDDEV_SAMP( source_data.val1 - source_data.val2 ) as std,
-            COUNT(*) as n
-        FROM source_data
+            AVG(value) x1,
+            STDDEV(value) st1,
+            COUNT(value) AS n1
+        FROM pop1
+    )
+    CROSS JOIN
+    (
+        SELECT
+            AVG(value) x2,
+            STDDEV(value) st2,
+            COUNT(value) AS n2
+        FROM pop2
     )
 """ INTO result;
 END;
@@ -204,11 +214,11 @@ BEGIN
      UNION ALL SELECT 5.9,3.0,5.1,1.8,'virginica';
 
 
-  CALL bqutil.procedure.t_test_paired('iris', 'sepal_width', 'petal_width', result);
+  CALL bqutil.procedure.t_test('iris', 'sepal_width', 'iris', 'petal_width', result);
 
   -- We round to 11 decimals here because there appears to be some inconsistency in the function, likely due to floating point errors and the order of aggregation
-  ASSERT ROUND(result.t_value, 11) = 22.65094961383;
-  ASSERT result.dof = 149;
+  ASSERT ROUND(result.t_value, 11) = 25.88834390257;
+  ASSERT result.dof = 298;
   ASSERT result.p_value = 1.0;
 END;
 
