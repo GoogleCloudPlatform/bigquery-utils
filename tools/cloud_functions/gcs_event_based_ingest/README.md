@@ -375,7 +375,7 @@ DEFAULT_JOB_LABELS = {
 
 If the destination regex matches a batch group, there will be a `batch-id`label.
 
-### Example INFROMATION SCHEMA Query
+### Example INFORMATION_SCHEMA Query
 
 ```sql
 SELECT
