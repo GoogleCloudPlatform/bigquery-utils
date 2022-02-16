@@ -2,7 +2,7 @@
 
 This sample shows how to create an event driven pipeline on Cloud Run via Pub/Sub
 
-[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/yrvine-g/event-driven-pipeline&cloudshell_tutorial=pipeline/pubsub/README.md)
+[![Open in Cloud Shell](https://gstatic.com/cloudssh/images/open-btn.png)](https://ssh.cloud.google.com/cloudshell/open?cloudshell_git_repo=https://github.com/yrvine-g/bigquery-utils.git&cloudshell_tutorial=tools/cloud_run/event_driven_bq_ingest/README.md)
 
 
 
