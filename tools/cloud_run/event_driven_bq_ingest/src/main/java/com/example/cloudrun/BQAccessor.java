@@ -61,7 +61,7 @@ public class BQAccessor {
 
       String query =
           String.format(
-              "INSERT INTO `%s.%s.%s` AS SELECT * FROM %s",
+              "INSERT INTO `%s.%s.%s` SELECT * FROM %s",
               pubSubMessageProperties.getProject(),
               pubSubMessageProperties.getDataset(),
               pubSubMessageProperties.getTable(),
