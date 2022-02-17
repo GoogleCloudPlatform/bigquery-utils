@@ -935,16 +935,25 @@ generate_udf_test("p_fisherexact", [
 	],
         expected_output: `CAST(8.046828829103659E-12 AS FLOAT64)`
     },
-]); 
+]);
 generate_udf_test("t_test", [
     {
         inputs: [
 		`(SELECT ARRAY<FLOAT64>[13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0])`,
-		`(SELECT ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0])` 
+		`(SELECT ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0])`
 	],
-	expected_output: `STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INTEGER) AS dof)`
+	expected_output: `STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INTEGER) AS dof, CAST(0.9999989005977227 AS FLOAT64) AS p_value)`
     },
-]); 
+]);
+generate_udf_test("t_test_paired", [
+    {
+        inputs: [
+		`(SELECT ARRAY<FLOAT64>[ 38.25, 31.68, 26.24, 41.29, 44.81, 46.37, 35.42, 38.41, 42.68, 46.71, 29.20, 30.76])`,
+		`(SELECT ARRAY<FLOAT64>[ 38.27, 31.71, 26.22, 41.33, 44.80, 46.39, 35.46, 38.39, 42.72, 46.76, 29.18, 30.79])`
+	],
+	expected_output: `STRUCT(CAST(-2.1589388479419087 AS FLOAT64) AS t_value, CAST(11 AS INTEGER) AS dof, CAST(1.0 AS FLOAT64) AS p_value)`
+    },
+]);
 generate_udf_test("mannwhitneyu", [
     {
         inputs: [
