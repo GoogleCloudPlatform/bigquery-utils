@@ -49,7 +49,7 @@ public class JobAccessor {
 
       List<String> allSourceUris = new ArrayList<String>();
       // check for error
-      if (job.isDone()) {
+      if (job.isDone() && job.getStatus().getError() == null) {
         log.info("Job successfully loaded BQ table");
         JobConfiguration jobConfig = job.getConfiguration();
         if (jobConfig instanceof QueryJobConfiguration) {

@@ -57,7 +57,6 @@ public class PipelineController {
         if (TRIGGER_FILE_NAME.equals(pubSubMessageProperties.getTriggerFile())) {
           log.info("Found Trigger file, started BQ insert");
           BQAccessor.insertIntoBQ(pubSubMessageProperties, FILE_FORMAT);
-          // GCSAccessor.archiveFiles(pubSubMessageProperties);
           return new ResponseEntity("triggered successfully", HttpStatus.OK);
         } else {
           log.info("Not trigger file");
