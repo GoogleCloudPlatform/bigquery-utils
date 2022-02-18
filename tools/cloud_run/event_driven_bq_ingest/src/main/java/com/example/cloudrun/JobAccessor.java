@@ -58,7 +58,6 @@ public class JobAccessor {
                   tableValue
                       .getSourceUris()
                       .forEach((item) -> allSourceUris.add(removeWildcard(item))));
-          log.info("end of tables");
         } else {
           log.info("job configuration is not an instance");
         }

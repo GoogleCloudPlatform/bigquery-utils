@@ -69,7 +69,7 @@ public class BQAccessor {
           QueryJobConfiguration.newBuilder(query)
               .addTableDefinition(EXTERNAL_TABLE_NAME, externalTable)
               .build();
-      log.info("query we fired: {}", query);
+      log.info("query fired: {}", query);
       JobInfo jobInfo = JobInfo.of(queryConfig);
       Job job = bigquery.create(jobInfo);
       JobId jobId = job.getJobId();

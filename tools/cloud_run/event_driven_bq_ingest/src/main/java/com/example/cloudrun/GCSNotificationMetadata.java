@@ -43,8 +43,6 @@ public class GCSNotificationMetadata extends GenericMessage{
         String triggerFile;
     }
     public GCSObjectProperties getGCSObjectProperties() {
-        log.info("bucket", bucket);
-        log.info("name", name);
         String bucketId = this.bucket;
         String objectId = this.name;
 
