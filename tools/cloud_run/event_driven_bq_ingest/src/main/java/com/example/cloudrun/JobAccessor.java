@@ -20,9 +20,7 @@ import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.ExternalTableDefinition;
-import com.google.cloud.bigquery.FormatOptions;
 import com.google.cloud.bigquery.Job;
-import com.google.cloud.bigquery.JobInfo;
 import com.google.cloud.bigquery.JobId;
 import com.google.cloud.bigquery.QueryJobConfiguration;
 import com.google.cloud.bigquery.JobConfiguration;
@@ -35,11 +33,11 @@ import java.util.ArrayList;
 @Log4j2
 public class JobAccessor {
 
-  public static List<String> checkJobCompeletion(PubSubMessageData pubSubMessageData) {
-    log.info("Resource Name:{}", pubSubMessageData.getProtoPayload().getResourceName());
+  public static List<String> checkJobCompeletion(BigQueryLogMetadata bigQueryLogMetadata) {
+    log.info("Resource Name:{}", bigQueryLogMetadata.getProtoPayload().getResourceName());
 
     try {
-      String resourceName = pubSubMessageData.getProtoPayload().getResourceName();
+      String resourceName = bigQueryLogMetadata.getProtoPayload().getResourceName();
       String[] parsedName = resourceName.split("/");
       String jobName = parsedName[parsedName.length - 1];
 
@@ -60,7 +58,6 @@ public class JobAccessor {
                   tableValue
                       .getSourceUris()
                       .forEach((item) -> allSourceUris.add(removeWildcard(item))));
-          log.info("end of tables");
         } else {
           log.info("job configuration is not an instance");
         }

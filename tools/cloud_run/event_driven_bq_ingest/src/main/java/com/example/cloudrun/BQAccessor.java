@@ -17,7 +17,6 @@
 package com.example.cloudrun;
 
 import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.BigQueryException;
 import com.google.cloud.bigquery.BigQueryOptions;
 import com.google.cloud.bigquery.ExternalTableDefinition;
 import com.google.cloud.bigquery.FormatOptions;
@@ -33,17 +32,17 @@ public class BQAccessor {
   private static final String EXTERNAL_TABLE_NAME = "externalTable";
 
   public static void insertIntoBQ(
-      PubSubMessageProperties pubSubMessageProperties, String fileFormat) {
+          GCSNotificationMetadata.GCSObjectProperties GCSObjectProperties, String fileFormat) {
 
     // create sourceUri with format --> gs://bucket/project/dataset/table/table*
     String sourceUri =
         String.format(
             "gs://%s/%s/%s/%s/%s*",
-            pubSubMessageProperties.getBucketId(),
-            pubSubMessageProperties.getProject(),
-            pubSubMessageProperties.getDataset(),
-            pubSubMessageProperties.getTable(),
-            pubSubMessageProperties.getTable());
+            GCSObjectProperties.getBucketId(),
+            GCSObjectProperties.getProject(),
+            GCSObjectProperties.getDataset(),
+            GCSObjectProperties.getTable(),
+            GCSObjectProperties.getTable());
     log.info("source URI is: {}", sourceUri);
 
     try {
@@ -62,15 +61,15 @@ public class BQAccessor {
       String query =
           String.format(
               "INSERT INTO `%s.%s.%s` SELECT * FROM %s",
-              pubSubMessageProperties.getProject(),
-              pubSubMessageProperties.getDataset(),
-              pubSubMessageProperties.getTable(),
+              GCSObjectProperties.getProject(),
+              GCSObjectProperties.getDataset(),
+              GCSObjectProperties.getTable(),
               EXTERNAL_TABLE_NAME);
       QueryJobConfiguration queryConfig =
           QueryJobConfiguration.newBuilder(query)
               .addTableDefinition(EXTERNAL_TABLE_NAME, externalTable)
               .build();
-      log.info("query we fired: {}", query);
+      log.info("query fired: {}", query);
       JobInfo jobInfo = JobInfo.of(queryConfig);
       Job job = bigquery.create(jobInfo);
       JobId jobId = job.getJobId();
