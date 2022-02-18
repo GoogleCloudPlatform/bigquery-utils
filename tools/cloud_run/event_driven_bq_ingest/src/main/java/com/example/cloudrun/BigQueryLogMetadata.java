@@ -16,18 +16,17 @@
 
 package com.example.cloudrun;
 
-import com.google.cloud.bigquery.BigQueryError;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class PubSubMessageData {
+public class BigQueryLogMetadata extends GenericMessage {
 
   private String insertId;
   private ProtoPayload protoPayload;
 
-  public PubSubMessageData() {}
+  public BigQueryLogMetadata() {}
 
-  public PubSubMessageData(String insertId, ProtoPayload protoPayload) {
+  public BigQueryLogMetadata(String insertId, ProtoPayload protoPayload) {
     this.insertId = insertId;
     this.protoPayload = protoPayload;
   }

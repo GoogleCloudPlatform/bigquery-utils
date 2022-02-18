@@ -10,46 +10,27 @@ import com.google.api.services.pubsub.model.PubsubMessage;
 
 @Log4j2
 public class PubSubMessageParser {
-
-  public static PubSubMessageProperties parsePubSubProperties(PubsubMessage message) {
-
-    Map<String, String> attributes = message.getAttributes();
-    if (attributes == null) {
-      throw new RuntimeException("No attributes in the pubsub message");
-    }
-
-    String bucketId = attributes.get("bucketId");
-    String objectId = attributes.get("objectId");
-
-    // return null if there is no objectId
-    if (objectId == null) {
+  public static GenericMessage parseMessage(PubsubMessage message) {
+    String data = message.getData();
+    if (data == null) {
       return null;
+    } else {
+      String dataStr = !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "";
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+      try {
+        GenericMessage dataObj = mapper.readValue(dataStr, GCSNotificationMetadata.class);
+        return dataObj;
+      } catch (JsonProcessingException error1) {
+        try {
+          GenericMessage dataObj = mapper.readValue(dataStr, BigQueryLogMetadata.class);
+          return dataObj;
+        } catch (JsonProcessingException error2) {
+          log.error("failed to parse GCS Notification metadata", error1);
+          log.error("failed to parse BQ Log metadata", error2);
+          return null;
+        }
+      }
     }
-
-    String[] parsedObjectId = objectId.split("/");
-
-    if (parsedObjectId.length < 4) {
-      throw new RuntimeException("The object id is formatted incorrectly");
-    }
-    String project = parsedObjectId[0];
-    String dataset = parsedObjectId[1];
-    String table = parsedObjectId[2];
-    String triggerFileName = parsedObjectId[3];
-
-    return PubSubMessageProperties.builder()
-        .bucketId(bucketId)
-        .project(project)
-        .dataset(dataset)
-        .table(table)
-        .triggerFile(triggerFileName)
-        .build();
-  }
-
-  public static PubSubMessageData parsePubSubData(String data) throws JsonProcessingException {
-    String dataStr = !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "";
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-    PubSubMessageData dataObj = mapper.readValue(dataStr, PubSubMessageData.class);
-    return dataObj;
   }
 }

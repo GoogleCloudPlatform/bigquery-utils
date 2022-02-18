@@ -42,30 +42,32 @@ public class PipelineController {
       log.info("Bad Request: invalid Pub/Sub pubSubMessage format");
       return new ResponseEntity("invalid Pub/Sub pubSubMessage", HttpStatus.BAD_REQUEST);
     }
-    try {
-      PubSubMessageProperties pubSubMessageProperties =
-          PubSubMessageParser.parsePubSubProperties(pubSubMessage);
-      if (pubSubMessageProperties == null) {
-        // parse pubsub message as bq job notification
-        PubSubMessageData pubSubMessageData =
-            PubSubMessageParser.parsePubSubData(pubSubMessage.getData());
-        List<String> sourceUris = JobAccessor.checkJobCompeletion(pubSubMessageData);
-        sourceUris.forEach((sourceUri -> GCSAccessor.archiveFiles(sourceUri)));
-        return new ResponseEntity("job completed", HttpStatus.OK);
+    GenericMessage metadata = PubSubMessageParser.parseMessage(pubSubMessage);
+    if (metadata == null) {
+      log.info("Bad Request: message does not follow format for data extraction");
+      return new ResponseEntity("invalid message data", HttpStatus.BAD_REQUEST);
+    } else if (metadata instanceof GCSNotificationMetadata) {
+      // handle gcs notification
+      GCSNotificationMetadata gcsNotificationMetadata = (GCSNotificationMetadata) metadata;
+      GCSNotificationMetadata.GCSObjectProperties gcsObjectProperties = gcsNotificationMetadata.getGCSObjectProperties();
+
+      if (TRIGGER_FILE_NAME.equals(gcsObjectProperties.getTriggerFile())) {
+        log.info("Found Trigger file, started BQ insert");
+        BQAccessor.insertIntoBQ(gcsObjectProperties, FILE_FORMAT);
+        return new ResponseEntity("triggered successfully", HttpStatus.OK);
       } else {
-        // pubsub message was a gcs notification
-        if (TRIGGER_FILE_NAME.equals(pubSubMessageProperties.getTriggerFile())) {
-          log.info("Found Trigger file, started BQ insert");
-          BQAccessor.insertIntoBQ(pubSubMessageProperties, FILE_FORMAT);
-          return new ResponseEntity("triggered successfully", HttpStatus.OK);
-        } else {
-          log.info("Not trigger file");
-          return new ResponseEntity("Not trigger file", HttpStatus.OK);
-        }
+        log.info("Not trigger file");
+        return new ResponseEntity("Not trigger file", HttpStatus.OK);
       }
-    } catch (RuntimeException | JsonProcessingException e) {
-      log.error("failed to process the message", e);
-      return new ResponseEntity(e.getMessage(), HttpStatus.OK);
+    } else if(metadata instanceof BigQueryLogMetadata) {
+      //handle bq job complete notification
+      BigQueryLogMetadata bigQueryLogMetadata = (BigQueryLogMetadata) metadata;
+      List<String> sourceUris = JobAccessor.checkJobCompeletion(bigQueryLogMetadata);
+      sourceUris.forEach((sourceUri -> GCSAccessor.archiveFiles(sourceUri)));
+      return new ResponseEntity("job completed", HttpStatus.OK);
+    } else {
+      log.error("failed to process the message");
+      return new ResponseEntity("failed to process the message", HttpStatus.OK);
     }
   }
 }
