@@ -49,7 +49,8 @@ public class PipelineController {
     } else if (metadata instanceof GCSNotificationMetadata) {
       // handle gcs notification
       GCSNotificationMetadata gcsNotificationMetadata = (GCSNotificationMetadata) metadata;
-      GCSNotificationMetadata.GCSObjectProperties gcsObjectProperties = gcsNotificationMetadata.getGCSObjectProperties();
+      GCSNotificationMetadata.GCSObjectProperties gcsObjectProperties =
+          gcsNotificationMetadata.getGCSObjectProperties();
       if (TRIGGER_FILE_NAME.equals(gcsObjectProperties.getTriggerFile())) {
         log.info("Found Trigger file, started BQ insert");
         BQAccessor.insertIntoBQ(gcsObjectProperties, FILE_FORMAT);
@@ -58,8 +59,8 @@ public class PipelineController {
         log.info("Not trigger file");
         return new ResponseEntity("Not trigger file", HttpStatus.OK);
       }
-    } else if(metadata instanceof BigQueryLogMetadata) {
-      //handle bq job complete notification
+    } else if (metadata instanceof BigQueryLogMetadata) {
+      // handle bq job complete notification
       BigQueryLogMetadata bigQueryLogMetadata = (BigQueryLogMetadata) metadata;
       List<String> sourceUris = JobAccessor.checkJobCompeletion(bigQueryLogMetadata);
       sourceUris.forEach((sourceUri -> GCSAccessor.archiveFiles(sourceUri)));

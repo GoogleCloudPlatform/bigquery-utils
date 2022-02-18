@@ -33,15 +33,6 @@ public class GCSNotificationMetadata extends GenericMessage{
         this.bucket = bucket;
     }
 
-    @Value
-    @Builder
-    public static class GCSObjectProperties {
-        String bucketId;
-        String project;
-        String dataset;
-        String table;
-        String triggerFile;
-    }
     public GCSObjectProperties getGCSObjectProperties() {
         String bucketId = this.bucket;
         String objectId = this.name;
@@ -68,5 +59,15 @@ public class GCSNotificationMetadata extends GenericMessage{
                 .table(table)
                 .triggerFile(triggerFileName)
                 .build();
+    }
+
+    @Value
+    @Builder
+    public static class GCSObjectProperties {
+        String bucketId;
+        String project;
+        String dataset;
+        String table;
+        String triggerFile;
     }
 }

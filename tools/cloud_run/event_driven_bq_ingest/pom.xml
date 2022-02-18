@@ -126,7 +126,7 @@
         <version>3.1.4</version>
         <configuration>
           <to>
-            <image>gcr.io/PROJECT_ID/pubsub</image>
+            <image>gcr.io/PROJECT_ID/event_driven_pipeline</image>
           </to>
         </configuration>
       </plugin>

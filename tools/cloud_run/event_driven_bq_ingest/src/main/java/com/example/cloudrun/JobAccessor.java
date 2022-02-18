@@ -71,7 +71,7 @@ public class JobAccessor {
       }
       return allSourceUris;
     } catch (NullPointerException | BigQueryException e) {
-      log.info("Job not retrieved. \n" + e.toString());
+      log.info("Job not retrieved. \n" + e);
       return null;
     }
   }

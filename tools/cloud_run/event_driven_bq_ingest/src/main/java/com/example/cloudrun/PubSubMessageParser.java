@@ -15,7 +15,8 @@ public class PubSubMessageParser {
     if (data == null) {
       return null;
     } else {
-      String dataStr = !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "";
+      String dataStr =
+          !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "";
       ObjectMapper mapper = new ObjectMapper();
       mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       try {
