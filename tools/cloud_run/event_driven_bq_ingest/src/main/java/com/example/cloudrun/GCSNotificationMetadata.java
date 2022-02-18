@@ -1,27 +1,20 @@
 package com.example.cloudrun;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 public class GCSNotificationMetadata extends GenericMessage{
-    private String id;
     private String name;
     private String bucket;
 
     public GCSNotificationMetadata() {}
 
-    public GCSNotificationMetadata(String id, String name, String bucket) {
-        this.id = id;
+    public GCSNotificationMetadata(@JsonProperty(value = "name", required = true) String name, @JsonProperty(value = "bucket", required = true) String bucket) {
         this.name = name;
         this.bucket = bucket;
-    }
-
-    public String getInsertId() {
-        return id;
-    }
-
-    public void setInsertId(String insertId) {
-        this.id = id;
     }
 
     public String getName() {
@@ -42,7 +35,7 @@ public class GCSNotificationMetadata extends GenericMessage{
 
     @Value
     @Builder
-    public class GCSObjectProperties {
+    public static class GCSObjectProperties {
         String bucketId;
         String project;
         String dataset;
@@ -50,6 +43,8 @@ public class GCSNotificationMetadata extends GenericMessage{
         String triggerFile;
     }
     public GCSObjectProperties getGCSObjectProperties() {
+        log.info("bucket", bucket);
+        log.info("name", name);
         String bucketId = this.bucket;
         String objectId = this.name;
 

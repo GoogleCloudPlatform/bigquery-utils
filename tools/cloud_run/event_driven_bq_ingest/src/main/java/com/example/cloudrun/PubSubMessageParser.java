@@ -20,6 +20,7 @@ public class PubSubMessageParser {
       mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       try {
         GenericMessage dataObj = mapper.readValue(dataStr, GCSNotificationMetadata.class);
+
         return dataObj;
       } catch (JsonProcessingException error1) {
         try {

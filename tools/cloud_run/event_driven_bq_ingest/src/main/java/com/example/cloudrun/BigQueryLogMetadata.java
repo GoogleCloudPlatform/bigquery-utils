@@ -16,6 +16,7 @@
 
 package com.example.cloudrun;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -24,9 +25,7 @@ public class BigQueryLogMetadata extends GenericMessage {
   private String insertId;
   private ProtoPayload protoPayload;
 
-  public BigQueryLogMetadata() {}
-
-  public BigQueryLogMetadata(String insertId, ProtoPayload protoPayload) {
+  public BigQueryLogMetadata(@JsonProperty("insertId") String insertId, @JsonProperty(value = "protoPayload", required = true) ProtoPayload protoPayload) {
     this.insertId = insertId;
     this.protoPayload = protoPayload;
   }
@@ -47,10 +46,12 @@ public class BigQueryLogMetadata extends GenericMessage {
     this.protoPayload = protoPayload;
   }
 
-  public class ProtoPayload {
+  public static class ProtoPayload {
     private String resourceName;
 
-    public ProtoPayload() {}
+    public ProtoPayload(@JsonProperty(value = "resourceName", required = true) String resourceName) {
+      this.resourceName = resourceName;
+    }
 
     public String getResourceName() {
       return resourceName;

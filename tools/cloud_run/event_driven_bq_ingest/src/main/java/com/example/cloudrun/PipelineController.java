@@ -50,7 +50,6 @@ public class PipelineController {
       // handle gcs notification
       GCSNotificationMetadata gcsNotificationMetadata = (GCSNotificationMetadata) metadata;
       GCSNotificationMetadata.GCSObjectProperties gcsObjectProperties = gcsNotificationMetadata.getGCSObjectProperties();
-
       if (TRIGGER_FILE_NAME.equals(gcsObjectProperties.getTriggerFile())) {
         log.info("Found Trigger file, started BQ insert");
         BQAccessor.insertIntoBQ(gcsObjectProperties, FILE_FORMAT);
