@@ -32,7 +32,7 @@ public class BQAccessor {
   private static final String EXTERNAL_TABLE_NAME = "externalTable";
 
   public static void insertIntoBQ(
-          GCSNotificationMetadata.GCSObjectProperties GCSObjectProperties, String fileFormat) {
+      GCSNotificationMetadata.GCSObjectProperties GCSObjectProperties, String fileFormat) {
 
     // create sourceUri with format --> gs://bucket/project/dataset/table/table*
     String sourceUri =

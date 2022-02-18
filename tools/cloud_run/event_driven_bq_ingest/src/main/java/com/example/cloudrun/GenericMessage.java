@@ -1,4 +1,3 @@
 package com.example.cloudrun;
 
-public abstract class  GenericMessage {
-}
+public abstract class GenericMessage {}

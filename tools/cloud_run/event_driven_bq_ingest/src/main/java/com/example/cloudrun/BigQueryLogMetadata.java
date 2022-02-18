@@ -25,7 +25,9 @@ public class BigQueryLogMetadata extends GenericMessage {
   private String insertId;
   private ProtoPayload protoPayload;
 
-  public BigQueryLogMetadata(@JsonProperty("insertId") String insertId, @JsonProperty(value = "protoPayload", required = true) ProtoPayload protoPayload) {
+  public BigQueryLogMetadata(
+      @JsonProperty("insertId") String insertId,
+      @JsonProperty(value = "protoPayload", required = true) ProtoPayload protoPayload) {
     this.insertId = insertId;
     this.protoPayload = protoPayload;
   }
@@ -49,7 +51,8 @@ public class BigQueryLogMetadata extends GenericMessage {
   public static class ProtoPayload {
     private String resourceName;
 
-    public ProtoPayload(@JsonProperty(value = "resourceName", required = true) String resourceName) {
+    public ProtoPayload(
+        @JsonProperty(value = "resourceName", required = true) String resourceName) {
       this.resourceName = resourceName;
     }
 
