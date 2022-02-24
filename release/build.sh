@@ -185,24 +185,21 @@ function dry_run_all_sql() {
 #   None
 #######################################
 function build() {
-  replace_js_udf_bucket_placeholder
-
   # Get a list of changed files in this commit.
   local files_changed
   files_changed=$(git diff --name-only origin/master)
-
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
   if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
     build_udf_testing_image
   fi
-
   # Only build the BigQuery UDFs if any files in the
   # udfs/ directory have been changed
   if echo "${files_changed}" | grep -q "${UDF_DIR}"/; then
+    printf "Building BigQuery UDFs since the following files have changed:\n%s\n" "${files_changed}"
+    replace_js_udf_bucket_placeholder
     build_udfs
   fi
-
 }
 
 #######################################
