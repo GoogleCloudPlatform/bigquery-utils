@@ -40,7 +40,7 @@ and a [column](https://cloud.google.com/bigquery/docs/schemas#column_description
 
 You can organize information in `description` filed as JSON. For example
 
-![Constraints as JSON in INFORMATION_SCHEMA](http://imgs/json_constraints.png)
+![Constraints as JSON in INFORMATION_SCHEMA](img/json_constraints.png)
 
 This method has several benefits:
 * JSON provides a common approach across all BigQuery tables to store constraint descriptions.
@@ -57,7 +57,7 @@ call constraints_staging.check_constraints('table_1', 'constraints_staging');
 ```
 In case of constraint violation procedure raises an error
 
-![Constraint violation error](http://imgs/constraint_violation_error.png)
+![Constraint violation error](img/constraint_violation_error.png)
 
 Keeping this function in BigQuery is preferable in comparison to implementing it as an external script:
 * Customer applications and ETLs will use the same BigQuery code to check for constraints.
@@ -85,11 +85,11 @@ You can remove the last condition to catch modifications of all tables in a give
 
 2. Create Pub/Sub subscription:
 
-![Pub/Sub sink](http://imgs/sink.png)
+![Pub/Sub sink](img/sink.png)
 
 3. Create Cloud Function from ./cloud_function which is triggered when a new Pub/Sub message is published to the topic
 
-![Cloud function](http://imgs/cloud_function.png)
+![Cloud function](img/cloud_function.png)
 
 4. The cloud function calls `check_constraints` stored procedure but it doesn’t wait till its completion 
 because validating large tables may take longer than the maximum Cloud Function timeout (9 minutes).
@@ -98,4 +98,4 @@ because validating large tables may take longer than the maximum Cloud Function 
 as any other BigQuery job. You can create a sync to Pub/Sub or BigQuery table and make customer applications 
 check for `check_constraints` results
 
-![Check constraints results in Cloud Logging](http://imgs/results.png)
+![Check constraints results in Cloud Logging](img/results.png)
