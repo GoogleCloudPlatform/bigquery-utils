@@ -18,8 +18,8 @@ config {
   type: "incremental",
   uniqueKey: ["meter_id"],
   bigquery: {
-    partitionBy: "load_date",
-    clusterBy: ["meter_hash_id", "load_date"]
+    partitionBy: "loaddate",
+    clusterBy: ["meter_hash_id", "loaddate"]
   }
 }
 pre_operations {
@@ -27,19 +27,20 @@ pre_operations {
       meter_hash_id STRING,
       meter_id INTEGER,
       source STRING,
-      load_date DATE
+      loaddate DATE
       )
-    PARTITION BY load_date
-    CLUSTER BY meter_hash_id, load_date;
+    PARTITION BY loaddate
+    CLUSTER BY meter_hash_id, loaddate;
 }
 
 SELECT DISTINCT
   ${hashing.ConvertHash("s.meter_id")} AS meter_hash_id,
   s.meter_id AS meter_id,
   s.source AS source,
-  s.load_date AS load_date
+  s.loaddate AS loaddate
 FROM ${ref("meter_load")} AS s LEFT JOIN ${self()} AS r 
 ON s.meter_id = r.meter_id
 WHERE
 r.meter_hash_id IS NULL
-AND s.load_date >= current_date
+AND
+s.loaddate >= current_date

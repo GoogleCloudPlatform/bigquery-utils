@@ -19,7 +19,7 @@ config {
   uniqueKey: ["readings_hash_id", "sat_readings_hashdiff"],
   bigquery: {
     partitionBy: "DATE(readings_time)",
-    clusterBy: ["meter_id", "readings_time"]
+    clusterBy: ["source", "effective_from"]
   }
 }
 pre_operations {
@@ -31,10 +31,10 @@ pre_operations {
       meter_id INTEGER,
       effective_from DATE,
       source STRING,
-      load_date DATE
+      loaddate DATE
       )
     PARTITION BY DATE(readings_time)
-    CLUSTER BY meter_id, readings_time;
+    CLUSTER BY source, effective_from;
 }
 
 WITH
@@ -45,10 +45,10 @@ SELECT  DISTINCT
   ,readings_time AS readings_time
   ,readings
   ,meter_id
-  ,CAST(meter_readings.load_date AS DATE) AS effective_from
+  ,CAST(meter_readings.loaddate AS DATE) AS effective_from
   ,meter_readings.source
-  ,CAST(meter_readings.load_date AS DATE) AS load_date
-FROM  ${ref("meter_readings_load")} AS meter_readings
+  ,CAST(meter_readings.loaddate AS DATE) AS loaddate
+FROM ${ref("meter_readings_load")} AS meter_readings
 ),
 currmeter AS ( SELECT readings_hash_id, sat_readings_hashdiff FROM ${self()} )
 SELECT
@@ -59,10 +59,11 @@ SELECT
   newmeter.meter_id,
   newmeter.effective_from,
   newmeter.source,
-  newmeter.load_date
+  newmeter.loaddate
 FROM newmeter
 LEFT JOIN currmeter
 USING(readings_hash_id, sat_readings_hashdiff)
 WHERE
 currmeter.sat_readings_hashdiff is NULL
-AND newmeter.load_date >= current_date
+AND
+newmeter.loaddate >= current_date

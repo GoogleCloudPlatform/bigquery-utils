@@ -18,8 +18,8 @@ config {
   name: "sat_meter",
   uniqueKey: ["meter_hash_id", "sat_meter_hashdiff"],
   bigquery: {
-    partitionBy: "load_date",
-    clusterBy: ["meter_hash_id", "effective_from"]
+    partitionBy: "loaddate",
+    clusterBy: ["source", "effective_from"]
   }
 }
 pre_operations {
@@ -31,10 +31,10 @@ pre_operations {
       manufacturer STRING,
       effective_from DATE,
       source STRING,
-      load_date DATE
+      loaddate DATE
       )
-    PARTITION BY load_date
-    CLUSTER BY meter_hash_id, effective_from;
+    PARTITION BY loaddate
+    CLUSTER BY source, effective_from;
 }
 WITH
 newmeter AS (
@@ -42,9 +42,9 @@ SELECT
   service_name,
   meter_id,
   manufacturer,
-  load_date AS effective_from,
+  loaddate AS effective_from,
   source,
-  load_date,
+  loaddate,
   ${hashing.ConvertHash("meter_id")} AS meter_hash_id,
   ${hashing.ConvertHash("service_name"||"manufacturer")} AS sat_meter_hashdiff
 FROM ${ref("meter_load")}
@@ -65,10 +65,11 @@ SELECT
   newmeter.manufacturer,
   newmeter.effective_from,
   newmeter.source,
-  newmeter.load_date
+  newmeter.loaddate
   FROM newmeter
 LEFT JOIN currmeter
 USING(meter_hash_id, sat_meter_hashdiff)
 WHERE
 currmeter.sat_meter_hashdiff is NULL
-AND newmeter.load_date >= current_date
+AND
+newmeter.loaddate >= current_date

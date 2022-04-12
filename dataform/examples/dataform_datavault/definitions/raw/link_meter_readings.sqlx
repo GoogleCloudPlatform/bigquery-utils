@@ -18,7 +18,7 @@ config {
   name: "link_meter_readings",
   uniqueKey: ["meter_hash_id", "readings_hash_id"],
   bigquery: {
-    partitionBy : "load_date",
+    partitionBy : "loaddate",
     clusterBy: ["source"]
   }
 }
@@ -28,9 +28,9 @@ pre_operations {
       meter_hash_id STRING,
       readings_hash_id STRING,
       source STRING,
-      load_date DATE
+      loaddate DATE
       )
-    PARTITION BY load_date
+    PARTITION BY loaddate
     CLUSTER BY source;
 }
 
@@ -39,8 +39,10 @@ SELECT  DISTINCT
   ${hashing.ConvertHash("m.meter_id")} AS meter_hash_id,
   ${hashing.ConvertHash("r.readings_id")} AS readings_hash_id,
   r.source,
-  r.load_date
+  r.loaddate
 FROM ${ref("meter_load")} m INNER JOIN${ref("meter_readings_load")} r
 ON m.meter_id = r.meter_id
-WHERE ${hashing.ConvertHash("m.meter_id"||"r.readings_id")}  NOT IN (SELECT link_hash_id FROM ${self()})
-AND m.load_date >= current_date
+WHERE
+${hashing.ConvertHash("m.meter_id"||"r.readings_id")}  NOT IN (SELECT link_hash_id FROM ${self()})
+AND
+m.loaddate >= current_date
