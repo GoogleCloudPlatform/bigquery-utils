@@ -16,12 +16,34 @@ config { hasOutput: true }
  */
 #standardSQL
 
-CREATE OR REPLACE FUNCTION ${self()}(H FLOAT64, dof INT64)
-RETURNS FLOAT64 
-LANGUAGE js AS """
-  return 1.0 - jstat.jStat['chisquare'].cdf(H, dof)
-"""
-OPTIONS ( 
-    library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]
-);
+/* 
+execute using:  `bq query < anovaftest.sqlx`
+save iris dataset: `bq --format csv query "SELECT * FROM bigquery-public-data.ml_datasets.iris" > iris.csv`
+*/
 
+
+DECLARE data ARRAY<STRUCT<factor STRING, val FLOAT64>>;
+set data = (SELECT ARRAY(SELECT AS STRUCT species, petal_width FROM `bigquery-public-data.ml_datasets.iris`));
+
+CREATE TEMP FUNCTION MMM (data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
+	WITH stats AS
+	(
+		WITH raw_data AS 
+		(
+			SELECT d.val AS v, d.factor as f
+			FROM UNNEST(data) AS d 
+		) #raw_data
+
+		SELECT "global" as label, VAR_SAMP(v) as var, COUNT(*) as cnt, COUNT(DISTINCT f) as discnt FROM raw_data
+		UNION ALL
+		SELECT "sample" as label, VAR_SAMP(v) as var, NULL as cnt, NULL as discnt FROM raw_data GROUP BY f
+
+
+	)
+    
+    SELECT  ((SELECT var from stats where label = "global") / ((SELECT cnt from stats where label = "global")-1))
+	         /((SELECT SUM(var) from stats where label = "sample")  / ((SELECT cnt from stats where label = "global")-(SELECT discnt from stats where label = "global")))
+			 
+));
+
+SELECT MMM(data) AS results;
