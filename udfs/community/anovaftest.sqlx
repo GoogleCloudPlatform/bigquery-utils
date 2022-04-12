@@ -1,4 +1,4 @@
-config { hasOutput: true }
+-- config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
