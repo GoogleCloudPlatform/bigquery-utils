@@ -896,6 +896,12 @@ generate_udf_test("kruskal_wallis", [
         expected_output: `STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)`
     },
 ]);
+generate_udf_test("anovaftest", [
+    {
+        inputs: [ ("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.2), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("virginica", 1.7), ("versicolor",1.6), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("versicolor",1.7), ("virginica", 1.9), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.4), ("setosa",    0.4), ("setosa",    0.4), ("versicolor",1.2), ("versicolor",1.4), ("versicolor",1.1), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.4), ("versicolor",1.8), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.2), ("virginica", 1.6), ("virginica", 1.8), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.5), ("setosa",    0.3), ("setosa",    0.2), ("setosa",    0.4), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.4), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("virginica", 2.4), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 1.9), ("versicolor",1.6), ("virginica", 1.8), ("virginica", 2.4), ("virginica", 2.4), ("virginica", 1.4), ("virginica", 2.2), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.1), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ],
+        expected_output: `959.3244057257594 as results`
+    },
+]);
 generate_udf_test("linear_regression", [
     {
         inputs: [`(SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])`],
