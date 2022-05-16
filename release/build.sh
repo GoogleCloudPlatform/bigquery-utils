@@ -16,6 +16,8 @@
 
 # Directory of the UDFs
 UDF_DIR=udfs
+# Directory of the Stored Procedures
+SP_DIR=stored_procedures
 
 # Set colors if terminal supports it
 ncolors=$(tput colors)
@@ -228,6 +230,22 @@ function deploy_udfs() {
 }
 
 #######################################
+# Deploys Stored Procedures to the
+# "procedure" bqutil dataset.
+# Returns:
+#   None
+#######################################
+function deploy_stored_procs() {
+  local sql_files=$(find $SP_DIR -type f -name "*.sql")
+  local num_files=$(echo "$sql_files" | wc -l)
+
+  printf "Creating or updating $num_files stored procedures...\n"
+  while read -r file; do
+    execute_query $file false "procedure"
+  done <<< "$sql_files"
+}
+
+#######################################
 # Main entry-point for execution
 # Globals:
 #   BRANCH_NAME
@@ -243,6 +261,7 @@ function main() {
   # and this is now building a commit on master branch.
   if [[ "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
     deploy_udfs
+    deploy_stored_procs
   else
     build
     dry_run_all_sql
