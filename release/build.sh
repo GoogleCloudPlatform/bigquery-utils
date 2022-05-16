@@ -47,7 +47,7 @@ function execute_query() {
   printf "%s%s%s\n" "${BOLD}" "${file}" "${NORMAL}"
   if [[ ${dry_run} = true ]]; then
     if ! bq query \
-    --headless --nouse_legacy_sql --dry_run "$(cat "${file}")" ; then
+    --headless --nouse_legacy_sql --dry_run < "${file}" ; then
       printf "Failed to dry run: %s" "${file}"
       # exit 1 is not called here because some dry-runs may fail due to
       # variable placeholders which a user must replace with their own values.
@@ -55,7 +55,7 @@ function execute_query() {
     fi
   else
     if ! bq query \
-    --headless --nouse_legacy_sql "$(cat "${file}")" ; then
+    --headless --nouse_legacy_sql < "${file}" ; then
       printf "Failed to create: %s" "${file}"
       exit 1
     fi
