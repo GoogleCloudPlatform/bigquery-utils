@@ -16,6 +16,8 @@
 
 # Directory of the UDFs
 UDF_DIR=udfs
+# Directory of the Stored Procedures
+SP_DIR=stored_procedures
 
 # Set colors if terminal supports it
 ncolors=$(tput colors)
@@ -45,7 +47,7 @@ function execute_query() {
   printf "%s%s%s\n" "${BOLD}" "${file}" "${NORMAL}"
   if [[ ${dry_run} = true ]]; then
     if ! bq query \
-    --headless --nouse_legacy_sql --dry_run "$(cat "${file}")" ; then
+    --headless --nouse_legacy_sql --dry_run < "${file}" ; then
       printf "Failed to dry run: %s" "${file}"
       # exit 1 is not called here because some dry-runs may fail due to
       # variable placeholders which a user must replace with their own values.
@@ -53,7 +55,7 @@ function execute_query() {
     fi
   else
     if ! bq query \
-    --headless --nouse_legacy_sql "$(cat "${file}")" ; then
+    --headless --nouse_legacy_sql < "${file}" ; then
       printf "Failed to create: %s" "${file}"
       exit 1
     fi
@@ -185,24 +187,21 @@ function dry_run_all_sql() {
 #   None
 #######################################
 function build() {
-  replace_js_udf_bucket_placeholder
-
   # Get a list of changed files in this commit.
   local files_changed
   files_changed=$(git diff --name-only origin/master)
-
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
   if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
     build_udf_testing_image
   fi
-
   # Only build the BigQuery UDFs if any files in the
   # udfs/ directory have been changed
   if echo "${files_changed}" | grep -q "${UDF_DIR}"/; then
+    printf "Building BigQuery UDFs since the following files have changed:\n%s\n" "${files_changed}"
+    replace_js_udf_bucket_placeholder
     build_udfs
   fi
-
 }
 
 #######################################
@@ -231,6 +230,22 @@ function deploy_udfs() {
 }
 
 #######################################
+# Deploys Stored Procedures to the
+# "procedure" bqutil dataset.
+# Returns:
+#   None
+#######################################
+function deploy_stored_procs() {
+  local sql_files=$(find $SP_DIR -type f -name "*.sql")
+  local num_files=$(echo "$sql_files" | wc -l)
+
+  printf "Creating or updating $num_files stored procedures...\n"
+  while read -r file; do
+    execute_query $file false "procedure"
+  done <<< "$sql_files"
+}
+
+#######################################
 # Main entry-point for execution
 # Globals:
 #   BRANCH_NAME
@@ -246,6 +261,7 @@ function main() {
   # and this is now building a commit on master branch.
   if [[ "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
     deploy_udfs
+    deploy_stored_procs
   else
     build
     dry_run_all_sql
