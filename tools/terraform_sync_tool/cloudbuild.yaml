@@ -1,0 +1,3 @@
+steps:
+- name: 'bash'
+  args: ['echo', 'I am running a bash command']
