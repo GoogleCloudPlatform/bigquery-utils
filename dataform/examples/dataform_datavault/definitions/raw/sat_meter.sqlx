@@ -1,0 +1,75 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+config {
+  type: "incremental",
+  schema: "raw",
+  name: "sat_meter",
+  uniqueKey: ["meter_hash_id", "sat_meter_hashdiff"],
+  bigquery: {
+    partitionBy: "loaddate",
+    clusterBy: ["source", "effective_from"]
+  }
+}
+pre_operations {
+  CREATE TABLE IF NOT EXISTS ${self()} (
+      meter_hash_id STRING,
+      sat_meter_hashdiff STRING,
+      Meter_ID INTEGER,
+      service_name STRING,
+      manufacturer STRING,
+      effective_from DATE,
+      source STRING,
+      loaddate DATE
+      )
+    PARTITION BY loaddate
+    CLUSTER BY source, effective_from;
+}
+WITH
+newmeter AS (
+SELECT
+  service_name,
+  meter_id,
+  manufacturer,
+  loaddate AS effective_from,
+  source,
+  loaddate,
+  ${hashing.ConvertHash("meter_id")} AS meter_hash_id,
+  ${hashing.ConvertHash("service_name"||"manufacturer")} AS sat_meter_hashdiff
+FROM ${ref("meter_load")}
+),
+currmeter AS (
+SELECT
+  meter_hash_id,
+  sat_meter_hashdiff
+FROM
+${self()}
+)
+SELECT
+  DISTINCT
+  newmeter.meter_hash_id,
+  newmeter.Sat_Meter_HashDiff,
+  newmeter.service_name,
+  newmeter.meter_id,
+  newmeter.manufacturer,
+  newmeter.effective_from,
+  newmeter.source,
+  newmeter.loaddate
+  FROM newmeter
+LEFT JOIN currmeter
+USING(meter_hash_id, sat_meter_hashdiff)
+WHERE
+currmeter.sat_meter_hashdiff is NULL
+AND
+newmeter.loaddate >= CAST(timestamp_sub(current_timestamp, INTERVAL 7 DAY)AS DATE)

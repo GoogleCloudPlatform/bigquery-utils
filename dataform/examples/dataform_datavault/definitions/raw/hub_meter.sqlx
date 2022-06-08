@@ -1,0 +1,44 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+config {
+  name: "hub_meter",
+  schema: "raw",
+  type: "incremental",
+  uniqueKey: ["meter_id"],
+  bigquery: {
+    partitionBy: "loaddate"
+  }
+}
+pre_operations {
+  CREATE TABLE IF NOT EXISTS ${self()} (
+      meter_hash_id STRING,
+      meter_id INTEGER,
+      source STRING,
+      loaddate DATE
+      )
+    PARTITION BY loaddate
+}
+
+SELECT DISTINCT
+  ${hashing.ConvertHash("s.meter_id")} AS meter_hash_id,
+  s.meter_id AS meter_id,
+  s.source AS source,
+  s.loaddate AS loaddate
+FROM ${ref("meter_load")} AS s LEFT JOIN ${self()} AS r 
+ON s.meter_id = r.meter_id
+WHERE
+r.meter_hash_id IS NULL
+AND
+s.loaddate >= CAST(timestamp_sub(current_timestamp, INTERVAL 7 DAY)AS DATE)

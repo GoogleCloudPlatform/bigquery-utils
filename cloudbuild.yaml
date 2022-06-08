@@ -43,6 +43,7 @@ steps:
     - SHORT_SHA=${SHORT_SHA}
     - _JS_BUCKET=${_JS_BUCKET}
     - _PR_NUMBER=${_PR_NUMBER}
+    - _BQ_LOCATION=${_BQ_LOCATION}
 
 substitutions:
   _JS_BUCKET: gs://bqutil-lib/test_bq_js_libs/${SHORT_SHA} # default value
