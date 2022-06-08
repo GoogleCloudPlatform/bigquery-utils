@@ -2,7 +2,7 @@ steps:
   # step 0: run terraform commands in deploy.sh to detects drifts
   - name: 'alpine/terragrunt'
     entrypoint: 'bash'
-    args: ['./deploy.sh', 'qa', 'terraform-sync-tool']
+    args: ['./tools/terraform_sync_tool/deploy.sh', 'qa', 'terraform-sync-tool']
   
   # step 1: run python scripts to investigate terraform output
   # - name: python:3.7
