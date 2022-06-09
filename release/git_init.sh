@@ -17,22 +17,15 @@
 # Only compare with master branch if this build has been triggered
 # by either a non-master branch on origin repo or a pull request.
 if [[ ! "${BRANCH_NAME}" = "master" || -n "${_PR_NUMBER}" ]]; then
-  git init
-  git config user.email "builder@bigquery-utils.repo"
-  git config user.name "builder"
-  printf "Adding repo %s as a remote" "${_REPO_URL}"
-  git remote remove origin # Removing necessary when testing locally
-  git remote add origin "${_REPO_URL}"
+  printf "Setting repo %s as origin.\n" "${_REPO_URL}"
+  git remote set-url origin ${_REPO_URL}
+  printf "Fetching history for main branch from origin repo.\n"
   git fetch origin master
 
   # Fetch the pull request which triggered this build and then
   # hard reset to it. The build.sh script can then call "git diff"
   # to figure out what to build based on what's changed.
-  if [[ ! "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
-    printf "Fetching and --hard resetting to (%s) branch from origin repo." "${BRANCH_NAME}"
-    git fetch origin "${BRANCH_NAME}"
-    git reset --hard origin/"${BRANCH_NAME}"
-  elif [[ -n "${_PR_NUMBER}" ]]; then
+  if [[ -n "${_PR_NUMBER}" ]]; then
     printf "Fetching and --hard resetting to the merge commit of pull request #%s which triggered this build." "${_PR_NUMBER}"
     git fetch origin +refs/pull/"${_PR_NUMBER}"/head:refs/remotes/origin/pr/"${_PR_NUMBER}"
     git reset --hard origin/pr/"${_PR_NUMBER}"

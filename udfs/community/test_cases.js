@@ -415,6 +415,108 @@ generate_udf_test("url_parse", [
         expected_output: `NULL`
     },
 ]);
+generate_udf_test("url_param", [
+    {
+        inputs: [
+            `NULL`,
+            `"k1"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"k1"`
+        ],
+        expected_output: `"v1"`
+    },
+    {
+        inputs: [
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"k2"`
+        ],
+        expected_output: `"v2"`
+    },
+    {
+        inputs: [
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
+            `"k3"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1&k4=v4"`,
+            `"k4"`
+        ],
+        expected_output: `NULL`
+    },
+]);
+generate_udf_test("url_trim_query", [
+    {
+        inputs: [
+            `NULL`,
+            `["hello"]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `[]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `NULL`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123&hello=world"`,
+          `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?hello=world"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
+          `["utm_id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?id=12345"`
+    },
+    {
+        inputs: [
+          `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123"`,
+          `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,
+            `["utm_id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html?id=12345#hash"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html?id=12345&utm_id=abc123#hash"`,
+            `["utm_id", "id"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html#hash"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/abc/index.html"`,
+            `["gclid"]`
+        ],
+        expected_output: `"https://www.example.com/abc/index.html"`
+    },
+]);
 generate_udf_test("percentage_change", [
     {
         inputs: [
@@ -934,9 +1036,9 @@ generate_udf_test("corr_pvalue", [
 generate_udf_test("p_fisherexact", [
     {
         inputs: [
-		`CAST(90 AS FLOAT64)`, 
-		`CAST(27 AS FLOAT64)`, 
-		`CAST(17 AS FLOAT64)`, 
+		`CAST(90 AS FLOAT64)`,
+		`CAST(27 AS FLOAT64)`,
+		`CAST(17 AS FLOAT64)`,
 		`CAST(50 AS FLOAT64)`
 	],
         expected_output: `CAST(8.046828829103659E-12 AS FLOAT64)`
@@ -958,18 +1060,18 @@ generate_udf_test("t_test_paired", [
 		`(SELECT ARRAY<FLOAT64>[ 38.27, 31.71, 26.22, 41.33, 44.80, 46.39, 35.46, 38.39, 42.72, 46.76, 29.18, 30.79])`
 	],
 	expected_output: `STRUCT(CAST(-2.1589388479419087 AS FLOAT64) AS t_value, CAST(11 AS INTEGER) AS dof, CAST(1.0 AS FLOAT64) AS p_value)`
-    },
+	
 ]);
 generate_udf_test("mannwhitneyu", [
     {
         inputs: [
 		`(SELECT ARRAY<FLOAT64>[2, 4, 6, 2, 3, 7, 5, 1.])`,
-		`(SELECT ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.])`, 
+		`(SELECT ARRAY<FLOAT64>[8, 10, 11, 14, 20, 18, 19, 9.])`,
 		`CAST('two-sided' AS STRING)`
 	],
 	expected_output: `STRUCT(CAST(64.0 AS FLOAT64) AS U, CAST(9.391056991171487E-4 AS FLOAT64) AS p)`
     },
-]); 
+]);
 //
 generate_udf_test("normal_cdf", [
     {
@@ -980,7 +1082,7 @@ generate_udf_test("normal_cdf", [
 	],
 	expected_output: `CAST(0.3820885778110474 AS FLOAT64)`
     },
-]); 
+]);
 //
 // End of StatsLib work tests
 //
