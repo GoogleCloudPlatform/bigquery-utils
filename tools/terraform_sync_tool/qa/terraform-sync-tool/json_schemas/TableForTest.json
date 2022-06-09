@@ -52,5 +52,11 @@
       "mode": "NULLABLE",
       "name": "Col9",
       "type": "STRING"
+    },
+    {
+      "description": "Col10",
+      "mode": "NULLABLE",
+      "name": "Col10", 
+      "type": "STRING"
     }
   ] 
