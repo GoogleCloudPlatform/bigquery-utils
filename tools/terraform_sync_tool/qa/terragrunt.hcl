@@ -29,7 +29,7 @@ remote_state {
     project  = local.gcp_project_id
     location = "us"
     bucket   = "synctooltest"
-    prefix   = "qa/${path_relative_to_include()}/terraform.tfstate"
+    prefix   = "qa/${path_relative_to_include()}"
     gcs_bucket_labels = {
       owner = "terragrunt_test"
       name  = "terraform_state_storage"
