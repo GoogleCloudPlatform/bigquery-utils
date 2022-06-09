@@ -25,7 +25,7 @@ def convert_to_table_id(input):
     return table_id[:len(table_id)-1]
 
 # Opening JSON file
-f = open('./state.json', 'r')
+f = open('./plan_out.json', 'r')
 data = f.read()
 data = data.split("}\n")
 data = [d.strip() + "}" for d in data]
