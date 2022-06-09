@@ -1,5 +1,5 @@
 terraform {
-  source = "../../modules/terraform-sync-tool"
+  source = "../../modules/bq-setup"
 }
 
 include "root" {
