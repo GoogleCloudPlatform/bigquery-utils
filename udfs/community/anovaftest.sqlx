@@ -31,9 +31,7 @@ CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<factor STRING, val FLOAT6
     )
     
     SELECT
-        ( 
             (SELECT SUM(var) / (COUNT(var)-1) FROM exp_var) 
            /    (SELECT SUM(var) / (select cnt from global_stats) FROM unexp_var) 
-        )
 	
 ));
