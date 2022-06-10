@@ -55,8 +55,7 @@ Meter Readings Staging table:
 1. npm lib needs be installed
 2. [Google cloud project](https://developers.google.com/workspace/guides/create-project) should be available
 3. BigQuery api is enabled
-4. Access to create service account keys
-5. [Dataform lib ](https://docs.dataform.co/dataform-cli) lib using NPM
+4. [Dataform lib ](https://docs.dataform.co/dataform-cli) using NPM
 
 
 ### Steps to follow:
@@ -64,28 +63,18 @@ All the steps below can be used via terminal or Use the CloudShell editor.
 
 In order to test and run the dataform, please run the following steps:
 
-1. Initialize a Dataform project and then create a new Dataform google cloud project ([*optional if you already have one*])
-    ```shell
-    dataform init bigquery dataform-demo --default-database $(gcloud config get-value project) --include-schedules
-    ```
+1. Generate the Dataform credentials file by running the following:
+```
+dataform init-creds bigquery
+```
+> Note: You will be prompted to select the following:
+>  * Your dataset location **(select ‘US’)**
+>  * Your authentication method **(select Application Default Credentials)**.
+>  * Your billing project ID (select the project in which you’ll run your queries).
 
-2. Set up authentication to BigQuery
-  - Go to https://console.cloud.google.com/iam-admin/serviceaccounts and
-      create a service account. Give this account the role of BigQuery Admin (it helps Dataform can create new tables etc.). Then, download the JSON key to
-      the project and upload the file to CloudShell. (optional if you already have a account with service account key uploaded into *optional if you already have a account with service account key uploaded into it*)
-    - Dataform requires a credentials file in order to connect to your warehouse. 
-      ```shell
-      cd dataform-demo
-      dataform init-creds bigquery
-    - Provide the path to the JSON key file when asked. Then make sure to add
-      the key file to .gitignore so that you don’t check it in by mistake.
-      ```shell
-      echo filename.json > .gitignore
-      git add -f .gitignore
-      ```
-3. User has to replace project id, please add them into this [file](./dataform.json). 
+2. User has to replace project id, please add them into this [file](./dataform.json). 
 
-4. Compile & Run
+3. Compile & Run
     ```shell
     dataform compile
     dataform run
