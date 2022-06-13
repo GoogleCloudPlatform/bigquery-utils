@@ -1,5 +1,6 @@
 import json
 import io
+import resource
 from google.cloud import bigquery
 
 # Fetch schemas for drifted tables form BQ
@@ -24,37 +25,31 @@ def convert_to_table_id(input):
             table_id += s+"."
     return table_id[:len(table_id)-1]
 
-# Opening JSON file
-f = open('./plan_out.json', 'r')
-data = f.read()
-data = data.split("}\n")
-data = [d.strip() + "}" for d in data]
-data = list(filter(("}").__ne__, data))
-data = [json.loads(d) for d in data]
-drifted_tables = []
-# find table with drifts and add to drifted_tables list
-for line in data: 
-    if line['type'] == 'resource_drift' and line['change']['resource']['resource_type'] == 'google_bigquery_table':
-        table_id = line['change']['resource']['resource_key']
-        drifted_tables.append(table_id) 
+def main():
+    # Opening JSON file
+    with open('plan_out.json') as file:
+        lines = file.readlines()
+        drifted_tables = []
+        drifted_table = ''                                                                                                    
+        for line in reversed(lines):                                                                    
+            json_line = json.loads(line)
+            type = json_line.get('type')
+            # Scan the json lines to detect drifts
+            if type:
+                if type == 'resource_drift' and json_line.get('change').get('resource').get('resource_type') == 'google_bigquery_table':
+                    table_name = json_line.get('change').get('resource').get('resource_key')
+                    drifted_table = table_name
+                if json_line.get('type') == 'refresh_complete':
+                    resource_table = json_line.get('hook').get('id_value')
+                    print(resource_table)
+                    if(resource_table[len(resource_table) - len(drifted_table):] == drifted_table):
+                        drifted_tables.append(convert_to_table_id(resource_table))
+        
+        if drifted_tables:
+            # Fetch latest schemas for drifted tables from BQ
+            drifted_table_schemas = get_schemas_from_BQ(drifted_tables)
+             # Drifts detected, throw exceptions
+            raise Exception("Drifts are detected in these tables, please update your terraform schema files with the following updated table schemas. ", drifted_table_schemas)
 
-# Convert drifted_tables format to table_ids
-if len(drifted_tables) > 0: 
-    # iterate through drifted_tables list
-    i = 0 
-    for line in data:
-        if line['type'] == 'refresh_complete':
-            resource_table = line['hook']['id_value']
-            if(resource_table[len(resource_table) - len(drifted_tables[i]):] == drifted_tables[i]):
-                drifted_tables[i] = convert_to_table_id(resource_table)
-                i += 1
-            if(i == len(drifted_tables)):
-                break
-    # Fetch schemas for drifted tables from BQ
-    drifted_table_schemas = get_schemas_from_BQ(drifted_tables)
-    # Drifts detected, throw exceptions
-    raise Exception("Drifts are detected in these tables, please update your terraform schema files with the following updated table schemas. ", drifted_table_schemas)
-
-
-# Closing file
-f.close()
+if __name__ == "__main__":
+    main()
