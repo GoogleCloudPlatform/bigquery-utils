@@ -33,15 +33,17 @@ def get_drifted_tables(json_file):
                         'resource_name':json_line.get('change').get('resource').get('resource_name'),
                         'resource_key':json_line.get('change').get('resource').get('resource_key')
                         }
+                # Trace the origins for drifted_table and convert table_name format to fully-qualified table_id
                 if json_line.get('type') == 'refresh_complete' and  json_line.get('hook').get('resource').get('resource_type') == 'google_bigquery_table':
                     event_table = {
                         'resource_name':json_line.get('hook').get('resource').get('resource_name'),
                         'resource_key':json_line.get('hook').get('resource').get('resource_key')
-                    }
+                        }
+                    # Match drifted_table with event_table using resource_name and resource_key as identifiers
                     if(drifted_table == event_table):
-                        drifted_table_name = json_line.get('hook').get('id_value')
-                        # Convert table resource from terraform log output to 
+                        # Retrive the drifted_table_name and convert it into 
                         # table_id format:[gcp_project_id].[dataset_id].[table_id]
+                        drifted_table_name = json_line.get('hook').get('id_value')
                         table_id = ""
                         for s in drifted_table_name.rsplit("/"):
                             if(s != "projects" and s != "datasets" and s != "tables"):
