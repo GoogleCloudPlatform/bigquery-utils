@@ -5,7 +5,8 @@
 # notation.
 
 locals {
-  gcp_project_id = "candicehou-terraform-sync-tool"
+  #TODO: Update your GCP Project ID
+  gcp_project_id = "YOUR_GCP_PROJECT_ID" 
 }
 
 inputs = {

@@ -8,7 +8,8 @@ include "root" {
 }
 
 locals {
-  dataset_id = "tf_test_sync_tool"
+  # TODO: Update your dataset ID
+  dataset_id = "YOUR_DATASET_ID"
 }
 
 inputs = {
