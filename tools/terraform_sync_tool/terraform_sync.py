@@ -16,15 +16,6 @@ def get_schemas_from_BQ(drifted_tables):
         table_schemas.append(schema_bq)
     return table_schemas
 
-# Convert table resource from terraform log output to 
-# table_id format:[gcp_project_id].[dataset_id].[table_id]
-def convert_to_table_id(input):
-    table_id = ""
-    for s in input.rsplit("/"):
-        if(s != "projects" and s != "datasets" and s != "tables"):
-            table_id += s+"."
-    return table_id[:len(table_id)-1]
-
 def main():
     # Opening JSON file
     with open('plan_out.json') as file:
@@ -41,14 +32,19 @@ def main():
                     drifted_table = table_name
                 if json_line.get('type') == 'refresh_complete':
                     resource_table = json_line.get('hook').get('id_value')
-                    print(resource_table)
                     if(resource_table[len(resource_table) - len(drifted_table):] == drifted_table):
-                        drifted_tables.append(convert_to_table_id(resource_table))
+                        # Convert table resource from terraform log output to 
+                        # table_id format:[gcp_project_id].[dataset_id].[table_id]
+                        table_id = ""
+                        for s in resource_table.rsplit("/"):
+                            if(s != "projects" and s != "datasets" and s != "tables"):
+                                table_id += s+"."
+                        drifted_tables.append(table_id[:len(table_id)-1])                        
         
         if drifted_tables:
             # Fetch latest schemas for drifted tables from BQ
             drifted_table_schemas = get_schemas_from_BQ(drifted_tables)
-             # Drifts detected, throw exceptions
+            # Drifts detected, throw exceptions
             raise Exception("Drifts are detected in these tables, please update your terraform schema files with the following updated table schemas. ", drifted_table_schemas)
 
 if __name__ == "__main__":
