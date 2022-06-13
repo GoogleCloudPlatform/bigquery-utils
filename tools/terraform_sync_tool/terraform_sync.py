@@ -1,7 +1,9 @@
 import json
 import io
-import resource
+import argparse
 from google.cloud import bigquery
+
+
 
 # Fetch schemas for drifted tables form BQ
 def get_schemas_from_BQ(drifted_tables):
@@ -17,8 +19,12 @@ def get_schemas_from_BQ(drifted_tables):
     return table_schemas
 
 def main():
+    parser = argparse.ArgumentParser(description='user-provided arguments')
+    parser.add_argument('filename')
+    args = parser.parse_args()
+
     # Opening JSON file
-    with open('plan_out.json') as file:
+    with open(args.filename) as file:
         lines = file.readlines()
         drifted_tables = []
         drifted_table = ''                                                                                                    

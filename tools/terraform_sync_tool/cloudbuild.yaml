@@ -12,3 +12,4 @@ steps:
     args: 
     - -c
     - 'pip install -r ./requirements.txt && python terraform_sync.py'
+    - 'plan_out.json'
