@@ -36,9 +36,11 @@ This directory serves as a starting point for your cloud project with terraform-
 
 
 ## TODO
-Please make sure to update **YOUR_GCP_PROJECT_ID** in `./qa/terragrunt.hcl` 
+Please make sure to update 
+- **YOUR_GCP_PROJECT_ID** in `./qa/terragrunt.hcl` 
+- **YOUR_DATASET_ID** in `./qa/terraform-sync-tool/terragrunt.hcl`
 
-and update **YOUR_DATASET_ID** in `./qa/terraform-sync-tool/terragrunt.hcl`
+Please **create and configure your trigger in Cloud Build** and make sure to use `cloudbuild.yaml` as **Cloud Build configuration file location**
 
 ## Setup
 
