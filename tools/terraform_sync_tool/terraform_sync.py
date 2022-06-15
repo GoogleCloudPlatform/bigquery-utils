@@ -52,6 +52,7 @@ def get_drifted_tables(json_file):
     return drifted_tables
 
 def main():
+    # Provide arguments for JSON filename
     parser = argparse.ArgumentParser(description='user-provided arguments')
     parser.add_argument('filename')
     args = parser.parse_args()
@@ -59,6 +60,7 @@ def main():
     # Parse json file to identify drifted tables
     drifted_tables = get_drifted_tables(args.filename)                   
         
+    # Fail the build and Fetch latest schemas if drifts are detected    
     if drifted_tables:
         # Fetch latest schemas for drifted tables from BQ
         drifted_table_schemas = get_schemas_from_BQ(drifted_tables)

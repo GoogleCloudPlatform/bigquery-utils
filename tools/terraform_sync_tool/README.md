@@ -3,7 +3,7 @@
 This directory contains the setup for the Terraform Sync Tool. Terraform Sync Tool was designed to address the schema drifts in BigQuery tables and keep the 
 Terraform schemas up-to-date with the BigQuery table schemas in production environment.
 
-Terraform Sync Tool can be integrated into your CI/CD pipeline using Cloud Build. You'll neeed add two steps to `cloudbuild.yaml`. 
+Terraform Sync Tool can be integrated into your CI/CD pipeline using Cloud Build. You'll need to add two steps to `cloudbuild.yaml`. 
 - Step 0: Use Terragrunt command to detect resource drifts and write output into a JSON file
 - Step 1: Use Python scripts to identify and investigate the drifts
 
