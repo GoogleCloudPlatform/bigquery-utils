@@ -308,6 +308,66 @@ generate_udf_test("typeof", [
         expected_output: `"NUMERIC"`
     },
 ]);
+generate_udf_test("url_decode", [
+    {
+        inputs: [
+            `"https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`,
+            `NULL`
+        ],
+        expected_output: `"https://example.com/?id=あいうえお"`
+    },
+    {
+        inputs: [
+            `"https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`,
+            `"decodeURIComponent"`
+        ],
+        expected_output: `"https://example.com/?id=あいうえお"`
+    },
+    {
+        inputs: [
+            `"https://example.com/?id=%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`,
+            `"decodeURI"`
+        ],
+        expected_output: `"https://example.com/?id=あいうえお"`
+    },
+    {
+        inputs: [
+            `"https%3A//example.com/%3Fid%3D%u3042%u3044%u3046%u3048%u304A"`,
+            `"unescape"`
+        ],
+        expected_output: `"https://example.com/?id=あいうえお"`
+    },
+]);
+generate_udf_test("url_encode", [
+    {
+        inputs: [
+            `"https://example.com/?id=あいうえお"`,
+            `NULL`
+        ],
+        expected_output: `"https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`
+    },
+    {
+        inputs: [
+            `"https://example.com/?id=あいうえお"`,
+            `"encodeURIComponent"`
+        ],
+        expected_output: `"https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`
+    },
+    {
+        inputs: [
+            `"https://example.com/?id=あいうえお"`,
+            `"encodeURI"`
+        ],
+        expected_output: `"https://example.com/?id=%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A"`
+    },
+    {
+        inputs: [
+            `"https://example.com/?id=あいうえお"`,
+            `"escape"`
+        ],
+        expected_output: `"https%3A//example.com/%3Fid%3D%u3042%u3044%u3046%u3048%u304A"`
+    },
+]);
 generate_udf_test("url_parse", [
     {
         inputs: [
