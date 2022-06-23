@@ -21,7 +21,9 @@ LANGUAGE js
 AS
 """
   method = method || 'decodeURIComponent';
-  if (method == 'decodeURIComponent') {
+  if (text === null) {
+    return null;
+  } else if (method == 'decodeURIComponent') {
     return decodeURIComponent(text);
   } else if (method == 'decodeURI') {
     return decodeURI(text);

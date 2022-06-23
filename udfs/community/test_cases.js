@@ -337,6 +337,13 @@ generate_udf_test("url_decode", [
         ],
         expected_output: `"https://example.com/?id=あいうえお"`
     },
+    {
+        inputs: [
+            `CAST(NULL AS STRING)`,
+            `CAST(NULL AS STRING)`
+        ],
+        expected_output: `CAST(NULL AS STRING)`
+    },
 ]);
 generate_udf_test("url_encode", [
     {
@@ -366,6 +373,13 @@ generate_udf_test("url_encode", [
             `"escape"`
         ],
         expected_output: `"https%3A//example.com/%3Fid%3D%u3042%u3044%u3046%u3048%u304A"`
+    },
+    {
+        inputs: [
+            `CAST(NULL AS STRING)`,
+            `CAST(NULL AS STRING)`
+        ],
+        expected_output: `CAST(NULL AS STRING)`
     },
 ]);
 generate_udf_test("url_parse", [
