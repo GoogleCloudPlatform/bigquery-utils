@@ -59,6 +59,8 @@ SELECT bqutil.fn.int(1.684)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
+* [url_decode](#url_decodetext-string-method-string)
+* [url_encode](#url_encodetext-string-method-string)
 * [url_keys](#url_keysquery-string)
 * [url_param](#url_paramquery-string-p-string)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
@@ -705,6 +707,39 @@ SELECT
 STRING, BINARY, FLOAT64, STRUCT
 ```
 
+### [url_decode(text STRING, method STRING)](url_decode.sqlx)
+Return decoded string of inputs "text" in "method" function.
+
+```sql
+SELECT NULL as method, bqutil.fn.url_decode("https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A", NULL) as value
+UNION ALL SELECT "decodeURIComponent" as method, bqutil.fn.url_encode("https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A", "decodeURIComponent") as value
+UNION ALL SELECT "decodeURI" as method, bqutil.fn.url_decode("https://example.com/?id=%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A", "decodeURI") as value
+UNION ALL SELECT "unescape" as method, bqutil.fn.url_decode("https%3A//example.com/%3Fid%3D%u3042%u3044%u3046%u3048%u304A", "unescape") as value
+```
+
+| method | value |
+|:-------|:------|
+| NULL | https://example.com/?id=あいうえお |
+| decodeURIComponent | https://example.com/?id=あいうえお |
+| decodeURI | https://example.com/?id=あいうえお |
+| unescape | https://example.com/?id=あいうえお |
+
+### [url_encode(text STRING, method STRING)](url_encode.sqlx)
+Return encoded string of inputs "text" in "method" function.
+
+```sql
+SELECT NULL as method, bqutil.fn.url_encode("https://example.com/?id=あいうえお", NULL) as value
+UNION ALL SELECT "encodeURIComponent" as method, bqutil.fn.url_encode("https://example.com/?id=あいうえお", "encodeURIComponent") as value
+UNION ALL SELECT "encodeURI" as method, bqutil.fn.url_encode("https://example.com/?id=あいうえお", "encodeURI") as value
+UNION ALL SELECT "escape" as method, bqutil.fn.url_encode("https://example.com/?id=あいうえお", "escape") as value
+```
+
+| method | value |
+|:-------|:------|
+| NULL | https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A |
+| encodeURIComponent | https%3A%2F%2Fexample.com%2F%3Fid%3D%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A |
+| encodeURI | https://example.com/?id=%E3%81%82%E3%81%84%E3%81%86%E3%81%88%E3%81%8A |
+| escape | https%3A//example.com/%3Fid%3D%u3042%u3044%u3046%u3048%u304A |
 
 ### [url_keys(query STRING)](url_keys.sqlx)
 Get an array of url param keys.
