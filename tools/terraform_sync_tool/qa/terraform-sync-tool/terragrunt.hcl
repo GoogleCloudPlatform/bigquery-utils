@@ -35,6 +35,17 @@ inputs = {
       range_partitioning  = null
       time_partitioning   = null
       labels              = {}
+    },
+    {
+      table_id            = "TableForTest2"
+      dataset_id          = "${local.dataset_id}"
+      schema              = "json_schemas/TableForTest2.json"
+      clustering          = []
+      expiration_time     = null
+      deletion_protection = true
+      range_partitioning  = null
+      time_partitioning   = null
+      labels              = {}
     }
   ]
 }

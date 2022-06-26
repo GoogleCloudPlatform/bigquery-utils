@@ -4,10 +4,11 @@ import argparse
 from google.cloud import bigquery
 
 # Fetch schemas for drifted tables form BQ
-def get_schemas_from_BQ(drifted_tables):
+def get_schemas_from_BQ(tables_of_interest):
     table_schemas = []
     client = bigquery.Client()
-    for table_id in drifted_tables:
+    for k in tables_of_interest:
+        table_id = tables_of_interest.get(k).get('table_id')
         table = client.get_table(table_id)
         file = io.StringIO("")
         client.schema_to_json(table.schema, file)
@@ -16,40 +17,52 @@ def get_schemas_from_BQ(drifted_tables):
         table_schemas.append(schema_bq)
     return table_schemas
 
-# Identify tables with drifts and add return drifted_tables list 
+# Identify tables with drifts and add return tables_of_interest 
 def get_drifted_tables(json_file):
+    tables_of_interest = {} # store events(dict) of interest where key=resource_name+resource_key as identifier and value=resource_id                                                                                                    
     # Opening JSON file
     with open(json_file) as file:
         lines = file.readlines()
-        drifted_tables = []
-        drifted_table = {}                                                                                                    
+        # Scan json lines to store events of interest
         for line in reversed(lines):                                                                    
             json_line = json.loads(line)
             type = json_line.get('type')
-            # Scan the json lines to detect drifts
-            if type:
-                if type == 'resource_drift' and json_line.get('change').get('resource').get('resource_type') == 'google_bigquery_table':
-                    drifted_table = {
-                        'resource_name':json_line.get('change').get('resource').get('resource_name'),
-                        'resource_key':json_line.get('change').get('resource').get('resource_key')
+            change = json_line.get('change')   
+            hook = json_line.get('hook') 
+            # When resource_drift event detected, append new dict to tables_of_interest
+            if type == 'resource_drift' and change and change.get('resource') and change.get('resource').get('resource_type') == 'google_bigquery_table':
+                change_resource = change.get('resource')
+                # Use condensed resource_name+resource_key as key of new dict
+                resource_condensed = change_resource.get('resource_name')+change_resource.get('resource_key')
+                # Use resource infomation from resource_drift event in value of new dict
+                resource_from_drift = {'identifier':
+                    {
+                    'resource_name':change_resource.get('resource_name'),
+                    'resource_key':change_resource.get('resource_key')
+                    }}
+                # Add to tables_of_interest
+                tables_of_interest[resource_condensed] =  resource_from_drift
+            # When refresh_complete event detected, add id_value and convert it to fully-qualified table_id, and add table_id to dict
+            if type == 'refresh_complete' and hook and hook.get('resource') and hook.get('resource').get('resource_type') == 'google_bigquery_table':
+                hook_resource = hook.get('resource')
+                # Use condensed resource_name+resource_key as the key to check if it exists in tables_of_interest
+                resource_condensed = hook_resource.get('resource_name') + hook_resource.get('resource_key')
+                # Usee resource information from refresh_complete event as identifier
+                resource_from_hook = {
+                        'resource_name':hook_resource.get('resource_name'),
+                        'resource_key':hook_resource.get('resource_key')
                         }
-                # Trace the origins for drifted_table and convert table_name format to fully-qualified table_id
-                if json_line.get('type') == 'refresh_complete' and  json_line.get('hook').get('resource').get('resource_type') == 'google_bigquery_table':
-                    event_table = {
-                        'resource_name':json_line.get('hook').get('resource').get('resource_name'),
-                        'resource_key':json_line.get('hook').get('resource').get('resource_key')
-                        }
-                    # Match drifted_table with event_table using resource_name and resource_key as identifiers
-                    if(drifted_table == event_table):
-                        # Retrive the drifted_table_name and convert it into 
-                        # table_id format:[gcp_project_id].[dataset_id].[table_id]
-                        drifted_table_name = json_line.get('hook').get('id_value')
-                        table_id = ""
-                        for s in drifted_table_name.rsplit("/"):
-                            if(s != "projects" and s != "datasets" and s != "tables"):
-                                table_id += s+"."
-                        drifted_tables.append(table_id[:len(table_id)-1]) 
-    return drifted_tables
+                # When the resource_condensed exists and resource_from_hook matched with identifier in dict
+                # add id_value and convert it to fully-qualified table_id, and add table_id to dict
+                if resource_from_hook == tables_of_interest.get(resource_condensed).get('identifier'):
+                    drifted_table_name = hook.get('id_value')
+                    tables_of_interest[resource_condensed]['id_value'] = drifted_table_name
+                    table_id = ""
+                    for s in drifted_table_name.rsplit("/"):
+                        if(s != "projects" and s != "datasets" and s != "tables"):
+                            table_id += s+"."
+                    tables_of_interest[resource_condensed]['table_id'] = table_id[:len(table_id)-1]
+        return tables_of_interest
 
 def main():
     # Provide arguments for JSON filename
@@ -58,12 +71,12 @@ def main():
     args = parser.parse_args()
 
     # Parse json file to identify drifted tables
-    drifted_tables = get_drifted_tables(args.filename)                   
+    tables_of_interest = get_drifted_tables(args.filename)   
         
     # Fail the build and Fetch latest schemas if drifts are detected    
-    if drifted_tables:
+    if tables_of_interest:
         # Fetch latest schemas for drifted tables from BQ
-        drifted_table_schemas = get_schemas_from_BQ(drifted_tables)
+        drifted_table_schemas = get_schemas_from_BQ(tables_of_interest)
         # Drifts detected, throw exceptions
         raise Exception("Drifts are detected in these tables, please update your terraform schema files with the following updated table schemas. ", drifted_table_schemas)
 
