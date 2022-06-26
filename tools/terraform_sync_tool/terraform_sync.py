@@ -54,7 +54,7 @@ def get_drifted_tables(json_file):
                         }
                 # When the resource_condensed exists and resource_from_hook matched with identifier in dict
                 # add id_value and convert it to fully-qualified table_id, and add table_id to dict
-                if resource_from_hook == tables_of_interest.get(resource_condensed).get('identifier'):
+                if resource_condensed in tables_of_interest and resource_from_hook == tables_of_interest.get(resource_condensed).get('identifier'):
                     drifted_table_name = hook.get('id_value')
                     tables_of_interest[resource_condensed]['id_value'] = drifted_table_name
                     table_id = ""
