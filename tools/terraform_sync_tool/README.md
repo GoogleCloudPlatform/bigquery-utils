@@ -20,7 +20,7 @@ This directory serves as a starting point for your cloud project with terraform-
 
     .
     ├── modules                     # Terraform modules directory
-    │   ├── bq-setup                # Example Terraform BigQuery Setup
+    │   ├── bigquery                # Example Terraform BigQuery Setup
     │   └── ...                     # Other modules setup you have
     ├── qa                          # qa environment directory
     │   ├── terragrunt.hcl      

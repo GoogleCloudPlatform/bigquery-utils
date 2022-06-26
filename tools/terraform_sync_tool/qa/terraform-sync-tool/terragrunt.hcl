@@ -1,5 +1,5 @@
 terraform {
-  source = "../../modules/bq-setup"
+  source = "../../modules/bigquery"
 }
 
 include "root" {
@@ -9,7 +9,7 @@ include "root" {
 
 locals {
   # TODO: Update your dataset ID
-  dataset_id = "YOUR_DATASET_ID"
+  dataset_id = "DatasetForTest" #YOUR_DATASET_ID
 }
 
 inputs = {
