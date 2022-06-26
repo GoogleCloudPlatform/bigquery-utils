@@ -7,6 +7,7 @@
 locals {
   #TODO: Update your GCP Project ID
   gcp_project_id = "YOUR_GCP_PROJECT_ID" #YOUR_GCP_PROJECT_ID
+  bucket_name = "YOUR_GCP_BUCKET_NAME" #YOUR_GCP_BUCKET_NAME
 }
 
 inputs = {
@@ -29,7 +30,7 @@ remote_state {
   config = {
     project  = local.gcp_project_id
     location = "us"
-    bucket   = "synctooltest"
+    bucket   = local.bucket_name
     prefix   = "${path_relative_to_include()}"
     gcs_bucket_labels = {
       owner = "terragrunt_test"
