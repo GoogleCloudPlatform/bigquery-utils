@@ -6,7 +6,7 @@
 
 locals {
   #TODO: Update your GCP Project ID
-  gcp_project_id = "YOUR_GCP_PROJECT_ID" 
+  gcp_project_id = "YOUR_GCP_PROJECT_ID" #YOUR_GCP_PROJECT_ID
 }
 
 inputs = {
@@ -30,7 +30,7 @@ remote_state {
     project  = local.gcp_project_id
     location = "us"
     bucket   = "synctooltest"
-    prefix   = "qa/${path_relative_to_include()}"
+    prefix   = "${path_relative_to_include()}"
     gcs_bucket_labels = {
       owner = "terragrunt_test"
       name  = "terraform_state_storage"
