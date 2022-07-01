@@ -1,6 +1,7 @@
 import json
 import io
 import argparse
+import re
 from google.cloud import bigquery
 
 # Fetch schemas for drifted tables form BQ
@@ -56,11 +57,10 @@ def get_drifted_tables(json_file):
                 if resource_condensed in tables_of_interest and resource_from_hook == tables_of_interest.get(resource_condensed).get('identifier'):
                     drifted_table_name = hook.get('id_value')
                     tables_of_interest[resource_condensed]['id_value'] = drifted_table_name
-                    table_id = ""
-                    for s in drifted_table_name.rsplit("/"):
-                        if(s != "projects" and s != "datasets" and s != "tables"):
-                            table_id += s+"."
-                    tables_of_interest[resource_condensed]['table_id'] = table_id[:len(table_id)-1]
+
+                    x = re.findall(r'projects/(.*)/datasets/(.*)/tables/(.*)', drifted_table_name)
+                    table_id = '.'.join(list(x[0]))
+                    tables_of_interest[resource_condensed]['table_id'] = table_id
         return tables_of_interest
 
 def main():
