@@ -765,7 +765,7 @@ SELECT bqutil.fn.url_param(
 
 ### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sqlx)
 
-Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
+Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL, DIR1, DIR2, DIR3, DIR4, DIR5
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
 ```sql
 WITH urls AS (
@@ -774,6 +774,8 @@ WITH urls AS (
   SELECT 'rpc://facebook.com/' as url
 )
 SELECT bqutil.fn.url_parse(url, 'HOST'), bqutil.fn.url_parse(url, 'PATH'), bqutil.fn.url_parse(url, 'QUERY'), bqutil.fn.url_parse(url, 'REF'), bqutil.fn.url_parse(url, 'PROTOCOL') from urls
+UNION ALL
+SELECT bqutil.fn.url_parse(url, 'DIR1'), bqutil.fn.url_parse(url, 'DIR2'), bqutil.fn.url_parse(url, 'DIR3'), bqutil.fn.url_parse(url, 'DIR4'), bqutil.fn.url_parse(url, 'DIR5') from urls
 ```
 
 results:
@@ -782,6 +784,8 @@ results:
 |--------------|-------------|------------------|------|------|
 | facebook.com | path1/p.php | k1=v1&k2=v2#Ref1 | Ref1 | http |
 | facebook.com | NULL        | NULL             | NULL | rpc  |
+| path1        | p.php       | NULL             | NULL | NULL |
+| NULL         | NULL        | NULL             | NULL | NULL |
 
 
 ### [url_trim_query(url STRING, keys_to_trim ARRAY<STRING>)](url_trim_query.sqlx)
