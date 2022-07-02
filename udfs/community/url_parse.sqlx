@@ -26,6 +26,11 @@ AS (
     WHEN UPPER(part) = 'QUERY' THEN REGEXP_EXTRACT(url, r'\?(.*)')
     WHEN UPPER(part) = 'REF'   THEN REGEXP_EXTRACT(url, r'#(.*)')
     WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, r'^([a-zA-Z]+)://')
+    WHEN UPPER(part) = 'DIR1'  THEN SPLIT(REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)'), '/')[OFFSET(0)]
+    WHEN UPPER(part) = 'DIR2'  THEN SPLIT(REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)'), '/')[OFFSET(1)]
+    WHEN UPPER(part) = 'DIR3'  THEN SPLIT(REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)'), '/')[OFFSET(2)]
+    WHEN UPPER(part) = 'DIR4'  THEN SPLIT(REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)'), '/')[OFFSET(3)]
+    WHEN UPPER(part) = 'DIR5'  THEN SPLIT(REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)'), '/')[OFFSET(4)]
     ELSE NULL
   END
 );

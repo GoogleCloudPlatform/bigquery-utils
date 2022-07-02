@@ -488,6 +488,76 @@ generate_udf_test("url_parse", [
         ],
         expected_output: `NULL`
     },
+    {
+        inputs: [
+            `"https://www.example.com/1st/2nd/3rd/4th/5th?query=TEST"`,
+            `"DIR1"`
+        ],
+        expected_output: `"1st"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/1st/2nd/3rd/4th/5th?query=TEST"`,
+            `"DIR2"`
+        ],
+        expected_output: `"2nd"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/1st/2nd/3rd/4th/5th?query=TEST"`,
+            `"DIR3"`
+        ],
+        expected_output: `"3rd"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/1st/2nd/3rd/4th/5th?query=TEST"`,
+            `"DIR4"`
+        ],
+        expected_output: `"4th"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/1st/2nd/3rd/4th/5th?query=TEST"`,
+            `"DIR5"`
+        ],
+        expected_output: `"5th"`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/"`,
+            `"DIR1"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/"`,
+            `"DIR2"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/"`,
+            `"DIR3"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/"`,
+            `"DIR4"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"https://www.example.com/"`,
+            `"DIR5"`
+        ],
+        expected_output: `NULL`
+    },
 ]);
 generate_udf_test("url_param", [
     {
