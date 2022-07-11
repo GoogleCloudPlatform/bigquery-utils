@@ -13,7 +13,7 @@ the Terraform resources accordingly.
 ## Prerequisite
 Before building the terraform sync tool, please ensure that billing and Cloud Build are enabled for your Cloud project.
 
-You'll also need to install Cloud SDK(https://cloud.google.com/sdk/docs/install) and Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install)
+You'll also need to install Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install)
 
 ## Folder Structure
 This directory serves as a starting point for your cloud project with terraform-sync-tool as one of qa tools integrated.
