@@ -67,7 +67,7 @@ def get_drifted_tables(json_file):
 
 def main():
     # Provide arguments for JSON filename
-    parser = argparse.ArgumentParser(description='user-provided arguments')
+    parser = argparse.ArgumentParser(description='user-provided arguments: filename of terragrunt ouput JSON file')
     parser.add_argument('filename')
     args = parser.parse_args()
 
@@ -76,8 +76,8 @@ def main():
         
     # Fail the build and Fetch latest schemas if drifts are detected    
     if tables_of_interest:
-        #obtain credentials
-        credentials, project_id = google.auth.default()
+        # Obtain credentials
+        project_id = google.auth.default()
         # Fetch latest schemas for drifted tables from BQ
         client = bigquery.Client(project_id)
         drifted_table_schemas = get_schemas_from_BQ(tables_of_interest, client)
