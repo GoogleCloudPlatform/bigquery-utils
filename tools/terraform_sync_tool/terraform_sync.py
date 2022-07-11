@@ -3,6 +3,8 @@ import io
 import argparse
 import re
 from google.cloud import bigquery
+import google.auth
+
 
 # Fetch schemas for drifted tables form BQ
 def get_schemas_from_BQ(tables_of_interest, client):
@@ -74,8 +76,10 @@ def main():
         
     # Fail the build and Fetch latest schemas if drifts are detected    
     if tables_of_interest:
+        #obtain credentials
+        credentials, project_id = google.auth.default()
         # Fetch latest schemas for drifted tables from BQ
-        client = bigquery.Client()
+        client = bigquery.Client(project_id)
         drifted_table_schemas = get_schemas_from_BQ(tables_of_interest, client)
         # Drifts detected, throw exceptions
         raise Exception("Drifts are detected in these tables, please update your terraform schema files with the following updated table schemas. ", drifted_table_schemas)
