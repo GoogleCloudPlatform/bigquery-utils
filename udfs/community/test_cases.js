@@ -1163,3 +1163,11 @@ generate_udf_test("jaccard", [
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
 ]);
+
+generate_udf_test("cw_initcap", [
+    {
+        inputs: [`"the camel is the guy"`],
+        expected_output: `"The Camel Is The Guy"`
+    },
+]);
+
