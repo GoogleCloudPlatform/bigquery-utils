@@ -1,63 +1,62 @@
-  [
-    {
-      "description": "Col1",
-      "mode": "NULLABLE",
-      "name": "Col1",
-      "type": "STRING"
-    },
-    {
-      "description": "Col2",
-      "mode": "NULLABLE",
-      "name": "Col2",
-      "type": "STRING"
-    },
-    {
-      "description": "Col3",
-      "mode": "NULLABLE",
-      "name": "Col3",
-      "type": "STRING"
-    },
-    {
-      "description": "Col4",
-      "mode": "NULLABLE",
-      "name": "Col4",
-      "type": "STRING"
-    },
-    {
-      "description": "Col5",
-      "mode": "NULLABLE",
-      "name": "Col5",
-      "type": "STRING"
-    },
-    {
-      "description": "Col6",
-      "mode": "NULLABLE",
-      "name": "Col6",
-      "type": "STRING"
-    },
-    {
-      "description": "Col7",
-      "mode": "NULLABLE",
-      "name": "Col7",
-      "type": "STRING"
-    },
-    {
-      "description": "Col8",
-      "mode": "NULLABLE",
-      "name": "Col8",
-      "type": "STRING"
-    },
-    {
-      "description": "Col9",
-      "mode": "NULLABLE",
-      "name": "Col9",
-      "type": "STRING"
-    },
-    {
-      "description": "Col10",
-      "mode": "NULLABLE",
-      "name": "Col10", 
-      "type": "STRING"
-    }
-  ] 
-  
+[
+  {
+    "description": "Col1",
+    "mode": "NULLABLE",
+    "name": "Col1",
+    "type": "STRING"
+  },
+  {
+    "description": "Col2",
+    "mode": "NULLABLE",
+    "name": "Col2",
+    "type": "STRING"
+  },
+  {
+    "description": "Col3",
+    "mode": "NULLABLE",
+    "name": "Col3",
+    "type": "STRING"
+  },
+  {
+    "description": "Col4",
+    "mode": "NULLABLE",
+    "name": "Col4",
+    "type": "STRING"
+  },
+  {
+    "description": "Col5",
+    "mode": "NULLABLE",
+    "name": "Col5",
+    "type": "STRING"
+  },
+  {
+    "description": "Col6",
+    "mode": "NULLABLE",
+    "name": "Col6",
+    "type": "STRING"
+  },
+  {
+    "description": "Col7",
+    "mode": "NULLABLE",
+    "name": "Col7",
+    "type": "STRING"
+  },
+  {
+    "description": "Col8",
+    "mode": "NULLABLE",
+    "name": "Col8",
+    "type": "STRING"
+  },
+  {
+    "description": "Col9",
+    "mode": "NULLABLE",
+    "name": "Col9",
+    "type": "STRING"
+  },
+  {
+    "description": "Col10",
+    "mode": "NULLABLE",
+    "name": "Col10", 
+    "type": "STRING"
+  }
+]
