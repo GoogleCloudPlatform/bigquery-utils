@@ -13,10 +13,8 @@ the Terraform resources accordingly.
 ## Prerequisite
 Before building the terraform sync tool, please ensure that billing and Cloud Build are enabled for your Cloud project.
 
-You'll need to install Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install)
-
 ## What is Terragrunt?
-Terragrunt is a framework on top of Terraform with some new tools out-of-the-box. 
+Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install) is a framework on top of Terraform with some new tools out-of-the-box. 
 Using new files *.hcl and new keywords, you can share variables across terraform modules easily.
 
 ## Folder Structure
@@ -38,7 +36,7 @@ This directory serves as a starting point for your cloud project with terraform-
     ├── terraform_sync.py           # Build Step 1 - python scripts
     └── ...                         # etc.
 
-## How to run Terraform Schema Sync Tool(TODO)
+## How to run Terraform Schema Sync Tool
 
 #### Use Terraform/Terragrunt commands to test if any resources drifts existed
 
@@ -54,7 +52,8 @@ terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-
 # If you need to write outputs into a json file. Feel free to replace `plan_out.json` with your JSON FILENAME.
 terragrunt run-all plan -json --terragrunt-non-interactive > plan_out.json
 
-# If you need to write outputs into a json file with variables specified. Feel free to replace `plan_out.json` with your JSON FILENAME.
+# If you need to write outputs into a json file with variables specified. 
+# Feel free to replace `plan_out.json` with your JSON FILENAME.
 env = VALUE_OF_ENV  # Value of env, for example "qa"
 tool = VALUE_OF_TOOL  # Value of tool, for example "terraform-sync-tool"
 terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}" > plan_out.json
