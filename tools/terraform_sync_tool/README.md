@@ -1,23 +1,76 @@
 # Terraform Sync Tool
 
 This directory contains the setup for the Terraform Sync Tool. Terraform Sync Tool was designed to address the schema drifts in BigQuery tables and keep the 
-Terraform schemas up-to-date with the BigQuery table schemas in production environment.
+Terraform schemas up-to-date with the BigQuery table schemas in production environment. Schema drifts occurred when BigQuery Table schemas are updated by newly 
+ingested data while Terraform schema files contain the outdated schemas. Therefore, this tool will detect the schema drifts, trace the origins of the drifts, and alert
+developers/data engineers.
 
-Terraform Sync Tool can be integrated into your CI/CD pipeline using Cloud Build. You'll need to add two steps to `cloudbuild.yaml`. 
-- Step 0: Use Terragrunt command to detect resource drifts and write output into a JSON file
+The Terraform Schema Sync Tool fails the build attemps if resource drifts are detected and notifies the latest resource information. Developers and data engineers should be able to update the Terraform resources accordingly. 
+
+Terraform Sync Tool can be integrated into your CI/CD pipeline. You'll need to add two steps to CI/CD pipeline. 
+- Step 0: Use Terraform/erragrunt command to detect resource drifts and write output into a JSON file
 - Step 1: Use Python scripts to identify and investigate the drifts
 
-Cloud Build fails the build attemps if resource drifts are detected and notifies the latest resource information. Developers should be able to update
-the Terraform resources accordingly. 
+## How to run Terraform Schema Sync Tool
 
-## Prerequisite
-Before building the terraform sync tool, please ensure that billing and Cloud Build are enabled for your Cloud project.
+#### Use Terraform/Terragrunt commands to test if any resources drifts existed
 
-## What is Terragrunt?
-Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install) is a framework on top of Terraform with some new tools out-of-the-box. 
-Using new files *.hcl and new keywords, you can share variables across terraform modules easily.
+Terragrunt/Terraform commands:
+```
+terragrunt run-all plan -json --terragrunt-non-interactive
 
-## Folder Structure
+# Terraform Command
+terraform plan -json
+```
+
+After running the Terrform plan command, **the event type "resource_drift"("type": "resource_drift") indicates a drift has occurred**.
+If drifts detected, please update your terraform configurations and address the resource drifts based on the event outputs.
+
+
+#### Add Could Build Steps to your configuration file
+
+Please check cloud build steps in `cloudbuild.yaml` file, and add these steps to your Cloud Build Configuration File.
+
+- step 0: run terraform commands in `deploy.sh` to detects drifts
+
+Add `deploy.sh` to your project directory. 
+
+- step 1: run python scripts to investigate terraform output
+
+Add `requirements.txt` and `terraform_sync.py` to your project directory.
+
+#### (Optional if you haven't created Cloud Build Trigger) Create and configure a new Trigger in Cloud Build
+Make sure to indicate your cloud configuration file location correctly.
+
+#### That's all you need! Let's commit and test in CLoud Build!
+
+## How Terraform Schema Sync Tool Works
+
+![Architecture Diagram](architecture.png)
+
+**Executing the Sync Tool**
+
+The Terraform Sync Tool will be executed as part of the CI/CD pipeline build steps triggered anytime when developers make a change to the linked repository. A build step specifies an action that you want Cloud Build to perform. For each build step, Cloud Build executes a docker container as an instance of docker run. 
+
+**Step 0: Terraform Detects Drifts**
+
+`deploy.sh` contains terraform plan command that writes event outputs into `plan_out.json` file. We'll use `plan_out.json` file for further investigation in the future steps. Feel free to repace `plan_out.json` with your JSON filename. we can pass through the variables ${env} and ${tool} if any. 
+
+**Step 1: Investigate Drifts** 
+
+ `requirements.txt` specifies python dependencies, and `terraform_sync.py` contains python scripts to
+investigate terraform event outputs stored from step 0 to detect and address schema drifts
+
+In the python scripts(`terraform_sync.py`), we firstly scan through the output by line to identify all the drifted tables and store their table names. 
+After storing the drifted table names and converted them into the table_id format:[gcp_project_id].[dataset_id].[table_id], we make API calls, to fetch the latest table schemas from BigQuery. 
+
+**Step 2: Fail Builds and Notify Expected Schemas** 
+
+Once the schema drifts are detected and identified, we fail the build and notify the developer who makes changes to the repository. The notifications will include the details and the expected schemas in order keep the schema files up-to-date with the latest table schemas in BigQuery. 
+
+To interpret the message, the expected table schema is in the format of [{table1_id:table1_schema}, {table2_id: table2_schema}, ...... ]. table_id falls in the format of [gcp_project_id].[dataset_id].[table_id] 
+
+#### Folder Structure ####
 This directory serves as a starting point for your cloud project with terraform-sync-tool as one of qa tools integrated.
 
     .
@@ -36,11 +89,12 @@ This directory serves as a starting point for your cloud project with terraform-
     ├── terraform_sync.py           # Build Step 1 - python scripts
     └── ...                         # etc.
 
-## How to run Terraform Schema Sync Tool
+**What is Terragrunt?**
 
-#### Use Terraform/Terragrunt commands to test if any resources drifts existed
+Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install) is a framework on top of Terraform with some new tools out-of-the-box. 
+Using new files *.hcl and new keywords, you can share variables across terraform modules easily.
 
-Terragrunt/Terraform commands:
+**Using terragrunt to detect resource drifts**
 ```
 terragrunt run-all plan -json --terragrunt-non-interactive
 
@@ -58,32 +112,6 @@ env = VALUE_OF_ENV  # Value of env, for example "qa"
 tool = VALUE_OF_TOOL  # Value of tool, for example "terraform-sync-tool"
 terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}" > plan_out.json
 ```
-
-After running the Terrform plan command, **the event type "resource_drift"("type": "resource_drift") indicates a drift has occurred**.
-If drifts detected, please update your terraform configurations and address the resource drifts based on the event outputs.
-
-
-#### Add Could Build Steps to your configuration file
-
-Please check cloud build steps in `cloudbuild.yaml` file, and add these steps to your Cloud Build Configuration File.
-
-Here are two steps in `cloudbuild.yaml` for Terraform Schema Sync Tool integration: 
-
-- step 0: run terraform commands in `deploy.sh` to detects drifts
-
-Add `deploy.sh` to your project directory. `deploy.sh` contains terraform plan command that writes event outputs into `plan_out.json` file. We'll use `plan_out.json` file for further investigation in the future steps. Feel free to repace `plan_out.json` with your JSON filename.
-
-
-- step 1: run python scripts to investigate terraform output
-
-Add `requirements.txt` and `terraform_sync.py` to your project directory. `requirements.txt` specifies python dependencies, and `terraform_sync.py` contains python scripts to
-investigate terraform event outputs stored from step 0 to detect and address schema drifts
-
-#### (Optional if you haven't created Cloud Build Trigger) Create and configure a new Trigger in Cloud Build
-Make sure to indicate your cloud configuration file location correctly.
-
-#### That's all you need! Let's commit and test in CLoud Build!
-
 
 ## How to run this sample repo?
 
