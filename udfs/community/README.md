@@ -13,6 +13,9 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [anovafscore](#anovafscoredata-arraystructfactor-string-val-float64)
+* [anovaftest](#anovaftestdata-arraystructfactor-string-val-float64)
+* [centralF_udf](#centralf_cdff-float64-df1-int64-df2-int64)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -844,9 +847,9 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
-* [anovafscore](#corr_pvaluer-float64-n-int64)
-* [anovaftest](#corr_pvaluer-float64-n-int64)
-* [centralF_udf](#corr_pvaluer-float64-n-int64)
+* [anovafscore](#anovafscoredata-arraystructfactor-string-val-float64)
+* [anovaftest](#anovaftestdata-arraystructfactor-string-val-float64)
+* [centralF_udf](#centralf_cdff-float64-df1-int64-df2-int64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
