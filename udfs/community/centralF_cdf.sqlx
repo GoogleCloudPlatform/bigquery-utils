@@ -14,21 +14,14 @@ config { hasOutput: true }
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#standardSQL
 
+CREATE OR REPLACE FUNCTION ${self()}(F FLOAT64, dof1 INT64, dof2 INT64)
+RETURNS FLOAT64 
+LANGUAGE js AS """
+  return 1.0 - jstat.jStat['centralF'].cdf(F, dof1, dof2)
+"""
+OPTIONS ( 
+    library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]
+);
 
-CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
-    WITH raw_data AS (
-        SELECT d.val AS v, d.factor as f
-        FROM UNNEST(data) AS d 
-    ),
-    global_stats AS (
-        SELECT COUNT(*) as N, COUNT(DISTINCT f)-1 as df1 FROM raw_data
-    ),
-    f_score as (
-        (SELECT ${ref("anovafscore")}(data) as F) 
-    )
-    
-    SELECT struct(cast(1 - ${ref("centralF_cdf")}(F, df1, N - df1 - 1) as FLOAT64) as p, F as F) from f_score, global_stats
-	
-	
-));

@@ -15,20 +15,23 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-
 CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<factor STRING, val FLOAT64>>) AS ((
     WITH raw_data AS (
         SELECT d.val AS v, d.factor as f
         FROM UNNEST(data) AS d 
     ),
     global_stats AS (
-        SELECT COUNT(*) as N, COUNT(DISTINCT f)-1 as df1 FROM raw_data
+        SELECT AVG(v) as M, COUNT(*) - COUNT(DISTINCT f)  as cnt FROM raw_data
     ),
-    f_score as (
-        (SELECT ${ref("anovafscore")}(data) as F) 
+    exp_var AS (
+        SELECT COUNT(v) * POW(AVG(v) - (select M from global_stats), 2) as var, NULL as cnt, NULL as discnt FROM raw_data GROUP BY f
+    ),
+    unexp_var as (
+        SELECT COUNT(v) * VAR_POP(v) as var FROM raw_data GROUP BY f
     )
     
-    SELECT struct(cast(1 - ${ref("centralF_cdf")}(F, df1, N - df1 - 1) as FLOAT64) as p, F as F) from f_score, global_stats
-	
+    SELECT
+            (SELECT SUM(var) / (COUNT(var)-1) FROM exp_var) 
+           /    (SELECT SUM(var) / (select cnt from global_stats) FROM unexp_var) 
 	
 ));
