@@ -219,6 +219,26 @@ main() {
   # for all other Dataform project directories.
   dataform install >/dev/null 2>&1
 
+  # Deploy UDFs to bigquery-public-data project
+  public_project_id="bigquery-public-data"
+  public_dataset_id="persistent_udfs"
+  if [[ -n "${_PUBLIC_DATA}"]]; then
+      # Deploy all UDFs in the community folder
+      deploy_udfs \
+        "${public_project_id}" \
+        "${JS_BUCKET}" \
+        "${udf_dir}" \
+        "${public_dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../"${udf_dir}" \
+        "${public_dataset_id}"_deploy
+      # Run unit tests for all UDFs in community folder
+      test_udfs \
+        "${public_project_id}" \
+        "${public_dataset_id}${SHORT_SHA}" \
+        "$(pwd)"/../../community \
+        "${public_dataset_id}"_test
+  fi
+
   local udf_dirs
   # Get the list of directory names which contain UDFs
   udf_dirs=$(sed 's/:.*//g' <../../dir_to_dataset_map.yaml)
