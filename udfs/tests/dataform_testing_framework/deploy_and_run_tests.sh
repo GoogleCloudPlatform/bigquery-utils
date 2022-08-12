@@ -227,16 +227,16 @@ main() {
       deploy_udfs \
         "${public_project_id}" \
         "${JS_BUCKET}" \
-        "${udf_dir}" \
+        "community" \
         "${public_dataset_id}${SHORT_SHA}" \
-        "$(pwd)"/../../"${udf_dir}" \
-        "${public_dataset_id}"_deploy
+        "$(pwd)"/../../community \
+        "community_deploy"
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${public_project_id}" \
         "${public_dataset_id}${SHORT_SHA}" \
         "$(pwd)"/../../community \
-        "${public_dataset_id}"_test
+        "community_test"
   fi
 
   local udf_dirs
