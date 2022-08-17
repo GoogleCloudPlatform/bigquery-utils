@@ -221,10 +221,10 @@ main() {
 
   # Deploy UDFs to bigquery-public-data project
   public_dataset_id="persistent_udfs"
-  if [[ -n "${_PUBLIC_PROJECT_ID}" ]]; then
+  if [[ -n "${PUBLIC_PROJECT_ID}" ]]; then
       # Deploy all UDFs in the community folder
       deploy_udfs \
-        "${_PUBLIC_PROJECT_ID}" \
+        "${PUBLIC_PROJECT_ID}" \
         "${JS_BUCKET}" \
         "community" \
         "${public_dataset_id}" \
@@ -232,7 +232,7 @@ main() {
         "community_deploy"
       # Run unit tests for all UDFs in community folder
       test_udfs \
-        "${_PUBLIC_PROJECT_ID}" \
+        "${PUBLIC_PROJECT_ID}" \
         "${public_dataset_id}" \
         "$(pwd)"/../../community \
         "community_test"
