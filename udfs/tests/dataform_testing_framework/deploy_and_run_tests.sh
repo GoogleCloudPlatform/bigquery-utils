@@ -228,7 +228,7 @@ main() {
         "${public_project_id}" \
         "${JS_BUCKET}" \
         "community" \
-        "${public_dataset_id}${SHORT_SHA}" \
+        "${public_dataset_id}" \
         "$(pwd)"/../../community \
         "community_deploy"
       # Run unit tests for all UDFs in community folder
