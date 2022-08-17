@@ -234,7 +234,7 @@ main() {
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${public_project_id}" \
-        "${public_dataset_id}${SHORT_SHA}" \
+        "${public_dataset_id}" \
         "$(pwd)"/../../community \
         "community_test"
   fi
