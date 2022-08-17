@@ -221,7 +221,7 @@ main() {
 
   # Deploy UDFs to bigquery-public-data project
   public_dataset_id="persistent_udfs"
-  if [[ -n "${_PUBLIC_PROJECT_ID}"]]; then
+  if [[ -n "${_PUBLIC_PROJECT_ID}" ]]; then
       # Deploy all UDFs in the community folder
       deploy_udfs \
         "${_PUBLIC_PROJECT_ID}" \
