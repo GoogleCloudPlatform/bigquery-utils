@@ -14,3 +14,8 @@ config { hasOutput: true }
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+CREATE OR REPLACE FUNCTION ${self()}(input_mph FLOAT64) AS (
+input_mph / 1.15078
+);
