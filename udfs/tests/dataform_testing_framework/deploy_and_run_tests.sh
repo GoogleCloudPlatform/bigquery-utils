@@ -224,7 +224,7 @@ main() {
   if [[ "${PROJECT_ID}" = "bigquery-public-data" ]]; then
       # Deploy all UDFs in the community folder
       deploy_udfs \
-        "${PUBLIC_PROJECT_ID}" \
+        "${PROJECT_ID}" \
         "${JS_BUCKET}" \
         "community" \
         "${public_dataset_id}" \
