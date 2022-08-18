@@ -232,7 +232,7 @@ main() {
         "community_deploy"
       # Run unit tests for all UDFs in community folder
       test_udfs \
-        "${PUBLIC_PROJECT_ID}" \
+        "${PROJECT_ID}" \
         "${public_dataset_id}" \
         "$(pwd)"/../../community \
         "community_test"
