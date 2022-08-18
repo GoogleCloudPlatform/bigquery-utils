@@ -24,8 +24,7 @@ steps:
   args:
     - deploy_and_run_tests.sh
   env:
-    - PROJECT_ID=${PROJECT_ID}
-    - PUBLIC_PROJECT_ID=${_PUBLIC_PROJECT_ID}
+    - PROJECT_ID=${_PROJECT_ID}
     - BQ_LOCATION=${_BQ_LOCATION}
     - SHORT_SHA=
     - JS_BUCKET=gs://bqutil-lib/bq_js_libs
