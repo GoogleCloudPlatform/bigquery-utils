@@ -1163,3 +1163,53 @@ generate_udf_test("jaccard", [
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
 ]);
+generate_udf_test("knots_to_miles", [
+    {
+        inputs: [`CAST(37.7 AS FLOAT64)`],
+        expected_output: `CAST(43.384406 AS FLOAT64)`
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
+generate_udf_test("miles_to_knots", [
+    {
+        inputs: [`CAST(75.5 AS FLOAT64)`],
+        expected_output: `CAST(65.607674794487224 AS FLOAT64)`
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
+generate_udf_test("meters_to_miles", [
+    {
+        inputs: [`CAST(5000.0 AS FLOAT64)`],
+        expected_output: `CAST(3.1068559611866697 AS FLOAT64)`
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
+generate_udf_test("miles_to_meters", [
+    {
+        inputs: [`CAST(2.73 AS FLOAT64)`],
+        expected_output: `CAST(4393.50912 AS FLOAT64)`
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
+generate_udf_test("nautical_miles_conversion", [
+    {
+        inputs: [`CAST(1.12 AS FLOAT64)`],
+        expected_output: `CAST(1.2888736 AS FLOAT64)`
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`],
+        expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+]);
