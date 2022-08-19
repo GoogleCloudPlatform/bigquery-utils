@@ -1163,7 +1163,7 @@ generate_udf_test("jaccard", [
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
 ]);
-generate_udf_test("knots_to_miles", [
+generate_udf_test("knots_to_mph", [
     {
         inputs: [`CAST(37.7 AS FLOAT64)`],
         expected_output: `CAST(43.384406 AS FLOAT64)`
@@ -1173,7 +1173,7 @@ generate_udf_test("knots_to_miles", [
         expected_output: `CAST(0.0 AS FLOAT64)`
     },
 ]);
-generate_udf_test("miles_to_knots", [
+generate_udf_test("mph_to_knots", [
     {
         inputs: [`CAST(75.5 AS FLOAT64)`],
         expected_output: `CAST(65.607674794487224 AS FLOAT64)`
@@ -1212,4 +1212,10 @@ generate_udf_test("nautical_miles_conversion", [
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
     },
+]);
+generate_udf_test("azimuth_to_geog_point", [
+    {
+        inputs: [`CAST(30.2672 AS FLOAT64)`,`CAST(97.7431 AS FLOAT64)`,`CAST(312.9 AS FLOAT64)`,`CAST(1066.6 AS FLOAT64)`],
+        expected_output: `ST_GEOGPOINT(81.4417483906444, 39.9606210457152)`
+    }
 ]);

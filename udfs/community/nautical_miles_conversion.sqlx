@@ -15,6 +15,6 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(input_nautical_miles) AS (
+CREATE OR REPLACE FUNCTION ${self()}(input_nautical_miles FLOAT64) AS (
   input_nautical_miles * 1.15078
 );
