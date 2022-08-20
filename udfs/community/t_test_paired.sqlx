@@ -17,34 +17,40 @@ config { hasOutput: true }
  */
 
 
--- Student's T-Test
+-- Paired (dependent samples) T-Test
 -- Input:
 --     pop1, array of FLOAT64, values from first group
 --     pop2, array of FLOAT64, values from second group
 -- Output: 
---     Struct of t_value, dof, and p_value
-
+--     Struct of t_value, p_value, and dof
 
 CREATE OR REPLACE FUNCTION ${self()}(pop1 ARRAY<FLOAT64>, pop2 ARRAY<FLOAT64>) AS ((
-    WITH pop1 AS (
-        SELECT 
-            AVG(p1) x1,
-            STDDEV(p1) st1,
-            COUNT(p1) AS n1 
-        FROM UNNEST(pop1) AS p1
-    ), pop2 as (
-        SELECT 
-            AVG(p2) x2,
-            STDDEV(p2) st2,
-            COUNT(p2) AS n2
-        FROM UNNEST(pop2) AS p2
-    )
-    SELECT
-        STRUCT(
-            ABS(x1 - x2) / Sqrt((st1 * st1 / n1) + (st2 * st2 / n2)) AS t_value,
-            n1 + n2 - 2 AS dof,
-            bqutil.fn.pvalue(ABS(x1 - x2) / Sqrt((st1 * st1 / n1) + (st2 * st2 / n2)), n1 + n2 - 2) AS p_value
-        )
-    FROM pop1 CROSS JOIN pop2
+    WITH t1 as (
+      SELECT id, val
+      FROM UNNEST(pop1) as val
+      WITH OFFSET AS id
+      ORDER BY id
+   ),
+   t2 as (
+      SELECT  id, val
+      FROM UNNEST(pop2) as val
+      WITH OFFSET AS id
+      ORDER BY id
+   )
+   SELECT
+      STRUCT(
+         mean / ( std / SQRT(N) ) AS  t_value,
+         N-1 AS dof,
+         bqutil.fn.pvalue(mean / ( std / SQRT(N) ), n-1) AS p_value
+     )
+   FROM (
+      SELECT
+         AVG( t1.val - t2.val ) as mean,
+         STDDEV_SAMP( t1.val - t2.val ) as std,
+         COUNT(*) as N
+      FROM t1
+      INNER JOIN t2
+      ON t1.id = t2.id
+   )
 ));
 

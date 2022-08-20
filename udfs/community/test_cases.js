@@ -1072,10 +1072,33 @@ generate_udf_test("kruskal_wallis", [
         expected_output: `STRUCT(CAST(3.423076923076927 AS FLOAT64) AS H, CAST( 0.1805877514841956 AS FLOAT64) AS p, CAST(2 AS INT64) AS DoF)`
     },
 ]);
+generate_udf_test("anovafscore", [
+    {
+		inputs: [`(SELECT [("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.2), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("virginica", 1.7), ("versicolor",1.6), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("versicolor",1.7), ("virginica", 1.9), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.4), ("setosa",    0.4), ("setosa",    0.4), ("versicolor",1.2), ("versicolor",1.4), ("versicolor",1.1), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.4), ("versicolor",1.8), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.2), ("virginica", 1.6), ("virginica", 1.8), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.5), ("setosa",    0.3), ("setosa",    0.2), ("setosa",    0.4), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.4), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("virginica", 2.4), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 1.9), ("versicolor",1.6), ("virginica", 1.8), ("virginica", 2.4), ("virginica", 2.4), ("virginica", 1.4), ("virginica", 2.2), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.1), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa", 0.2), ("setosa", 0.4), ("versicolor", 1), ("versicolor", 1.2), ("versicolor", 1.4), ("versicolor", 1.4), ("versicolor", 1.3), ("virginica", 2), ("versicolor", 1.5), ("versicolor", 1.5), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2), ("virginica", 2.3), ("setosa", 0.1), ("setosa", 0.6), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.4), ("versicolor", 1.3), ("versicolor", 1.5), ("versicolor", 1.2), ("versicolor", 1.3), ("versicolor", 1.3), ("versicolor", 1.5), ("versicolor", 1.2), ("versicolor", 1.4), ("versicolor", 1.4), ("versicolor", 1.6), ("virginica", 2), ("virginica", 2.3), ("virginica", 2.5), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2), ("virginica", 2.2), ("setosa", 0.3), ("setosa", 0.3), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.4) ])`],
+        expected_output: `CAST(959.3244057257594 AS FLOAT64)`
+    },
+]);
+generate_udf_test("anovaftest", [
+    {
+		inputs: [`(SELECT [("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.2), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("versicolor",1.5), ("virginica", 1.7), ("versicolor",1.6), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("versicolor",1.7), ("virginica", 1.9), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.4), ("setosa",    0.4), ("setosa",    0.4), ("versicolor",1.2), ("versicolor",1.4), ("versicolor",1.1), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.4), ("versicolor",1.8), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.2), ("virginica", 1.6), ("virginica", 1.8), ("virginica", 1.8), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.5), ("setosa",    0.3), ("setosa",    0.2), ("setosa",    0.4), ("versicolor",1.0), ("versicolor",1.0), ("versicolor",1.1), ("versicolor",1.0), ("versicolor",1.3), ("versicolor",1.3), ("versicolor",1.5), ("versicolor",1.4), ("versicolor",1.3), ("virginica", 2.0), ("virginica", 1.5), ("virginica", 2.4), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 1.9), ("versicolor",1.6), ("virginica", 1.8), ("virginica", 2.4), ("virginica", 2.4), ("virginica", 1.4), ("virginica", 2.2), ("virginica", 2.1), ("virginica", 1.8), ("virginica", 2.5), ("virginica", 2.3), ("virginica", 1.9), ("virginica", 2.1), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.3), ("setosa",    0.1), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa",    0.2), ("setosa", 0.2), ("setosa", 0.4), ("versicolor", 1), ("versicolor", 1.2), ("versicolor", 1.4), ("versicolor", 1.4), ("versicolor", 1.3), ("virginica", 2), ("versicolor", 1.5), ("versicolor", 1.5), ("virginica", 1.8), ("virginica", 1.8), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2), ("virginica", 2.3), ("setosa", 0.1), ("setosa", 0.6), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.4), ("versicolor", 1.3), ("versicolor", 1.5), ("versicolor", 1.2), ("versicolor", 1.3), ("versicolor", 1.3), ("versicolor", 1.5), ("versicolor", 1.2), ("versicolor", 1.4), ("versicolor", 1.4), ("versicolor", 1.6), ("virginica", 2), ("virginica", 2.3), ("virginica", 2.5), ("virginica", 2.3), ("virginica", 2.1), ("virginica", 2), ("virginica", 2.2), ("setosa", 0.3), ("setosa", 0.3), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.2), ("setosa", 0.4) ])`],
+		expected_output: `STRUCT(CAST(1.0 AS FLOAT64) AS p, CAST(959.3244057257594 AS FLOAT64) AS F)`
+    },
+]);
 generate_udf_test("linear_regression", [
     {
         inputs: [`(SELECT [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)])`],
         expected_output: `STRUCT(CAST(-0.4353361094588436 AS FLOAT64) AS a, CAST( 0.5300416418798544 AS FLOAT64) AS b, CAST(0.632366563565354 AS FLOAT64) AS r)`
+    },
+]);
+generate_udf_test("centralF_cdf", [
+    {
+	inputs: [
+                `CAST(0.9 AS FLOAT64)`,
+                `CAST(25 AS INT64)`,
+                `CAST(5 AS INT64)`
+
+	],
+	expected_output: `CAST(0.00004357692924095158 AS FLOAT64)`
     },
 ]);
 generate_udf_test("corr_pvalue", [
@@ -1118,8 +1141,18 @@ generate_udf_test("t_test", [
 		`(SELECT ARRAY<FLOAT64>[13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0])`,
 		`(SELECT ARRAY<FLOAT64>[22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0])`
 	],
-	expected_output: `STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INTEGER) AS dof)`
+	expected_output: `STRUCT(CAST(2.8957935572829476 AS FLOAT64) AS t_value, CAST(21 AS INTEGER) AS dof, CAST(0.9999989005977227 AS FLOAT64) AS p_value)`
     },
+]);
+generate_udf_test("t_test_paired", [
+    {
+        inputs: [
+		`(SELECT ARRAY<FLOAT64>[ 38.25, 31.68, 26.24, 41.29, 44.81, 46.37, 35.42, 38.41, 42.68, 46.71, 29.20, 30.76])`,
+		`(SELECT ARRAY<FLOAT64>[ 38.27, 31.71, 26.22, 41.33, 44.80, 46.39, 35.46, 38.39, 42.72, 46.76, 29.18, 30.79])`
+	],
+	expected_output: `STRUCT(CAST(-2.1589388479419087 AS FLOAT64) AS t_value, CAST(11 AS INTEGER) AS dof, CAST(1.0 AS FLOAT64) AS p_value)`
+   }
+	
 ]);
 generate_udf_test("mannwhitneyu", [
     {

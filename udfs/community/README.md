@@ -13,6 +13,9 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 
+* [anovafscore](#anovafscoredata-arraystructfactor-string-val-float64)
+* [anovaftest](#anovaftestdata-arraystructfactor-string-val-float64)
+* [centralF_udf](#centralf_cdff-float64-df1-int64-df2-int64)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -879,6 +882,9 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
+* [anovafscore](#anovafscoredata-arraystructfactor-string-val-float64)
+* [anovaftest](#anovaftestdata-arraystructfactor-string-val-float64)
+* [centralF_udf](#centralf_cdff-float64-df1-int64-df2-int64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
@@ -888,6 +894,86 @@ SELECT bqutil.fn.int(1.684)
 * [t_test](#t_testarrayarray)
 
 ## Documentation
+
+### [anovafscore(data ARRAY<STRUCT<factor STRING, val FLOAT64>>)](anovafscore.sqlx)
+Returns the f-score of the ANOVA test on the arrays of stucts, having factor and value pairs.
+
+Input:
+data: array of struct 
+  > struct: string "factor", val "float64"
+
+Output:
+The F value of the ANOVA score
+
+```sql
+#standardSQL
+
+DECLARE data ARRAY<STRUCT<factor STRING, val FLOAT64>>;
+set data = (SELECT ARRAY(SELECT AS STRUCT species, sepal_length FROM `bigquery-public-data.ml_datasets.iris`));
+SELECT bqutils.fn.anovafscore(data) 
+```
+
+results:
+
+```
+119.26450218450492
+```
+-----
+
+### [anovaftest(data ARRAY<STRUCT<factor STRING, val FLOAT64>>)](anovaftest.sqlx)
+Returns a struct of the p-value (p) and f-score (F) of the ANOVA test on the arrays of stucts, having factor and value pairs.
+
+Input:
+data: array of struct 
+  > struct: string "factor", val "float64"
+
+Output:
+The F value of the ANOVA score
+
+```sql
+#standardSQL
+
+DECLARE data ARRAY<STRUCT<factor STRING, val FLOAT64>>;
+set data = (SELECT ARRAY(SELECT AS STRUCT species, sepal_length FROM `bigquery-public-data.ml_datasets.iris`));
+SELECT bqutils.fn.anovaftest(data) 
+```
+
+results:
+
+```
+{
+  "results": {
+    "p": "0.0"",
+    "F"": "119.26450218450492"
+  }
+}
+```
+-----
+
+### [centralF_cdf(F FLOAT64, df1 INT64, df2 INT64)](centralF_cdf.sqlx)
+Given x in the range [0, infinity), returns the cumulative probability density of the central F distribution. That is, jStat.centralF.cdf(2.5, 10, 20) will return the probability that a number randomly selected from the central F distribution with df1 = 10 and df2 = 20 will be less than 2.5.
+
+`df1` is the "numerator degrees of freedom" and `df2` is the "denominator degrees of freedom", which parameterize the distribtuion.
+
+This function corresponds to the pf(q, df1, df2) function in R.
+
+Input:
+F: the statistic returned by `anovaftest`
+df1: numerator degrees of freedom
+df2: denominator degrees of freedom
+
+Output:
+p-value the cumulative probability density of the central F distribution
+```sql
+SELECT bqutil.fn.centralF_cdf(2.5, 2, 40 - 2 - 1)
+```
+
+results:
+```
+p: 0.15891301645400449
+```
+-----
+
 
 ### [corr_pvalue(r FLOAT64, n INT64)](corr_pvalue.sqlx)
 The returns the p value of the computed correlation coefficient based on the t-distribution.
