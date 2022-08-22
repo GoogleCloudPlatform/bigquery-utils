@@ -1172,6 +1172,10 @@ generate_udf_test("knots_to_mph", [
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
     },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
+    },
 ]);
 generate_udf_test("mph_to_knots", [
     {
@@ -1181,6 +1185,10 @@ generate_udf_test("mph_to_knots", [
     {
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("meters_to_miles", [
@@ -1192,6 +1200,10 @@ generate_udf_test("meters_to_miles", [
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
     },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
+    },
 ]);
 generate_udf_test("miles_to_meters", [
     {
@@ -1201,6 +1213,10 @@ generate_udf_test("miles_to_meters", [
     {
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
+    },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("nautical_miles_conversion", [
@@ -1212,10 +1228,26 @@ generate_udf_test("nautical_miles_conversion", [
         inputs: [`CAST(0.0 AS FLOAT64)`],
         expected_output: `CAST(0.0 AS FLOAT64)`
     },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
+    },
 ]);
 generate_udf_test("azimuth_to_geog_point", [
     {
         inputs: [`CAST(30.2672 AS FLOAT64)`,`CAST(97.7431 AS FLOAT64)`,`CAST(312.9 AS FLOAT64)`,`CAST(1066.6 AS FLOAT64)`],
         expected_output: `ST_GEOGPOINT(81.4417483906444, 39.9606210457152)`
-    }
+    },
+    {
+        inputs: [`CAST(0.0 AS FLOAT64)`,`CAST(0.0 AS FLOAT64)`,`CAST(0.0 AS FLOAT64)`,`CAST(0.0 AS FLOAT64)`],
+        expected_output: `ST_GEOGPOINT(0, 0)`
+    },
+    {
+        inputs: [`CAST(30.2672 AS FLOAT64)`,`CAST(97.7431 AS FLOAT64)`,`CAST(312.9 AS FLOAT64)`,`NULL`],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [`NULL`,`NULL`,`NULL`,`NULL`],
+        expected_output: `NULL`
+    },
 ]);
