@@ -65,7 +65,7 @@ The following sections cover a few methods of deploying the UDFs.
 
    ```bash
    # Deploy to US
-   gcloud builds submit . --config=deploy.yaml --substitutions _PROJECT_ID=YOUR_PROJECT_ID, _BQ_LOCATION=US
+   gcloud builds submit . --config=deploy.yaml --substitutions _PROJECT_ID=YOUR_PROJECT_ID,_BQ_LOCATION=US
    ```
    > Note: Deploy to a different location by setting `_BQ_LOCATION` to your own
    > desired value.\
