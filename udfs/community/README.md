@@ -12,7 +12,7 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
-* [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon float64-azimuth-float64-distance-float64)
+* [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
