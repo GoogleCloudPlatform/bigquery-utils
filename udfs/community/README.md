@@ -12,7 +12,7 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
-
+* [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -30,6 +30,7 @@ SELECT bqutil.fn.int(1.684)
 * [json_extract_keys](#json_extract_keys)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
+* [knots_to_mph](#knots_to_mphinput_knots-float64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
 * [levenshtein](#levenshteinsource-string-target-string-returns-int64)
@@ -37,6 +38,10 @@ SELECT bqutil.fn.int(1.684)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
 * [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
 * [median](#medianarr-any-type)
+* [meter_to_miles](#meters_to_milesinput_meters-float64)
+* [miles_to_meters](#miles_to_metersinput_miles-float64)
+* [mph_to_knots](#mph_to_knotsinput_mph-float64)
+* [nautical_miles_conversion](#nautical_miles_conversioninput_nautical_miles-float64)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [normal_cdf](#normal_cdfx-float64-mean-float64-stdev-float64)
@@ -70,6 +75,13 @@ SELECT bqutil.fn.int(1.684)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
+### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
+Takes an input latitude, longitude, azimuth, and distance (in miles) and returns the corresponding latitude and longitude as a BigQuery GEOGRAPHY point.
+``` sql
+SELECT bqutil.fn.azimuth_to_geog_point(30.2672, 97.7431, 312.9, 1066.6);
+
+POINT(81.4417483906444 39.9606210457152)
+```
 
 ### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
 Take a list of comma separated key-value pairs and creates a struct.
@@ -350,6 +362,14 @@ SELECT
 object, array, string, number, boolean, boolean, null
 ```
 
+### [knots_to_mph(input_knots FLOAT64)](knots_to_mph.sqlx)
+Converts knots to miles per hour
+``` sql
+SELECT bqutil.fn.knots_to_mph(37.7);
+
+43.384406
+```
+
 ### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sqlx)
 Returns an integer number indicating the degree of similarity between two strings (0=identical, 1=single character difference, etc.)
 
@@ -405,6 +425,38 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
   , bqutil.fn.median([1,2,3,4]) median_3
 
 3.0, 2.0, 2.5
+```
+
+### [meters_to_miles(input_meters FLOAT64)](meters_to_miles.sqlx)
+Converts meters to miles
+``` sql
+SELECT bqutil.fn.meters_to_miles(5000.0);
+
+3.1068559611866697
+```
+
+### [miles_to_meters(input_miles FLOAT64)](miles_to_meters.sqlx)
+Converts miles to meters
+``` sql
+SELECT bqutil.fn.miles_to_meters(2.73);
+
+4393.50912
+```
+
+### [mph_to_knots(input_mph FLOAT64)](mph_to_knots.sqlx)
+Converts miles per hour to knots
+``` sql
+SELECT bqutil.fn.mph_to_knots(75.5);
+
+65.607674794487224
+```
+
+### [nautical_miles_conversion(input_nautical_miles FLOAT64)](nautical_miles_conversion.sqlx)
+Converts nautical miles to miles
+``` sql
+SELECT bqutil.fn.nautical_miles_conversion(1.12);
+
+1.2888736
 ```
 
 
