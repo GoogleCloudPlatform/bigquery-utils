@@ -14,36 +14,18 @@ Terraform Sync Tool can be integrated into your CI/CD pipeline. You'll need to a
 
 ## How to run Terraform Schema Sync Tool
 
-### Use Terraform/Terragrunt commands to test if any resources drifts existed
+``bash
+###############
+# Using Terragrunt
+###############
+terragrunt run-all plan -json --terragrunt-non-interactive > plan_output.json
+python3 terraform_sync.py plan_output.json <YOUR_GCP_PROJECT_ID>
+##############
+# Using Terraform
+##############
+terraform plan -json > plan_output.json
+python3 terraform_sync.py plan_output.json <YOUR_GCP_PROJECT_ID>
 
-Terragrunt/Terraform commands:
-```
-terragrunt run-all plan -json --terragrunt-non-interactive
-
-# Terraform Command
-terraform plan -json
-```
-
-After running the Terrform plan command, **the event type "resource_drift"("type": "resource_drift") indicates a drift has occurred**.
-If drifts detected, please update your terraform configurations and address the resource drifts based on the event outputs.
-
-
-#### Add Could Build Steps to your configuration file
-
-Please check cloud build steps in `cloudbuild.yaml` file, and add these steps to your Cloud Build Configuration File.
-
-- step 0: run terraform commands in `deploy.sh` to detects drifts
-
-Add `deploy.sh` to your project directory. 
-
-- step 1: run python scripts to investigate terraform output
-
-Add `requirements.txt` and `terraform_sync.py` to your project directory.
-
-#### (Optional if you haven't created Cloud Build Trigger) Create and configure a new Trigger in Cloud Build
-Make sure to indicate your cloud configuration file location correctly.
-
-#### That's all you need! Let's commit and test in CLoud Build!
 
 ## How Terraform Schema Sync Tool Works
 
@@ -71,7 +53,16 @@ Once the schema drifts are detected and identified, we fail the build and notify
 
 To interpret the message, the expected table schema is in the format of [{table1_id:table1_schema}, {table2_id: table2_schema}, ...... ]. table_id falls in the format of [gcp_project_id].[dataset_id].[table_id] 
 
-#### Folder Structure ####
+**What is Terragrunt?**
+
+Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install) is a framework on top of Terraform with some new tools out-of-the-box. 
+Using new files *.hcl and new keywords, you can share variables across terraform modules easily.
+
+## How to run this sample repo?
+
+#### Fork and Clone this repo
+
+#### Folder Structure 
 This directory serves as a starting point for your cloud project with terraform-sync-tool as one of qa tools integrated.
 
     .
@@ -90,71 +81,39 @@ This directory serves as a starting point for your cloud project with terraform-
     ├── terraform_sync.py           # Build Step 1 - python scripts
     └── ...                         # etc.
 
-**What is Terragrunt?**
-
-Terragrunt(https://terragrunt.gruntwork.io/docs/getting-started/install) is a framework on top of Terraform with some new tools out-of-the-box. 
-Using new files *.hcl and new keywords, you can share variables across terraform modules easily.
-
-**Using terragrunt to detect resource drifts**
-```
-terragrunt run-all plan -json --terragrunt-non-interactive
-
-# If you need to pass variables to specify working directory
-env = VALUE_OF_ENV  # Value of env, for example "qa"
-tool = VALUE_OF_TOOL  # Value of tool, for example "terraform-sync-tool"
-terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}"
-
-# If you need to write outputs into a json file. Feel free to replace `plan_out.json` with your JSON FILENAME.
-terragrunt run-all plan -json --terragrunt-non-interactive > plan_out.json
-
-# If you need to write outputs into a json file with variables specified. 
-# Feel free to replace `plan_out.json` with your JSON FILENAME.
-env = VALUE_OF_ENV  # Value of env, for example "qa"
-tool = VALUE_OF_TOOL  # Value of tool, for example "terraform-sync-tool"
-terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}" > plan_out.json
-```
-
-## How to run this sample repo?
-
-#### Fork and Clone this repo
-
 #### Go to the directory you just cloned, and update
 
 - **YOUR_GCP_PROJECT_ID** in `./qa/terragrunt.hcl` 
 - **YOUR_BUCKET_NAME** in `./qa/terragrunt.hcl` 
 - **YOUR_DATASET_ID** in `./qa/terraform-sync-tool/terragrunt.hcl` 
 
-#### (First time only) Use terraform plan & apply to deploy your resource to you GCP Project
+### Use Terraform/Terragrunt commands to test if any resources drifts existed
 
+Terragrunt/Terraform commands:
 ```
-env = qa
-tool = terraform-sync-tool
-echo $env
-echo $tool
-terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}"
-terragrunt run-all apply -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}"
-```
-#### Create and configure a new Trigger in Cloud Build
-Make sure to indicate your cloud configuration file location correctly. 
-In this sample repo, use `tools/terraform_sync_tool/cloudbuild.yaml` as your cloud configuration file location
+terragrunt run-all plan -json --terragrunt-non-interactive
 
-### How to test each Build Step without triggering Cloud Build?
-
-- To test using terragrunt commands. Feel free to replace `plan_out.json` with your JSON FILENAME and change values of variables.
-```
-env = qa
-tool = terraform-sync-tool
-echo $env
-echo $tool
-terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}" > plan_out.json
+# Terraform Command
+terraform plan -json
 ```
 
-- To test using terragrunt commands without writing the output into a JSON file
-```
-terragrunt run-all plan -json --terragrunt-non-interactive --terragrunt-working-dir="${env}"/"${tool}"
-```
+After running the Terrform plan command, **the event type "resource_drift"("type": "resource_drift") indicates a drift has occurred**.
+If drifts detected, please update your terraform configurations and address the resource drifts based on the event outputs.
 
-- To test python scripts. `terraform_sync.py` requires two arguments: JSON filename and gcp_project_id. Provide arguments to test `terraform_sync.py`. Feel free to replace `plan_out.json` with your JSON FILENAME.
-```
-terraform_sync.py plan_out.json <YOUR_GCP_PROJECT_ID>
-```
+
+#### Add Could Build Steps to your configuration file
+
+Please check cloud build steps in `cloudbuild.yaml` file, and add these steps to your Cloud Build Configuration File.
+
+- step 0: run terraform commands in `deploy.sh` to detects drifts
+
+Add `deploy.sh` to your project directory. 
+
+- step 1: run python scripts to investigate terraform output
+
+Add `requirements.txt` and `terraform_sync.py` to your project directory.
+
+#### (Optional if you haven't created a Cloud Build Trigger) Create and configure a new Trigger in Cloud Build
+Make sure to indicate your cloud configuration file location correctly. In this sample repo, use `tools/terraform_sync_tool/cloudbuild.yaml` as your cloud configuration file location
+
+#### That's all you need! Let's commit and test in Cloud Build!
