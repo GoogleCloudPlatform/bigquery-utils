@@ -14,7 +14,7 @@ Terraform Sync Tool can be integrated into your CI/CD pipeline. You'll need to a
 
 ## How to run Terraform Schema Sync Tool
 
-``bash
+```bash
 ###############
 # Using Terragrunt
 ###############
@@ -25,7 +25,7 @@ python3 terraform_sync.py plan_output.json <YOUR_GCP_PROJECT_ID>
 ##############
 terraform plan -json > plan_output.json
 python3 terraform_sync.py plan_output.json <YOUR_GCP_PROJECT_ID>
-
+```
 
 ## How Terraform Schema Sync Tool Works
 
