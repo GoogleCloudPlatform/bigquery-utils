@@ -1,19 +1,20 @@
 # Terraform Sync Tool
 
-This directory contains the setup for the Terraform Sync Tool. Terraform Sync Tool was designed to address the schema drifts in BigQuery tables and keep the 
-Terraform schemas up-to-date with the BigQuery table schemas in production environment. Schema drifts occurred when BigQuery Table schemas are updated by newly 
-ingested data while Terraform schema files contain the outdated schemas. Therefore, this tool will detect the schema drifts, trace the origins of the drifts, and alert
-developers/data engineers.
+This directory contains the Terraform Sync Tool. This tool intentionally fails your CI/CD pipeline when schema drifts occur between 
+what your BigQuery Terraform resources declare and what's actually present in your BigQuery environment. 
+Theses schema drifts happen when BigQuery tables are updated by processes outside of Terraform (ETL process may dynamically add new columns when loading data into BigQuery). 
+When drifts occur, you end up with outdated BigQuery Terraform resource files. This tool detects the schema drifts, 
+traces the origins of the drifts, and alerts developers/data engineers (by failing the CI/CD pipeline) 
+so they can patch the Terraform in their current commit.
 
-The Terraform Schema Sync Tool fails the build attemps if resource drifts are detected and notifies the latest resource information. Developers and data engineers should be able to update the Terraform resources accordingly. 
 
 Terraform Sync Tool can be integrated into your CI/CD pipeline. You'll need to add two steps to CI/CD pipeline. 
-- Step 0: Use Terraform/erragrunt command to detect resource drifts and write output into a JSON file
+- Step 0: Run the Terraform plan command (using either Terraform/Terragrunt) with the `-json` option  and write the output into a JSON file using the caret operator `> output.json`
 - Step 1: Use Python scripts to identify and investigate the drifts
 
 ## How to run Terraform Schema Sync Tool
 
-#### Use Terraform/Terragrunt commands to test if any resources drifts existed
+### Use Terraform/Terragrunt commands to test if any resources drifts existed
 
 Terragrunt/Terraform commands:
 ```
