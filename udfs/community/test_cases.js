@@ -1163,3 +1163,717 @@ generate_udf_test("jaccard", [
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
 ]);
+generate_udf_test("cw_instr4", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+		    `"Str"`,
+		    `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+]);
+generate_udf_test("cw_initcap", [
+    {
+        inputs: [
+            `"teststr"`
+        ],
+        expected_output: `"Teststr"`
+    },
+    {
+        inputs: [
+            `"test str"`
+        ],
+        expected_output: `"Test Str"`
+    },
+]);
+generate_udf_test("cw_otranslate", [
+    {
+        inputs: [
+            `"Thin and Thick"`,
+            `"Thk"`,
+            `"Sp"`
+        ],
+        expected_output: `"Spin and Spic"`
+    },
+]);
+generate_udf_test("cw_stringify_interval", [
+    {
+        inputs: [
+            `CAST(86100 AS INT64)`
+        ],
+        expected_output: `"+0000 23:55:00"`
+    },
+    {
+        inputs: [
+            `CAST(86400 AS INT64)`
+        ],
+        expected_output: `"+0001 00:00:00"`
+    },
+]);
+generate_udf_test("cw_regex_mode", [
+    {
+        inputs: [
+            `"i"`
+        ],
+        expected_output: `"ig"`
+    },
+    {
+        inputs: [
+            `"m"`
+        ],
+        expected_output: `"mg"`
+    },
+    {
+        inputs: [
+            `"n"`
+        ],
+        expected_output: `"sg"`
+    },
+    {
+        inputs: [
+            `"a"`
+        ],
+        expected_output: `"g"`
+    },
+]);
+generate_udf_test("cw_regexp_substr_4", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"Test"`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"123"`
+    },
+]);
+generate_udf_test("cw_regexp_instr_2", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"90"`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+]);
+generate_udf_test("cw_regexp_instr_3", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(6 AS INT64)`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+]);
+generate_udf_test("cw_regexp_instr_4", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+]);
+generate_udf_test("cw_regexp_instr_generic", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"i"`
+        ],
+        expected_output: `CAST(8 AS INT64)`
+    },
+]);
+generate_udf_test("cw_regexp_instr_6", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"i"`
+        ],
+        expected_output: `CAST(8 AS INT64)`
+    },
+]);
+generate_udf_test("cw_regexp_replace_generic", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `"Gbp"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"i"`
+        ],
+        expected_output: `"TestGbp123456"`
+    },
+]);
+generate_udf_test("cw_regexp_replace_4", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `"Cad$"`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"TestCad$123456"`
+    },
+]);
+generate_udf_test("cw_regexp_replace_5", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `"Usd$#"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"TestUsd$#123456"`
+    },
+]);
+generate_udf_test("cw_regexp_replace_6", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `"$:#>"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"i"`
+        ],
+        expected_output: `"Test$:#>123456"`
+    },
+]);
+generate_udf_test("cw_regexp_instr_5", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(11 AS INT64)`
+    },
+]);
+generate_udf_test("cw_array_min", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3, 4, 5, 6])`
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
+generate_udf_test("cw_array_median", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3, 4, 5, 6])`
+        ],
+        expected_output: `CAST(3.5 AS FLOAT64)`
+    },
+]);
+generate_udf_test("cw_array_max", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3, 4, 5, 6])`
+        ],
+        expected_output: `CAST(6 AS INT64)`
+    },
+]);
+generate_udf_test("cw_array_distinct", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3, 4, 4, 5, 5])`
+        ],
+        expected_output: `CAST([1, 2, 3, 4, 5] AS ARRAY<INT64>)`
+    },
+]);
+generate_udf_test("cw_td_nvp", [
+    {
+        inputs: [
+            `"entree:orange chicken#entree2:honey salmon"`,
+            `"entree"`,
+            `"#"`,
+            `":"`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"orange chicken"`
+    },
+]);
+generate_udf_test("cw_from_base", [
+    {
+        inputs: [
+            `"001101011"`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `CAST(107 AS INT64)`
+    },
+    {
+        inputs: [
+            `"37"`,
+            `CAST(8 AS INT64)`
+        ],
+        expected_output: `CAST(31 AS INT64)`
+    },
+    {
+        inputs: [
+            `"A"`,
+            `CAST(16 AS INT64)`
+        ],
+        expected_output: `CAST(10 AS INT64)`
+    },
+]);
+generate_udf_test("cw_to_base", [
+    {
+        inputs: [
+            `CAST(5 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"101"`
+    },
+    {
+        inputs: [
+            `CAST(31 AS INT64)`,
+            `CAST(8 AS INT64)`
+        ],
+        expected_output: `"37"`
+    },
+    {
+        inputs: [
+            `CAST(10 AS INT64)`,
+            `CAST(16 AS INT64)`
+        ],
+        expected_output: `"a"`
+    },
+]);
+generate_udf_test("cw_array_overlap", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3])`,
+            `(SELECT ARRAY<INT64>[4, 5, 6])`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3])`,
+            `(SELECT ARRAY<INT64>[2, 3, 4])`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+]);
+generate_udf_test("cw_array_compact", [
+    {
+        inputs: [
+            `(SELECT ARRAY<INT64>[1, 2, 3])`
+        ],
+        expected_output: `CAST([1, 2, 3] AS ARRAY<INT64>)`
+    },
+]);
+generate_udf_test("cw_runtime_parse_interval_seconds", [
+    {
+        inputs: [
+            `"1 day"`
+        ],
+        expected_output: `CAST(86400 AS INT64)`
+    },
+    {
+        inputs: [
+            `"1 DAY"`
+        ],
+        expected_output: `CAST(86400 AS INT64)`
+    },
+]);
+generate_udf_test("cw_url_encode", [
+    {
+        inputs: [
+            `"?"`
+        ],
+        expected_output: `"%3F"`
+    },
+    {
+        inputs: [
+            `"/"`
+        ],
+        expected_output: `"%2F"`
+    },
+]);
+generate_udf_test("cw_url_decode", [
+    {
+        inputs: [
+            `"%3F"`
+        ],
+        expected_output: `"?"`
+    },
+    {
+        inputs: [
+            `"%2F"`
+        ],
+        expected_output: `"/"`
+    },
+]);
+generate_udf_test("cw_url_extract_host", [
+    {
+        inputs: [
+            `"https://google.com"`
+        ],
+        expected_output: `"google.com"`
+    },
+    {
+        inputs: [
+            `"   www.Example.Co.UK    "`
+        ],
+        expected_output: `"www.Example.Co.UK"`
+    },
+]);
+generate_udf_test("cw_url_extract_protocol", [
+    {
+        inputs: [
+            `"https://google.com/test?key=val"`
+        ],
+        expected_output: `"https"`
+    },
+]);
+generate_udf_test("cw_url_extract_path", [
+    {
+        inputs: [
+            `"https://www.test.com/collections-in-java#collectionmethods"`
+        ],
+        expected_output: `"/collections-in-java"`
+    },
+]);
+generate_udf_test("cw_url_extract_port", [
+    {
+        inputs: [
+            `"https://localhost:8080/test?key=val"`
+        ],
+        expected_output: `CAST(8080 AS INT64)`
+    },
+]);
+generate_udf_test("cw_url_extract_authority", [
+    {
+        inputs: [
+            `"https://localhost:8080/test?key=val"`
+        ],
+        expected_output: `"localhost:8080"`
+    },
+]);
+generate_udf_test("cw_url_extract_query", [
+    {
+        inputs: [
+            `"https://localhost:8080/test?key=val"`
+        ],
+        expected_output: `"key=val"`
+    },
+]);
+generate_udf_test("cw_url_extract_file", [
+    {
+        inputs: [
+            `"https://www.test.com/collections-in-java#collectionmethods"`
+        ],
+        expected_output: `"/collections-in-java"`
+    },
+]);
+generate_udf_test("cw_url_extract_fragment", [
+    {
+        inputs: [
+            `"https://www.test.com/collections-in-java#collectionmethods"`
+        ],
+        expected_output: `"collectionmethods"`
+    },
+]);
+generate_udf_test("cw_url_extract_parameter", [
+    {
+        inputs: [
+            `"https://www.test.com/collections-in-java&key=val#collectionmethods"`,
+            `"key"`
+        ],
+        expected_output: `"val"`
+    },
+]);
+generate_udf_test("cw_regexp_extract", [
+    {
+        inputs: [
+            `"TestStr123456#?%&"`,
+            `"Str"`
+        ],
+        expected_output: `"Str"`
+    },
+]);
+generate_udf_test("cw_regexp_extract_n", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `"Str"`
+    },
+]);
+generate_udf_test("cw_regexp_extract_all", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str.*"`
+        ],
+        expected_output: `CAST(["Str123456"] AS ARRAY<STRING>)`
+    },
+]);
+generate_udf_test("cw_regexp_extract_all_n", [
+    {
+        inputs: [
+            `"TestStr123456Str789"`,
+            `"Str.*"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `CAST(["Str123456Str789"] AS ARRAY<STRING>)`
+    },
+]);
+generate_udf_test("cw_json_array_contains_str", [
+    {
+        inputs: [
+            `'["name", "test", "valid"]'`,
+            `"test"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+]);
+generate_udf_test("cw_json_array_contains_num", [
+    {
+        inputs: [
+            `'[1, 2, 3, "valid"]'`,
+            `CAST(1.0 AS FLOAT64)`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `'[1, 2, 3, "valid"]'`,
+            `CAST(5.0 AS FLOAT64)`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+]);
+generate_udf_test("cw_json_array_contains_bool", [
+    {
+        inputs: [
+            `'[1, 2, 3, "valid", true]'`,
+            `CAST(true AS BOOL)`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `'[1, 2, 3, "valid", true]'`,
+            `CAST(false AS BOOL)`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+]);
+generate_udf_test("cw_json_array_get", [
+    {
+        inputs: [
+            `'[{"name": "test"}, {"name": "test1"}]'`,
+            `CAST(1.0 AS FLOAT64)`
+        ],
+        expected_output: `'{"name":"test1"}'`
+    },
+]);
+generate_udf_test("cw_json_array_length", [
+    {
+        inputs: [
+            `'[{"name": "test"}, {"name": "test1"}]'`
+        ],
+        expected_output: `CAST(2 AS INT64)`
+    },
+]);
+generate_udf_test("cw_substring_index", [
+    {
+        inputs: [
+            `"TestStr123456,Test123"`,
+            `","`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"TestStr123456"`
+    },
+]);
+generate_udf_test("cw_editdistance", [
+    {
+        inputs: [
+            `"Jim D. Swain"`,
+            `"John Smith"`
+        ],
+        expected_output: `CAST(9 AS INT64)`
+    },
+    {
+        inputs: [
+            `"Jim D. Swain"`,
+            `"Jim D. Swain"`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+]);
+generate_udf_test("cw_round_half_even", [
+    {
+        inputs: [
+            `CAST(10 AS BIGNUMERIC)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `CAST(10 AS NUMERIC)`
+    },
+]);
+generate_udf_test("cw_round_half_even_bignumeric", [
+    {
+        inputs: [
+            `CAST(10 AS BIGNUMERIC)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `CAST(10 AS BIGNUMERIC)`
+    },
+]);
+generate_udf_test("cw_getbit", [
+    {
+        inputs: [
+            `CAST(11 AS INT64)`,
+            `CAST(100 AS INT64)`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [
+            `CAST(11 AS INT64)`,
+            `CAST(3 AS INT64)`
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
+generate_udf_test("cw_setbit", [
+    {
+        inputs: [
+            `CAST(1001 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `CAST(1005 AS INT64)`
+    },
+]);
+generate_udf_test("cw_lower_case_ascii_only", [
+    {
+        inputs: [
+            `"TestStr123456#"`
+        ],
+        expected_output: `"teststr123456#"`
+    },
+]);
+generate_udf_test("cw_substrb", [
+    {
+        inputs: [
+            `"TestStr123"`,
+            `CAST(0 AS INT64)`,
+            `CAST(3 AS INT64)`
+        ],
+        expected_output: `"Te"`
+    },
+]);
+generate_udf_test("cw_strtok", [
+    {
+        inputs: [
+            `"Test#1"`,
+            `"#"`
+        ],
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+                           STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])`
+    },
+]);
+generate_udf_test("cw_regexp_split", [
+    {
+        inputs: [
+            `"Test#1"`,
+            `"#"`,
+            `"i"`
+        ],
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+                           STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])`
+    },
+]);
+generate_udf_test("cw_csvld", [
+    {
+        inputs: [
+            `"Test#123"`,
+            `"#"`,
+            `'"'`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `CAST(["Test", "123"] AS ARRAY<STRING>)`
+    },
+]);
+generate_udf_test("cw_find_in_list", [
+    {
+        inputs: [
+            `"1"`,
+            `"[Test,1,2]"`
+        ],
+        expected_output: `CAST(2 AS INT64)`
+    },
+]);
+generate_udf_test("cw_map_parse", [
+    {
+        inputs: [
+            `"a=1 b=42"`,
+            `" "`,
+            `"="`
+        ],
+        expected_output: `([STRUCT("a" AS key, "1" AS value), 
+                           STRUCT("b" AS key, "42" AS value)])`
+    },
+]);
+generate_udf_test("cw_comparable_format_varchar_t", [
+    {
+        inputs: [
+            `"2"`,
+        ],
+        expected_output: `"32"`
+    },
+]);

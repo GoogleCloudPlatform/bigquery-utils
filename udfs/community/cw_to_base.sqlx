@@ -1,0 +1,26 @@
+config { hasOutput: true }
+/*
+ * Copyright 2019 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Emulate Presto to_base function - convert decimal number to number with given base */
+CREATE OR REPLACE FUNCTION ${self()}(number INT64, base INT64) RETURNS STRING AS (
+    (WITH chars AS (
+        SELECT MOD(CAST(FLOOR(ABS(number)/POW(base, (FLOOR(LOG(ABS(number))/LOG(base)) + 1) - idx)) AS INT64), base) ch, idx
+            from UNNEST(GENERATE_ARRAY(1, CAST(FLOOR(LOG(ABS(number))/LOG(base)) AS INT64) + 1)) idx
+    )
+    SELECT CONCAT(CASE WHEN number < 0 THEN '-' ELSE '' END,
+        CODE_POINTS_TO_STRING(ARRAY_AGG(if(ch >= 0 AND ch <= 9, ch + 48, ch + 97 - 10) ORDER BY idx))) to_base FROM chars)
+);

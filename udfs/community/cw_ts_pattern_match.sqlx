@@ -1,0 +1,69 @@
+config { hasOutput: true }
+/*
+ * Copyright 2019 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+-- ts_pattern_match is function that returns range of matched pattern
+-- in given UID, SID (user session)
+CREATE OR REPLACE FUNCTION ${self()}(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)
+RETURNS ARRAY<STRUCT<pattern_id INT64, start INT64, stop INT64>>
+LANGUAGE js AS """
+
+var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var charIdx = 0;
+var name2char = {};
+var eventRegExp = '';
+
+for( nameWithQuantifierOrAlt of regexpParts ) {
+    var match = nameWithQuantifierOrAlt.match(/([a-zA-Z0-9]*)([^a-zA-Z0-9]*)/)
+    if( !match ) {
+        throw new Error("Invalid Event name" + nameWithQuantifierOrAlt);
+    }
+    var name = match[1];
+    var quantifiers = match[2];
+    if ( name ) {
+        var ch = name2char[name];
+        if ( ! ch ) {
+            if( charIdx == 52) {
+                throw new Error("More than 52 events are not supported")
+            }
+            ch = chars.charAt(charIdx++)
+            name2char[name] = ch;
+        }
+        eventRegExp += ch + quantifiers;
+    } else { // is  Alt('|')
+        eventRegExp += quantifiers; // quantifier match the PCRE, [*+?]/[*?], |
+    }
+};
+
+var eventHaystack = ''
+for ( ev of evSeries ) {
+    var ch = name2char[ev];
+    if ( ch )
+        eventHaystack += ch;
+    else if ( ev == '?' ) {
+        eventHaystack += ev;
+    } else {
+        throw new Error("Unknown event in event stream : " + evSeries)
+    }
+};
+
+var out = [];
+var k = 1;
+for(var matchedEvent of eventHaystack.matchAll(new RegExp(eventRegExp, 'g'))) {
+    out.push({ 'pattern_id' : k++ , 'start' : matchedEvent.index + 1, 'stop' : matchedEvent.index + matchedEvent[0].length})
+}
+return out;
+""";

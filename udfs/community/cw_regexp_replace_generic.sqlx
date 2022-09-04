@@ -1,0 +1,41 @@
+config { hasOutput: true }
+/*
+ * Copyright 2019 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ /* Generic regexp_replace, which is the 6-args version with regexp_mode already decoded */
+CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING) RETURNS STRING
+LANGUAGE js AS """
+  if (haystack == null || regexp == null || replacement == null || offset == null || occurrence == null || mode == null) return null;
+  replacement = replacement.replace('\\\\', '$');
+  let regExp = new RegExp(regexp, mode);
+  if (occurrence == 0)
+      return haystack.replace(regExp, replacement);
+  const start = offset - 1;
+  const index = occurrence - 1;
+  let relevantString = haystack.substring(start);
+  let a, count = 0;
+  while ((a = regExp.exec(relevantString)) !== null && count++ < index) {
+      relevantString = relevantString.substr(regExp.lastIndex);
+      regExp.lastIndex = 0;
+  }
+  if (a == null) return haystack;
+  const prefix = haystack.substr(0, haystack.length - relevantString.length);
+  if (mode.indexOf('g') >= 0) {
+      mode = mode.replace('g', '');
+      regExp = new RegExp(regexp, mode);
+  }
+  return prefix + relevantString.replace(regExp, replacement);
+""";
