@@ -815,7 +815,7 @@ SELECT bqutil.fn.url_param(
 ```
 
 
-### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sqlx)
+### [url_parse(urlString STRING, partToExtract STRING)](url_parse.sqlx)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
