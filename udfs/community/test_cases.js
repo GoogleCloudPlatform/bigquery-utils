@@ -413,6 +413,13 @@ generate_udf_test("url_parse", [
     },
     {
         inputs: [
+            `"http://facebook.com/~tilde/hy-phen/do.t/under_score.php?k1=v1&k2=v2#Ref1"`,
+            `"PATH"`
+        ],
+        expected_output: `"~tilde/hy-phen/do.t/under_score.php"`
+    },
+    {
+        inputs: [
             `"subdomain.facebook.com/path1/p.php?k1=v1&k2=v2#Ref1"`,
             `"PATH"`
         ],
