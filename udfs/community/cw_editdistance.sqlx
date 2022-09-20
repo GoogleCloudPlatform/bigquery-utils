@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements teradata's editdistance without weightages */
+/* Similar to teradata's editdistance without weightages */
 CREATE OR REPLACE FUNCTION ${self()}( a STRING, b STRING ) RETURNS INT64
 LANGUAGE js AS """
 

@@ -56,6 +56,23 @@ SELECT bqutil.fn.int(1.684)
 * [cw_url_extract_file](#cw_url_extract_fileurl-string)
 * [cw_url_extract_fragment](#cw_url_extract_fragmenturl-string)
 * [cw_url_extract_parameter](#cw_url_extract_parameterurl-string-pname-string)
+* [cw_regexp_extract](#cw_regexp_extractstr-string-regexp-string)
+* [cw_regexp_extract_n](#cw_regexp_extract_nstr-string-regexp-string-groupn-int64)
+* [cw_regexp_extract_all](#cw_regexp_extract_allstr-string-regexp-string)
+* [cw_regexp_extract_all_n](#cw_regexp_extract_all_nstr-string-regexp-string-groupn-int64)
+* [cw_json_array_contains_str](#cw_json_array_contains_strjson-string-needle-string)
+* [cw_json_array_contains_num](#cw_json_array_contains_numjson-string-needle-float64)
+* [cw_json_array_contains_bool](#cw_json_array_contains_booljson-string-needle-bool)
+* [cw_json_array_get](#cw_json_array_getjson-string-loc-float64)
+* [cw_json_array_length](#cw_json_array_lengthjson-string)
+* [cw_substring_index](#cw_substring_indexstr-string-sep-string-idx-int64)
+* [cw_editdistance](#cw_editdistancea-string-b-string)
+* [cw_round_half_even](#cw_round_half_evenn-bignumeric-d-int64)
+* [cw_round_half_even_bignumeric](#cw_round_half_even_bignumericn-bignumeric-d-int64)
+* [cw_getbit](#cw_getbitbits-int64-index-int64)
+* [cw_setbit](#cw_setbitbits-int64-index-int64)
+* [cw_lower_case_ascii_only](#cw_lower_case_ascii_onlystr-string)
+* [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -508,6 +525,150 @@ Extract the value of a query param from a url, returns null if the parameter isn
 SELECT bqutil.fn.cw_url_extract_parameter('https://www.test.com/collections-in-java&key=val#collectionmethods', 'key');
 
 val
+```
+
+### [cw_regexp_extract(str STRING, regexp STRING)](cw_regexp_extract.sqlx)
+Returns the first substring matched by the regular expression regexp in str.
+```sql
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'Str');
+
+Str
+```
+
+### [cw_regexp_extract_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_n.sqlx)
+Finds the first occurrence of the regular expression regexp in str and returns the capturing group number groupn.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_n('TestStr123456', 'Str', 0);
+
+Str
+```
+
+### [cw_regexp_extract_all(str STRING, regexp STRING)](cw_regexp_extract_all.sqlx)
+Returns the substring(s) matched by the regular expression regexp in str.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'Str.*');
+
+[Str123456]
+```
+
+### [cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_all_n.sqlx)
+Finds all occurrences of the regular expression regexp in str and returns the capturing group number groupn.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_all_n('TestStr123456Str789', 'Str.*', 0);
+
+Str123456Str789
+```
+
+### [cw_json_array_contains_str(json STRING, needle STRING)](cw_json_array_contains_str.sqlx)
+Determine if value exists in json (a string containing a JSON array).
+```sql
+SELECT bqutil.fn.cw_json_array_contains_str('["name", "test", "valid"]', 'test');
+
+true
+```
+
+### [cw_json_array_contains_num(json STRING, needle FLOAT64)](cw_json_array_contains_num.sqlx)
+Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = number.
+```sql
+SELECT bqutil.fn.cw_json_array_contains_num('[1, 2, 3, "valid"]', 1.0);
+SELECT bqutil.fn.cw_json_array_contains_num('[1, 2, 3, "valid"]', 5.0);
+
+true
+false
+```
+
+### [cw_json_array_contains_bool(json STRING, needle BOOL)](cw_json_array_contains_bool.sqlx)
+Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = boolean
+```sql
+SELECT bqutil.fn.cw_json_array_contains_bool('[1, 2, 3, "valid", true]', true);
+SELECT bqutil.fn.cw_json_array_contains_bool('[1, 2, 3, "valid", true]', false);
+
+true
+false
+```
+
+### [cw_json_array_get(json STRING, loc FLOAT64)](cw_json_array_get.sqlx)
+Returns the element at the specified index into the json_array. The index is zero-based
+```sql
+SELECT bqutil.fn.cw_json_array_get('[{"name": "test"}, {"name": "test1"}]', 1.0);
+
+test1
+```
+
+### [cw_json_array_length(json STRING)](cw_json_array_length.sqlx)
+Returns the array length of json (a string containing a JSON array)
+```sql
+SELECT bqutil.fn.cw_json_array_length('[{"name": "test"}, {"name": "test1"}]');
+
+2
+```
+
+### [cw_substring_index(str STRING, sep STRING, idx INT64)](cw_substring_index.sqlx)
+Takes input string, seperater string and index number. It returns index element.
+```sql
+SELECT bqutil.fn.cw_substring_index('TestStr123456,Test123', ',', 1);
+
+TestStr123456
+```
+
+### [cw_editdistance(a STRING, b STRING)](cw_editdistance.sqlx)
+Similar to teradata's editdistance without weightages
+```sql
+SELECT bqutil.fn.cw_editdistance('Jim D. Swain', 'Jim D. Swain');
+SELECT bqutil.fn.cw_editdistance('Jim D. Swain', 'John Smith');
+
+0
+9
+```
+
+### [cw_round_half_even(n BIGNUMERIC, d INT64)](cw_round_half_even.sqlx)
+Round half even number
+```sql
+SELECT bqutil.fn.cw_round_half_even(10, 10);
+
+10
+```
+
+### [cw_round_half_even_bignumeric(n BIGNUMERIC, d INT64)](cw_round_half_even_bignumeric.sqlx)
+Round half even bignumeric number
+```sql
+SELECT bqutil.fn.cw_round_half_even_bignumeric(10, 10);
+
+10
+```
+
+### [cw_getbit(bits INT64, index INT64)](cw_getbit.sqlx)
+Get bit on given inex.
+```sql
+SELECT bqutil.fn.cw_getbit(11, 100);
+SELECT bqutil.fn.cw_getbit(11, 3);
+
+0
+1
+```
+
+### [cw_setbit(bits INT64, index INT64)](cw_setbit.sqlx)
+Set bit and return new bits
+```sql
+SELECT bqutil.fn.cw_setbit(1001, 2);
+
+1005
+```
+
+### [cw_lower_case_ascii_only(str STRING)](cw_lower_case_ascii_only.sqlx)
+Lowercases only ASCII characters within a given string.
+```sql
+SELECT bqutil.fn.cw_lower_case_ascii_only('TestStr123456#');
+
+teststr123456#
+```
+
+### [cw_substrb(str STRING, startpos INT64, extent INT64)](cw_substrb.sqlx)
+Treats the multibyte character string as a string of octets (bytes).
+```sql
+SELECT bqutil.fn.cw_substrb('TestStr123', 0, 3);
+
+Te
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)

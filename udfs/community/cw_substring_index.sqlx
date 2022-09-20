@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements MySQL SUBSTRING_INDEX */
+/* Similar to MySQL SUBSTRING_INDEX */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, sep STRING, idx INT64) RETURNS STRING
 LANGUAGE js AS """
   if (str === null || sep === null || idx === null) return null;
