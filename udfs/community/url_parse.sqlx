@@ -22,7 +22,7 @@ CREATE OR REPLACE FUNCTION ${self()}(url STRING, part STRING)
 AS (
   CASE
     WHEN UPPER(part) = 'HOST'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?([a-zA-Z0-9-.]+)/?')
-    WHEN UPPER(part) = 'PATH'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-./]+)')
+    WHEN UPPER(part) = 'PATH'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?(?:[a-zA-Z0-9-.]+)/{1}([a-zA-Z0-9-.~_/]+)')
     WHEN UPPER(part) = 'QUERY' THEN REGEXP_EXTRACT(url, r'\?(.*)')
     WHEN UPPER(part) = 'REF'   THEN REGEXP_EXTRACT(url, r'#(.*)')
     WHEN UPPER(part) = 'PROTOCOL' THEN REGEXP_EXTRACT(url, r'^([a-zA-Z]+)://')
