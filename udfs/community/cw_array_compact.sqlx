@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements Snowflake ARRAY_COMPACT */
+/* Similar to Snowflake ARRAY_COMPACT */
 CREATE OR REPLACE FUNCTION ${self()}(a ANY TYPE) AS (
     ARRAY(SELECT v FROM UNNEST(a) v WHERE v IS NOT NULL)
 );

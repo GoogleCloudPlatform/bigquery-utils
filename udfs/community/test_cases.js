@@ -1265,6 +1265,52 @@ generate_udf_test("cw_regexp_substr_4", [
         expected_output: `"123"`
     },
 ]);
+generate_udf_test("cw_regexp_substr_5", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"g"`
+        ],
+        expected_output: `"Test"`
+    },
+    {
+        inputs: [
+            `"TestStr123456Test"`,
+            `"test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`,
+            `"i"`
+        ],
+        expected_output: `"Test"`
+    },
+]);
+generate_udf_test("cw_regexp_substr_6", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"g"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `"Test"`
+    },
+    {
+        inputs: [
+            `"TestStr123456Test"`,
+            `"test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`,
+            `"i"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `"Test"`
+    },
+]);
 generate_udf_test("cw_regexp_instr_2", [
     {
         inputs: [
@@ -1379,6 +1425,26 @@ generate_udf_test("cw_regexp_replace_5", [
             `CAST(1 AS INT64)`
         ],
         expected_output: `"TestUsd$#123456"`
+    },
+    {
+        inputs: [
+            `"TestStr123456Str"`,
+            `"Str"`,
+            `"Usd$#"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"TestUsd$#123456Usd$#"`
+    },
+    {
+        inputs: [
+            `"TestStr123456Str"`,
+            `"Str"`,
+            `"Usd$#"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"TestUsd$#123456Str"`
     },
 ]);
 generate_udf_test("cw_regexp_replace_6", [

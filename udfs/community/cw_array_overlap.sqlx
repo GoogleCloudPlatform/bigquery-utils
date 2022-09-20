@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements Presto ARRAYS_OVERLAP */
+/* Similar to Presto ARRAYS_OVERLAP */
 CREATE OR REPLACE FUNCTION ${self()}(x ANY TYPE, y ANY TYPE) RETURNS BOOL AS(
     CASE WHEN EXISTS(SELECT 1 FROM UNNEST(ARRAY_CONCAT(x,y)) as z WHERE z IS NULL) THEN NULL
          ELSE EXISTS(SELECT 1 FROM UNNEST(x) as u JOIN UNNEST(y) as v ON u=v)

@@ -17,6 +17,45 @@ SELECT bqutil.fn.int(1.684)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
 * [cw_instr4](#cw_instr4source-string-search-string-position-int64-ocurrence-int64)
+* [cw_initcap](#cw_initcaps-string)
+* [cw_otranslate](#cw_otranslates-string-key-string-value-string)
+* [cw_stringify_interval](#cw_stringify_intervalx-int64)
+* [cw_regexp_substr_4](#cw_regexp_substr_4h-string-n-string-p-int64-o-int64)
+* [cw_regexp_substr_5](#cw_regexp_substr_5h-string-n-string-p-int64-o-int64-mode-string)
+* [cw_regexp_substr_6](#cw_regexp_substr_6h-string-n-string-p-int64-o-int64-mode-string-g-string)
+* [cw_map_create](#cw_map_createkeys-any-type-vals-any-type)
+* [cw_map_get](#cw_map_getmaparray-any-type-inkey-any-type)
+* [cw_regexp_instr_2](#cw_regexp_instr_2haystack-string-needle-string)
+* [cw_regexp_instr_3](#cw_regexp_instr_3haystack-string-needle-string-start-int64)
+* [cw_regexp_instr_4](#cw_regexp_instr_3haystack-string-needle-string-p-int64-o-int64)
+* [cw_regexp_instr_generic](#cw_regexp_instr_generichaystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
+* [cw_regexp_instr_6](#cw_regexp_instr_6haystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
+* [cw_regexp_replace_4](cw_regexp_replace_4haystack-string-regexpstring-replacement-string-offset-int64)
+* [cw_regexp_replace_5](cw_regexp_replace_5haystack-string-regexpstring-replacement-string-offset-int64-occurrence-int64)
+* [cw_regexp_replace_6](cw_regexp_replace_6haystack-string-regexpstring-replacement-string-p-int64-o-int64-mode-string)
+* [cw_regexp_instr_5](#cw_regexp_instr_5haystack-string-needle-string-p-int64-o-int64-returnopt-int64)
+* [cw_array_min](#cw_array_minarr-any-type)
+* [cw_array_median](#cw_array_medianarr-any-type)
+* [cw_array_max](#cw_array_maxarr-any-type)
+* [cw_array_distinct](#cw_array_distinctarr-any-type)
+* [cw_next_day](#cw_next_daydate_value-date-day_name-string)
+* [cw_td_nvp](#cw_td_nvphaystack-string-needle-string-pairsep-string-valuesep-string-occurence-int64)
+* [cw_from_base](#cw_from_basenumber-string-base-int64)
+* [cw_to_base](#cw_to_basenumber-int64-base-int64)
+* [cw_array_overlap](#cw_array_overlapx-any-type-y-any-type)
+* [cw_array_compact](#cw_array_compacta-any-type)
+* [cw_runtime_parse_interval_seconds](#cw_runtime_parse_interval_secondsival-string)
+* [cw_url_encode](#cw_url_encodepath-string)
+* [cw_url_decode](#cw_url_decodepath-string)
+* [cw_url_extract_host](#cw_url_extract_hosturl-string)
+* [cw_url_extract_protocol](#cw_url_extract_protocolurl-string)
+* [cw_url_extract_path](#cw_url_extract_pathurl-string)
+* [cw_url_extract_port](#cw_url_extract_porturl-string)
+* [cw_url_extract_authority](#cw_url_extract_authorityurl-string)
+* [cw_url_extract_query](#cw_url_extract_queryurl-string)
+* [cw_url_extract_file](#cw_url_extract_fileurl-string)
+* [cw_url_extract_fragment](#cw_url_extract_fragmenturl-string)
+* [cw_url_extract_parameter](#cw_url_extract_parameterurl-string-pname-string)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -78,7 +117,7 @@ SELECT bqutil.fn.int(1.684)
 ## Documentation
 ### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
 Takes an input latitude, longitude, azimuth, and distance (in miles) and returns the corresponding latitude and longitude as a BigQuery GEOGRAPHY point.
-``` sql
+```sql
 SELECT bqutil.fn.azimuth_to_geog_point(30.2672, 97.7431, 312.9, 1066.6);
 
 POINT(81.4417483906444 39.9606210457152)
@@ -119,10 +158,356 @@ results:
 
 ### [cw_instr4(source STRING, search STRING, position INT64, ocurrence INT64)](cw_instr4.sqlx)
 Takes an input source string, search string within source, position and number of occurrence. It returns index number of last occurrence staring position from position in source.
-``` sql
+```sql
 SELECT bqutil.fn.cw_instr4('TestStr123456Str', 'Str', 1, 2);
 
 14
+```
+
+### [cw_initcap(s STRING)](cw_initcap.sqlx)
+Takes an input string and returns input string with first letter capital.
+```sql
+SELECT bqutil.fn.cw_initcap('teststr');
+SELECT bqutil.fn.cw_initcap('test str');
+
+Teststr
+Test Str
+```
+
+### [cw_otranslate(s STRING, key STRING, value STRING)](cw_otranslate.sqlx)
+Takes input source string with key and value. It returns source string with replacement of key with value.
+```sql
+SELECT bqutil.fn.cw_otranslate('Thin and Thick', 'Thk', 'Sp');
+
+Spin and Spic
+```
+
+### [cw_stringify_interval(x INT64)](cw_stringify_interval.sqlx)
+Formats the interval as 'day hour:minute:second
+```sql
+SELECT bqutil.fn.cw_stringify_interval(86100);
+
++0000 23:55:00
+```
+
+### [cw_regexp_substr_4(h STRING, n STRING, p INT64, o INT64)](cw_regexp_substr_4.sqlx)
+Takes input haystack string, needle string, position and occurence. It returns needle from the starting position if present with number of occurence time in haystack.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456', 'Test', 1, 1);
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 2);
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 3);
+
+Test
+Test
+null
+```
+
+### [cw_regexp_substr_5(h STRING, n STRING, p INT64, o INT64, mode STRING)](cw_regexp_substr_5.sqlx)
+Takes input haystack string, needle string, position, occurence and mode. It returns needle from the starting position if present with number of occurence time in haystack. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456', 'Test', 1, 1, 'g');
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456Test', 'test', 1, 2, 'i');
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456\nTest', 'Test', 1, 2, 'm');
+
+Test
+Test
+Test
+```
+
+### [cw_regexp_substr_6(h STRING, n STRING, p INT64, o INT64, mode STRING, g INT64)](cw_regexp_substr_6.sqlx)
+Takes input haystack string, needle string, position, occurence and mode. It returns needle from the starting position if present with number of occurence time in haystack. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_6('TestStr123456', 'Test', 1, 1, 'g', 0);
+
+Test
+```
+
+### [cw_map_create(keys ANY TYPE, vals ANY TYPE)](cw_map_create.sqlx)
+Given an array of keys and values, creates an array of struct containing matched <key,value> from each array. Number of elements in each array should be equal otherwise remaining values will be ignored.
+```sql
+SELECT bqutil.fn.cw_map_create([1, 2, 3], ['A', 'B', 'C']);
+```
+
+results:
+|   Row   |  f0_.key    |  f0_.value  |
+|---------|-------------|-------------|
+|    1    |       1     |     A       |
+|         |       2     |     B       |
+|         |       3     |     C       |
+
+### [cw_map_get(maparray ANY TYPE, inkey ANY TYPE)](cw_map_get.sqlx)
+Given an array of struct and needle, searches an array to find struct whose key-field matches needle, then it returns the value-field in the given struct.
+```sql
+```
+
+### [cw_regexp_instr_2(haystack STRING, needle STRING)](cw_regexp_instr_2.sqlx)
+Takes input haystack string with needle string. Returns starting index of needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_2('TestStr123456', 'Str');
+SELECT bqutil.fn.cw_regexp_instr_2('TestStr123456', '90');
+
+5
+0
+```
+
+### [cw_regexp_instr_3(haystack STRING, needle STRING, start INT64)](cw_regexp_instr_3.sqlx)
+Takes input haystack string, needle string and starting positin from where search will start. Returns starting index of needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_3('TestStr123456', 'Str', 0);
+SELECT bqutil.fn.cw_regexp_instr_3('TestStr123456', 'Str', 6);
+
+5
+0
+```
+
+### [cw_regexp_instr_4(haystack STRING, needle STRING, start INT64)](cw_regexp_instr_4.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start and number of occurance. Returns starting index of last needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456', 'Str', 1, 1);
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456Str', 'Str', 1, 2);
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456Str', 'Str', 1, 3);
+
+5
+14
+0
+```
+
+### [cw_regexp_instr_generic(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING)](cw_regexp_instr_generic.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance, returnopt number and mode. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_generic('TestStr123456', 'Str', 1, 1, 1, 'g');
+
+8
+```
+
+### [cw_regexp_instr_6(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING)](cw_regexp_instr_6.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance, returnopt number and mode. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_6('TestStr123456', 'Str', 1, 1, 1, 'g');
+
+8
+```
+
+### [cw_regexp_replace_4(haystack STRING, regexp STRING, replacement STRING, offset INT64)](cw_regexp_replace_4.sqlx)
+Takes input haystack string, regular expression, replacement string and starting offset. It returns new string with replacement string matches accordingly regular expression.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_4('TestStr123456', 'Str', 'Cad$', 1);
+
+TestCad$123456
+```
+
+### [cw_regexp_replace_5(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64)](cw_regexp_replace_5.sqlx)
+Takes input haystack string, regular expression, replacement string, starting offset and number of occurence which we want to replace. It returns new string with replacement string matches accordingly regular expression.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456', 'Str', 'Cad$', 1, 1);
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 2);
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 1);
+
+TestCad$123456
+TestCad$123456Cad$
+TestCad$123456Str
+```
+
+### [cw_regexp_replace_6(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING)](cw_regexp_replace_6.sqlx)
+Takes input haystack string, regular expression, replacement string, starting offset, number of occurence which we want to replace and mode. It returns new string with replacement string matches accordingly regular expression. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_6('TestStr123456', 'Str', '$:#>', 1, 1, 'i');
+
+Test$:#>123456
+```
+
+### [cw_regexp_instr_5(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64)](cw_regexp_instr_5.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance and returnopt number. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_5('TestStr123456', '123', 1, 1, 1);
+
+11
+```
+
+### [cw_array_min(arr ANY TYPE)](cw_array_min.sqlx)
+Returns minimum of array.
+```sql
+SELECT bqutil.fn.cw_array_min([1, 2, 3, 4, 5]);
+
+1
+```
+
+### [cw_array_median(arr ANY TYPE)](cw_array_median.sqlx)
+Returns median of array.
+```sql
+SELECT bqutil.fn.cw_array_median([1, 2, 3, 4, 5, 6]);
+
+3.5
+```
+
+### [cw_array_max(arr ANY TYPE)](cw_array_max.sqlx)
+Returns maximum of array.
+```sql
+SELECT bqutil.fn.cw_array_max([1, 2, 3, 4, 5, 6]);
+
+6
+```
+
+### [cw_array_distinct(arr ANY TYPE)](cw_array_distinct.sqlx)
+Returns distinct array.
+```sql
+SELECT bqutil.fn.cw_array_distinct([1, 2, 3, 4, 4, 5, 5]);
+
+[1, 2, 3, 4, 5]
+```
+
+### [cw_next_day(date_value DATE, day_name STRING)](cw_next_day.sqlx)
+Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument.
+```sql
+SELECT bqutil.fn.cw_next_day('2022-09-21', 'we');
+
+2022-09-28
+```
+
+### [cw_td_nvp(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64)](cw_td_nvp.sqlx)
+Extract a value from a key-value separated string
+```sql
+SELECT bqutil.fn.cw_td_nvp('entree:orange chicken#entree2:honey salmon', 'entree', '#', ':', 1);
+
+orange chicken
+```
+
+### [cw_from_base(number STRING, base INT64)](cw_from_base.sqlx)
+Convert string from given base to decimal
+```sql
+SELECT bqutil.fn.cw_from_base('001101011', 2);
+SELECT bqutil.fn.cw_from_base('A', 16);
+
+107
+10
+```
+
+### [cw_to_base(number INT64, base INT64)](cw_to_base.sqlx)
+Convert string from given base to decimal
+```sql
+SELECT bqutil.fn.cw_to_base(5, 2);
+SELECT bqutil.fn.cw_to_base(10, 16);
+
+101
+a
+```
+
+### [cw_array_overlap(x ANY TYPE, y ANY TYPE)](cw_array_overlap.sqlx)
+Returns true if arrays are overlapped otherwise false.
+```sql
+SELECT bqutil.fn.cw_array_overlap([1, 2, 3], [4, 5, 6]);
+SELECT bqutil.fn.cw_array_overlap([1, 2, 3], [2, 3, 4]);
+
+false
+true
+```
+
+### [cw_array_compact(a ANY TYPE)](cw_array_compact.sqlx)
+Returns a compacted array with null values removed
+```sql
+SELECT bqutil.fn.cw_array_compact([1, 2, 3, null, 5]);
+
+[1, 2, 3, 5]
+```
+
+### [cw_runtime_parse_interval_seconds(ival STRING)](cw_runtime_parse_interval_seconds.sqlx)
+Kludge for interval translation - for now day->sec only
+```sql
+SELECT bqutil.fn.cw_runtime_parse_interval_seconds(1 DAY);
+
+86400
+```
+
+### [cw_url_encode(path STRING)](cw_url_encode.sqlx)
+URL encode a string
+```sql
+SELECT bqutil.fn.cw_url_encode("?");
+SELECT bqutil.fn.cw_url_encode("/");
+
+%3F
+%2F
+```
+
+### [cw_url_decode(path STRING)](cw_url_decode.sqlx)
+URL decode a string
+```sql
+SELECT bqutil.fn.cw_url_decode("%3F");
+SELECT bqutil.fn.cw_url_decode("%2F");
+
+?
+/
+```
+
+### [cw_url_extract_host(url STRING)](cw_url_extract_host.sqlx)
+Extract the host from a url, return "" (empty string) if no host is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_host('https://google.com');
+
+google.com
+```
+
+### [cw_url_extract_protocol(url STRING)](cw_url_extract_protocol.sqlx)
+Extract the protocol from a url, return "" (empty string) if no protocol is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_protocol('https://google.com/test?key=val');
+
+https
+```
+
+### [cw_url_extract_path(url STRING)](cw_url_extract_path.sqlx)
+Extract the path from a url, returns "" (empty string) if no path is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_path('https://www.test.com/collections-in-java#collectionmethods');
+
+/collections-in-java
+```
+
+### [cw_url_extract_port(url STRING)](cw_url_extract_port.sqlx)
+Extract the port from a url, returns null if no port is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_port('https://localhost:8080/test?key=val');
+
+8080
+```
+
+### [cw_url_extract_authority(url STRING)](cw_url_extract_authority.sqlx)
+Extract the authority from a url, returns "" (empty string) if no authority is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_authority('https://localhost:8080/test?key=val');
+
+localhost:8080
+```
+
+### [cw_url_extract_query(url STRING)](cw_url_extract_query.sqlx)
+Extract the query from a url, returns "" (empty string) if no query is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_query('https://localhost:8080/test?key=val');
+
+key=val
+```
+
+### [cw_url_extract_file(url STRING)](cw_url_extract_file.sqlx)
+Extract the file from a url, returns "" (empty string) string if no file is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_file('https://www.test.com/collections-in-java#collectionmethods');
+
+/collections-in-java
+```
+
+### [cw_url_extract_fragment(url STRING)](cw_url_extract_fragment.sqlx)
+Extract the fragment from a url, returns "" (empty string) if no fragment is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_fragment('https://www.test.com/collections-in-java#collectionmethods');
+
+collectionmethods
+```
+
+### [cw_url_extract_parameter(url STRING, pname STRING)](cw_url_extract_parameter.sqlx)
+Extract the value of a query param from a url, returns null if the parameter isn't found.
+```sql
+SELECT bqutil.fn.cw_url_extract_parameter('https://www.test.com/collections-in-java&key=val#collectionmethods', 'key');
+
+val
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
@@ -372,7 +757,7 @@ object, array, string, number, boolean, boolean, null
 
 ### [knots_to_mph(input_knots FLOAT64)](knots_to_mph.sqlx)
 Converts knots to miles per hour
-``` sql
+```sql
 SELECT bqutil.fn.knots_to_mph(37.7);
 
 43.384406
@@ -437,7 +822,7 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
 
 ### [meters_to_miles(input_meters FLOAT64)](meters_to_miles.sqlx)
 Converts meters to miles
-``` sql
+```sql
 SELECT bqutil.fn.meters_to_miles(5000.0);
 
 3.1068559611866697
@@ -445,7 +830,7 @@ SELECT bqutil.fn.meters_to_miles(5000.0);
 
 ### [miles_to_meters(input_miles FLOAT64)](miles_to_meters.sqlx)
 Converts miles to meters
-``` sql
+```sql
 SELECT bqutil.fn.miles_to_meters(2.73);
 
 4393.50912
@@ -453,7 +838,7 @@ SELECT bqutil.fn.miles_to_meters(2.73);
 
 ### [mph_to_knots(input_mph FLOAT64)](mph_to_knots.sqlx)
 Converts miles per hour to knots
-``` sql
+```sql
 SELECT bqutil.fn.mph_to_knots(75.5);
 
 65.607674794487224
@@ -461,7 +846,7 @@ SELECT bqutil.fn.mph_to_knots(75.5);
 
 ### [nautical_miles_conversion(input_nautical_miles FLOAT64)](nautical_miles_conversion.sqlx)
 Converts nautical miles to miles
-``` sql
+```sql
 SELECT bqutil.fn.nautical_miles_conversion(1.12);
 
 1.2888736

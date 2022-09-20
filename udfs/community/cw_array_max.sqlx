@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Like presto ARRAY_MAX */
+/* Similar to presto ARRAY_MAX */
 CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) AS (
    ( SELECT MAX(x) FROM UNNEST(arr) AS x )
 );

@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Like presto ARRAY_DISTINCT */
+/* Similar to presto ARRAY_DISTINCT */
 CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) AS (
    ARRAY( SELECT DISTINCT x FROM UNNEST(arr) AS x )
 );
