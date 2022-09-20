@@ -15,7 +15,7 @@ steps:
 ###########################################################
 - name: gcr.io/bqutil/bq_udf_ci
   id: deploy_and_test_udfs
-  dir: tests/dataform_testing_framework
+  dir: ${_WORKING_DIR}
   entrypoint: bash
   args:
     - deploy_and_run_tests.sh
@@ -24,5 +24,8 @@ steps:
     - BQ_LOCATION=${_BQ_LOCATION}
     - SHORT_SHA=
     - JS_BUCKET=gs://bqutil-lib/bq_js_libs
+substitutions:
+  _WORKING_DIR: tests/dataform_testing_framework # default value when submitting from udfs/ directory
 options:
   logging: CLOUD_LOGGING_ONLY
+
