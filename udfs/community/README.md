@@ -304,7 +304,7 @@ SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 2);
 SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 1);
 
 TestCad$123456
-TestCad$123456Cad$
+TestStr123456Cad$
 TestCad$123456Str
 ```
 

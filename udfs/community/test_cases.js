@@ -1434,7 +1434,7 @@ generate_udf_test("cw_regexp_replace_5", [
             `CAST(1 AS INT64)`,
             `CAST(2 AS INT64)`
         ],
-        expected_output: `"TestUsd$#123456Usd$#"`
+        expected_output: `"TestStr123456Usd$#"`
     },
     {
         inputs: [
