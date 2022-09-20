@@ -12,6 +12,7 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
+* [cw_instr4](#cw_instr4source-string-search-string-position-int64-ocurrence-int64)
 * [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
@@ -75,6 +76,14 @@ SELECT bqutil.fn.int(1.684)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
+### [cw_instr4(source STRING, search STRING, position INT64, ocurrence INT64)](cw_instr4.sqlx)
+Takes an input source string, search string within source, position and number of occurrence. It returns index number of last occurrence staring position from position in source.
+``` sql
+SELECT bqutil.fn.cw_instr4('TestStr123456Str', 'Str', 1, 2);
+
+14
+```
+
 ### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
 Takes an input latitude, longitude, azimuth, and distance (in miles) and returns the corresponding latitude and longitude as a BigQuery GEOGRAPHY point.
 ``` sql
