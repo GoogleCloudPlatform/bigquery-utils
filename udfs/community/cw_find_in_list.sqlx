@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements Hive "find_in_set" */
+/* Similar to Hive "find_in_set" */
 CREATE OR REPLACE FUNCTION ${self()}(needle STRING, list STRING) RETURNS INT64
 AS (
   CASE WHEN needle IS NULL OR list IS NULL THEN NULL

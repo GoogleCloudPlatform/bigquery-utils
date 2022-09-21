@@ -73,6 +73,23 @@ SELECT bqutil.fn.int(1.684)
 * [cw_setbit](#cw_setbitbits-int64-index-int64)
 * [cw_lower_case_ascii_only](#cw_lower_case_ascii_onlystr-string)
 * [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
+* [cw_twograms](#cw_twogramst-string)
+* [cw_threegrams](#cw_threegramst-string)
+* [cw_nvp2json1](#cw_nvp2json1nvp-string)
+* [cw_nvp2json3](#cw_nvp2json3nvp-string-name_delim-string-val_delim-string)
+* [cw_nvp2json4](#cw_nvp2json4nvp-string-name_delim-string-val_delim-string-ignore_char-string)
+* [cw_strtok](#cw_strtoktext-string-delim-string)
+* [cw_regexp_split](#cw_regexp_splittext-string-delim-string-flags-string)
+* [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
+* [cw_json_enumerate_array](#cw_json_enumerate_arraytext-string)
+* [cw_ts_pattern_match](#cw_ts_pattern_matchevseries-arraystring-regexpParts-arraystring)
+* [cw_find_in_list](#cw_find_in_listneedle-string-list-string)
+* [cw_map_parse](#cw_map_parsem-string-pd-string-kvd-string)
+* [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
+* [cw_comparable_format_varchar](#cw_comparable_format_varchardata-arraystring)
+* [cw_comparable_format_bigint_t](#cw_comparable_format_bigint_tpart-int64)
+* [cw_comparable_format_bigint](#cw_comparable_format_bigintdata-arrayint64)
+* [cw_ts_overlap_buckets](#cw_ts_overlap_bucketsincludeMeets-boolean-inputs-arraystruct-st-timestamp-et-timestamp)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -669,6 +686,134 @@ Treats the multibyte character string as a string of octets (bytes).
 SELECT bqutil.fn.cw_substrb('TestStr123', 0, 3);
 
 Te
+```
+
+### [cw_twograms(t STRING)](cw_twograms.sqlx)
+```sql
+
+```
+
+### [cw_threegrams(t STRING)](cw_threegrams.sqlx)
+```sql
+
+```
+
+### [cw_nvp2json1(nvp STRING)](cw_nvp2json1.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+```sql
+SELECT bqutil.fn.cw_nvp2json1('name=google&occupation=engineer&hair=color');
+
+{"name":"google","occupation":"engineer","hair":"color"}
+```
+
+### [cw_nvp2json3(nvp STRING,name_delim STRING, val_delim STRING)](cw_nvp2json3.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+name_delim is delimiter for keys. val_delim is delimiter for key-value.
+```sql
+SELECT bqutil.fn.cw_nvp2json3('name=google&occupation=engineer&hair=color', '&', '=');
+
+{"name":"google","occupation":"engineer","hair":"color"}
+```
+
+### [cw_nvp2json4(nvp STRING, name_delim STRING, val_delim STRING, ignore_char STRING)](cw_nvp2json4.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+name_delim is delimiter for keys. val_delim is delimiter for key-value. ignore_char is to ignore and removed from output json.
+```sql
+SELECT bqutil.fn.cw_nvp2json4('name=google#1&occupation=engineer#2&hair=color#3', '&', '=', '#');
+
+{"name":"google1","occupation":"engineer2","hair":"color3"}
+```
+
+### [cw_strtok(text string, delim string)](cw_strtok.sqlx)
+Takes input string and delimiter. It generates pair from string tokenizer.
+```sql
+SELECT bqutil.fn.cw_strtok('Test#1', '#');
+
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
+```
+
+### [cw_regexp_split(text string, delim string, flags string)](cw_regexp_split.sqlx)
+Takes input string, delimiter and flags. It generates pair from string tokenizer. Flags works like Regex mode of javascript.
+```sql
+SELECT bqutil.fn.cw_regexp_split('Test#1', '#', 'i');
+
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
+```
+
+### [cw_csvld(text string, comma string, quote string,len INT64)](cw_csvld.sqlx)
+Generates CSV array.
+```sql
+SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
+
+["Test", "123"]
+```
+
+### [cw_json_enumerate_array(text STRING)](cw_json_enumerate_array.sqlx)
+```sql
+
+```
+
+### [cw_ts_pattern_match(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)](cw_ts_pattern_match.sqlx)
+ts_pattern_match is function that returns range of matched pattern in given UID, SID (user session)
+```sql
+
+```
+
+### [cw_find_in_list(needle STRING, list STRING)](cw_find_in_list.sqlx)
+Find index of element in set.
+```sql
+SELECT bqutil.fn.cw_find_in_list("1", "[Test,1,2]");
+
+2
+```
+
+### [cw_map_parse(m string, pd string, kvd string)](cw_map_parse.sqlx)
+String to map convert.
+```sql
+SELECT bqutil.fn.cw_map_parse("a=1 b=42", " ", "=");
+
+([STRUCT("a" AS key, "1" AS value), 
+STRUCT("b" AS key, "42" AS value)])
+```
+
+### [cw_comparable_format_varchar_t(part STRING)](cw_comparable_format_varchar_t.sqlx)
+Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--')
+```sql
+SELECT bqutil.fn.cw_comparable_format_varchar_t("2");
+
+32
+```
+
+### [cw_comparable_format_varchar(data ARRAY<STRING>)](cw_comparable_format_varchar.sqlx)
+Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--')
+```sql
+SELECT bqutil.fn.cw_comparable_format_varchar(["2", "8"]);
+
+32 38
+```
+
+### [cw_comparable_format_bigint_t(part INT64)](cw_comparable_format_bigint_t.sqlx)
+Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values
+```sql
+SELECT bqutil.fn.cw_comparable_format_bigint_t(2);
+
+p                  2
+```
+
+### [cw_comparable_format_bigint(data ARRAT<INT64>)](cw_comparable_format_bigint.sqlx)
+Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values
+```sql
+SELECT bqutil.fn.cw_comparable_format_bigint([2, 8]);
+
+p                  2 p                  8
+```
+
+### [cw_ts_overlap_buckets()](cw_ts_overlap_buckets.sqlx)
+Merges two periods together if they overlap and returns unique id for each merged bucket. Coalesces meeting periods as well (not just overlapping periods) if includeMeets is true.
+```sql
+
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)

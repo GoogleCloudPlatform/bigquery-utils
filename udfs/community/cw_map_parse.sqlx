@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements hive "str_to_map" */
+/* Similar to hive "str_to_map" */
 CREATE OR REPLACE FUNCTION ${self()}(m string, pd string, kvd string)
    RETURNS ARRAY<STRUCT<key STRING, value STRING>> AS (
   ARRAY(SELECT AS STRUCT kv[SAFE_OFFSET(0)] AS key, kv[SAFE_OFFSET(1)] AS value

@@ -1890,6 +1890,35 @@ generate_udf_test("cw_substrb", [
         expected_output: `"Te"`
     },
 ]);
+generate_udf_test("cw_nvp2json1", [
+    {
+        inputs: [
+            `"name=google&occupation=engineer&hair=color"`
+        ],
+        expected_output: `'{"name":"google","occupation":"engineer","hair":"color"}'`
+    },
+]);
+generate_udf_test("cw_nvp2json3", [
+    {
+        inputs: [
+            `"name=google&occupation=engineer&hair=color"`,
+            `"&"`,
+            `"="`
+        ],
+        expected_output: `'{"name":"google","occupation":"engineer","hair":"color"}'`
+    },
+]);
+generate_udf_test("cw_nvp2json4", [
+    {
+        inputs: [
+            `"name=google#1&occupation=engineer#2&hair=color#3"`,
+            `"&"`,
+            `"="`,
+            `"#"`
+        ],
+        expected_output: `'{"name":"google1","occupation":"engineer2","hair":"color3"}'`
+    },
+]);
 generate_udf_test("cw_strtok", [
     {
         inputs: [
@@ -1945,9 +1974,33 @@ generate_udf_test("cw_map_parse", [
 generate_udf_test("cw_comparable_format_varchar_t", [
     {
         inputs: [
-            `"2"`,
+            `"2"`
         ],
         expected_output: `"32"`
+    },
+]);
+generate_udf_test("cw_comparable_format_varchar", [
+    {
+        inputs: [
+            `ARRAY<STRING>["2", "8"]`
+        ],
+        expected_output: `"32 38"`
+    },
+]);
+generate_udf_test("cw_comparable_format_bigint_t", [
+    {
+        inputs: [
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"p                  2"`
+    },
+]);
+generate_udf_test("cw_comparable_format_bigint", [
+    {
+        inputs: [
+            `ARRAY<INT64>[2, 8]`
+        ],
+        expected_output: `"p                  2 p                  8"`
     },
 ]);
 generate_udf_test("knots_to_mph", [
