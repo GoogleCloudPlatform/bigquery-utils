@@ -689,13 +689,19 @@ Te
 ```
 
 ### [cw_twograms(t STRING)](cw_twograms.sqlx)
+Takes input string with space. Space delimiter words will repeat two times and generate array.
 ```sql
+SELECT bqutil.fn.cw_twograms('Test Str 123456 789');
 
+["Test Str", "Str 123456", "123456 789"]
 ```
 
 ### [cw_threegrams(t STRING)](cw_threegrams.sqlx)
+Takes input string with space. Space delimiter words will repeat three times and generate array.
 ```sql
+SELECT bqutil.fn.cw_threegrams('Test 1234 str abc');
 
+["Test 1234 str", "1234 str abc"]
 ```
 
 ### [cw_nvp2json1(nvp STRING)](cw_nvp2json1.sqlx)
