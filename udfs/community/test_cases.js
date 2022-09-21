@@ -1262,8 +1262,8 @@ generate_udf_test("cw_instr4", [
     {
         inputs: [
             `"TestStr123456"`,
-		                `"Str"`,
-		                `CAST(1 AS INT64)`,
+		        `"Str"`,
+		        `CAST(1 AS INT64)`,
             `CAST(1 AS INT64)`
         ],
         expected_output: `CAST(5 AS INT64)`
