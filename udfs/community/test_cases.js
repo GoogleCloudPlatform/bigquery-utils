@@ -1170,17 +1170,6 @@ generate_udf_test("jaccard", [
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
 ]);
-generate_udf_test("cw_instr4", [
-    {
-        inputs: [
-            `"TestStr123456"`,
-		                `"Str"`,
-		                `CAST(1 AS INT64)`,
-            `CAST(1 AS INT64)`
-        ],
-        expected_output: `CAST(5 AS INT64)`
-    },
-]);
 generate_udf_test("knots_to_mph", [
     {
         inputs: [`CAST(37.7 AS FLOAT64)`],
@@ -1269,6 +1258,17 @@ generate_udf_test("azimuth_to_geog_point", [
         expected_output: `NULL`
     },
 ]);
+generate_udf_test("cw_instr4", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+		                `"Str"`,
+		                `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+]);
 generate_udf_test("cw_initcap", [
     {
         inputs: [
@@ -1353,6 +1353,30 @@ generate_udf_test("cw_regexp_substr_4", [
         expected_output: `"123"`
     },
 ]);
+generate_udf_test("cw_regexp_substr_generic", [
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`,
+            `"g"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `"Test"`
+    },
+    {
+        inputs: [
+            `"TestStr123456Test"`,
+            `"test"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`,
+            `"ig"`,
+            `CAST(0 AS INT64)`
+        ],
+        expected_output: `"Test"`
+    },
+]);
 generate_udf_test("cw_regexp_substr_5", [
     {
         inputs: [
@@ -1397,6 +1421,26 @@ generate_udf_test("cw_regexp_substr_6", [
             `CAST(0 AS INT64)`
         ],
         expected_output: `"Test"`
+    },
+]);
+generate_udf_test("cw_map_create", [
+    {
+        inputs: [
+            `CAST([1, 2, 3] AS ARRAY<INT64>)`,
+            `CAST(["A", "B", "C"] AS ARRAY<STRING>)`
+        ],
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS key, "A" AS value), 
+                           STRUCT(CAST(2 AS INT64) AS key, "B" AS value),
+                           STRUCT(CAST(3 AS INT64) AS key, "C" AS value)])`
+    },
+]);
+generate_udf_test("cw_map_get", [
+    {
+        inputs: [
+            `([STRUCT(CAST(1 AS INT64) AS key, "ABC" AS value)])`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"ABC"`
     },
 ]);
 generate_udf_test("cw_regexp_instr_2", [
@@ -1590,6 +1634,15 @@ generate_udf_test("cw_array_distinct", [
             `(SELECT ARRAY<INT64>[1, 2, 3, 4, 4, 5, 5])`
         ],
         expected_output: `CAST([1, 2, 3, 4, 5] AS ARRAY<INT64>)`
+    },
+]);
+generate_udf_test("cw_next_day", [
+    {
+        inputs: [
+            `CAST('2022-09-21' AS DATE)`,
+            `"we"`
+        ],
+        expected_output: `CAST('2022-09-28' AS DATE)`
     },
 ]);
 generate_udf_test("cw_td_nvp", [
@@ -2062,6 +2115,16 @@ generate_udf_test("cw_json_enumerate_array", [
         ],
         expected_output: `([STRUCT(CAST(1 AS INT64) AS ordinal, '{"name":"Cameron"}' AS jsonvalue), 
                            STRUCT(CAST(2 AS INT64) AS ordinal, '{"name":"John"}' AS jsonvalue)])`
+    },
+]);
+generate_udf_test("cw_ts_pattern_match", [
+    {
+        inputs: [
+            `CAST(["abc", "abc"] AS ARRAY<STRING>)`,
+            `CAST(["abc"] AS ARRAY<STRING>)`
+        ],
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS pattern_id, CAST(1 AS INT64) AS start, CAST(1 AS INT64) AS stop),
+                            STRUCT(CAST(2 AS INT64) AS pattern_id, CAST(2 AS INT64) AS start, CAST(2 AS INT64) AS stop)])`
     },
 ]);
 generate_udf_test("cw_error_number", [

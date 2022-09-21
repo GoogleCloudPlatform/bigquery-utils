@@ -20,7 +20,9 @@ SELECT bqutil.fn.int(1.684)
 * [cw_initcap](#cw_initcaps-string)
 * [cw_otranslate](#cw_otranslates-string-key-string-value-string)
 * [cw_stringify_interval](#cw_stringify_intervalx-int64)
+* [cw_regex_mode](#cw_regex_modemode-string)
 * [cw_regexp_substr_4](#cw_regexp_substr_4h-string-n-string-p-int64-o-int64)
+* [cw_regexp_substr_generic](#cw_regexp_substr_genericstr-string-regexp-string-p-int64-o-int64-mode-string-g-int64)
 * [cw_regexp_substr_5](#cw_regexp_substr_5h-string-n-string-p-int64-o-int64-mode-string)
 * [cw_regexp_substr_6](#cw_regexp_substr_6h-string-n-string-p-int64-o-int64-mode-string-g-string)
 * [cw_map_create](#cw_map_createkeys-any-type-vals-any-type)
@@ -30,6 +32,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_regexp_instr_4](#cw_regexp_instr_3haystack-string-needle-string-p-int64-o-int64)
 * [cw_regexp_instr_generic](#cw_regexp_instr_generichaystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
 * [cw_regexp_instr_6](#cw_regexp_instr_6haystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
+* [cw_regexp_replace_generic](#cw_regexp_replace_generichaystack-string-regexp-string-replacement-string-offset-int64-occurrence-int64-mode-string)
 * [cw_regexp_replace_4](cw_regexp_replace_4haystack-string-regexpstring-replacement-string-offset-int64)
 * [cw_regexp_replace_5](cw_regexp_replace_5haystack-string-regexpstring-replacement-string-offset-int64-occurrence-int64)
 * [cw_regexp_replace_6](cw_regexp_replace_6haystack-string-regexpstring-replacement-string-p-int64-o-int64-mode-string)
@@ -82,7 +85,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_regexp_split](#cw_regexp_splittext-string-delim-string-flags-string)
 * [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
 * [cw_json_enumerate_array](#cw_json_enumerate_arraytext-string)
-* [cw_ts_pattern_match](#cw_ts_pattern_matchevseries-arraystring-regexpParts-arraystring)
+* [cw_ts_pattern_match](#cw_ts_pattern_matchevseries-array-regexpParts-array)
 * [cw_error_number](cw_error_numbererrmsg-string)
 * [cw_error_severity](cw_error_severityerrmsg-string)
 * [cw_error_state](cw_error_stateerrmsg-string)
@@ -227,6 +230,18 @@ SELECT bqutil.fn.cw_stringify_interval(86100);
 +0000 23:55:00
 ```
 
+### [cw_regex_mode(mode STRING)](cw_regex_mode.sqlx)
+Retrieve mode.
+```sql
+SELECT bqutil.fn.cw_regex_mode('i');
+SELECT bqutil.fn.cw_regex_mode('m');
+SELECT bqutil.fn.cw_regex_mode('n);
+
+ig
+mg
+sg
+```
+
 ### [cw_regexp_substr_4(h STRING, n STRING, p INT64, o INT64)](cw_regexp_substr_4.sqlx)
 Takes input haystack string, needle string, position and occurence. It returns needle from the starting position if present with number of occurence time in haystack.
 ```sql
@@ -237,6 +252,14 @@ SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 3);
 Test
 Test
 null
+```
+
+### [cw_regexp_substr_generic(str STRING, regexp STRING, p INT64, o INT64, mode STRING, g INT64)](cw_regexp_substr_generic.sqlx)
+Generic regex based substring function.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_generic('TestStr123456', 'Test', 1, 1, 'g', 0);
+
+Test
 ```
 
 ### [cw_regexp_substr_5(h STRING, n STRING, p INT64, o INT64, mode STRING)](cw_regexp_substr_5.sqlx)
@@ -275,6 +298,9 @@ results:
 ### [cw_map_get(maparray ANY TYPE, inkey ANY TYPE)](cw_map_get.sqlx)
 Given an array of struct and needle, searches an array to find struct whose key-field matches needle, then it returns the value-field in the given struct.
 ```sql
+SELECT bqutil.fn.cw_map_get([STRUCT(1 as key, "ABC" as value)], 1);
+
+ABC
 ```
 
 ### [cw_regexp_instr_2(haystack STRING, needle STRING)](cw_regexp_instr_2.sqlx)
@@ -323,6 +349,14 @@ Takes input haystack string, needle string, starting positin from where search w
 SELECT bqutil.fn.cw_regexp_instr_6('TestStr123456', 'Str', 1, 1, 1, 'g');
 
 8
+```
+
+### [cw_regexp_replace_generic(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING)](cw_regexp_replace_generic.sqlx)
+Generic regexp_replace, which is the 6-args version with regexp_mode already decoded
+```sql
+SELECT bqutil.fn.cw_regexp_replace_generic('TestStr123456', 'Str', '$:#>', 1, 1, 'i');
+
+Test$:#>123456
 ```
 
 ### [cw_regexp_replace_4(haystack STRING, regexp STRING, replacement STRING, offset INT64)](cw_regexp_replace_4.sqlx)
@@ -773,8 +807,14 @@ results:
 ### [cw_ts_pattern_match(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)](cw_ts_pattern_match.sqlx)
 ts_pattern_match is function that returns range of matched pattern in given UID, SID (user session)
 ```sql
-
+SELECT bqutil.fn.cw_ts_pattern_match(['abc', 'abc'], ['abc']);
 ```
+
+results:
+|   Row   |  f0_.pattern_id   |  f0_.start      |  f0_.stop    |
+|---------|-------------------|-----------------|--------------|
+|    1    |       1           |     1           |   1          |
+|         |       2           |     2           |   2          |
 
 ### [cw_error_number(errmsg string)](cw_error_number.sqlx)
 Convert BQ generated error string to a number appropriate for other DBs
