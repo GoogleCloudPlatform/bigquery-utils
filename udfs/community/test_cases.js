@@ -2055,6 +2055,39 @@ generate_udf_test("cw_csvld", [
         expected_output: `CAST(["Test", "123"] AS ARRAY<STRING>)`
     },
 ]);
+generate_udf_test("cw_json_enumerate_array", [
+    {
+        inputs: [
+            `'[{"name":"Cameron"}, {"name":"John"}]'`
+        ],
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS ordinal, '{"name":"Cameron"}' AS jsonvalue), 
+                           STRUCT(CAST(2 AS INT64) AS ordinal, '{"name":"John"}' AS jsonvalue)])`
+    },
+]);
+generate_udf_test("cw_error_number", [
+    {
+        inputs: [
+            `"Error Message"`,
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
+generate_udf_test("cw_error_severity", [
+    {
+        inputs: [
+            `"Error Message"`,
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
+generate_udf_test("cw_error_state", [
+    {
+        inputs: [
+            `"Error Message"`,
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
 generate_udf_test("cw_find_in_list", [
     {
         inputs: [
@@ -2105,5 +2138,15 @@ generate_udf_test("cw_comparable_format_bigint", [
             `ARRAY<INT64>[2, 8]`
         ],
         expected_output: `"p                  2 p                  8"`
+    },
+]);
+generate_udf_test("cw_ts_overlap_buckets", [
+    {
+        inputs: [
+            `CAST(false AS BOOL)`,
+            `([STRUCT(TIMESTAMP("2008-12-25"), TIMESTAMP("2008-12-31")), 
+            STRUCT(TIMESTAMP("2008-12-26"), TIMESTAMP("2008-12-30"))])`
+        ],
+        expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
     },
 ]);

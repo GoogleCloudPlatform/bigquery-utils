@@ -83,6 +83,9 @@ SELECT bqutil.fn.int(1.684)
 * [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
 * [cw_json_enumerate_array](#cw_json_enumerate_arraytext-string)
 * [cw_ts_pattern_match](#cw_ts_pattern_matchevseries-arraystring-regexpParts-arraystring)
+* [cw_error_number](cw_error_numbererrmsg-string)
+* [cw_error_severity](cw_error_severityerrmsg-string)
+* [cw_error_state](cw_error_stateerrmsg-string)
 * [cw_find_in_list](#cw_find_in_listneedle-string-list-string)
 * [cw_map_parse](#cw_map_parsem-string-pd-string-kvd-string)
 * [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
@@ -757,14 +760,44 @@ SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
 ```
 
 ### [cw_json_enumerate_array(text STRING)](cw_json_enumerate_array.sqlx)
+Takes input JSON array and flatten it.
 ```sql
-
+SELECT bqutil.fn.cw_json_enumerate_array('[{"name":"Cameron"}, {"name":"John"}]');
 ```
+results:
+|   Row   |  f0_.ordinal   |  f0_.jsonvalue               |
+|---------|----------------|------------------------------|
+|    1    |       1        |     {"name":"Cameron"}       |
+|         |       2        |     {"name":"John"}          |
 
 ### [cw_ts_pattern_match(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)](cw_ts_pattern_match.sqlx)
 ts_pattern_match is function that returns range of matched pattern in given UID, SID (user session)
 ```sql
 
+```
+
+### [cw_error_number(errmsg string)](cw_error_number.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_number('Error Message');
+
+1
+```
+
+### [cw_error_severity(errmsg string)](cw_error_severity.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_severity('Error Message');
+
+1
+```
+
+### [cw_error_state(errmsg string)](cw_error_state.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_state('Error Message');
+
+1
 ```
 
 ### [cw_find_in_list(needle STRING, list STRING)](cw_find_in_list.sqlx)
@@ -816,11 +849,16 @@ SELECT bqutil.fn.cw_comparable_format_bigint([2, 8]);
 p                  2 p                  8
 ```
 
-### [cw_ts_overlap_buckets()](cw_ts_overlap_buckets.sqlx)
+### [cw_ts_overlap_buckets(includeMeets BOOLEAN, inputs ARRAY<STRUCT<st TIMESTAMP, et TIMESTAMP>>)](cw_ts_overlap_buckets.sqlx)
 Merges two periods together if they overlap and returns unique id for each merged bucket. Coalesces meeting periods as well (not just overlapping periods) if includeMeets is true.
 ```sql
-
+SELECT bqutil.fn.cw_ts_overlap_buckets(false, [STRUCT(TIMESTAMP("2008-12-25"), TIMESTAMP("2008-12-31")), STRUCT(TIMESTAMP("2008-12-26"), TIMESTAMP("2008-12-30"))]);
 ```
+
+results:
+|   Row   |  f0_.bucketNo   |  f0_.st                      |  f0_.et                 |
+|---------|-----------------|------------------------------|-------------------------|
+|    1    |       1         |     2008-12-25 00:00:00 UTC  | 2008-12-31 00:00:00 UTC |
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
 Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
