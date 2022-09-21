@@ -1,0 +1,36 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING, p INT64, o INT64, mode STRING, g INT64) RETURNS STRING
+LANGUAGE js AS """
+  if (str == null || regexp == null || p == null || o == null || mode == null) return null;
+  var r = new RegExp(regexp, mode);
+  var m = str.substring(p - 1).matchAll(r);
+  if (m == null) return null;
+  var co = 1;
+  for(var cm of m) {
+    if (co == o) {
+      if (g < cm.length) {
+        return cm[g];
+      } else {
+        return null;
+      }
+    }
+    co++;
+  }
+  return null;
+""";

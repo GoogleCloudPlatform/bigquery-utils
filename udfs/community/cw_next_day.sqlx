@@ -1,0 +1,35 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument */
+CREATE OR REPLACE FUNCTION ${self()}(date_value DATE, day_name STRING) RETURNS DATE AS (
+    (WITH t AS (SELECT
+       CASE lower(substr(day_name, 1, 2))
+       WHEN 'su' THEN 1
+       WHEN 'mo' THEN 2
+       WHEN 'tu' THEN 3
+       WHEN 'we' THEN 4
+       WHEN 'th' THEN 5
+       WHEN 'fr' THEN 6
+       WHEN 'sa' THEN 7
+       ELSE NULL END AS tgt,
+       extract(dayofweek FROM date_value) AS src
+    ) SELECT CASE WHEN src < tgt
+             THEN date_add(date_value, INTERVAL (tgt - src) DAY)
+             ELSE date_add(date_value, INTERVAL (tgt + 7 - src) DAY) END
+             FROM t)
+);
