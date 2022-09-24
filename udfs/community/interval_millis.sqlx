@@ -16,15 +16,16 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(iv interval)
-returns INT64
+returns FLOAT64
 options(
-  description="""Covnert INTERVAL to seconds"""
+  description="""Covnert INTERVAL to milliseconds"""
 )
 AS (
-     31536000 * EXTRACT(YEAR FROM iv)
-    + 2592000 *  EXTRACT(MONTH FROM iv)
-    +   86400 * EXTRACT(DAY FROM iv)
-    +    3600 * EXTRACT(HOUR FROM iv)
-    +      60 * EXTRACT(MINUTE FROM iv)
-    +           EXTRACT(SECOND FROM iv)
+     31536000000 * EXTRACT(YEAR FROM iv)
+    + 2592000000 *  EXTRACT(MONTH FROM iv)
+    +   86400000 * EXTRACT(DAY FROM iv)
+    +    3600000 * EXTRACT(HOUR FROM iv)
+    +      60000 * EXTRACT(MINUTE FROM iv)
+    +       1000 * EXTRACT(SECOND FROM iv)
+    +              EXTRACT(MILLISECOND FROM iv)
 );

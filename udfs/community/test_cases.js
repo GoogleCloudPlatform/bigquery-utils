@@ -2218,6 +2218,24 @@ generate_udf_test("interval_seconds", [
     inputs: [
       `INTERVAL '-1 00:00:00' DAY TO SECOND`,
     ],
-    expected_output: `CAST(-86400 AS FLOAT64)`
+    expected_output: `CAST(-86400 AS INT64)`
+  },
+]);
+
+generate_udf_test("interval_millis", [
+  {
+    inputs: [
+      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+    ],
+    expected_output: `CAST(-86400000 AS INT64)`
+  },
+]);
+
+generate_udf_test("interval_micros", [
+  {
+    inputs: [
+      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+    ],
+    expected_output: `CAST(-86400000000 AS INT64)`
   },
 ]);
