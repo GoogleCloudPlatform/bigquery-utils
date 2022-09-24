@@ -2213,3 +2213,11 @@ generate_udf_test("cw_ts_overlap_buckets", [
         expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
     },
 ]);
+generate_udf_test("interval_seconds", [
+  {
+    inputs: [
+      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+    ],
+    expected_output: `CAST(-86400 AS FLOAT64)`
+  },
+]);
