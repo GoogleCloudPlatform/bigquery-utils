@@ -1,5 +1,5 @@
 # BigQuery Utils
-new words
+
 BigQuery is a serverless, highly-scalable, and cost-effective cloud data
 warehouse with an in-memory BI Engine and machine learning built in. This
 repository provides useful utilities to assist you in migration and usage of
