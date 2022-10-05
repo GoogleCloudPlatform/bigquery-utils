@@ -1657,6 +1657,32 @@ generate_udf_test("cw_td_nvp", [
         expected_output: `"orange chicken"`
     },
 ]);
+generate_udf_test("cw_convert_base", [
+    {
+        inputs: [
+            `"001101011"`,
+            `CAST(2 AS INT64)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `"107"`
+    },
+    {
+        inputs: [
+            `"A"`,
+            `CAST(16 AS INT64)`,
+            `CAST(8 AS INT64)`
+        ],
+        expected_output: `"12"`
+    },
+    {
+        inputs: [
+            `"17"`,
+            `CAST(16 AS INT64)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `"23"`
+    },
+])
 generate_udf_test("cw_from_base", [
     {
         inputs: [
@@ -2239,4 +2265,3 @@ generate_udf_test("interval_micros", [
     expected_output: `CAST(-86400000000 AS INT64)`
   },
 ]);
-
