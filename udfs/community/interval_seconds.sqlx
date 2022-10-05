@@ -15,9 +15,9 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(iv interval)
-returns INT64
-options(
+CREATE OR REPLACE FUNCTION ${self()}(iv INTERVAL)
+RETURNS INT64
+OPTIONS(
   description="""Covnert INTERVAL to seconds"""
 )
 AS (
