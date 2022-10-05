@@ -2216,7 +2216,7 @@ generate_udf_test("cw_ts_overlap_buckets", [
 generate_udf_test("interval_seconds", [
   {
     inputs: [
-      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+      `INTERVAL -1 DAY`,
     ],
     expected_output: `CAST(-86400 AS INT64)`
   },
@@ -2225,7 +2225,7 @@ generate_udf_test("interval_seconds", [
 generate_udf_test("interval_millis", [
   {
     inputs: [
-      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+      `INTERVAL -1 DAY`,
     ],
     expected_output: `CAST(-86400000 AS INT64)`
   },
@@ -2234,8 +2234,9 @@ generate_udf_test("interval_millis", [
 generate_udf_test("interval_micros", [
   {
     inputs: [
-      `INTERVAL '-1 00:00:00' DAY TO SECOND`,
+      `INTERVAL -1 DAY`,
     ],
     expected_output: `CAST(-86400000000 AS INT64)`
   },
 ]);
+
