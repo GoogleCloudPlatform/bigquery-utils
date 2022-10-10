@@ -9,9 +9,9 @@ import time
 import base64
 
 # id of project used for BQ storage
-BQ_DATA_PROJECT_ID = "pso-dev-whaite"
+BQ_DATA_PROJECT_ID = ""
 # id of project used for BQ compute
-BQ_JOBS_PROJECT_ID = "pso-dev-whaite"
+BQ_JOBS_PROJECT_ID = ""
 
 
 def get_bq_client():
@@ -46,9 +46,9 @@ def hello_pubsub(event, context):
     """
     event should containa payload like:
     {
-        'source_project_id': 'pso-dev-whaite', 
-        'source_dataset_name': 'DATASET_1', 
-        'source_table_name': 'test_table_1', 
+        'source_project_id': 'my-project', 
+        'source_dataset_name': 'my-dataset', 
+        'source_table_name': 'my-table', 
         'snapshot_timestamp': 1665426373054, 
         'seconds_before_expiration': 2592000
     }
