@@ -43,6 +43,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_array_distinct](#cw_array_distinctarr-any-type)
 * [cw_next_day](#cw_next_daydate_value-date-day_name-string)
 * [cw_td_nvp](#cw_td_nvphaystack-string-needle-string-pairsep-string-valuesep-string-occurence-int64)
+* [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
 * [cw_from_base](#cw_from_basenumber-string-base-int64)
 * [cw_to_base](#cw_to_basenumber-int64-base-int64)
 * [cw_array_overlap](#cw_array_overlapx-any-type-y-any-type)
@@ -443,6 +444,18 @@ SELECT bqutil.fn.cw_td_nvp('entree:orange chicken#entree2:honey salmon', 'entree
 orange chicken
 ```
 
+### [cw_convert_base(number STRING, from_base INT64, to_base INT64)](cw_from_base.sqlx)
+Convert string from given base to another base
+
+```sql
+SELECT bqutil.fn.cw_convert_base('001101011', 2, 10);
+SELECT bqutil.fn.cw_convert_base('A', 16, 2);
+
+107
+1010
+```
+
+
 ### [cw_from_base(number STRING, base INT64)](cw_from_base.sqlx)
 Convert string from given base to decimal
 ```sql
@@ -454,7 +467,7 @@ SELECT bqutil.fn.cw_from_base('A', 16);
 ```
 
 ### [cw_to_base(number INT64, base INT64)](cw_to_base.sqlx)
-Convert string from given base to decimal
+Convert string from decimal to given base
 ```sql
 SELECT bqutil.fn.cw_to_base(5, 2);
 SELECT bqutil.fn.cw_to_base(10, 16);
