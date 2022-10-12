@@ -8,11 +8,12 @@ import json
 import logging
 import time
 import base64
+import os
 
 # id of project used for BQ storage
-BQ_DATA_PROJECT_ID = ""
+BQ_DATA_PROJECT_ID = os.environ.get('BQ_DATA_PROJECT_ID', 'Specified environment variable is not set.')
 # id of project used for BQ compute
-BQ_JOBS_PROJECT_ID = ""
+BQ_JOBS_PROJECT_ID = os.environ.get('BQ_JOBS_PROJECT_ID', 'Specified environment variable is not set.')
 
 
 def get_snapshot_timestamp(message):
@@ -30,9 +31,10 @@ def get_bq_client():
     client_info = http_client_info.ClientInfo(user_agent=f"google-pso-tool/bq-snapshots/0.0.1")
     client = bigquery.Client(project=BQ_JOBS_PROJECT_ID, client_info=client_info)
     return client
+client = get_bq_client()
 
 
-def create_snapshot(client, message):
+def create_snapshot(message):
     target_dataset_name = message['target_dataset_name']
     seconds_before_expiration = message['seconds_before_expiration']
 
@@ -58,8 +60,8 @@ def main(event, context):
     """
     event should containa payload like:
     {
-        "source_dataset_name":"test_dataset",
-        "target_dataset_name":"snapshot_dataset",
+        "source_dataset_name":"DATASET_1",
+        "target_dataset_name":"SNAPSHOT_DATASET_1",
         "crontab_format":"0 * * * *",
         "seconds_before_expiration":604800,
         "table_name": "project.dataset.table"
@@ -69,7 +71,7 @@ def main(event, context):
     message = json.loads(message)
     
     client = get_bq_client()
-    job = create_snapshot(client, message)
+    job = create_snapshot(message)
 
     while True:
         if job.done():

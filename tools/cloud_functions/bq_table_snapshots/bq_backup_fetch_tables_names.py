@@ -4,14 +4,15 @@ from google.cloud import bigquery
 from google.cloud import pubsub_v1
 from google.api_core import client_info as http_client_info
 import base64
+import os
 
 TABLE_TYPE_PHYSICAL_TABLE = "TABLE"
 # id of project used for BQ storage
-DATA_PROJECT_ID = ""
+DATA_PROJECT_ID = os.environ.get('DATA_PROJECT_ID', 'Specified environment variable is not set.')
 # id of project with P/S topic
-PUBSUB_PROJECT_ID = ""
+PUBSUB_PROJECT_ID = os.environ.get('PUBSUB_PROJECT_ID', 'Specified environment variable is not set.')
 # name of P/S topic where this code will publish to
-TABLE_NAME_PUBSUB_TOPIC_ID = "bq-backup-table-names"
+TABLE_NAME_PUBSUB_TOPIC_ID = os.environ.get('TABLE_NAME_PUBSUB_TOPIC_ID', 'Specified environment variable is not set.')
 
 
 def filter_tables(tables, request_json):
@@ -39,8 +40,8 @@ def main(event, context):
     """
     request should containa payload like:
     {
-        "source_dataset_name":"backup_test",
-        "target_dataset_name":"snap_test_dly",
+        "source_dataset_name":"DATASET_1",
+        "target_dataset_name":"SNAPSHOT_DATASET_1",
         "crontab_format":"10 * * * *",
         "seconds_before_expiration":604800,
         "tables_to_include_list":[],
