@@ -15,12 +15,12 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Similar to hive/spark CONV(string, int, int) */
+/* Convert string from given base to another base. Similar to hive/spark CONV(string, int, int) */
 CREATE OR REPLACE FUNCTION ${self()}(value STRING, from_base INT64, to_base INT64)
   RETURNS STRING
   LANGUAGE js
   OPTIONS(
-      description="""Similar to hive/spark CONV(string, int, int)"""
+      description="""Convert string from given base to another base. Similar to hive/spark CONV(string, int, int)"""
   )
   AS """
   return parseInt(value, from_base).toString(to_base);
