@@ -1657,6 +1657,32 @@ generate_udf_test("cw_td_nvp", [
         expected_output: `"orange chicken"`
     },
 ]);
+generate_udf_test("cw_convert_base", [
+    {
+        inputs: [
+            `"001101011"`,
+            `CAST(2 AS INT64)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `"107"`
+    },
+    {
+        inputs: [
+            `"A"`,
+            `CAST(16 AS INT64)`,
+            `CAST(8 AS INT64)`
+        ],
+        expected_output: `"12"`
+    },
+    {
+        inputs: [
+            `"17"`,
+            `CAST(16 AS INT64)`,
+            `CAST(10 AS INT64)`
+        ],
+        expected_output: `"23"`
+    },
+])
 generate_udf_test("cw_from_base", [
     {
         inputs: [
@@ -2212,4 +2238,30 @@ generate_udf_test("cw_ts_overlap_buckets", [
         ],
         expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
     },
+]);
+generate_udf_test("interval_seconds", [
+  {
+    inputs: [
+      `INTERVAL -1 DAY`,
+    ],
+    expected_output: `CAST(-86400 AS INT64)`
+  },
+]);
+
+generate_udf_test("interval_millis", [
+  {
+    inputs: [
+      `INTERVAL -1 DAY`,
+    ],
+    expected_output: `CAST(-86400000 AS INT64)`
+  },
+]);
+
+generate_udf_test("interval_micros", [
+  {
+    inputs: [
+      `INTERVAL -1 DAY`,
+    ],
+    expected_output: `CAST(-86400000000 AS INT64)`
+  },
 ]);
