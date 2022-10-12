@@ -27,13 +27,6 @@ def get_snapshot_timestamp(message):
     return prev_cron_interval_timestamp 
 
 
-def get_bq_client():
-    client_info = http_client_info.ClientInfo(user_agent=f"google-pso-tool/bq-snapshots/0.0.1")
-    client = bigquery.Client(project=BQ_JOBS_PROJECT_ID, client_info=client_info)
-    return client
-client = get_bq_client()
-
-
 def create_snapshot(message):
     target_dataset_name = message['target_dataset_name']
     seconds_before_expiration = message['seconds_before_expiration']
@@ -55,6 +48,14 @@ def create_snapshot(message):
     logging.info(f"Creating snapshot for table: {snapshot_name}")
     return job
 
+def get_bq_client():
+    client_info = http_client_info.ClientInfo(user_agent=f"google-pso-tool/bq-snapshots/0.0.1")
+    client = bigquery.Client(project=BQ_JOBS_PROJECT_ID, client_info=client_info)
+    return client
+
+
+client = get_bq_client()
+
 
 def main(event, context):
     """
@@ -70,7 +71,6 @@ def main(event, context):
     message = base64.b64decode(event['data']).decode('utf-8')
     message = json.loads(message)
     
-    client = get_bq_client()
     job = create_snapshot(message)
 
     while True:

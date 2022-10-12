@@ -36,6 +36,9 @@ def get_bq_client():
     return client
 
 
+client = get_bq_client()
+
+
 def main(event, context):
     """
     request should containa payload like:
@@ -57,7 +60,6 @@ def main(event, context):
     publisher = pubsub_v1.PublisherClient()
     table_name_topic_path = publisher.topic_path(PUBSUB_PROJECT_ID, TABLE_NAME_PUBSUB_TOPIC_ID)
 
-    client = get_bq_client()
     tables = client.list_tables(source_dataset)
     tables = filter_tables(tables, request_json)
     
