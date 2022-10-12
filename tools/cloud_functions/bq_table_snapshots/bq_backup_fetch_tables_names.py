@@ -1,0 +1,69 @@
+import logging
+import json
+from google.cloud import bigquery
+from google.cloud import pubsub_v1
+from google.api_core import client_info as http_client_info
+import base64
+
+TABLE_TYPE_PHYSICAL_TABLE = "TABLE"
+# id of project used for BQ storage
+DATA_PROJECT_ID = ""
+# id of project with P/S topic
+PUBSUB_PROJECT_ID = ""
+# name of P/S topic where this code will publish to
+TABLE_NAME_PUBSUB_TOPIC_ID = "bq-backup-table-names"
+
+
+def filter_tables(tables, request_json):
+    tables_to_include_list = request_json.get("tables_to_include_list", [])
+    tables_to_exclude_list = request_json.get("tables_to_exclude_list", [])
+
+    tables = [x for x in tables if x.table_type == TABLE_TYPE_PHYSICAL_TABLE]
+    if len(tables_to_include_list) > 0:
+        tables = [x for x in tables if x.table_id in tables_to_include_list]
+    if len(tables_to_exclude_list) > 0:
+        tables = [x for x in tables if x.table_id not in tables_to_exclude_list]
+    
+    tables = [f"{x.project}.{x.dataset_id}.{x.table_id}" for x in tables]
+
+    return tables 
+
+
+def get_bq_client():
+    client_info = http_client_info.ClientInfo(user_agent=f"google-pso-tool/bq-snapshots/0.0.1")
+    client = bigquery.Client(project=DATA_PROJECT_ID, client_info=client_info)
+    return client
+
+
+def main(event, context):
+    """
+    request should containa payload like:
+    {
+        "source_dataset_name":"backup_test",
+        "target_dataset_name":"snap_test_dly",
+        "crontab_format":"10 * * * *",
+        "seconds_before_expiration":604800,
+        "tables_to_include_list":[],
+        "tables_to_exclude_list":[] 
+    }
+    tables_to_include_list and tables_to_exclude_list are optional
+    """
+    message = base64.b64decode(event['data']).decode('utf-8')
+    request_json = json.loads(message)
+
+    source_dataset = request_json['source_dataset_name']
+
+    publisher = pubsub_v1.PublisherClient()
+    table_name_topic_path = publisher.topic_path(PUBSUB_PROJECT_ID, TABLE_NAME_PUBSUB_TOPIC_ID)
+
+    client = get_bq_client()
+    tables = client.list_tables(source_dataset)
+    tables = filter_tables(tables, request_json)
+    
+    for table_name in tables:
+        logging.info(f"sending Pub/Sub message for table: {table_name}")
+        request_json['table_name'] = table_name
+        data = json.dumps(request_json)
+        publisher.publish(table_name_topic_path, data.encode("utf-8"))
+
+    return "ok"

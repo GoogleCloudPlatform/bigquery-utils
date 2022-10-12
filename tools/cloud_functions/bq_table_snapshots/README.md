@@ -1,19 +1,28 @@
-# Requirements
-This solutions automates and schedules the creation of [BigQuery Table Snapshots](https://cloud.google.com/bigquery/docs/table-snapshots-intro) at dataset and project level.
+# Automate BigQuery Snapshots at Dataset Level
 
-# Architecture
-![text](./arch_diagram.png)
+This solution schedules and automates [BigQuery Snapshot](https://cloud.google.com/bigquery/docs/table-snapshots-intro) creation at dataset level, helping create a single point in time picture of our data at scale.  
 
 
-- **bq-snap-start-process-scheduler**: responsible of triggering the process based on the provided schedule
-- **bq-snap-start-process-topic**: will trigger the bq_snap_fetch_tables_names cloud function
-- **bq_snap_fetch_tables_names**: this cloud function will fetch all the table names for which snapshots must be created. It contains fields that allow the user to specify what datasets and tables to include/exclude. This function will send one message to the bq-snap-table-names-topic for each table
-- **bq-snap-table-names-topic**: responsible for triggering bq_snaps_create_snapshots cloud function
-- **bq_snap_create_snapshots**: this cloud function will create the snapshot based on the triggering message
+## Solution architecture
+![alt text](./architecture_diagram.png)
 
+* dataset_1 monthly_snapshot_scheduler will run monthly and trigger the snapshot creation process for dataset_1. The Pub/Sub message body will contain parameters for the snapshot creation, as shown in the example below:
+ 
+```
+{
+    "source_dataset_name":"Dataset_1",
+    "target_dataset_name":"DATASET_1_MONTHLY_NAME",
+    "crontab_format":"10 * * * *",
+    "seconds_before_expiration":2592000,
+    "tables_to_include_list":[],
+    "tables_to_exclude_list":[] 
+}
+```
 
-# Considerations
-- **Target dataset name**: the target dataset name will be constructed by prefixing `SNAPSHOT_` to the source dataset name. For example all tables comming from `DATASET_1` will have thier snapshots written to `SNAPSHOT_DATASET_1`. **NOTE** `SNAPSHOT_DATASET_1` **must** exist before execution, the cloud function **will not** create it
-- **Snapshot name**: snapshot name will be the same of the source table with the current date as prefix. For example `my-project.DATASET_1.table_1` might have its snapshot written to `my-project.SNAPSHOT_DATASET_1.table_1_20220101`
-- **Snapshot duration**: snapshots can optionally be set to expire after a given date. This solution by default sets the `SECONDS_BEFORE_EXPIRATION` in `bq_snap_fetch_tables_names` to 30 days
-- **Snapshot timestamp**: to make sure all snapshots in a given execution represent the same point in time, snapshots are created for each table as it was at the moment when `bq_snap_fetch_tables_names` was invoked
+ 
+* the **bq_snapshots_list_tables_to_backup_cf** cloud function will fetch all the table names in source_dataset_name. It will then apply filters based on tables_to_include_list and tables_to_exclude_list to determine the tables in scope. Finally, it will submit one Pub/Sub message per table.
+
+* the **bq_snapshot_create_snapshot_cf** cloud function will submit a BigQuery job to create a snapshot for each table in scope. This cloud function will suffix the snapshot name with the snapshot datetime to guarantee a unique name. It will also calculate and set the expiration time of the snapshot based on seconds_before_expiration. Finally, it will determine the snapshot time based on crontab_format. 
+
+## The crontab_format field
+If dataset_1 has 500 tables, 500 Pub/Sub messages are sent, and 500 Cloud Function invocations are performed. If the Cloud Function used the current time when it creates the snapshots then these 500 snapshots will represent different points in time. To avoid this the Cloud Function will create the snapshots for the table as they were when the Cloud Scheduler job (dataset_1 monthly_snapshot_scheduler) was triggered. To achieve this the Cloud Function will calculate the previous interval based on **crontab_format**.
