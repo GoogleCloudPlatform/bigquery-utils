@@ -153,6 +153,10 @@ generate_udf_test("typeof", [
         inputs: [`""`],
         expected_output: `"STRING"`
     },
+    {
+        inputs: [`'string containing " double-quote'`],
+        expected_output: `"STRING"`
+    },
 ]);
 generate_udf_test("typeof", [
     {
