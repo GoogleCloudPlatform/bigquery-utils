@@ -1,0 +1,4 @@
+google-cloud-datacatalog==3.9.1
+functions-framework
+flask
+google-cloud-error-reporting
