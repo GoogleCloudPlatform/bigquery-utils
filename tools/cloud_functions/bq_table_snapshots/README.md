@@ -45,4 +45,8 @@ The following environemnt variables must be set:
 If DATASET_1 has 500 tables, 500 Pub/Sub messages are sent, and 500 Cloud Function invocations are performed. If the Cloud Function used the current time when it creates the snapshots then these 500 snapshots will represent different points in time. To avoid this the Cloud Function will create the snapshots for the table as they were when the Cloud Scheduler job (bq-snap-start-process) was triggered. To achieve this the Cloud Function will calculate the previous interval based on **crontab_format**.
 
 
-
+## Deployment
+```
+cd terraform
+terraform apply
+```
