@@ -38,16 +38,6 @@ bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME
 
 Within properties you'll find *serviceAccountId* which will have the service ID you'll need in a subsequent step.
 
-### Granting the service account invoker permissions on the functions
-
-Grant the service account obtained above permissions to invoke the functions.
-* project - the project where your external connection was created
-* service_account - the service account obtained above
-```
-gcloud projects add-iam-policy-binding $PROJECT \
-    --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
-```
-
 ### Deploying your Cloud Function
 
 [More information about deploying your cloud function can be found here.](https://cloud.google.com/functions/docs/deploy)
@@ -59,6 +49,16 @@ Snippet provided below for brevity.
 ```
 gcloud functions deploy $CF_NAME \
 --project=$PROJECT --runtime python39 --trigger-http
+```
+
+### Granting the service account invoker permissions on the functions
+
+Grant the service account obtained above permissions to invoke the functions.
+* project - the project where your external connection was created
+* cf_name - the name of your cloud function 
+* service_account - the service account obtained above
+```
+gcloud --project=$PROJECT functions add-iam-policy-binding $CF_NAME --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
 ```
 
 ### Obtaining the full Cloud Function endpoint
