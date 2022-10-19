@@ -77,6 +77,9 @@ Grant the service account obtained above permissions to invoke the functions.
 * project - the project where your external connection was created
 * cf_name - the name of your cloud function 
 * service_account - the service account obtained above
+
+**_NOTE:_** For the below command you will need to have jq installed. 
+
 ```
 SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME | jq '.cloudResource.serviceAccountId' | tr -d '"')
 gcloud --project=$PROJECT functions add-iam-policy-binding $CF_NAME --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
