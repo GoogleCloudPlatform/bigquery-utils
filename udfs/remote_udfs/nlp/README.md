@@ -28,9 +28,12 @@ bq mk --connection --display_name=\'$DISPLAY_NAME\' --connection_type=CLOUD_RESO
 You need to grant the connection service account to be able to invoke functions.  
 To do this, first obtain the service account. 
 * location - the location for the external connection in BigQuery
+* project - the project where your external connection was created
+* connection_name - the name (or friendly/display name) of the external connection
 
 ```
 bq ls --connection --location=$LOCATION
+bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME
 ```
 
 Within properties you'll find *serviceAccountId* which will have the service ID you'll need in a subsequent step.
