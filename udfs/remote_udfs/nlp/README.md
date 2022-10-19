@@ -78,6 +78,7 @@ Grant the service account obtained above permissions to invoke the functions.
 * cf_name - the name of your cloud function 
 * service_account - the service account obtained above
 ```
+SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME | jq '.cloudResource.serviceAccountId' | tr -d '"')
 gcloud --project=$PROJECT functions add-iam-policy-binding $CF_NAME --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
 ```
 
@@ -106,9 +107,11 @@ The input parameters for the helper script above need to be in order:
 * location - the location where your BigQuery dataset is 
 * connection_name - the name of the connection 
 * endpoint - the full endpoint you obtained above
+* cf_name - the name of the cloud function deployed
 
 ```
-sh create_bq_function.sh $PROJECT $DATASET $LOCATION $CONNECTION_NAME %endpoint%
+ENDPOINT=$(gcloud functions describe $CF_NAME --format="value(httpsTrigger.url)")
+sh create_bq_function.sh $PROJECT $DATASET $LOCATION $CONNECTION_NAME $ENDPOINT
 ```
 
 ### Running it on BigQuery
