@@ -10,6 +10,25 @@ To run this example, you will need the following APIs enabled:
 
 ## Running the example
 
+### Setting the environment variables 
+
+Replace the various environment variables below with your desired values.
+```
+CONNECTION_NAME=%Functional BigQuery Connection name% 
+DISPLAY_NAME=%Friendly or Display BigQuery Connection name%
+PROJECT=%Your project name% 
+LOCATION=%Your BigQuery dataset location% 
+CF_NAME=%Your Cloud Function name%
+ENTRY_POINT=%Your Cloud Function Entry Point%
+DATASET=%Your BigQuery Dataset to deploy to%
+```
+
+### Navigate to the remote_udfs directory
+Change to the remote_udfs directory after cloning the repo. 
+```
+cd bigquery-utils/udfs/remote_udfs/ 
+```
+
 ### Creating your BigQuery connection 
 
 To create your BigQuery connection, you need to specify the following:
@@ -32,7 +51,6 @@ To do this, first obtain the service account.
 * connection_name - the name (or friendly/display name) of the external connection
 
 ```
-bq ls --connection --location=$LOCATION
 bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME
 ```
 
@@ -42,13 +60,15 @@ Within properties you'll find *serviceAccountId* which will have the service ID 
 
 [More information about deploying your cloud function can be found here.](https://cloud.google.com/functions/docs/deploy)
 
-Snippet provided below for brevity.
-* cf_name - the name of the cloud function, this should match the entry function in your code (in the example it's *remote_vertex_ai*)
+Snippet provided below for brevity.  
+It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.
+
+* cf_name - the name of the cloud function
 * project - the project the cloud function is deployed to 
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
 gcloud functions deploy $CF_NAME \
---project=$PROJECT --runtime python39 --trigger-http
+--project=$PROJECT --runtime=python39 --entry-point=$ENTRY_POINT --source=call_nlp --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions
@@ -88,7 +108,7 @@ The input parameters for the helper script above need to be in order:
 * endpoint - the full endpoint you obtained above
 
 ```
-sh create_bq_function.sh project dataset location connection_name endpoint
+sh create_bq_function.sh $PROJECT $DATASET $LOCATION $CONNECTION_NAME %endpoint%
 ```
 
 ### Running it on BigQuery
