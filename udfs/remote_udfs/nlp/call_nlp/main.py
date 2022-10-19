@@ -14,6 +14,10 @@
 
 import json
 from google.cloud import language_v1
+from google.api_core.retry import Retry
+
+# https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
+client = language_v1.LanguageServiceClient()
 
 def remote_vertex_ai(request):
     '''
@@ -29,14 +33,13 @@ def remote_vertex_ai(request):
     if mode == "call_nlp":
         return call_nlp(calls)
 
-    return json.dumps({"Error in Request": request_json}), 400
+    return json.dumps({"errorMessage": f"Not supported 'mode' in user_defined_context: {mode}"}), 400
 
 
 def call_nlp(calls):
     try:
         return_value = []
         # Create the client to connecto the Language Service.
-        client = language_v1.LanguageServiceClient()
         for call in calls:
             # Retreive the text to be analyzed
             text = call[0]
@@ -48,7 +51,9 @@ def call_nlp(calls):
             # This returns a sentiment analysis. 
             # Append the sentiment to be returned. 
             sentiment = client.analyze_sentiment(
-                request={"document": document}
+                request={"document": document},
+                # Retry default values: https://github.com/googleapis/python-api-core/blob/main/google/api_core/retry.py#L72
+                retry=Retry()
             ).document_sentiment
             return_value.append(str(sentiment.score))
             
