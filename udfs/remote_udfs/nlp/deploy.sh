@@ -13,7 +13,7 @@ bq mk --connection \
     remote_connection
 
 echo "Deploying the Cloud Function."
-gcloud functions deploy sampleCF \
+gcloud functions deploy analyze-sentiment \
     --project="${PROJECT}" \
     --runtime=python39 \
     --entry-point=remote_vertex_ai \
@@ -22,15 +22,15 @@ gcloud functions deploy sampleCF \
 
 echo "Setting the service account."
 SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
-gcloud functions add-iam-policy-binding sampleCF \
+gcloud functions add-iam-policy-binding analyze-sentiment \
     --project="${PROJECT}" \
     --member=serviceAccount:"${SERVICE_ACCOUNT}" \
     --role=roles/cloudfunctions.invoker
 
 echo "Creating the BigQuery UDF."
-ENDPOINT=$(gcloud functions describe sampleCF --format="value(httpsTrigger.url)")
+ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 NLP_QUERY="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.call_nlp\` (x STRING)
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(

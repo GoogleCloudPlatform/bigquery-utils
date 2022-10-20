@@ -47,7 +47,7 @@ We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Clo
 * project - the project the cloud function is deployed to 
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
-gcloud functions deploy sampleCF \
+gcloud functions deploy analyze-sentiment \
 --project=$PROJECT --runtime=python39 --entry-point=remote_vertex_ai --source=call_nlp --trigger-http
 ```
 
@@ -66,7 +66,7 @@ Then apply the cloudfunctions.invoker role to the service account for the functi
 
 ```
 SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
-gcloud --project=$PROJECT functions add-iam-policy-binding sampleCF --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
+gcloud --project=$PROJECT functions add-iam-policy-binding analyze-sentiment --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
 ```
 
 ### Creating your BigQuery UDF on BigQuery
@@ -81,7 +81,7 @@ The input parameters for the helper script above need to be in order:
 * endpoint - the full endpoint of the cloud function invocation
 
 ```
-ENDPOINT=$(gcloud functions describe sampleCF --format="value(httpsTrigger.url)")
+ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 
 sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.remote_connection $ENDPOINT
 ```
@@ -105,7 +105,7 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-select `%your_project_id%.%your_dataset_id%.%function_name%`("This is really awesome!");
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment`("This is really awesome!");
 ```
 
 It should return a positive float value (as in greater than 0) as a response.
