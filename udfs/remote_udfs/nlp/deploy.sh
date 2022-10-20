@@ -29,7 +29,7 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 
 echo "Creating the BigQuery UDF."
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
-NLP_QUERY="""
+REMOTE_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
@@ -42,4 +42,4 @@ OPTIONS(
 bq query \
     --location="$LOCATION" \
     --use_legacy_sql=false \
-    "${NLP_QUERY}"
+    "${REMOTE_UDF_DDL}"
