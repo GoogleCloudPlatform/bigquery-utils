@@ -36,6 +36,7 @@ def analyze_sentiment(request):
         for call in calls:
             # Retreive the text to be analyzed
             text = call[0]
+            type = language_v1.Document.Type.TYPE_UNSPECIFIED
             # Prepare the Document object to be sent to the service.
             if document_type == "PLAIN_TEXT":
                 type = language_v1.Document.Type.PLAIN_TEXT

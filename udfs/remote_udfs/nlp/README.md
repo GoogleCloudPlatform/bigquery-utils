@@ -33,8 +33,12 @@ cd bigquery-utils/udfs/remote_udfs/nlp
 Run the following command to create your BigQuery external connection:
 
 ```
-bq mk --connection --display_name=\'remote_connection\' --connection_type=CLOUD_RESOURCE \
-      --project_id=$PROJECT --location=$LOCATION remote_connection
+bq mk --connection \
+    --display_name=\'remote_connection\' \
+    --connection_type=CLOUD_RESOURCE \
+    --project_id=$PROJECT \
+    --location=$LOCATION \
+    remote_connection
 ```
 
 ### Deploying your Cloud Function
@@ -47,7 +51,12 @@ We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Clo
 Run the following command to deploy your Cloud Function:
 ```
 gcloud functions deploy analyze-sentiment \
---project=$PROJECT --runtime=python39 --entry-point=analyze_sentiment --region=$LOCATION --source=call_nlp --trigger-http
+    --project=$PROJECT \
+    --runtime=python39 \
+    --entry-point=analyze_sentiment \
+    --region=$LOCATION \
+    --source=call_nlp \
+    --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions
@@ -58,10 +67,16 @@ Run the following commands to grant the service account obtained above permissio
 
 ```
 SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
-gcloud --project=$PROJECT functions add-iam-policy-binding analyze-sentiment --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
+gcloud functions add-iam-policy-binding analyze-sentiment \
+    --project=$PROJECT \
+    --member=serviceAccount:$SERVICE_ACCOUNT \
+    --role=roles/cloudfunctions.invoker
 ```
 
 ### Creating your BigQuery UDF on BigQuery
+
+You are able to provide different context to the Cloud Function as key value pairs.
+[You can read more about it here.](https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#providing_user_defined_context)
 
 Run the following DDL statements to create two  remote UDFs in BigQuery, one which analyzes sentiment of plain text and another which analyzes sentiment of html:
 
@@ -75,7 +90,7 @@ REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
-);
+);"""
 
 ANALYZE_HTML_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_html\` (x STRING)

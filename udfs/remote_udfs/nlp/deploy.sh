@@ -30,17 +30,33 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 
 echo "Creating the BigQuery UDF."
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
-REMOTE_UDF_DDL="""
+
+
+ANALYZE_PLAIN_TEXT_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
+);"""
+
+ANALYZE_HTML_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_html\` (x STRING)
+RETURNS STRING
+REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
+OPTIONS(
+  endpoint = '${ENDPOINT}',
+  user_defined_context = [(\"documentType\",\"HTML\")]
 );
 """
 
 bq query \
-    --location="$LOCATION" \
+    --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${REMOTE_UDF_DDL}"
+    "${ANALYZE_PLAIN_TEXT_UDF_DDL}"
+    
+bq query \
+    --location="${LOCATION}" \
+    --use_legacy_sql=false \
+    "${ANALYZE_HTML_UDF_DDL}"    
