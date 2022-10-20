@@ -69,7 +69,8 @@ gcloud functions deploy analyze-sentiment \
 ### Granting the service account invoker permissions on the functions
 
 
-**_NOTE:_** For the below commands you will need to have jq installed. 
+**_NOTE:_** For the below commands you will need to have jq installed.  
+
 Run the following commands to grant the service account obtained above permissions to invoke your Cloud Function:
 
 ```
@@ -80,7 +81,7 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
     --role=roles/cloudfunctions.invoker
 ```
 
-### Creating your BigQuery UDF on BigQuery
+### Creating your BigQuery UDF
 
 You are able to provide different context to the Cloud Function as key value pairs.
 [You can read more about it here.](https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#providing_user_defined_context)
@@ -126,11 +127,6 @@ The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previou
 **_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery LOCATION. 
 
 ```
-PROJECT=your_project_id
-LOCATION=your_bigquery_dataset_location
-DATASET=your_bigquery_dataset_id
-CLOUD_FUNCTION_REGION=your_cloud_function_region
-
 sh deploy.sh "${PROJECT}" "${LOCATION}" "${DATASET}" "${CLOUD_FUNCTION_REGION}"
 ```
 

@@ -63,4 +63,3 @@ bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
     "${ANALYZE_es_UDF_DDL}"
-    "${ANALYZE_es_UDF_DDL}" 
