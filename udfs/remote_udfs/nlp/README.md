@@ -14,11 +14,11 @@ To run this example, you will need the following APIs enabled:
 
 Replace the various environment variables below with your desired values.  
 
-**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery REGION. 
+**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery LOCATION. 
 
 ```
 PROJECT=your_project_id
-REGION=your_bigquery_dataset_region
+LOCATION=your_bigquery_dataset_LOCATION
 DATASET=your_bigquery_dataaset_id
 CLOUD_FUNCTION_REGION=your_cloud_function_region
 ```
@@ -29,6 +29,12 @@ Change to the remote_udfs directory after cloning the repo.
 cd bigquery-utils/udfs/remote_udfs/nlp
 ```
 
+### Create your BigQuery dataset
+Run the following command to create your BigQuery dataset:
+```
+bq --location="${LOCATION}" mk -d --project_id="${PROJECT}" "${DATASET}"
+```
+
 ### Creating your BigQuery connection 
 
 Run the following command to create your BigQuery external connection:
@@ -37,8 +43,8 @@ Run the following command to create your BigQuery external connection:
 bq mk --connection \
     --display_name=\'remote_connection\' \
     --connection_type=CLOUD_RESOURCE \
-    --project_id=$PROJECT \
-    --location=$REGION \
+    --project_id="${PROJECT}" \
+    --location="${LOCATION}" \
     remote_connection
 ```
 
@@ -52,10 +58,10 @@ We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Clo
 Run the following command to deploy your Cloud Function:
 ```
 gcloud functions deploy analyze-sentiment \
-    --project=$PROJECT \
+    --project="${PROJECT}" \
     --runtime=python39 \
     --entry-point=analyze_sentiment \
-    --region=$CLOUD_FUNCTION_REGION \
+    --region="${CLOUD_FUNCTION_REGION}" \
     --source=call_nlp \
     --trigger-http
 ```
@@ -67,10 +73,10 @@ gcloud functions deploy analyze-sentiment \
 Run the following commands to grant the service account obtained above permissions to invoke your Cloud Function:
 
 ```
-SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$REGION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
+SERVICE_ACCOUNT=$(bq show --connection --project_id="${PROJECT}" --location="${LOCATION}" --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
 gcloud functions add-iam-policy-binding analyze-sentiment \
-    --project=$PROJECT \
-    --member=serviceAccount:$SERVICE_ACCOUNT \
+    --project="${PROJECT}" \
+    --member=serviceAccount:"${SERVICE_ACCOUNT}" \
     --role=roles/cloudfunctions.invoker
 ```
 
@@ -87,7 +93,7 @@ ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrig
 ANALYZE_en_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_en\` (x STRING)
 RETURNS STRING
-REMOTE WITH CONNECTION \`${PROJECT}.${REGION}.remote_connection\`
+REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"language\",\"en\")]
@@ -96,7 +102,7 @@ OPTIONS(
 ANALYZE_es_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_es\` (x STRING)
 RETURNS STRING
-REMOTE WITH CONNECTION \`${PROJECT}.${REGION}.remote_connection\`
+REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"language\",\"es\")]
@@ -104,12 +110,12 @@ OPTIONS(
 """
 
 bq query \
-    --location="${REGION}" \
+    --location="${LOCATION}" \
     --use_legacy_sql=false \
     "${ANALYZE_en_UDF_DDL}"
     
 bq query \
-    --location="${REGION}" \
+    --location="${LOCATION}" \
     --use_legacy_sql=false \
     "${ANALYZE_es_UDF_DDL}"    
 ```
@@ -117,15 +123,15 @@ bq query \
 ### Putting it all together
 
 The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command: 
-**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery REGION. 
+**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery LOCATION. 
 
 ```
 PROJECT=your_project_id
-REGION=your_bigquery_dataset_region
+LOCATION=your_bigquery_dataset_location
 DATASET=your_bigquery_dataset_id
 CLOUD_FUNCTION_REGION=your_cloud_function_region
 
-sh deploy.sh "${PROJECT}" "${REGION}" "${DATASET}" "${CLOUD_FUNCTION_REGION}"
+sh deploy.sh "${PROJECT}" "${LOCATION}" "${DATASET}" "${CLOUD_FUNCTION_REGION}"
 ```
 
 ### Running it on BigQuery
@@ -135,9 +141,12 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
+# Positive sentiments, greater than 0
 select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really awesome!");
-
 select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente impresionante");
-```
 
-It should return a positive float value (as in greater than 0) as a response.
+# Negative sentiments, less than 0 
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really bad");
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente malo");
+
+```
