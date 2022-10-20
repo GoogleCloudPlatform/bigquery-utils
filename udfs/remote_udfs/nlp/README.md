@@ -20,6 +20,7 @@ Replace the various environment variables below with your desired values.
 PROJECT=your_project_id
 REGION=your_bigquery_dataset_region
 DATASET=your_bigquery_dataaset_id
+CLOUD_FUNCTION_REGION=your_cloud_function_region
 ```
 
 ### Navigate to the remote_udfs directory
@@ -54,7 +55,7 @@ gcloud functions deploy analyze-sentiment \
     --project=$PROJECT \
     --runtime=python39 \
     --entry-point=analyze_sentiment \
-    --region=$REGION \
+    --region=$CLOUD_FUNCTION_REGION \
     --source=call_nlp \
     --trigger-http
 ```
@@ -122,8 +123,9 @@ The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previou
 PROJECT=your_project_id
 REGION=your_bigquery_dataset_region
 DATASET=your_bigquery_dataset_id
+CLOUD_FUNCTION_REGION=your_cloud_function_region
 
-sh deploy.sh "${PROJECT}" "${REGION}" "${DATASET}"
+sh deploy.sh "${PROJECT}" "${REGION}" "${DATASET}" "${CLOUD_FUNCTION_REGION}"
 ```
 
 ### Running it on BigQuery
