@@ -14,11 +14,8 @@ To run this example, you will need the following APIs enabled:
 
 Replace the various environment variables below with your desired values.
 ```
-CONNECTION_NAME=%Functional BigQuery Connection name% 
-DISPLAY_NAME=%Friendly or Display BigQuery Connection name%
 PROJECT=%Your project name% 
 LOCATION=%Your BigQuery dataset location% 
-CF_NAME=%Your Cloud Function name%
 DATASET=%Your BigQuery Dataset to deploy to%
 ```
 
@@ -33,12 +30,10 @@ cd bigquery-utils/udfs/remote_udfs/
 To create your BigQuery connection, you need to specify the following:
 * project_id - the project id that you wish to create the connection in
 * location - the location for the external connection in BigQuery
-* connection_name - the name of the connection 
-* display_name - (optional) the name (friendly name) you want to show 
 
 ```
-bq mk --connection --display_name=\'$DISPLAY_NAME\' --connection_type=CLOUD_RESOURCE \
-      --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME
+bq mk --connection --display_name=\'example_connection\' --connection_type=CLOUD_RESOURCE \
+      --project_id=$PROJECT --location=$LOCATION remote_connection
 ```
 
 ### Getting the service account associated with the connection
@@ -47,10 +42,9 @@ You need to grant the connection service account to be able to invoke functions.
 To do this, first obtain the service account. 
 * location - the location for the external connection in BigQuery
 * project - the project where your external connection was created
-* connection_name - the name (or friendly/display name) of the external connection
 
 ```
-bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME
+bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection
 ```
 
 Within properties you'll find *serviceAccountId* which will have the service ID you'll need in a subsequent step.
@@ -63,11 +57,10 @@ Snippet provided below for brevity.
 It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.  
 We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended. 
 
-* cf_name - the name of the cloud function
 * project - the project the cloud function is deployed to 
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
-gcloud functions deploy $CF_NAME \
+gcloud functions deploy sampleCF \
 --project=$PROJECT --runtime=python39 --entry-point=remote_vertex_ai --source=call_nlp --trigger-http
 ```
 
@@ -81,8 +74,8 @@ Grant the service account obtained above permissions to invoke the functions.
 **_NOTE:_** For the below command you will need to have jq installed. 
 
 ```
-SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION $CONNECTION_NAME | jq '.cloudResource.serviceAccountId' | tr -d '"')
-gcloud --project=$PROJECT functions add-iam-policy-binding $CF_NAME --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
+SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection | jq '.cloudResource.serviceAccountId' | tr -d '"')
+gcloud --project=$PROJECT functions add-iam-policy-binding sampleCF --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
 ```
 
 ### Obtaining the full Cloud Function endpoint
@@ -90,7 +83,7 @@ gcloud --project=$PROJECT functions add-iam-policy-binding $CF_NAME --member=ser
 [More information about the gcloud functions describe can be found here.](https://cloud.google.com/sdk/gcloud/reference/functions/describe)
 * cf_name - the name of the cloud function
 ```
-gcloud functions describe $CF_NAME
+gcloud functions describe sampleCF
 ```
 
 You will need the full URL under the httpsTrigger section.
@@ -107,15 +100,13 @@ You can choose to do this many ways.
 The input parameters for the helper script above need to be in order:
 * project - the project you deployed to 
 * dataset - the BigQuery dataset you want to deploy to 
-* location - the location where your BigQuery dataset is 
-* connection_name - the name of the connection 
+* location - the location where your BigQuery dataset is
 * endpoint - the full endpoint you obtained above
-* cf_name - the name of the cloud function deployed
 
 ```
 ENDPOINT=$(gcloud functions describe $CF_NAME --format="value(httpsTrigger.url)")
 
-sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.$CONNECTION_NAME $ENDPOINT
+sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.sampleCF $ENDPOINT
 ```
 
 ### Running it on BigQuery
