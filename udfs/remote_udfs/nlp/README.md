@@ -78,39 +78,39 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 You are able to provide different context to the Cloud Function as key value pairs.
 [You can read more about it here.](https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#providing_user_defined_context)
 
-Run the following DDL statements to create two  remote UDFs in BigQuery, one which analyzes sentiment of plain text and another which analyzes sentiment of html:
+Run the following DDL statements to create two remote UDFs in BigQuery, one which analyzes sentiment in English and one in Spanish.
 
 ```
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 
-ANALYZE_PLAIN_TEXT_UDF_DDL="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
+ANALYZE_en_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_en\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
+  user_defined_context = [(\"language\",\"en\")]
 );"""
 
-ANALYZE_HTML_UDF_DDL="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_html\` (x STRING)
+ANALYZE_es_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_es\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"documentType\",\"HTML\")]
+  user_defined_context = [(\"language\",\"es\")]
 );
 """
 
 bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${ANALYZE_PLAIN_TEXT_UDF_DDL}"
+    "${ANALYZE_en_UDF_DDL}"
     
 bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${ANALYZE_HTML_UDF_DDL}"    
+    "${ANALYZE_es_UDF_DDL}"    
 ```
 
 ### Putting it all together
@@ -133,7 +133,9 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_plain_text`("This is really awesome!");
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really awesome!");
+
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente impresionante");
 ```
 
 It should return a positive float value (as in greater than 0) as a response.

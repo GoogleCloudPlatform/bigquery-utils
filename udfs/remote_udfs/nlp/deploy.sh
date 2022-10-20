@@ -31,32 +31,31 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 echo "Creating the BigQuery UDF."
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 
-
-ANALYZE_PLAIN_TEXT_UDF_DDL="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
+ANALYZE_en_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_en\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
+  user_defined_context = [(\"language\",\"en\")]
 );"""
 
-ANALYZE_HTML_UDF_DDL="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_html\` (x STRING)
+ANALYZE_es_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_es\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"documentType\",\"HTML\")]
+  user_defined_context = [(\"language\",\"es\")]
 );
 """
 
 bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${ANALYZE_PLAIN_TEXT_UDF_DDL}"
+    "${ANALYZE_en_UDF_DDL}"
     
 bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${ANALYZE_HTML_UDF_DDL}"    
+    "${ANALYZE_es_UDF_DDL}" 

@@ -27,7 +27,7 @@ def analyze_sentiment(request):
     https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#input_format
     '''
     request_json = request.get_json()
-    document_type = request_json['userDefinedContext']['documentType']
+    language = request_json['userDefinedContext']['language']
     # The input into the function from BigQuery is retrieved with the calls field. 
     calls = request_json['calls']
     try:
@@ -36,16 +36,11 @@ def analyze_sentiment(request):
         for call in calls:
             # Retreive the text to be analyzed
             text = call[0]
-            type = language_v1.Document.Type.TYPE_UNSPECIFIED
             # Prepare the Document object to be sent to the service.
-            if document_type == "PLAIN_TEXT":
-                type = language_v1.Document.Type.PLAIN_TEXT
-            elif document_type == "HTML":
-                type = language_v1.Document.Type.HTML
-            else:
-                type = language_v1.Document.Type.TYPE_UNSPECIFIED
             document = language_v1.Document(
-                content=text, type_=type
+                content=text,
+                type_=language_v1.Document.Type.PLAIN_TEXT,
+                language=language
             )
             # Use the analyze_sentiment function to call the API.
             # This returns a sentiment analysis.
