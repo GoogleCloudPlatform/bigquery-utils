@@ -68,13 +68,22 @@ Run the following DDL statement to create your remote UDF in BigQuery:
 ```
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 
-REMOTE_UDF_DDL="""
+ANALYZE_PLAIN_TEXT_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
+);
+
+ANALYZE_HTML_UDF_DDL="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
+RETURNS STRING
+REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
+OPTIONS(
+  endpoint = '${ENDPOINT}',
+  user_defined_context = [(\"documentType\",\"HTML\")]
 );
 """
 
