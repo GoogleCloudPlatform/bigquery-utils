@@ -15,6 +15,7 @@ bq mk --connection \
 echo "Deploying the Cloud Function."
 gcloud functions deploy analyze-sentiment \
     --project="${PROJECT}" \
+    --region=$LOCATION \
     --runtime=python39 \
     --entry-point=analyze_sentiment \
     --source=call_nlp \

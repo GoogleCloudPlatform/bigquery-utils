@@ -12,7 +12,10 @@ To run this example, you will need the following APIs enabled:
 
 ### Setting the environment variables 
 
-Replace the various environment variables below with your desired values.
+Replace the various environment variables below with your desired values.  
+
+**_NOTE:_** When setting the LOCATION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the location will be used for both the Cloud Function and the BigQuery parameters.
+
 ```
 PROJECT=your_project_id
 LOCATION=your_bigquery_dataset_location
@@ -27,9 +30,7 @@ cd bigquery-utils/udfs/remote_udfs/nlp
 
 ### Creating your BigQuery connection 
 
-To create your BigQuery connection, you need to specify the following:
-* project_id - the project id that you wish to create the connection in
-* location - the location for the external connection in BigQuery
+Run the following command to create your BigQuery external connection:
 
 ```
 bq mk --connection --display_name=\'remote_connection\' --connection_type=CLOUD_RESOURCE \
@@ -42,27 +43,18 @@ bq mk --connection --display_name=\'remote_connection\' --connection_type=CLOUD_
 
 Snippet provided below for brevity.  
 It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.  
-We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended.  
-
-* project - the project the cloud function is deployed to 
-* runtime - this was defaulted to python39 but can be changed as required 
+We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended. 
+Run the following command to deploy your Cloud Function:
 ```
 gcloud functions deploy analyze-sentiment \
---project=$PROJECT --runtime=python39 --entry-point=analyze_sentiment --source=call_nlp --trigger-http
+--project=$PROJECT --runtime=python39 --entry-point=analyze_sentiment --region=$LOCATION --source=call_nlp --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions
 
-Grant the service account obtained above permissions to invoke the functions.
-* project - the project where your external connection was created
-* cf_name - the name of your cloud function 
-* service_account - the service account associated with the external connection
 
-**_NOTE:_** For the below command you will need to have jq installed. 
-
-You need to grant the connection service account to be able to invoke functions.  
-To do this, first obtain the service account.  
-Then apply the cloudfunctions.invoker role to the service account for the function. 
+**_NOTE:_** For the below commands you will need to have jq installed. 
+Run the following commands to grant the service account obtained above permissions to invoke your Cloud Function:
 
 ```
 SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
@@ -92,16 +84,18 @@ bq query \
     "${REMOTE_UDF_DDL}"
 ```
 
-### Deploying it all together
+### Putting it all together
 
-* [Deploying it all together](/udfs/remote_udfs/nlp/deploy.sh)
+* [Putting it all together](/udfs/remote_udfs/nlp/deploy.sh)
 This script is a cumulation of the various steps.  
 This step is optional, only if you haven't done the steps above.  
+
+**_NOTE:_** When setting the LOCATION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the location will be used for both the Cloud Function and the BigQuery parameters.
 
 ```
 PROJECT=your_project_id
 LOCATION=your_bigquery_dataset_location
-DATASET=your_bigquery_dataaset_id
+DATASET=your_bigquery_dataset_id
 
 sh deploy.sh $PROJECT $LOCATION $DATASET
 ```
