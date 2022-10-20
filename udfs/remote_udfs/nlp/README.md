@@ -90,7 +90,12 @@ OPTIONS(
 bq query \
     --location="${LOCATION}" \
     --use_legacy_sql=false \
-    "${REMOTE_UDF_DDL}"
+    "${ANALYZE_PLAIN_TEXT_UDF_DDL}"
+    
+bq query \
+    --location="${LOCATION}" \
+    --use_legacy_sql=false \
+    "${ANALYZE_HTML_UDF_DDL}"    
 ```
 
 ### Putting it all together
