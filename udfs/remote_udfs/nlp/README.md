@@ -83,7 +83,20 @@ The input parameters for the helper script above need to be in order:
 ```
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 
-sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.remote_connection $ENDPOINT
+NLP_QUERY="""
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
+RETURNS STRING
+REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
+OPTIONS(
+  endpoint = '${ENDPOINT}',
+  user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
+);
+"""
+
+bq query \
+    --location="${LOCATION}" \
+    --use_legacy_sql=false \
+    "${NLP_QUERY}"
 ```
 
 ### Deploying it all together
