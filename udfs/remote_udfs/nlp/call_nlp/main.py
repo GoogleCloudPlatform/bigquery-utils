@@ -19,7 +19,7 @@ from google.api_core.retry import Retry
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 client = language_v1.LanguageServiceClient()
 
-def remote_vertex_ai(request):
+def remote_call_nlp(request):
     '''
     This function serves the request.
     The additional parameter "mode" is part of a key value pair sent as part of the call.
@@ -30,13 +30,13 @@ def remote_vertex_ai(request):
     mode = request_json['userDefinedContext']['mode']
     # The input into the function from BigQuery is retrieved with the calls field. 
     calls = request_json['calls']
-    if mode == "call_nlp":
-        return call_nlp(calls)
+    if mode == "PLAIN_TEXT":
+        return call_nlp_plaintext(calls)
 
     return json.dumps({"errorMessage": f"Not supported 'mode' in user_defined_context: {mode}"}), 400
 
 
-def call_nlp(calls):
+def call_nlp_plaintext(calls,):
     try:
         return_value = []
         # Create the client to connecto the Language Service.

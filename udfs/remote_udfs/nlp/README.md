@@ -48,7 +48,7 @@ We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Clo
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
 gcloud functions deploy analyze-sentiment \
---project=$PROJECT --runtime=python39 --entry-point=remote_vertex_ai --source=call_nlp --trigger-http
+--project=$PROJECT --runtime=python39 --entry-point=remote_call_nlp --source=call_nlp --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions
@@ -103,9 +103,11 @@ sh deploy.sh $PROJECT $LOCATION $DATASET
 ### Running it on BigQuery
 You should now be able to run the remote UDF on BigQuery.
 
+**_NOTE:_** If you get a permissions denied error, wait approximately 60 seconds, permissions may take up to 60 seconds to propagate. 
+
 Try it in your BigQuery console. 
 ```
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment`("This is really awesome!");
+select `%your_project_id%.%your_dataset_id%.analyze_sentiment_plain_text`("This is really awesome!");
 ```
 
 It should return a positive float value (as in greater than 0) as a response.

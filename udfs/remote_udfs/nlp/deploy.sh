@@ -16,7 +16,7 @@ echo "Deploying the Cloud Function."
 gcloud functions deploy analyze-sentiment \
     --project="${PROJECT}" \
     --runtime=python39 \
-    --entry-point=remote_vertex_ai \
+    --entry-point=remote_call_nlp \
     --source=call_nlp \
     --trigger-http
 
@@ -30,12 +30,12 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 echo "Creating the BigQuery UDF."
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
 NLP_QUERY="""
-CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment\` (x STRING)
+CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_plain_text\` (x STRING)
 RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"mode\",\"call_nlp\")]
+  user_defined_context = [(\"mode\",\"PLAIN_TEXT\")]
 );
 """
 
