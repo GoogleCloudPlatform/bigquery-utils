@@ -14,7 +14,7 @@ To run this example, you will need the following APIs enabled:
 
 Replace the various environment variables below with your desired values.  
 
-**_NOTE:_** When setting the REGION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the region will be used for both the Cloud Function and the BigQuery parameters.
+**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery REGION. 
 
 ```
 PROJECT=your_project_id
@@ -117,7 +117,7 @@ bq query \
 ### Putting it all together
 
 The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command: 
-**_NOTE:_** When setting the REGION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the region will be used for both the Cloud Function and the BigQuery parameters.
+**_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery REGION. 
 
 ```
 PROJECT=your_project_id
