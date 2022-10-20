@@ -14,11 +14,11 @@ To run this example, you will need the following APIs enabled:
 
 Replace the various environment variables below with your desired values.  
 
-**_NOTE:_** When setting the LOCATION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the location will be used for both the Cloud Function and the BigQuery parameters.
+**_NOTE:_** When setting the REGION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the region will be used for both the Cloud Function and the BigQuery parameters.
 
 ```
 PROJECT=your_project_id
-LOCATION=your_bigquery_dataset_location
+REGION=your_bigquery_dataset_region
 DATASET=your_bigquery_dataaset_id
 ```
 
@@ -37,7 +37,7 @@ bq mk --connection \
     --display_name=\'remote_connection\' \
     --connection_type=CLOUD_RESOURCE \
     --project_id=$PROJECT \
-    --location=$LOCATION \
+    --location=$REGION \
     remote_connection
 ```
 
@@ -54,7 +54,7 @@ gcloud functions deploy analyze-sentiment \
     --project=$PROJECT \
     --runtime=python39 \
     --entry-point=analyze_sentiment \
-    --region=$LOCATION \
+    --region=$REGION \
     --source=call_nlp \
     --trigger-http
 ```
@@ -66,7 +66,7 @@ gcloud functions deploy analyze-sentiment \
 Run the following commands to grant the service account obtained above permissions to invoke your Cloud Function:
 
 ```
-SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
+SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$REGION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
 gcloud functions add-iam-policy-binding analyze-sentiment \
     --project=$PROJECT \
     --member=serviceAccount:$SERVICE_ACCOUNT \
@@ -86,7 +86,7 @@ ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrig
 ANALYZE_en_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_en\` (x STRING)
 RETURNS STRING
-REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
+REMOTE WITH CONNECTION \`${PROJECT}.${REGION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"language\",\"en\")]
@@ -95,7 +95,7 @@ OPTIONS(
 ANALYZE_es_UDF_DDL="""
 CREATE OR REPLACE  FUNCTION \`${PROJECT}.${DATASET}.analyze_sentiment_es\` (x STRING)
 RETURNS STRING
-REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
+REMOTE WITH CONNECTION \`${PROJECT}.${REGION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
   user_defined_context = [(\"language\",\"es\")]
@@ -103,12 +103,12 @@ OPTIONS(
 """
 
 bq query \
-    --location="${LOCATION}" \
+    --location="${REGION}" \
     --use_legacy_sql=false \
     "${ANALYZE_en_UDF_DDL}"
     
 bq query \
-    --location="${LOCATION}" \
+    --location="${REGION}" \
     --use_legacy_sql=false \
     "${ANALYZE_es_UDF_DDL}"    
 ```
@@ -116,14 +116,14 @@ bq query \
 ### Putting it all together
 
 The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command: 
-**_NOTE:_** When setting the LOCATION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the location will be used for both the Cloud Function and the BigQuery parameters.
+**_NOTE:_** When setting the REGION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the region will be used for both the Cloud Function and the BigQuery parameters.
 
 ```
 PROJECT=your_project_id
-LOCATION=your_bigquery_dataset_location
+REGION=your_bigquery_dataset_region
 DATASET=your_bigquery_dataset_id
 
-sh deploy.sh "${PROJECT}" "${LOCATION}" "${DATASET}"
+sh deploy.sh "${PROJECT}" "${REGION}" "${DATASET}"
 ```
 
 ### Running it on BigQuery
