@@ -141,12 +141,9 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-# Positive sentiments, greater than 0
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really awesome!");
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente impresionante");
-
-# Negative sentiments, less than 0 
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really bad");
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente malo");
-
+SELECT
+    `your_project_id.your_dataset_id.analyze_sentiment_en`("This is really awesome!") AS english_positive_sentiment,
+    `your_project_id.your_dataset_id.analyze_sentiment_es`("esto es realmente impresionante") AS spanish_positive_sentiment,
+    `your_project_id.your_dataset_id.analyze_sentiment_en`("This is really bad!") AS english_negative_sentiment,
+    `your_project_id.your_dataset_id.analyze_sentiment_es`("esto es realmente malo") AS spanish_negative_sentiment
 ```
