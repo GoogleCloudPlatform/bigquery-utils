@@ -135,9 +135,9 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really awesome!");
-
-select `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente impresionante");
+SELECT
+    `%your_project_id%.%your_dataset_id%.analyze_sentiment_en`("This is really awesome!") AS english_sentiment
+    `%your_project_id%.%your_dataset_id%.analyze_sentiment_es`("esto es realmente impresionante") AS spanish_sentiment
 ```
 
 It should return a positive float value (as in greater than 0) as a response.
