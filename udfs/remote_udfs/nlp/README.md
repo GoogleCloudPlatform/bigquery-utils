@@ -86,10 +86,7 @@ bq query \
 
 ### Putting it all together
 
-* [Putting it all together](/udfs/remote_udfs/nlp/deploy.sh)
-This script is a cumulation of the various steps.  
-This step is optional, only if you haven't done the steps above.  
-
+The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command: 
 **_NOTE:_** When setting the LOCATION, use a regional endpoint (for example, us-central1) for the purpose of this demo, the location will be used for both the Cloud Function and the BigQuery parameters.
 
 ```
