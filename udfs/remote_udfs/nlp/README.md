@@ -22,7 +22,7 @@ DATASET=your_bigquery_dataaset_id
 ### Navigate to the remote_udfs directory
 Change to the remote_udfs directory after cloning the repo. 
 ```
-cd bigquery-utils/udfs/remote_udfs/ 
+cd bigquery-utils/udfs/remote_udfs/nlp
 ```
 
 ### Creating your BigQuery connection 
@@ -36,26 +36,13 @@ bq mk --connection --display_name=\'remote_connection\' --connection_type=CLOUD_
       --project_id=$PROJECT --location=$LOCATION remote_connection
 ```
 
-### Getting the service account associated with the connection
-
-You need to grant the connection service account to be able to invoke functions.  
-To do this, first obtain the service account. 
-* location - the location for the external connection in BigQuery
-* project - the project where your external connection was created
-
-```
-bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection
-```
-
-Within properties you'll find *serviceAccountId* which will have the service ID you'll need in a subsequent step.
-
 ### Deploying your Cloud Function
 
 [More information about deploying your cloud function can be found here.](https://cloud.google.com/functions/docs/deploy)
 
 Snippet provided below for brevity.  
 It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.  
-We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended. 
+We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended.  
 
 * project - the project the cloud function is deployed to 
 * runtime - this was defaulted to python39 but can be changed as required 
@@ -69,39 +56,29 @@ gcloud functions deploy sampleCF \
 Grant the service account obtained above permissions to invoke the functions.
 * project - the project where your external connection was created
 * cf_name - the name of your cloud function 
-* service_account - the service account obtained above
+* service_account - the service account associated with the external connection
 
 **_NOTE:_** For the below command you will need to have jq installed. 
 
+You need to grant the connection service account to be able to invoke functions.  
+To do this, first obtain the service account.  
+Then apply the cloudfunctions.invoker role to the service account for the function. 
+
 ```
-SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection | jq '.cloudResource.serviceAccountId' -r)
+SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
 gcloud --project=$PROJECT functions add-iam-policy-binding sampleCF --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
-```
-
-### Obtaining the full Cloud Function endpoint
-
-[More information about the gcloud functions describe can be found here.](https://cloud.google.com/sdk/gcloud/reference/functions/describe)
-* cf_name - the name of the cloud function
-```
-gcloud functions describe sampleCF
-```
-
-You will need the full URL under the httpsTrigger section.
-It should look something like this:
-```
-https://<location>-<project-id>.cloudfunctions.net/<cf-name>
 ```
 
 ### Creating your BigQuery UDF on BigQuery
 
 You can choose to do this many ways.  
-* [creating your bq function](/remote_udfs/nlp/create_bq_function.sh) 
+* [Creating your BigQuery function](/udfs/remote_udfs/nlp/create_bq_function.sh) 
 
 The input parameters for the helper script above need to be in order:
 * project - the project you deployed to 
 * dataset - the BigQuery dataset you want to deploy to 
 * location - the location where your BigQuery dataset is
-* endpoint - the full endpoint you obtained above
+* endpoint - the full endpoint of the cloud function invocation
 
 ```
 ENDPOINT=$(gcloud functions describe sampleCF --format="value(httpsTrigger.url)")
@@ -109,13 +86,26 @@ ENDPOINT=$(gcloud functions describe sampleCF --format="value(httpsTrigger.url)"
 sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.remote_connection $ENDPOINT
 ```
 
+### Deploying it all together
+
+* [Deploying it all together](/udfs/remote_udfs/nlp/deploy.sh)
+This script is a cumulation of the various steps.  
+This step is optional, only if you haven't done the steps above.  
+
+```
+PROJECT=your_project_id
+LOCATION=your_bigquery_dataset_location
+DATASET=your_bigquery_dataaset_id
+
+sh deploy.sh $PROJECT $LOCATION $DATASET
+```
+
 ### Running it on BigQuery
 You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-select %your_project_id%.%your_dataset_id%.%function_name%("This is really awesome!");
+select `%your_project_id%.%your_dataset_id%.%function_name%`("This is really awesome!");
 ```
 
 It should return a positive float value (as in greater than 0) as a response.
-
