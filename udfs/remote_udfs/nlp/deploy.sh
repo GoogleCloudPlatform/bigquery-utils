@@ -16,7 +16,7 @@ echo "Deploying the Cloud Function."
 gcloud functions deploy analyze-sentiment \
     --project="${PROJECT}" \
     --runtime=python39 \
-    --entry-point=remote_call_nlp \
+    --entry-point=analyze_sentiment \
     --source=call_nlp \
     --trigger-http
 
@@ -35,7 +35,7 @@ RETURNS STRING
 REMOTE WITH CONNECTION \`${PROJECT}.${LOCATION}.remote_connection\`
 OPTIONS(
   endpoint = '${ENDPOINT}',
-  user_defined_context = [(\"mode\",\"PLAIN_TEXT\")]
+  user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")]
 );
 """
 

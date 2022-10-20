@@ -19,7 +19,7 @@ from google.api_core.retry import Retry
 # https://cloud.google.com/functions/docs/bestpractices/tips#use_global_variables_to_reuse_objects_in_future_invocations
 client = language_v1.LanguageServiceClient()
 
-def remote_call_nlp(request):
+def analyze_sentiment(request):
     '''
     This function serves the request.
     The additional parameter "mode" is part of a key value pair sent as part of the call.
@@ -27,16 +27,9 @@ def remote_call_nlp(request):
     https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#input_format
     '''
     request_json = request.get_json()
-    mode = request_json['userDefinedContext']['mode']
+    document_type = request_json['userDefinedContext']['documentType']
     # The input into the function from BigQuery is retrieved with the calls field. 
     calls = request_json['calls']
-    if mode == "PLAIN_TEXT":
-        return call_nlp_plaintext(calls)
-
-    return json.dumps({"errorMessage": f"Not supported 'mode' in user_defined_context: {mode}"}), 400
-
-
-def call_nlp_plaintext(calls,):
     try:
         return_value = []
         # Create the client to connecto the Language Service.
@@ -44,23 +37,27 @@ def call_nlp_plaintext(calls,):
             # Retreive the text to be analyzed
             text = call[0]
             # Prepare the Document object to be sent to the service.
+            if document_type == "PLAIN_TEXT":
+                type = language_v1.Document.Type.PLAIN_TEXT
+            elif document_type == "HTML":
+                type = language_v1.Document.Type.HTML
+            else:
+                type = language_v1.Document.Type.TYPE_UNSPECIFIED
             document = language_v1.Document(
-                content=text, type_=language_v1.Document.Type.PLAIN_TEXT
+                content=text, type_=type
             )
             # Use the analyze_sentiment function to call the API.
-            # This returns a sentiment analysis. 
-            # Append the sentiment to be returned. 
+            # This returns a sentiment analysis.
+            # Append the sentiment to be returned.
             sentiment = client.analyze_sentiment(
                 request={"document": document},
                 # Retry default values: https://github.com/googleapis/python-api-core/blob/main/google/api_core/retry.py#L72
                 retry=Retry()
             ).document_sentiment
             return_value.append(str(sentiment.score))
-            
+
         # Format the JSON to be readable by BigQuery
         return_json = json.dumps({"replies": return_value})
         return return_json
     except Exception as inst:
         return json.dumps({"errorMessage": inst}), 400
-
-

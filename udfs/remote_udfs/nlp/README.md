@@ -48,7 +48,7 @@ We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Clo
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
 gcloud functions deploy analyze-sentiment \
---project=$PROJECT --runtime=python39 --entry-point=remote_call_nlp --source=call_nlp --trigger-http
+--project=$PROJECT --runtime=python39 --entry-point=analyze_sentiment --source=call_nlp --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions

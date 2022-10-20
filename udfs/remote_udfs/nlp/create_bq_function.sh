@@ -18,7 +18,7 @@ LOCATION=$3
 CONNECTION_NAME=$4
 ENDPOINT=$5
 
-NLP_QUERY=" CREATE OR REPLACE  FUNCTION \`$PROJECT.$DATASET.analyze_sentiment_plain_text\` (x STRING) RETURNS STRING REMOTE WITH CONNECTION \`$CONNECTION_NAME\` OPTIONS (endpoint = '$ENDPOINT', user_defined_context = [(\"mode\",\"PLAIN_TEXT\")])"
+NLP_QUERY=" CREATE OR REPLACE  FUNCTION \`$PROJECT.$DATASET.analyze_sentiment_plain_text\` (x STRING) RETURNS STRING REMOTE WITH CONNECTION \`$CONNECTION_NAME\` OPTIONS (endpoint = '$ENDPOINT', user_defined_context = [(\"documentType\",\"PLAIN_TEXT\")])"
 
 # Requires the bq CLI installed.
 
