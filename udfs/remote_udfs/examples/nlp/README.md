@@ -26,7 +26,7 @@ CLOUD_FUNCTION_REGION=your_cloud_function_region
 ### Navigate to the remote_udfs directory
 Change to the remote_udfs directory after cloning the repo. 
 ```
-cd bigquery-utils/udfs/remote_udfs/nlp
+cd bigquery-utils/udfs/remote_udfs/examples/nlp
 ```
 
 ### Create your BigQuery dataset
@@ -123,7 +123,7 @@ bq query \
 
 ### Putting it all together
 
-The [deploy.sh](/udfs/remote_udfs/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command:  
+The [deploy.sh](/udfs/remote_udfs/examples/nlp/deploy.sh) script combines all the previous setup steps into one simple script which you can execute via the following command:  
 
 **_NOTE:_** Your CLOUD_FUNCTION_REGION must match or be within the multi-region of BigQuery LOCATION. 
 
