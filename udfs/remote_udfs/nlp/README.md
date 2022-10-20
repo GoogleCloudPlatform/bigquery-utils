@@ -19,7 +19,6 @@ DISPLAY_NAME=%Friendly or Display BigQuery Connection name%
 PROJECT=%Your project name% 
 LOCATION=%Your BigQuery dataset location% 
 CF_NAME=%Your Cloud Function name%
-ENTRY_POINT=%Your Cloud Function Entry Point%
 DATASET=%Your BigQuery Dataset to deploy to%
 ```
 
@@ -68,7 +67,7 @@ It’s recommended that you keep the default authentication instead of allowing 
 * runtime - this was defaulted to python39 but can be changed as required 
 ```
 gcloud functions deploy $CF_NAME \
---project=$PROJECT --runtime=python39 --entry-point=$ENTRY_POINT --source=call_nlp --trigger-http
+--project=$PROJECT --runtime=python39 --entry-point=remote_vertex_ai --source=call_nlp --trigger-http
 ```
 
 ### Granting the service account invoker permissions on the functions
@@ -114,7 +113,8 @@ The input parameters for the helper script above need to be in order:
 
 ```
 ENDPOINT=$(gcloud functions describe $CF_NAME --format="value(httpsTrigger.url)")
-sh create_bq_function.sh $PROJECT $DATASET $LOCATION $CONNECTION_NAME $ENDPOINT
+
+sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.$CONNECTION_NAME $ENDPOINT
 ```
 
 ### Running it on BigQuery
@@ -122,7 +122,7 @@ You should now be able to run the remote UDF on BigQuery.
 
 Try it in your BigQuery console. 
 ```
-select function_name("This is really awesome!");
+select %your_project_id%.%your_dataset_id%.%function_name%("This is really awesome!");
 ```
 
 It should return a positive float value (as in greater than 0) as a response.
