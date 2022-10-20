@@ -32,7 +32,7 @@ To create your BigQuery connection, you need to specify the following:
 * location - the location for the external connection in BigQuery
 
 ```
-bq mk --connection --display_name=\'example_connection\' --connection_type=CLOUD_RESOURCE \
+bq mk --connection --display_name=\'remote_connection\' --connection_type=CLOUD_RESOURCE \
       --project_id=$PROJECT --location=$LOCATION remote_connection
 ```
 
