@@ -18,7 +18,7 @@ Replace the various environment variables below with your desired values.
 
 ```
 PROJECT=your_project_id
-LOCATION=your_bigquery_dataset_LOCATION
+LOCATION=your_bigquery_dataset_location
 DATASET=your_bigquery_dataaset_id
 CLOUD_FUNCTION_REGION=your_cloud_function_region
 ```
