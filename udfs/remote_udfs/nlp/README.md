@@ -74,7 +74,7 @@ Grant the service account obtained above permissions to invoke the functions.
 **_NOTE:_** For the below command you will need to have jq installed. 
 
 ```
-SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection | jq '.cloudResource.serviceAccountId' | tr -d '"')
+SERVICE_ACCOUNT=$(bq show --connection --project_id=$PROJECT --location=$LOCATION remote_connection | jq '.cloudResource.serviceAccountId' -r)
 gcloud --project=$PROJECT functions add-iam-policy-binding sampleCF --member=serviceAccount:$SERVICE_ACCOUNT --role=roles/cloudfunctions.invoker
 ```
 
