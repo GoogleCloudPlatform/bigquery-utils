@@ -71,14 +71,7 @@ gcloud --project=$PROJECT functions add-iam-policy-binding analyze-sentiment --m
 
 ### Creating your BigQuery UDF on BigQuery
 
-You can choose to do this many ways.  
-* [Creating your BigQuery function](/udfs/remote_udfs/nlp/create_bq_function.sh) 
-
-The input parameters for the helper script above need to be in order:
-* project - the project you deployed to 
-* dataset - the BigQuery dataset you want to deploy to 
-* location - the location where your BigQuery dataset is
-* endpoint - the full endpoint of the cloud function invocation
+Run the following DDL statement to create your remote UDF in BigQuery:
 
 ```
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
