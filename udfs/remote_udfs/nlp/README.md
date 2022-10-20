@@ -14,9 +14,9 @@ To run this example, you will need the following APIs enabled:
 
 Replace the various environment variables below with your desired values.
 ```
-PROJECT=%Your project name% 
-LOCATION=%Your BigQuery dataset location% 
-DATASET=%Your BigQuery Dataset to deploy to%
+PROJECT=your_project_id
+LOCATION=your_bigquery_dataset_location
+DATASET=your_bigquery_dataaset_id
 ```
 
 ### Navigate to the remote_udfs directory
