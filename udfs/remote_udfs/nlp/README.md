@@ -94,7 +94,7 @@ PROJECT=your_project_id
 LOCATION=your_bigquery_dataset_location
 DATASET=your_bigquery_dataset_id
 
-sh deploy.sh $PROJECT $LOCATION $DATASET
+sh deploy.sh "${PROJECT}" "${LOCATION}" "${DATASET}"
 ```
 
 ### Running it on BigQuery
