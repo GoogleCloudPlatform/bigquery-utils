@@ -60,7 +60,8 @@ Within properties you'll find *serviceAccountId* which will have the service ID 
 [More information about deploying your cloud function can be found here.](https://cloud.google.com/functions/docs/deploy)
 
 Snippet provided below for brevity.  
-It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.
+It’s recommended that you keep the default authentication instead of allowing unauthenticated invocation of your Cloud Function or Cloud Run service.  
+We use gen1 Cloud Functions here for the simple demo purposes; however, gen2 Cloud Functions are recommended. 
 
 * cf_name - the name of the cloud function
 * project - the project the cloud function is deployed to 
