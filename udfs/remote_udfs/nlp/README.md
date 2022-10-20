@@ -106,7 +106,7 @@ The input parameters for the helper script above need to be in order:
 ```
 ENDPOINT=$(gcloud functions describe $CF_NAME --format="value(httpsTrigger.url)")
 
-sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.sampleCF $ENDPOINT
+sh create_bq_function.sh $PROJECT $DATASET $LOCATION $PROJECT.$LOCATION.remote_connection $ENDPOINT
 ```
 
 ### Running it on BigQuery
