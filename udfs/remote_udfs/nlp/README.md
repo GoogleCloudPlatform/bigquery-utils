@@ -83,7 +83,7 @@ gcloud functions add-iam-policy-binding analyze-sentiment \
 
 ### Creating your BigQuery UDF
 
-You are able to provide different context to the Cloud Function as key value pairs.
+You are able to provide different context to the Cloud Function as key value pairs. This example uses context to specify the language of text being passed to the NLP API. 
 [You can read more about it here.](https://cloud.google.com/bigquery/docs/reference/standard-sql/remote-functions#providing_user_defined_context)
 
 Run the following DDL statements to create two remote UDFs in BigQuery, one which analyzes sentiment in English and one in Spanish.
