@@ -27,4 +27,4 @@ class test_call_nlp (unittest.TestCase):
         self.assertGreaterEqual(sentiment_value,0)
 
 if __name__ == '__main__':
-    unittest.main()    
+    unittest.main()
