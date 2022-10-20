@@ -23,7 +23,7 @@ gcloud functions deploy analyze-sentiment \
     --trigger-http
 
 echo "Setting the service account."
-SERVICE_ACCOUNT=$(bq show --connection --project_id="${PROJECT}" --location="${REGION}" --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
+SERVICE_ACCOUNT=$(bq show --connection --project_id="${PROJECT}" --location="${LOCATION}" --format=json remote_connection | jq '.cloudResource.serviceAccountId' -r)
 gcloud functions add-iam-policy-binding analyze-sentiment \
     --project="${PROJECT}" \
     --member=serviceAccount:"${SERVICE_ACCOUNT}" \
