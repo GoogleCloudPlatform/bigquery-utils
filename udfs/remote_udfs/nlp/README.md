@@ -63,7 +63,7 @@ gcloud --project=$PROJECT functions add-iam-policy-binding analyze-sentiment --m
 
 ### Creating your BigQuery UDF on BigQuery
 
-Run the following DDL statement to create your remote UDF in BigQuery:
+Run the following DDL statements to create two  remote UDFs in BigQuery, one which analyzes sentiment of plain text and another which analyzes sentiment of html:
 
 ```
 ENDPOINT=$(gcloud functions describe analyze-sentiment --format="value(httpsTrigger.url)")
