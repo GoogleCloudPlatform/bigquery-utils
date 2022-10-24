@@ -15,12 +15,12 @@
  */
 
 /* Emulation for Teradata's SYS_CALENDAR.CALENDAR table */
-CREATE OR REPLACE VIEW 'project_id.SYS_CALENDAR.CALENDAR' (
+CREATE OR REPLACE VIEW SYS_CALENDAR.CALENDAR (
     /* the date */
     calendar_date,
     /* 1-7 day of week */
     day_of_week,
-    /* 1-n day of month
+    /* 1-n day of month */
     day_of_month,
     /* 1-365 day of year */
     day_of_year,
@@ -54,15 +54,8 @@ CREATE OR REPLACE VIEW 'project_id.SYS_CALENDAR.CALENDAR' (
     EXTRACT(DAY FROM r) as day_of_month,
     EXTRACT(DAYOFYEAR FROM r) AS day_of_year,
     DATE_DIFF(r, DATE(1, 1, 1), DAY) AS day_of_calendar,
-    MOD(EXTRACT(DAYOFWEEK FROM DATE(
-      EXTRACT(YEAR FROM r),
-      EXTRACT(MONTH FROM R),
-      1)), 7) + CAST(FLOOR((EXTRACT(DAY FROM r) - 1) / 7) AS INT64) + 1
-      AS weekday_of_month,
-    EXTRACT(WEEK from r) - EXTRACT(WEEK FROM DATE(
-      EXTRACT(YEAR FROM r),
-      EXTRACT(MONTH FROM R),
-      1)) AS week_of_month,
+    CAST(FLOOR(EXTRACT(DAY FROM r) / 7) AS INT64) + 1 AS weekday_of_month,
+    EXTRACT(WEEK FROM r) - EXTRACT(WEEK FROM DATE_TRUNC(r, MONTH)) + IF(EXTRACT(DAYOFWEEK FROM DATE_TRUNC(r, MONTH)) = 1, 1, 0) AS week_of_month,
     EXTRACT(WEEK FROM r) as week_of_year,
     DATE_DIFF(r, DATE(1, 1, 1), WEEK) as week_of_calendar,
     MOD(EXTRACT(MONTH FROM r) - 1, 3) + 1 as month_of_quarter,
@@ -72,4 +65,4 @@ CREATE OR REPLACE VIEW 'project_id.SYS_CALENDAR.CALENDAR' (
     4 * EXTRACT(YEAR FROM r) + EXTRACT(QUARTER FROM r) AS quarter_of_calendar,
     EXTRACT(YEAR FROM r) as year_of_calendar
   FROM
-    UNNEST(GENERATE_DATE_ARRAY('1900-1-1', '2100-1-1', INTERVAL 1 day)) AS r;
+    UNNEST(GENERATE_DATE_ARRAY('1900-1-1', '2100-1-1', INTERVAL 1 DAY)) AS r;
