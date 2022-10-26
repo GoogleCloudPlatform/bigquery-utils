@@ -26,7 +26,9 @@ CREATE OR REPLACE VIEW SYS_CALENDAR.CALENDAR (
     day_of_year,
     /* 1-n day since the beginning of the calendar */
     day_of_calendar,
-    /* 1 if the date is a Monday and the first Monday of the month, etc. */
+    /* 1 if the date is a Monday and the first Monday of the month, 2 if it's a
+	 * Monday and the second Monday of the month, 4 for the fourth Tuesday, etc.
+	 */
     weekday_of_month,
     /* 0-n week of the month. The first partial week is zero.
      * The first full week is 1. If the month starts on Sunday, there is no
