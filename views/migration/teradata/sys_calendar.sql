@@ -56,7 +56,7 @@ CREATE OR REPLACE VIEW SYS_CALENDAR.CALENDAR (
     EXTRACT(DAY FROM r) as day_of_month,
     EXTRACT(DAYOFYEAR FROM r) AS day_of_year,
     DATE_DIFF(r, DATE(1, 1, 1), DAY) AS day_of_calendar,
-    CAST(FLOOR(EXTRACT(DAY FROM r) / 7) AS INT64) + 1 AS weekday_of_month,
+    CAST(FLOOR((EXTRACT(DAY FROM r) - 1) / 7) AS INT64) + 1 AS weekday_of_month,
     EXTRACT(WEEK FROM r) - EXTRACT(WEEK FROM DATE_TRUNC(r, MONTH)) + IF(EXTRACT(DAYOFWEEK FROM DATE_TRUNC(r, MONTH)) = 1, 1, 0) AS week_of_month,
     EXTRACT(WEEK FROM r) as week_of_year,
     DATE_DIFF(r, DATE(1, 1, 1), WEEK) as week_of_calendar,
