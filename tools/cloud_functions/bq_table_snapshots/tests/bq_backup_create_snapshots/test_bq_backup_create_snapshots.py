@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""unit tests for bq_backup_fetch_table_names"""
+"""unit tests for bq_backup_create_snapshots"""
 
 from requests import request
 from bq_backup_create_snapshots.main import get_snapshot_timestamp
