@@ -1,0 +1,4 @@
+google-cloud-pubsub==2.12.1
+google-cloud-bigquery==2.34.0
+google-api-core==2.10.1
+cronsim==2.1

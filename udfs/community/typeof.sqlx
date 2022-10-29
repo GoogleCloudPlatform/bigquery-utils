@@ -27,7 +27,7 @@ AS ( (
         WHEN REGEXP_CONTAINS(literal, r'^-?[0-9]*$') THEN 'INT64'
         WHEN REGEXP_CONTAINS(literal, r'^(-?[0-9]+[.e].*|CAST\("([^"]*)" AS FLOAT64\))$') THEN 'FLOAT64'
         WHEN literal IN ('true', 'false') THEN 'BOOL'
-        WHEN literal LIKE '"%' THEN 'STRING'
+        WHEN literal LIKE '"%' OR literal LIKE "'%" THEN 'STRING'
         WHEN literal LIKE 'b"%' THEN 'BYTES'
         WHEN literal LIKE '[%' THEN 'ARRAY'
         WHEN REGEXP_CONTAINS(literal, r'^(STRUCT)?\(') THEN 'STRUCT'
