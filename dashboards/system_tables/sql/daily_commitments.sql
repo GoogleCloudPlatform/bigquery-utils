@@ -46,9 +46,9 @@ WITH
           OVER (PARTITION BY state ORDER BY change_timestamp),
         CURRENT_DATE()) AS stop_date,
       -- In order to calculate the cumulative slots up to this point, add
-      -- the slot count of new commitments (indicated by an UPDATE action)
+      -- the slot count of new commitments (indicated by a CREATE or UPDATE action)
       -- and subtract the slot count of deleted commitments
-      SUM(CASE WHEN cccp.action = 'UPDATE' THEN cccp.slot_count ELSE cccp.slot_count * -1 END)
+      SUM(CASE WHEN cccp.action IN ('CREATE', 'UPDATE') THEN cccp.slot_count ELSE cccp.slot_count * -1 END)
         -- Cumulative slots are tracked by their state and carried over from
         -- previous rows
         OVER (
