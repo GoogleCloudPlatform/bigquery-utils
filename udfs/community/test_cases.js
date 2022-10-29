@@ -49,6 +49,14 @@ generate_udf_test("json_extract_keys", [
         inputs: [`'{"int" : 1}'`],
         expected_output: `["int"]`
     },
+    {
+        inputs: [`'invalid_json'`],
+        expected_output: `cast(null as array<string>)`,
+    },
+    {
+        inputs: [`string(null)`],
+        expected_output: `cast(null as array<string>)`,
+    },
 ]);
 generate_udf_test("json_extract_values", [
     {
@@ -58,6 +66,14 @@ generate_udf_test("json_extract_values", [
     {
         inputs: [`'{"int" : 1}'`],
         expected_output: `["1"]`
+    },
+    {
+        inputs: [`'invalid_json'`],
+        expected_output: `cast(null as array<string>)`,
+    },
+    {
+        inputs: [`string(null)`],
+        expected_output: `cast(null as array<string>)`,
     },
 ]);
 generate_udf_test("json_typeof", [
