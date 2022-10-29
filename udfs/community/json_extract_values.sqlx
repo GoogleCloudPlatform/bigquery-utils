@@ -21,5 +21,17 @@ config { hasOutput: true }
 CREATE OR REPLACE FUNCTION ${self()}(input STRING)
 RETURNS Array<String>
 LANGUAGE js AS """
-  return Object.values(JSON.parse(input));
+  if(input === null) {
+    return null;
+  }
+  let obj;
+  try {
+    obj = JSON.parse(input);
+  } catch {
+    return null;
+  }
+  if(!obj) {
+    return null;
+  }
+  return Object.values(obj);
 """;
