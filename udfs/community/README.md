@@ -919,7 +919,7 @@ Similar to Teradata and Netezza's months_between function
 ```sql
 SELECT bqutil.fn.months_between(DATETIME '2005-03-01 10:34:56', DATETIME '2005-02-28 11:22:33');
 
-0.127956989
+0.12795698924731182795698924731182795699
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
