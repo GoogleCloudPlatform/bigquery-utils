@@ -1,0 +1,35 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Emulates Teradata and Netezza's months_between function. */
+CREATE OR REPLACE FUNCTION ${self()}(et datetime, st datetime) RETURNS BIGNUMERIC
+OPTIONS(description="Emulates Teradata and Netezza's months_between function.")
+AS ((
+  WITH t AS (
+    SELECT
+      EXTRACT(DAY FROM et) * 86400 + EXTRACT(HOUR FROM et) * 3600 +  EXTRACT(MINUTE FROM et) * 60 + EXTRACT(SECOND FROM et) end_in_sec,
+      EXTRACT(DAY FROM st) * 86400 + EXTRACT(HOUR FROM st) * 3600 +  EXTRACT(MINUTE FROM st) * 60 + EXTRACT(SECOND FROM et) start_in_sec,
+      DATETIME_DIFF(et, st, MONTH) as month_diff
+  )
+  SELECT
+    CASE
+      WHEN EXTRACT(DAY FROM et) = EXTRACT(DAY FROM st) OR (DATETIME_TRUNC(et, DAY) = LAST_DAY(et, MONTH) AND DATETIME_TRUNC(st, DAY) = LAST_DAY(st, MONTH))
+      THEN CAST(month_diff AS BIGNUMERIC)
+      ELSE month_diff + (end_in_sec - start_in_sec) / BIGNUMERIC '2678400'
+    END
+  FROM t
+));

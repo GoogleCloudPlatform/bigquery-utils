@@ -97,6 +97,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_comparable_format_bigint_t](#cw_comparable_format_bigint_tpart-int64)
 * [cw_comparable_format_bigint](#cw_comparable_format_bigintdata-array)
 * [cw_ts_overlap_buckets](#cw_ts_overlap_bucketsincludemeets-boolean-arraystruct-st-timestamp-et-timestamp)
+* [cw_months_between](#cw_months_betweenet-datetime-st-datetime)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -912,6 +913,14 @@ results:
 |   Row   |  f0_.bucketNo   |  f0_.st                      |  f0_.et                 |
 |---------|-----------------|------------------------------|-------------------------|
 |    1    |       1         |     2008-12-25 00:00:00 UTC  | 2008-12-31 00:00:00 UTC |
+
+### [cw_months_between(et DATETIME, st DATETIME)](cw_months_between.sqlx)
+Similar to Teradata and Netezza's months_between function
+```sql
+SELECT bqutil.fn.months_between(DATETIME '2005-03-01 10:34:56', DATETIME '2005-02-28 11:22:33');
+
+0.127956989
+```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
 Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
