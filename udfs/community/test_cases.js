@@ -2243,6 +2243,29 @@ generate_udf_test("cw_ts_overlap_buckets", [
         expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
     },
 ]);
+generate_udf_test("cw_months_between", [
+    {
+        inputs: [
+            `DATETIME "2022-02-01 00:00:00"`,
+            `DATETIME "2022-01-31 00:00:00"`
+        ],
+        expected_output: `CAST("0.03225806451612903225806451612903225806" AS BIGNUMERIC)`
+    },
+    {
+        inputs: [
+            `DATETIME "2022-03-01 11:00:00"`,
+            `DATETIME "2022-02-01 10:00:00"`
+        ],
+        expected_output: `CAST("1" AS BIGNUMERIC)`
+    },
+    {
+        inputs: [
+            `DATETIME "2022-03-01 11:34:56"`,
+            `DATETIME "2022-02-28 10:22:33"`
+        ],
+        expected_output: `CAST("0.13064516129032258064516129032258064516" AS BIGNUMERIC)`
+    }
+]);
 generate_udf_test("interval_seconds", [
   {
     inputs: [
