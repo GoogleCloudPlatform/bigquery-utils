@@ -786,7 +786,7 @@ Takes input string and delimiter. It generates pair from string tokenizer.
 ```sql
 SELECT bqutil.fn.cw_strtok('Test#1', '#');
 
-([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
 STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
 ```
 
@@ -795,7 +795,7 @@ Takes input string, delimiter and flags. It generates pair from string tokenizer
 ```sql
 SELECT bqutil.fn.cw_regexp_split('Test#1', '#', 'i');
 
-([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
 STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
 ```
 
@@ -867,7 +867,7 @@ String to map convert.
 ```sql
 SELECT bqutil.fn.cw_map_parse("a=1 b=42", " ", "=");
 
-([STRUCT("a" AS key, "1" AS value), 
+([STRUCT("a" AS key, "1" AS value),
 STRUCT("b" AS key, "42" AS value)])
 ```
 
@@ -1125,6 +1125,7 @@ SELECT
 
 ### [json_extract_keys()](json_extract_keys.sqlx)
 Returns all keys in the input JSON as an array of string
+Returns NULL if invalid JSON string is passed,
 
 ```sql
 SELECT bqutil.fn.json_extract_keys(
@@ -1138,6 +1139,8 @@ hat
 
 ### [json_extract_values()](json_extract_values.sqlx)
 Returns all values in the input JSON as an array of string
+Returns NULL if invalid JSON string is passed,
+
 
 ```sql
 SELECT bqutil.fn.json_extract_values(
