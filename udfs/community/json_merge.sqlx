@@ -32,17 +32,17 @@ else if ( json1 == null ){
 }
 """
  OPTIONS (
-  description = 'Combines given two json attributes(of string type) and returns combined json as string. Attributes from second json are added if missing and replaced if they are exists.'
+  description = 'Merges given two json attributes(of string type) and returns merged json as string. Attributes from second json are added if missing and replaced if they are exists.'
 );
 
 --ASSERT(
 ---- start ests
---(SELECT json_combine('{"field1":"val1","field2":"value2"}','{"field2":"updatedvalue2", "field3":"val3"}'))='{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
+--(SELECT json_merge('{"field1":"val1","field2":"value2"}','{"field2":"updatedvalue2", "field3":"val3"}'))='{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
 --AND
---(SELECT json_combine(null,'{"field2":"updatedvalue2", "field3":"val3"}') )= '{"field2":"updatedvalue2", "field3":"val3"}'
+--(SELECT json_merge(null,'{"field2":"updatedvalue2", "field3":"val3"}') )= '{"field2":"updatedvalue2", "field3":"val3"}'
 --AND
---(SELECT json_combine('{"field1":"val1","field2":"value2"}',NULL))='{"field1":"val1","field2":"value2"}'
+--(SELECT json_merge('{"field1":"val1","field2":"value2"}',NULL))='{"field1":"val1","field2":"value2"}'
 --AND
---(SELECT json_combine(null,null)) is null
+--(SELECT json_merge(null,null)) is null
 ---- end tests
 --);
