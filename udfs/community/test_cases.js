@@ -2335,6 +2335,26 @@ generate_udf_test("sure_like", [
   },
 ]);
 
+generate_udf_test("sure_range", [
+  {
+    inputs: [
+      `1`,
+      `1`,
+      `10`,
+    ],
+    expected_output: `1`,
+  },
+  {
+    inputs: [
+      `"b"`,
+      `"a"`,
+      `"c"`,
+    ],
+    expected_output: `"b"`,
+  },
+]);
+
+
 generate_udf_test("sure_values", [
   {
     inputs: [

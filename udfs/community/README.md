@@ -138,6 +138,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_value](#random_valuearr-any-type)
 * [sure_like](#sure_like)
 * [sure_nonnull](#sure_nonnull)
+* [sure_range](#sure_range)
 * [sure_values](#sure_values)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
@@ -1392,6 +1393,16 @@ SELECT
   bqutil.fn.sure_nonnull(1),
   bqutil.fn.sure_nonnull("string"),
   bqutil.fn.sure_nonnull([1, 2, 3]),
+```
+
+### [sure_range(value ANY TYPE)](sure_range.sqlx)
+
+Returns true if value is between lower_bound and upper_bound, inclusive.
+
+```sql
+SELECT
+  bqutil.fn.sure_range(1, 1, 10) == 1,
+  bqutil.fn.sure_range("b", "a", "b") == "b",
 ```
 
 ### [sure_values(value ANY TYPE, acceptable_value_array ANY TYPE)](sure_values.sqlx)
