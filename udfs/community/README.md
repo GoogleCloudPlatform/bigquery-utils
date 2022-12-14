@@ -136,6 +136,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
+* [sure_cond](#sure_cond)
 * [sure_like](#sure_like)
 * [sure_nonnull](#sure_nonnull)
 * [sure_range](#sure_range)
@@ -1371,6 +1372,16 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+### [sure_cond(value STRING, cond BOOL)](sure_cond.sqlx)
+
+If `cond` is `FALSE` the function cause error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_cond`(x, x > 0)
+FROM UNNEST([1, 2, 3, 4]) as x
 ```
 
 ### [sure_like(value STRING, like_pattern STRING)](sure_like.sqlx)
