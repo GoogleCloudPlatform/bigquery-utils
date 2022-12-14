@@ -136,6 +136,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
+* [sure_nonnull](#sure_nonnull)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -1367,6 +1368,18 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+### [sure_nonnull(value ANY TYPE)](sure_nonnull.sqlx)
+
+If non-NULL argument is passed, the function returns input `value` as-is.
+However if NULL value is passed, it causes error.
+
+```sql
+SELECT
+  bqutil.fn.sure_nonnull(1),
+  bqutil.fn.sure_nonnull("string"),
+  bqutil.fn.sure_nonnull([1, 2, 3]),
 ```
 
 ### [to_binary(x INT64)](to_binary.sqlx)

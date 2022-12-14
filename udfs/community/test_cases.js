@@ -2308,3 +2308,18 @@ generate_udf_test("interval_micros", [
     expected_output: `CAST(-86400000000 AS INT64)`
   },
 ]);
+
+generate_udf_test("sure_nonnull", [
+  {
+    inputs: [
+      `"string_example"`,
+    ],
+    expected_output: `"string_example"`
+  },
+  {
+    inputs: [
+      `1`,
+    ],
+    expected_output: `1`
+  }
+]);
