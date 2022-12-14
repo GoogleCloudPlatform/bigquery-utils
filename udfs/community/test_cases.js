@@ -2315,7 +2315,10 @@ generate_udf_test("sure_nonnull", [
       `"string_example"`,
     ],
     expected_output: `"string_example"`
-  },
+  }
+]);
+
+generate_udf_test("sure_nonnull", [
   {
     inputs: [
       `1`,
