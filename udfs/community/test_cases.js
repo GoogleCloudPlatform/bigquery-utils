@@ -2323,3 +2323,19 @@ generate_udf_test("sure_nonnull", [
     expected_output: `1`
   }
 ]);
+
+generate_udf_test("sure_values", [
+  {
+    inputs: [
+      `"hoge"`,
+      `["hoge"]`
+    ],
+    expected_output: `"hoge"`
+  },
+  {
+    inputs: [
+      `STRING(null)`,
+    ],
+    expected_output: `NULL`
+  }
+]);
