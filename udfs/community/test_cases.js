@@ -2380,6 +2380,7 @@ generate_udf_test("sure_values", [
   {
     inputs: [
       `STRING(null)`,
+      `["hoge"]`
     ],
     expected_output: `NULL`
   }
