@@ -2324,6 +2324,17 @@ generate_udf_test("sure_nonnull", [
   }
 ]);
 
+
+generate_udf_test("sure_like", [
+  {
+    inputs: [
+      `"[Testcase]"`,
+      `"[%]"`,
+    ],
+    expected_output: `"[Testcase]"`
+  },
+]);
+
 generate_udf_test("sure_values", [
   {
     inputs: [

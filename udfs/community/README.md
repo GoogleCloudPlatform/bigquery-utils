@@ -136,6 +136,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
+* [sure_like](#sure_like)
 * [sure_nonnull](#sure_nonnull)
 * [sure_values](#sure_values)
 * [to_binary](#to_binaryx-int64)
@@ -1371,6 +1372,16 @@ SELECT
 'tino', 'julie', 'jordan'
 ```
 
+### [sure_like(value STRING, like_pattern STRING)](sure_like.sqlx)
+
+If argument `value` is matched by `like_pattern`, the function returns `value` as-is.
+Otherwise it causes error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_like`("[some_pattern]", "[%]") = "hoge";
+```
+
 ### [sure_nonnull(value ANY TYPE)](sure_nonnull.sqlx)
 
 If non-NULL argument is passed, the function returns input `value` as-is.
@@ -1385,8 +1396,8 @@ SELECT
 
 ### [sure_values(value ANY TYPE, acceptable_value_array ANY TYPE)](sure_values.sqlx)
 
-If non-NULL argument is passed, the function returns input `value` as-is.
-However if NULL value is passed, it causes error.
+If argument `value` is in `acceptable_value_array` or NULL, the function returns input `value` as-is.
+Otherwise it causes error.
 
 ```sql
 SELECT
