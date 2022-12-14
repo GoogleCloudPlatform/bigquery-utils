@@ -2352,7 +2352,10 @@ generate_udf_test("sure_range", [
       `10`,
     ],
     expected_output: `1`,
-  },
+  }
+]);
+
+generate_udf_test("sure_range", [
   {
     inputs: [
       `"b"`,
@@ -2360,9 +2363,8 @@ generate_udf_test("sure_range", [
       `"c"`,
     ],
     expected_output: `"b"`,
-  },
+  }
 ]);
-
 
 generate_udf_test("sure_values", [
   {
