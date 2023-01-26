@@ -146,6 +146,7 @@ SELECT bqutil.fn.int(1.684)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
+* [uint256_add](#uint256_add-first-string-second-string)
 * [url_decode](#url_decodetext-string-method-string)
 * [url_encode](#url_encodetext-string-method-string)
 * [url_keys](#url_keysquery-string)
@@ -1565,6 +1566,16 @@ SELECT
   bqutil.fn.typeof(STRUCT()),
 
 STRING, BINARY, FLOAT64, STRUCT
+```
+
+### [uint256_add(first STRING, second STRING)](uint256_add.sqlx)
+Safely allows mathematical addition on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.uint256_add(
+  '893427328497983427893248932498034289324', '234859234879342897893427893274')
+
+"893427328732842662772591830391462182598"
 ```
 
 ### [url_decode(text STRING, method STRING)](url_decode.sqlx)
