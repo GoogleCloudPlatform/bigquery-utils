@@ -147,6 +147,9 @@ SELECT bqutil.fn.int(1.684)
 * [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
 * [uint256_add](#uint256_add-first-string-second-string)
+* [uint256_div](#uint256_div-first-string-second-string)
+* [uint256_mul](#uint256_mul-first-string-second-string)
+* [uint256_sub](#uint256_sub-first-string-second-string)
 * [url_decode](#url_decodetext-string-method-string)
 * [url_encode](#url_encodetext-string-method-string)
 * [url_keys](#url_keysquery-string)
@@ -1573,9 +1576,39 @@ Safely allows mathematical addition on numbers of any magnitude. Returns the res
 
 ```sql
 SELECT bqutil.fn.uint256_add(
-  '893427328497983427893248932498034289324', '234859234879342897893427893274')
+  '99999999999999999999999999999999999999999999999999999999999999999999', '2348592348793428978934278932746531725371625376152367153761536715376')
 
-"893427328732842662772591830391462182598"
+"102348592348793428978934278932746531725371625376152367153761536715375"
+```
+
+### [uint256_div(first STRING, second STRING)](uint256_div.sqlx)
+Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.uint256_div(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+"3"
+```
+
+### [uint256_mul(first STRING, second STRING)](uint256_mul.sqlx)
+Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.uint256_mul(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"
+```
+
+### [uint256_sub(first STRING, second STRING)](uint256_sub.sqlx)
+Safely allows mathematical substraction on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.uint256_sub(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"99999999999106572671267157337227408169608537817401563452213123123123"
 ```
 
 ### [url_decode(text STRING, method STRING)](url_decode.sqlx)
