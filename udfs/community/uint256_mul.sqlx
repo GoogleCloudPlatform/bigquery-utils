@@ -22,6 +22,9 @@ LANGUAGE js
   OPTIONS (
     library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
 AS r"""
+  if (first === null || second === null) {
+      return null;
+  }
   var a = new bn_js.BN(first, 10);
   var b = new bn_js.BN(second, 10);
   return a.mul(b).toString(10);
