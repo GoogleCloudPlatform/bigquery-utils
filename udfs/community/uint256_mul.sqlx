@@ -22,7 +22,7 @@ LANGUAGE js
   OPTIONS (
     library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
 AS r"""
-  if (first === null || second === null) {
+  if (first === null || second === null || first === "" || second === "") {
       return null;
   }
   var a = new bn_js.BN(first, 10);
