@@ -146,10 +146,10 @@ SELECT bqutil.fn.int(1.684)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [t_test](#t_testarrayarray)
 * [typeof](#typeofinput-any-type)
-* [uint256_add](#uint256_add-first-string-second-string)
-* [uint256_div](#uint256_div-first-string-second-string)
-* [uint256_mul](#uint256_mul-first-string-second-string)
-* [uint256_sub](#uint256_sub-first-string-second-string)
+* [bignumber_add](#bignumber_add-first-string-second-string)
+* [bignumber_div](#bignumber_div-first-string-second-string)
+* [bignumber_mul](#bignumber_mul-first-string-second-string)
+* [bignumber_sub](#bignumber_sub-first-string-second-string)
 * [url_decode](#url_decodetext-string-method-string)
 * [url_encode](#url_encodetext-string-method-string)
 * [url_keys](#url_keysquery-string)
@@ -1571,41 +1571,41 @@ SELECT
 STRING, BINARY, FLOAT64, STRUCT
 ```
 
-### [uint256_add(first STRING, second STRING)](uint256_add.sqlx)
+### [bignumber_add(first STRING, second STRING)](bignumber_add.sqlx)
 Safely allows mathematical addition on numbers of any magnitude. Returns the result as a string.
 
 ```sql
-SELECT bqutil.fn.uint256_add(
+SELECT bqutil.fn.bignumber_add(
   '99999999999999999999999999999999999999999999999999999999999999999999', '2348592348793428978934278932746531725371625376152367153761536715376')
 
 "102348592348793428978934278932746531725371625376152367153761536715375"
 ```
 
-### [uint256_div(first STRING, second STRING)](uint256_div.sqlx)
+### [bignumber_div(first STRING, second STRING)](bignumber_div.sqlx)
 Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
 
 ```sql
-SELECT bqutil.fn.uint256_div(
+SELECT bqutil.fn.bignumber_div(
   '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
 
 "3"
 ```
 
-### [uint256_mul(first STRING, second STRING)](uint256_mul.sqlx)
+### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
 Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
 
 ```sql
-SELECT bqutil.fn.uint256_mul(
+SELECT bqutil.fn.bignumber_mul(
   '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
 
 "89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"
 ```
 
-### [uint256_sub(first STRING, second STRING)](uint256_sub.sqlx)
+### [bignumber_sub(first STRING, second STRING)](bignumber_sub.sqlx)
 Safely allows mathematical substraction on numbers of any magnitude. Returns the result as a string.
 
 ```sql
-SELECT bqutil.fn.uint256_sub(
+SELECT bqutil.fn.bignumber_sub(
   '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
 
 "99999999999106572671267157337227408169608537817401563452213123123123"
