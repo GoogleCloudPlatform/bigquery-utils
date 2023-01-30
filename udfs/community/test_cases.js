@@ -2309,7 +2309,7 @@ generate_udf_test("interval_micros", [
   },
 ]);
 
-generate_udf_test("uint256_add", [
+generate_udf_test("bignumber_add", [
     {
         inputs: [
             `"99999999999999999999999999999999999999999999999999999999999999999999"`,
@@ -2333,7 +2333,7 @@ generate_udf_test("uint256_add", [
     },
 ]);
 
-generate_udf_test("uint256_div", [
+generate_udf_test("bignumber_div", [
     {
         inputs: [
             `"99999999999999999999999999999999999999999999999999999999999999999999"`,
@@ -2385,7 +2385,7 @@ generate_udf_test("uint256_div", [
     },
 ]);
 
-generate_udf_test("uint256_mul", [
+generate_udf_test("bignumber_mul", [
     {
         inputs: [
             `"99999999999999999999999999999999999999999999999999999999999999999999"`,
@@ -2416,7 +2416,7 @@ generate_udf_test("uint256_mul", [
     },
 ]);
 
-generate_udf_test("uint256_sub", [
+generate_udf_test("bignumber_sub", [
     {
         inputs: [
             `"99999999999999999999999999999999999999999999999999999999999999999999"`,
