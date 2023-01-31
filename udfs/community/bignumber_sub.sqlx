@@ -15,11 +15,12 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
--- Safely allows mathematical substraction on numbers of any magnitude
+-- Safely allows mathematical subtraction on numbers of any magnitude
 CREATE OR REPLACE FUNCTION ${self()}(first STRING, second STRING)
 RETURNS STRING
 LANGUAGE js
   OPTIONS (
+    description="Safely allows mathematical subtraction on numbers of any magnitude."
     library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
 AS r"""
   if (first === null || second === null || first === "" || second === "") {

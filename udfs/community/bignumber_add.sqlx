@@ -20,6 +20,7 @@ CREATE OR REPLACE FUNCTION ${self()}(first STRING, second STRING)
 RETURNS STRING
 LANGUAGE js
   OPTIONS (
+    description="Safely allows mathematical addition on numbers of any magnitude.",
     library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
 AS r"""
   if (first === null || second === null || first === "" || second === "") {
