@@ -200,7 +200,7 @@ SELECT bqutil.fn.bignumber_mul(
 ```
 
 ### [bignumber_sub(first STRING, second STRING)](bignumber_sub.sqlx)
-Safely allows mathematical substraction on numbers of any magnitude. Returns the result as a string.
+Safely allows mathematical subtraction on numbers of any magnitude. Returns the result as a string.
 
 ```sql
 SELECT bqutil.fn.bignumber_sub(
