@@ -14,9 +14,11 @@ SELECT bqutil.fn.int(1.684)
 ## UDFs
 * [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
 * [bignumber_add](#bignumber_add-first-string-second-string)
+* [bignumber_avg](#bignumber_avg-numbers-array)
 * [bignumber_div](#bignumber_div-first-string-second-string)
 * [bignumber_mul](#bignumber_mul-first-string-second-string)
 * [bignumber_sub](#bignumber_sub-first-string-second-string)
+* [bignumber_sum](#bignumber_sum-numbers-array)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -179,6 +181,18 @@ SELECT bqutil.fn.bignumber_add(
 "102348592348793428978934278932746531725371625376152367153761536715375"
 ```
 
+### [bignumber_avg(numbers ARRAY<STRING>)](bignumber_avg.sqlx)
+Safely allows calculating the average of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_avg(
+  '99999999999999999999999999999999999999999999999999999999999999999999', 
+  '33333333333333333333333333333333333333333333333333333333333333333333',
+  '66666666666666666666666666666666666666666666666666666666666666666666')
+
+"66666666666666666666666666666666666666666666666666666666666666666666"
+```
+
 ### [bignumber_div(first STRING, second STRING)](bignumber_div.sqlx)
 Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
 
@@ -207,6 +221,17 @@ SELECT bqutil.fn.bignumber_sub(
   '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
 
 "99999999999106572671267157337227408169608537817401563452213123123123"
+```
+
+### [bignumber_sum(numbers ARRAY<STRING>)](bignumber_sum.sqlx)
+Safely allows calculating the total sum of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sum(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876',
+  '123456789123456789123456789123456789123456789123456789123456789123456789')
+
+"123556789123457682550785521966119561715287180585639387560004576000333664"
 ```
 
 ### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
