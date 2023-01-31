@@ -13,6 +13,10 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 * [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
+* [bignumber_add](#bignumber_add-first-string-second-string)
+* [bignumber_div](#bignumber_div-first-string-second-string)
+* [bignumber_mul](#bignumber_mul-first-string-second-string)
+* [bignumber_sub](#bignumber_sub-first-string-second-string)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -163,6 +167,46 @@ Takes an input latitude, longitude, azimuth, and distance (in miles) and returns
 SELECT bqutil.fn.azimuth_to_geog_point(30.2672, 97.7431, 312.9, 1066.6);
 
 POINT(81.4417483906444 39.9606210457152)
+```
+
+### [bignumber_add(first STRING, second STRING)](bignumber_add.sqlx)
+Safely allows mathematical addition on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_add(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '2348592348793428978934278932746531725371625376152367153761536715376')
+
+"102348592348793428978934278932746531725371625376152367153761536715375"
+```
+
+### [bignumber_div(first STRING, second STRING)](bignumber_div.sqlx)
+Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_div(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+"3"
+```
+
+### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
+Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_mul(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"
+```
+
+### [bignumber_sub(first STRING, second STRING)](bignumber_sub.sqlx)
+Safely allows mathematical subtraction on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sub(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"99999999999106572671267157337227408169608537817401563452213123123123"
 ```
 
 ### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
