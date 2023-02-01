@@ -18,11 +18,10 @@ config { hasOutput: true }
 /* Emulates Teradata's RDIFF operator.  */
 CREATE OR REPLACE FUNCTION ${self()}(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>) RETURNS STRUCT<lower TIMESTAMP, upper TIMESTAMP>
 OPTIONS(description="Emulates Teradata's RDIFF operator.")
-AS ((
-  SELECT
-    CASE
-      WHEN GREATEST(p1.lower, p2.lower) < LEAST(p1.upper, p2.upper) AND p1.upper > p2.upper THEN
-        STRUCT(p2.upper AS lower, p1.upper AS upper)
-      ELSE NULL
-    END
-));
+AS (
+  CASE
+    WHEN GREATEST(p1.lower, p2.lower) < LEAST(p1.upper, p2.upper) AND p1.upper > p2.upper THEN
+      STRUCT(p2.upper AS lower, p1.upper AS upper)
+    ELSE NULL
+  END
+);
