@@ -2511,3 +2511,103 @@ generate_udf_test("bignumber_avg", [
         expected_output: `NULL`
     },
 ]);
+
+generate_udf_test("cw_period_intersection", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-10 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_ldiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-23 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_rdiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-25 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
