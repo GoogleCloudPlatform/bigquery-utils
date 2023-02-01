@@ -30,8 +30,8 @@
 SELECT
   -- usage_time is used for grouping jobs by the hour
   -- usage_date is used to separately store the date this job occurred
-  TIMESTAMP_TRUNC(jbo.creation_time, HOUR) AS usage_time,
-  EXTRACT(DATE from jbo.creation_time) AS usage_date,
+  TIMESTAMP_TRUNC(jbo.period_start, HOUR) AS usage_time,
+  EXTRACT(DATE from jbo.period_start) AS usage_date,
   jbo.reservation_id,
   jbo.project_id,
   jbo.job_type,
@@ -39,9 +39,10 @@ SELECT
   -- Aggregate total_slots_ms used for all jobs at this hour and divide
   -- by the number of milliseconds in an hour. Most accurate for hours with
   -- consistent slot usage
-  SUM(jbo.total_slot_ms) / (1000 * 60 * 60) AS average_hourly_slot_usage
+  SUM(jbo.period_slot_ms) / (1000 * 60 * 60) AS average_hourly_slot_usage
 FROM
-  `region-{region_name}`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
+  `region-{region_name}`.INFORMATION_SCHEMA.JOBS_TIMELINE_BY_ORGANIZATION jbo
+WHERE (jbo.statement_type != "SCRIPT" OR jbo.statement_type IS NULL)  -- Avoid duplicate byte counting in parent and children jobs.
 GROUP BY
   usage_time,
   usage_date,
