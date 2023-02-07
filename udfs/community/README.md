@@ -145,6 +145,11 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
+* [sure_cond](#sure_cond)
+* [sure_like](#sure_like)
+* [sure_nonnull](#sure_nonnull)
+* [sure_range](#sure_range)
+* [sure_values](#sure_values)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -1463,6 +1468,59 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+### [sure_cond(value STRING, cond BOOL)](sure_cond.sqlx)
+
+If `cond` is `FALSE` the function cause error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_cond`(x, x > 0)
+FROM UNNEST([1, 2, 3, 4]) as x
+```
+
+### [sure_like(value STRING, like_pattern STRING)](sure_like.sqlx)
+
+If argument `value` is matched by `like_pattern`, the function returns `value` as-is.
+Otherwise it causes error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_like`("[some_pattern]", "[%]") = "hoge";
+```
+
+### [sure_nonnull(value ANY TYPE)](sure_nonnull.sqlx)
+
+If non-NULL argument is passed, the function returns input `value` as-is.
+However if NULL value is passed, it causes error.
+
+```sql
+SELECT
+  bqutil.fn.sure_nonnull(1),
+  bqutil.fn.sure_nonnull("string"),
+  bqutil.fn.sure_nonnull([1, 2, 3]),
+```
+
+### [sure_range(value ANY TYPE)](sure_range.sqlx)
+
+Returns true if value is between lower_bound and upper_bound, inclusive.
+
+```sql
+SELECT
+  bqutil.fn.sure_range(1, 1, 10) == 1,
+  bqutil.fn.sure_range("b", "a", "b") == "b",
+```
+
+### [sure_values(value ANY TYPE, acceptable_value_array ANY TYPE)](sure_values.sqlx)
+
+If argument `value` is in `acceptable_value_array` or NULL, the function returns input `value` as-is.
+Otherwise it causes error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_values`("hoge", ["hoge", "fuga"]) = "hoge",
+  `bqutil.fn.sure_values`(  NULL, ["hoge", "fuga"]) is NULL
 ```
 
 ### [to_binary(x INT64)](to_binary.sqlx)

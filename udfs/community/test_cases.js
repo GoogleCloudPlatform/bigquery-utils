@@ -2611,3 +2611,80 @@ generate_udf_test("cw_period_rdiff", [
         expected_output: `NULL`
     },
 ]);
+
+generate_udf_test("sure_nonnull", [
+  {
+    inputs: [
+      `"string_example"`,
+    ],
+    expected_output: `"string_example"`
+  }
+]);
+
+generate_udf_test("sure_nonnull", [
+  {
+    inputs: [
+      `1`,
+    ],
+    expected_output: `1`
+  }
+]);
+
+generate_udf_test("sure_cond", [
+  {
+    inputs: [
+      `1`,
+      `TRUE`,
+    ],
+    expected_output: `1`
+  },
+]);
+
+generate_udf_test("sure_like", [
+  {
+    inputs: [
+      `"[Testcase]"`,
+      `"[%]"`,
+    ],
+    expected_output: `"[Testcase]"`
+  },
+]);
+
+generate_udf_test("sure_range", [
+  {
+    inputs: [
+      `1`,
+      `1`,
+      `10`,
+    ],
+    expected_output: `1`,
+  }
+]);
+
+generate_udf_test("sure_range", [
+  {
+    inputs: [
+      `"b"`,
+      `"a"`,
+      `"c"`,
+    ],
+    expected_output: `"b"`,
+  }
+]);
+
+generate_udf_test("sure_values", [
+  {
+    inputs: [
+      `"hoge"`,
+      `["hoge"]`
+    ],
+    expected_output: `"hoge"`
+  },
+  {
+    inputs: [
+      `STRING(null)`,
+      `["hoge"]`
+    ],
+    expected_output: `NULL`
+  }
+]);
