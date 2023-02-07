@@ -8,3 +8,6 @@ jstat:
   versions:
     - 1.9.3
     - 1.9.4
+bn.js:
+  versions:
+    - 5.2.1

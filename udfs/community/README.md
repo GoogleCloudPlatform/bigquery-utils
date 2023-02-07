@@ -13,6 +13,12 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 * [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
+* [bignumber_add](#bignumber_add-first-string-second-string)
+* [bignumber_avg](#bignumber_avg-numbers-array)
+* [bignumber_div](#bignumber_div-first-string-second-string)
+* [bignumber_mul](#bignumber_mul-first-string-second-string)
+* [bignumber_sub](#bignumber_sub-first-string-second-string)
+* [bignumber_sum](#bignumber_sum-numbers-array)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -97,6 +103,9 @@ SELECT bqutil.fn.int(1.684)
 * [cw_comparable_format_bigint_t](#cw_comparable_format_bigint_tpart-int64)
 * [cw_comparable_format_bigint](#cw_comparable_format_bigintdata-array)
 * [cw_months_between](#cw_months_betweenet-datetime-st-datetime)
+* [cw_period_intersection](#cw_period_intersectionp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_period_ldiff](#cw_period_ldiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_period_rdiff](#cw_period_rdiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_ts_overlap_buckets](#cw_ts_overlap_bucketsincludemeets-boolean-arraystruct-st-timestamp-et-timestamp)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
@@ -168,6 +177,66 @@ Takes an input latitude, longitude, azimuth, and distance (in miles) and returns
 SELECT bqutil.fn.azimuth_to_geog_point(30.2672, 97.7431, 312.9, 1066.6);
 
 POINT(81.4417483906444 39.9606210457152)
+```
+
+### [bignumber_add(first STRING, second STRING)](bignumber_add.sqlx)
+Safely allows mathematical addition on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_add(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '2348592348793428978934278932746531725371625376152367153761536715376')
+
+"102348592348793428978934278932746531725371625376152367153761536715375"
+```
+
+### [bignumber_avg(numbers ARRAY<STRING>)](bignumber_avg.sqlx)
+Safely allows calculating the average of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_avg(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333', '66666666666666666666666666666666666666666666666666666666666666666666')
+
+"66666666666666666666666666666666666666666666666666666666666666666666"
+```
+
+### [bignumber_div(first STRING, second STRING)](bignumber_div.sqlx)
+Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_div(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+"3"
+```
+
+### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
+Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_mul(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"
+```
+
+### [bignumber_sub(first STRING, second STRING)](bignumber_sub.sqlx)
+Safely allows mathematical subtraction on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sub(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"99999999999106572671267157337227408169608537817401563452213123123123"
+```
+
+### [bignumber_sum(numbers ARRAY<STRING>)](bignumber_sum.sqlx)
+Safely allows calculating the total sum of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sum(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876', '123456789123456789123456789123456789123456789123456789123456789123456789')
+
+"123556789123457682550785521966119561715287180585639387560004576000333664"
 ```
 
 ### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
@@ -925,6 +994,33 @@ Similar to Teradata and Netezza's months_between function
 SELECT bqutil.fn.months_between(DATETIME '2005-03-01 10:34:56', DATETIME '2005-02-28 11:22:33');
 
 0.12795698924731182795698924731182795699
+```
+
+### [cw_period_intersection(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_intersection.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_intersection(
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)
+```
+
+### [cw_period_ldiff(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_ldiff.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_ldiff(
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)
+```
+
+### [cw_period_rdiff(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_rdiff.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_rdiff(
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)

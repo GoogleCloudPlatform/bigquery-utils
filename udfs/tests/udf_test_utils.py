@@ -154,7 +154,7 @@ def generate_webpack_configs():
                 f'    output: {{\n'
                 f'        path: path.resolve(__dirname, "js_builds"),\n'
                 f'        filename: "{js_lib_name}-v{js_lib_version}{js_lib_file_extension}",\n'
-                f'        library: "{js_lib_name.replace("-", "_")}",\n'
+                f'        library: "{js_lib_name.replace("-", "_").replace(".","_")}",\n'
                 f'        libraryTarget: "var",\n'
                 f'    }},\n'
                 f'    optimization: {{\n'

@@ -2309,6 +2309,309 @@ generate_udf_test("interval_micros", [
   },
 ]);
 
+generate_udf_test("bignumber_add", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"2348592348793428978934278932746531725371625376152367153761536715376"`
+        ],
+        expected_output: `"102348592348793428978934278932746531725371625376152367153761536715375"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_div", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `"3"`
+    },
+    {
+        inputs: [
+            `"0"`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `""`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"0"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_mul", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"893427328732842662772591830391462182598436547786876876876"`
+        ],
+        expected_output: `"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_sub", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"893427328732842662772591830391462182598436547786876876876"`
+        ],
+        expected_output: `"99999999999106572671267157337227408169608537817401563452213123123123"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_sum", [
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `"123556789123457682550785521966119561715287180585639387560004576000333664"`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                NULL
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_avg", [
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "33333333333333333333333333333333333333333333333333333333333333333333",
+                "66666666666666666666666666666666666666666666666666666666666666666666"
+            ]`
+        ],
+        expected_output: `"66666666666666666666666666666666666666666666666666666666666666666666"`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                NULL
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[]`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_intersection", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-10 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_ldiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-23 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_rdiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-25 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
 generate_udf_test("sure_nonnull", [
   {
     inputs: [
