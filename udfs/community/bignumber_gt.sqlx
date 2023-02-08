@@ -17,7 +17,7 @@ config { hasOutput: true }
 
 -- Safely allows mathematical addition on numbers of any magnitude
 CREATE OR REPLACE FUNCTION ${self()}(first STRING, second STRING)
-RETURNS STRING
+RETURNS BOOL
 LANGUAGE js
   OPTIONS (
     description="Safely allows greater-than comparison on numbers of any magnitude.",
