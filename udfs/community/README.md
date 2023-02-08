@@ -1159,7 +1159,9 @@ Merges given two json and returns merged json. Attributes from second json are a
 
   
 ```sql
-SELECT TO_JSON_STRING(dwh.json_merge(PARSE_JSON('{"field1":"val1","field2":"value2"}'),PARSE_JSON('{"field2":"updatedvalue2", "field3":"val3"}')))
+SELECT TO_JSON_STRING(
+  dwh.json_merge(PARSE_JSON('{"field1":"val1","field2":"value2"}'),PARSE_JSON('{"field2":"updatedvalue2", "field3":"val3"}'))
+  )
   
 '{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
 ```
