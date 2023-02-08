@@ -1152,11 +1152,9 @@ cat
 dog
 rat
 ```
-
   
 ### [json_merge()](json_merge.sqlx)
 Merges given two json and returns merged json. Attributes from second json are added if missing and replaced if they are exists.
-
   
 ```sql
 SELECT TO_JSON_STRING(
@@ -1165,7 +1163,6 @@ SELECT TO_JSON_STRING(
   
 '{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
 ```
-  
   
 ### [json_typeof(json string)](json_typeof.sqlx)
 
