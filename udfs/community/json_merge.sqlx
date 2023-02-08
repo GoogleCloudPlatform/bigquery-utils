@@ -16,8 +16,8 @@ config { hasOutput: true }
  */
 
 
-CREATE OR REPLACE FUNCTION ${self()}(json1 STRING, json2 STRING)
-RETURNS STRING
+CREATE OR REPLACE FUNCTION ${self()}(json1 JSON, json2 JSON)
+RETURNS JSON
 LANGUAGE js AS r"""
 if ( json1 == null && json2 == null ){
   return null;
@@ -28,21 +28,9 @@ else if ( json2 == null ){
 else if ( json1 == null ){
   return json2;
 } else{
-  return JSON.stringify(Object.assign(JSON.parse(json1), JSON.parse(json2)));
+  return Object.assign(json1, json2);
 }
 """
  OPTIONS (
-  description = 'Merges given two json attributes(of string type) and returns merged json as string. Attributes from second json are added if missing and replaced if they are exists.'
+  description = 'Merges given two json and returns merged json. Attributes from second json are added if missing and replaced if they are exists.'
 );
-
---ASSERT(
----- start ests
---(SELECT json_merge('{"field1":"val1","field2":"value2"}','{"field2":"updatedvalue2", "field3":"val3"}'))='{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
---AND
---(SELECT json_merge(null,'{"field2":"updatedvalue2", "field3":"val3"}') )= '{"field2":"updatedvalue2", "field3":"val3"}'
---AND
---(SELECT json_merge('{"field1":"val1","field2":"value2"}',NULL))='{"field1":"val1","field2":"value2"}'
---AND
---(SELECT json_merge(null,null)) is null
----- end tests
---);
