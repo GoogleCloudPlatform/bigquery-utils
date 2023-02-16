@@ -15,12 +15,12 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
--- Safely allows greater than comparison on numbers of any magnitude
+-- Safely allows less than comparison on numbers of any magnitude
 CREATE OR REPLACE FUNCTION ${self()}(first STRING, second STRING)
 RETURNS BOOL
 LANGUAGE js
   OPTIONS (
-    description="Safely allows greater than comparison on numbers of any magnitude.",
+    description="Safely allows less than comparison on numbers of any magnitude.",
     library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
 AS r"""
   if (first === null || second === null || first === "" || second === "") {
@@ -28,5 +28,5 @@ AS r"""
   }
   var a = new bn_js.BN(first, 10);
   var b = new bn_js.BN(second, 10);
-  return a.gt(b);
+  return a.lt(b);
 """;
