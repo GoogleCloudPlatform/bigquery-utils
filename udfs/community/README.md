@@ -210,6 +210,16 @@ SELECT bqutil.fn.bignumber_div(
 "3"
 ```
 
+### [bignumber_gt(first STRING, second STRING)](bignumber_gt.sqlx)
+Safely allows mathematical greater-than comparison  on numbers of any magnitude. Returns the result as a bool.
+
+```sql
+SELECT bqutil.fn.bignumber_gt(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+TRUE
+```
+
 ### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
 Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
 
