@@ -13,12 +13,17 @@ SELECT bqutil.fn.int(1.684)
 
 ## UDFs
 * [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
-* [bignumber_add](#bignumber_add-first-string-second-string)
-* [bignumber_avg](#bignumber_avg-numbers-array)
-* [bignumber_div](#bignumber_div-first-string-second-string)
-* [bignumber_mul](#bignumber_mul-first-string-second-string)
-* [bignumber_sub](#bignumber_sub-first-string-second-string)
-* [bignumber_sum](#bignumber_sum-numbers-array)
+* [bignumber_add](#bignumber_addfirst-string-second-string)
+* [bignumber_avg](#bignumber_avgnumbers-array)
+* [bignumber_div](#bignumber_divfirst-string-second-string)
+* [bignumber_eq](#bignumber_gtfirst-string-second-string)
+* [bignumber_gt](#bignumber_gtfirst-string-second-string)
+* [bignumber_gte](#bignumber_gtefirst-string-second-string)
+* [bignumber_lt](#bignumber_gtfirst-string-second-string)
+* [bignumber_lte](#bignumber_gtefirst-string-second-string)
+* [bignumber_mul](#bignumber_mulfirst-string-second-string)
+* [bignumber_sub](#bignumber_subfirst-string-second-string)
+* [bignumber_sum](#bignumber_sumnumbers-array)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
@@ -207,6 +212,56 @@ SELECT bqutil.fn.bignumber_div(
   '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
 
 "3"
+```
+
+### [bignumber_eq(first STRING, second STRING)](bignumber_eq.sqlx)
+Safely allows equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_eq(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_gt(first STRING, second STRING)](bignumber_gt.sqlx)
+Safely allows greater than comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_gt(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+TRUE
+```
+
+### [bignumber_gte(first STRING, second STRING)](bignumber_gte.sqlx)
+Safely allows greater than or equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_gte(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_lt(first STRING, second STRING)](bignumber_lt.sqlx)
+Safely allows less than comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_lt(
+  '33333333333333333333333333333333333333333333333333333333333333333333','99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_lte(first STRING, second STRING)](bignumber_lte.sqlx)
+Safely allows less than or equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_lte(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
 ```
 
 ### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
