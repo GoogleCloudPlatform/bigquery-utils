@@ -48,7 +48,7 @@ This chart displays the average usage for every hour, sorted by days with the mo
 
 
 ### Hourly Heatmap
-This chart deplays the overall slot utilization broken down by day and hour.
+This chart displays the overall slot utilization broken down by day and hour.
 Cell color scales based on utilization and the largest utilization values are shown in black text.
 
 ![Hourly Heatmap](../images/hourly_utilization/hourly_heatmap.png)
