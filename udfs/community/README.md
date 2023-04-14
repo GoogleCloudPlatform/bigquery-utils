@@ -52,6 +52,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_array_median](#cw_array_medianarr-any-type)
 * [cw_array_max](#cw_array_maxarr-any-type)
 * [cw_array_distinct](#cw_array_distinctarr-any-type)
+* [cw_array_stable_distinct](#cw_array_stable_distinctarr-any-type)
 * [cw_next_day](#cw_next_daydate_value-date-day_name-string)
 * [cw_td_nvp](#cw_td_nvphaystack-string-needle-string-pairsep-string-valuesep-string-occurence-int64)
 * [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
@@ -556,6 +557,14 @@ Returns distinct array.
 SELECT bqutil.fn.cw_array_distinct([1, 2, 3, 4, 4, 5, 5]);
 
 [1, 2, 3, 4, 5]
+```
+
+### [cw_array_stable_distinct(arr ANY TYPE)](cw_array_stable_distinct.sqlx)
+Returns distinct array with preserved elements order.
+```sql
+SELECT bqutil.fn.cw_array_stable_distinct([4, 1, 4, 9, 1, 10]);
+
+[4, 1, 9, 10]
 ```
 
 ### [cw_next_day(date_value DATE, day_name STRING)](cw_next_day.sqlx)
