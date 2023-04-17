@@ -20,7 +20,10 @@ config { hasOutput: true }
  * Duplicate with the lowest index is retained, others are discarded.
  */
 CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE)
-OPTIONS(description="Removes duplicates from ARRAY while preserving the elements ordering.")
+OPTIONS(description="""
+Removes duplicates from ARRAY while preserving the elements ordering. 
+Duplicate with the lowest index is retained, others are discarded.
+""")
 AS (
    ARRAY(SELECT el FROM (SELECT el, MIN(idx) as idx FROM UNNEST(arr) as el WITH OFFSET AS idx GROUP BY el) ORDER BY idx)
 );
