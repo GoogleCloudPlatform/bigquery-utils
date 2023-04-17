@@ -1656,6 +1656,26 @@ generate_udf_test("cw_array_distinct", [
         expected_output: `CAST([1, 2, 3, 4, 5] AS ARRAY<INT64>)`
     },
 ]);
+generate_udf_test("cw_array_stable_distinct", [
+    {
+        inputs: [
+            `(SELECT ARRAY[4, 1, 4, 9, 1, 10])`
+        ],
+        expected_output: `[4, 1, 9, 10]`
+    },
+    {
+        inputs: [
+            `(SELECT ARRAY[])`
+        ],
+        expected_output: `[]`
+    },
+    {
+        inputs: [
+            `(SELECT ARRAY[5, 5, 5, 5, 5, 5])`
+        ],
+        expected_output: `[5]`
+    },
+]);
 generate_udf_test("cw_next_day", [
     {
         inputs: [
