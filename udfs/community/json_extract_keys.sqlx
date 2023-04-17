@@ -21,8 +21,8 @@ config { hasOutput: true }
 CREATE OR REPLACE FUNCTION ${self()}(input STRING)
 RETURNS Array<String>
 LANGUAGE js 
-OPTIONS (description="""Returns all keys in the input JSON as an array of string
-Returns NULL if invalid JSON string is passed,
+OPTIONS (description="""Returns all keys in the input JSON as an array of string.
+Returns NULL if invalid JSON string is passed.
 
 ```sql
 SELECT bqutil.fn.json_extract_keys(

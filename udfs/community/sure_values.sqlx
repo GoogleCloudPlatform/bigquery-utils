@@ -20,9 +20,8 @@ CREATE OR REPLACE FUNCTION ${self()}(
   value ANY TYPE, 
   acceptable_value_array ANY TYPE
 )
-OPTIONS (description="""
-If argument `value` is in `acceptable_value_array` or NULL, the function returns input `value` as-is.
-Otherwise it causes error.
+OPTIONS (description="""If argument `value` is in `acceptable_value_array`
+or NULL, the function returns input `value` as-is; otherwise it throws an error.
 
 ```sql
 SELECT

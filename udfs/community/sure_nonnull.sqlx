@@ -15,9 +15,9 @@ config { hasOutput: true }
  * limitations under the License.
  */
 CREATE OR REPLACE FUNCTION ${self()}(value ANY TYPE)
-OPTIONS (description="""
-If non-NULL argument is passed, the function returns input `value` as-is.
-However if NULL value is passed, it causes error.
+OPTIONS (description="""If non-NULL argument is passed,
+the function returns input `value` as-is; however if NULL
+value is passed, it throws an error.
 """)
 AS (
   IF(
