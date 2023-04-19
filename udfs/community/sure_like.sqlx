@@ -15,9 +15,8 @@ config { hasOutput: true }
  * limitations under the License.
  */
 CREATE OR REPLACE FUNCTION ${self()}(value STRING, like_pattern STRING)
-OPTIONS (description="""
-If argument `value` is matched by `like_pattern`, the function returns `value` as-is.
-Otherwise it causes error.
+OPTIONS (description="""If argument `value` is matched by `like_pattern`,
+the function returns `value` as-is; otherwise it throws an error.
 
 ```sql
 SELECT

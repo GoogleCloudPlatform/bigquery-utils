@@ -15,8 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 CREATE OR REPLACE FUNCTION ${self()}(value ANY TYPE, cond BOOL)
-OPTIONS (description="""
-If `cond` is `FALSE` the function cause error.
+OPTIONS (description="""If `cond` is `FALSE` the function throws an error.
 
 ```sql
 SELECT
