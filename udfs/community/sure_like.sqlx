@@ -1,0 +1,32 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+CREATE OR REPLACE FUNCTION ${self()}(value STRING, like_pattern STRING)
+OPTIONS (description="""If argument `value` is matched by `like_pattern`,
+the function returns `value` as-is; otherwise it throws an error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_like`("[some_pattern]", "[%]") = "[some_pattern]"
+```
+""")
+AS (
+  IF(
+    value NOT LIKE like_pattern,
+    ERROR(FORMAT("${self()}: Value must be matech (%T LIKE %T)", value, like_pattern)),
+    value
+  )
+);

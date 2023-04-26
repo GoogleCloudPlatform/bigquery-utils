@@ -1,0 +1,54 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Similar to teradata's editdistance without weightages */
+CREATE OR REPLACE FUNCTION ${self()}( a STRING, b STRING ) RETURNS INT64
+LANGUAGE js AS """
+
+    if ( a == null || b == null ) {
+        return null;
+    }
+
+    var work = new Array( a.length + 1 )
+    for ( var i = 0 ; i <= a.length ; i ++ ) {
+        work[i] = new Array ( b.length + 1 )
+    }
+
+
+    for ( var i = 0 ; i < a.length + 1 ; i ++ )
+        work[i][0] = i;
+
+    for ( var j = 0 ; j < b.length + 1 ; j ++ )
+        work[0][j] = j;
+
+
+    for ( var i = 1 ; i < a.length + 1 ; i ++ ) {
+        for ( var j = 1 ; j < b.length + 1 ; j ++ ) {
+            var cost = a[i-1] == b[j-1] ? 0 : 1;
+            work[i][j] = Math.min(
+                work[i-1] [j]   + 1,
+                work[i]   [j-1] + 1,
+                work[i-1] [j-1] + cost )
+            if ( i > 1 && j > 1 && a[i-1] == b[j-2] && a[i-2] == b[j-1] ) {
+                work[i][j] = Math.min(
+                    work[i]  [j],
+                    work[i-2][j-2] + 1 );
+            }
+        }
+    }
+    return work[a.length][b.length];
+""";

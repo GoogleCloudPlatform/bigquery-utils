@@ -1,0 +1,25 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Similar to Presto from_base function - convert string from given base to decimal */
+CREATE OR REPLACE FUNCTION ${self()}(number STRING, base INT64) RETURNS INT64 AS (
+    (WITH chars AS (
+        SELECT IF(ch >= 48 AND ch <= 57, ch - 48, IF(ch >= 65 AND ch <= 90, ch - 65 + 10, ch - 97 + 10)) pos, offset + 1 AS idx
+        FROM UNNEST(TO_CODE_POINTS(number)) AS ch WITH OFFSET
+    )
+    SELECT SAFE_CAST(SUM(pos*CAST(POW(base, CHAR_LENGTH(number) - idx) AS NUMERIC)) AS INT64) from_base FROM chars)
+);

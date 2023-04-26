@@ -15,11 +15,29 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/*
-  Returns all values in the input JSON as an array of string
-*/
 CREATE OR REPLACE FUNCTION ${self()}(input STRING)
 RETURNS Array<String>
-LANGUAGE js AS """
-  return Object.values(JSON.parse(input));
+LANGUAGE js 
+OPTIONS(
+  description = """Returns all values in the input JSON as an array of string
+Returns NULL if invalid JSON string is passed,
+
+
+```sql
+SELECT bqutil.fn.json_extract_values(
+  '{"foo" : "cat", "bar": "dog", "hat": "rat"}'
+) AS keys_array
+
+cat
+dog
+rat
+```
+"""
+) 
+AS """
+  try {
+    return Object.values(JSON.parse(input));
+  } catch {
+    return null;
+  }
 """;

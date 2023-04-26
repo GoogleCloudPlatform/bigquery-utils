@@ -1,0 +1,64 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(text string, comma string, quote string,len INT64)
+RETURNS array<string>
+LANGUAGE js AS """
+
+    var ret = []
+    var index = 0;
+    /* Can't return NULL from ARRAY */
+    for( var j = 0 ; j < len ; j ++ ) ret.push('');
+    if ( text === null )
+        return ret;
+    var state = 0;
+    const STATE_TOP    = 0;
+    const STATE_QUOTE  = 1;
+    const STATE_ESCAPE = 2;
+    var start_new = function () { index ++;  };
+    var append = function(c) {  ret[index] += c; };
+
+    for ( var j = 0 ; j < text.length ; j ++ ) {
+        var c = text.charAt(j);
+        switch ( state ) {
+        case STATE_TOP:
+            if ( c == quote ) state = STATE_QUOTE;
+            else if ( c == comma ) start_new();
+            else append(c);
+            break;
+        case STATE_QUOTE:
+            if ( c == quote ) state = STATE_ESCAPE;
+            else append(c);
+            break;
+        case STATE_ESCAPE:
+            if ( c == quote ) {
+                state = STATE_QUOTE;
+                append(quote)
+            } else if ( c == comma ) {
+                state = STATE_TOP;
+                start_new();
+            } else {
+                state = STATE_TOP;
+                append(c);
+            }
+            break;
+        default: /* impossible condition */
+            break;
+        }
+    }
+    return ret;
+""";

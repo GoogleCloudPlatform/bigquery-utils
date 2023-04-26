@@ -20,6 +20,25 @@ config { hasOutput: true }
 */
 CREATE OR REPLACE FUNCTION ${self()}(input STRING)
 RETURNS Array<String>
-LANGUAGE js AS """
-  return Object.keys(JSON.parse(input));
+LANGUAGE js 
+OPTIONS (description="""Returns all keys in the input JSON as an array of string.
+Returns NULL if invalid JSON string is passed.
+
+```sql
+SELECT bqutil.fn.json_extract_keys(
+  '{"foo" : "cat", "bar": "dog", "hat": "rat"}'
+) AS keys_array
+
+foo
+bar
+hat
+```
+"""
+)
+AS """
+  try {
+    return Object.keys(JSON.parse(input));
+  } catch {
+    return null;
+  }
 """;

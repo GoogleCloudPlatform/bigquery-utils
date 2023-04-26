@@ -1,0 +1,28 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(n BIGNUMERIC, d INT64) RETURNS BIGNUMERIC AS (
+  CAST(
+    -- if both arguments to POW are INT then it returns FLOAT and it messes up entire calculation for big numbers
+    -- hence we changed 'd' to be BIGNUMERIC so that we force POW to return BIGNUMERIC
+    POW(10, -CAST(d AS BIGNUMERIC)) * SIGN(n) *
+    CASE WHEN MOD(TRUNC(n * POW(10, CAST(d AS BIGNUMERIC))), 2) = 0 -- even number
+       THEN CEIL(ABS(n * POW(10, CAST(d AS BIGNUMERIC))) - 0.5) -- round towards
+       ELSE FLOOR(ABS(n * POW(10, CAST(d AS BIGNUMERIC))) + 0.5) -- round away
+    END
+    AS BIGNUMERIC)
+);

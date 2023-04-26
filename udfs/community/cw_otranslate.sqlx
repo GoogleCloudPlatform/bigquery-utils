@@ -1,0 +1,25 @@
+config { hasOutput: true }
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(s STRING, key STRING, value STRING) RETURNS STRING AS (
+  (SELECT
+     STRING_AGG(CASE WHEN STRPOS(key, c) > 0
+                     THEN SUBSTR(value, STRPOS(key, c), 1) -- this correctly gets '' for out-of-bounds
+                     ELSE c END, '' ORDER BY o1 ASC)
+   FROM UNNEST(SPLIT(s, '')) AS c WITH OFFSET o1
+  )
+);

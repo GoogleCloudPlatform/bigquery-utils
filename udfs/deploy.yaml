@@ -1,16 +1,12 @@
-# Google Cloud Build script to deploy bqutils UDFs in your own project
-#
-# This build script is used to unit test.sql the BigQuery UDFs for every
-# change pushed to the udfs/ directory.
+# Google Cloud Build config to deploy bqutils
+# BigQuery UDFs in your own project and location
 #
 # Manual Execution:
-# Use the below command to invoke the build manually. Note the substitutions for
-# BRANCH_NAME and REVISION_ID. These variables are normally populated when the
-# build is executed via build triggers but will be empty during manual
-# execution. Dummy branch and revisions can be passed during manual execution so
-# the artifacts can be uploaded upon build completion.
+# Use the below command to invoke the build manually.
+# Note the substitutions for _PROJECT_ID and _BQ_LOCATION.
 #
-# gcloud builds submit . --substitutions _BQ_LOCATION=
+# Example Run:
+# gcloud builds submit . --substitutions _PROJECT_ID=YOUR_PROJECT_ID,_BQ_LOCATION=US
 #
 
 steps:
@@ -18,8 +14,8 @@ steps:
 # Deploy UDFs and run unit tests
 ###########################################################
 - name: gcr.io/bqutil/bq_udf_ci
-  id: test_udfs
-  dir: tests/dataform_testing_framework
+  id: deploy_and_test_udfs
+  dir: ${_WORKING_DIR}
   entrypoint: bash
   args:
     - deploy_and_run_tests.sh
@@ -28,3 +24,8 @@ steps:
     - BQ_LOCATION=${_BQ_LOCATION}
     - SHORT_SHA=
     - JS_BUCKET=gs://bqutil-lib/bq_js_libs
+substitutions:
+  _WORKING_DIR: tests/dataform_testing_framework # default value when submitting from udfs/ directory
+options:
+  logging: CLOUD_LOGGING_ONLY
+

@@ -12,10 +12,107 @@ SELECT bqutil.fn.int(1.684)
 ```
 
 ## UDFs
-
+* [azimuth_to_geog_point](#azimuth_to_geog_pointinput_lat-float64-input_lon-float64-azimuth-float64-distance-float64)
+* [bignumber_add](#bignumber_addfirst-string-second-string)
+* [bignumber_avg](#bignumber_avgnumbers-array)
+* [bignumber_div](#bignumber_divfirst-string-second-string)
+* [bignumber_eq](#bignumber_gtfirst-string-second-string)
+* [bignumber_gt](#bignumber_gtfirst-string-second-string)
+* [bignumber_gte](#bignumber_gtefirst-string-second-string)
+* [bignumber_lt](#bignumber_gtfirst-string-second-string)
+* [bignumber_lte](#bignumber_gtefirst-string-second-string)
+* [bignumber_mul](#bignumber_mulfirst-string-second-string)
+* [bignumber_sub](#bignumber_subfirst-string-second-string)
+* [bignumber_sum](#bignumber_sumnumbers-array)
 * [chisquare_cdf](#chisquare_cdfh-float64-dof-float64)
 * [corr_pvalue](#corr_pvaluer-float64-n-int64)
 * [csv_to_struct](#csv_to_structstrlist-string)
+* [cw_array_compact](#cw_array_compacta-any-type)
+* [cw_array_distinct](#cw_array_distinctarr-any-type)
+* [cw_array_max](#cw_array_maxarr-any-type)
+* [cw_array_median](#cw_array_medianarr-any-type)
+* [cw_array_min](#cw_array_minarr-any-type)
+* [cw_array_overlap](#cw_array_overlapx-any-type-y-any-type)
+* [cw_array_stable_distinct](#cw_array_stable_distinctarr-any-type)
+* [cw_comparable_format_bigint](#cw_comparable_format_bigintdata-array)
+* [cw_comparable_format_bigint_t](#cw_comparable_format_bigint_tpart-int64)
+* [cw_comparable_format_varchar](#cw_comparable_format_varchardata-array)
+* [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
+* [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
+* [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
+* [cw_editdistance](#cw_editdistancea-string-b-string)
+* [cw_error_number](cw_error_numbererrmsg-string)
+* [cw_error_severity](cw_error_severityerrmsg-string)
+* [cw_error_state](cw_error_stateerrmsg-string)
+* [cw_find_in_list](#cw_find_in_listneedle-string-list-string)
+* [cw_from_base](#cw_from_basenumber-string-base-int64)
+* [cw_getbit](#cw_getbitbits-int64-index-int64)
+* [cw_initcap](#cw_initcaps-string)
+* [cw_instr4](#cw_instr4source-string-search-string-position-int64-ocurrence-int64)
+* [cw_json_array_contains_bool](#cw_json_array_contains_booljson-string-needle-bool)
+* [cw_json_array_contains_num](#cw_json_array_contains_numjson-string-needle-float64)
+* [cw_json_array_contains_str](#cw_json_array_contains_strjson-string-needle-string)
+* [cw_json_array_get](#cw_json_array_getjson-string-loc-float64)
+* [cw_json_array_length](#cw_json_array_lengthjson-string)
+* [cw_json_enumerate_array](#cw_json_enumerate_arraytext-string)
+* [cw_lower_case_ascii_only](#cw_lower_case_ascii_onlystr-string)
+* [cw_map_create](#cw_map_createkeys-any-type-vals-any-type)
+* [cw_map_get](#cw_map_getmaparray-any-type-inkey-any-type)
+* [cw_map_parse](#cw_map_parsem-string-pd-string-kvd-string)
+* [cw_months_between](#cw_months_betweenet-datetime-st-datetime)
+* [cw_next_day](#cw_next_daydate_value-date-day_name-string)
+* [cw_nvp2json1](#cw_nvp2json1nvp-string)
+* [cw_nvp2json3](#cw_nvp2json3nvp-string-name_delim-string-val_delim-string)
+* [cw_nvp2json4](#cw_nvp2json4nvp-string-name_delim-string-val_delim-string-ignore_char-string)
+* [cw_otranslate](#cw_otranslates-string-key-string-value-string)
+* [cw_period_intersection](#cw_period_intersectionp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_period_ldiff](#cw_period_ldiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_period_rdiff](#cw_period_rdiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_regex_mode](#cw_regex_modemode-string)
+* [cw_regexp_extract](#cw_regexp_extractstr-string-regexp-string)
+* [cw_regexp_extract_all](#cw_regexp_extract_allstr-string-regexp-string)
+* [cw_regexp_extract_all_n](#cw_regexp_extract_all_nstr-string-regexp-string-groupn-int64)
+* [cw_regexp_extract_n](#cw_regexp_extract_nstr-string-regexp-string-groupn-int64)
+* [cw_regexp_instr_2](#cw_regexp_instr_2haystack-string-needle-string)
+* [cw_regexp_instr_3](#cw_regexp_instr_3haystack-string-needle-string-start-int64)
+* [cw_regexp_instr_4](#cw_regexp_instr_3haystack-string-needle-string-p-int64-o-int64)
+* [cw_regexp_instr_5](#cw_regexp_instr_5haystack-string-needle-string-p-int64-o-int64-returnopt-int64)
+* [cw_regexp_instr_6](#cw_regexp_instr_6haystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
+* [cw_regexp_instr_generic](#cw_regexp_instr_generichaystack-string-needle-string-p-int64-o-int64-returnopt-int64-mode-string)
+* [cw_regexp_replace_4](cw_regexp_replace_4haystack-string-regexpstring-replacement-string-offset-int64)
+* [cw_regexp_replace_5](cw_regexp_replace_5haystack-string-regexpstring-replacement-string-offset-int64-occurrence-int64)
+* [cw_regexp_replace_6](cw_regexp_replace_6haystack-string-regexpstring-replacement-string-p-int64-o-int64-mode-string)
+* [cw_regexp_replace_generic](#cw_regexp_replace_generichaystack-string-regexp-string-replacement-string-offset-int64-occurrence-int64-mode-string)
+* [cw_regexp_split](#cw_regexp_splittext-string-delim-string-flags-string)
+* [cw_regexp_substr_4](#cw_regexp_substr_4h-string-n-string-p-int64-o-int64)
+* [cw_regexp_substr_5](#cw_regexp_substr_5h-string-n-string-p-int64-o-int64-mode-string)
+* [cw_regexp_substr_6](#cw_regexp_substr_6h-string-n-string-p-int64-o-int64-mode-string-g-string)
+* [cw_regexp_substr_generic](#cw_regexp_substr_genericstr-string-regexp-string-p-int64-o-int64-mode-string-g-int64)
+* [cw_round_half_even](#cw_round_half_evenn-bignumeric-d-int64)
+* [cw_round_half_even_bignumeric](#cw_round_half_even_bignumericn-bignumeric-d-int64)
+* [cw_runtime_parse_interval_seconds](#cw_runtime_parse_interval_secondsival-string)
+* [cw_setbit](#cw_setbitbits-int64-index-int64)
+* [cw_stringify_interval](#cw_stringify_intervalx-int64)
+* [cw_strtok](#cw_strtoktext-string-delim-string)
+* [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
+* [cw_substring_index](#cw_substring_indexstr-string-sep-string-idx-int64)
+* [cw_td_nvp](#cw_td_nvphaystack-string-needle-string-pairsep-string-valuesep-string-occurence-int64)
+* [cw_threegrams](#cw_threegramst-string)
+* [cw_to_base](#cw_to_basenumber-int64-base-int64)
+* [cw_ts_overlap_buckets](#cw_ts_overlap_bucketsincludemeets-boolean-arraystruct-st-timestamp-et-timestamp)
+* [cw_ts_pattern_match](#cw_ts_pattern_matchevseries-array-regexpParts-array)
+* [cw_twograms](#cw_twogramst-string)
+* [cw_url_decode](#cw_url_decodepath-string)
+* [cw_url_encode](#cw_url_encodepath-string)
+* [cw_url_extract_authority](#cw_url_extract_authorityurl-string)
+* [cw_url_extract_file](#cw_url_extract_fileurl-string)
+* [cw_url_extract_fragment](#cw_url_extract_fragmenturl-string)
+* [cw_url_extract_host](#cw_url_extract_hosturl-string)
+* [cw_url_extract_parameter](#cw_url_extract_parameterurl-string-pname-string)
+* [cw_url_extract_path](#cw_url_extract_pathurl-string)
+* [cw_url_extract_port](#cw_url_extract_porturl-string)
+* [cw_url_extract_protocol](#cw_url_extract_protocolurl-string)
+* [cw_url_extract_query](#cw_url_extract_queryurl-string)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -30,6 +127,7 @@ SELECT bqutil.fn.int(1.684)
 * [json_extract_keys](#json_extract_keys)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
+* [knots_to_mph](#knots_to_mphinput_knots-float64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
 * [levenshtein](#levenshteinsource-string-target-string-returns-int64)
@@ -37,6 +135,10 @@ SELECT bqutil.fn.int(1.684)
 * [linear_regression](#linear_regressionarraystructstructx-float64-y-float64)
 * [mannwhitneyu](#mannwhitneyux-array-y-array-alt-string)
 * [median](#medianarr-any-type)
+* [meter_to_miles](#meters_to_milesinput_meters-float64)
+* [miles_to_meters](#miles_to_metersinput_miles-float64)
+* [mph_to_knots](#mph_to_knotsinput_mph-float64)
+* [nautical_miles_conversion](#nautical_miles_conversioninput_nautical_miles-float64)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [normal_cdf](#normal_cdfx-float64-mean-float64-stdev-float64)
@@ -49,6 +151,11 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
+* [sure_cond](#sure_cond)
+* [sure_like](#sure_like)
+* [sure_nonnull](#sure_nonnull)
+* [sure_range](#sure_range)
+* [sure_values](#sure_values)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -70,6 +177,123 @@ SELECT bqutil.fn.int(1.684)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
 ## Documentation
+### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
+Takes an input latitude, longitude, azimuth, and distance (in miles) and returns the corresponding latitude and longitude as a BigQuery GEOGRAPHY point.
+```sql
+SELECT bqutil.fn.azimuth_to_geog_point(30.2672, 97.7431, 312.9, 1066.6);
+
+POINT(81.4417483906444 39.9606210457152)
+```
+
+### [bignumber_add(first STRING, second STRING)](bignumber_add.sqlx)
+Safely allows mathematical addition on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_add(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '2348592348793428978934278932746531725371625376152367153761536715376')
+
+"102348592348793428978934278932746531725371625376152367153761536715375"
+```
+
+### [bignumber_avg(numbers ARRAY<STRING>)](bignumber_avg.sqlx)
+Safely allows calculating the average of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_avg(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333', '66666666666666666666666666666666666666666666666666666666666666666666')
+
+"66666666666666666666666666666666666666666666666666666666666666666666"
+```
+
+### [bignumber_div(first STRING, second STRING)](bignumber_div.sqlx)
+Safely allows mathematical division on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_div(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+"3"
+```
+
+### [bignumber_eq(first STRING, second STRING)](bignumber_eq.sqlx)
+Safely allows equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_eq(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_gt(first STRING, second STRING)](bignumber_gt.sqlx)
+Safely allows greater than comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_gt(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '33333333333333333333333333333333333333333333333333333333333333333333')
+
+TRUE
+```
+
+### [bignumber_gte(first STRING, second STRING)](bignumber_gte.sqlx)
+Safely allows greater than or equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_gte(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_lt(first STRING, second STRING)](bignumber_lt.sqlx)
+Safely allows less than comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_lt(
+  '33333333333333333333333333333333333333333333333333333333333333333333','99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_lte(first STRING, second STRING)](bignumber_lte.sqlx)
+Safely allows less than or equal comparison on numbers of any magnitude. Returns the result as a boolean.
+
+```sql
+SELECT bqutil.fn.bignumber_lte(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '99999999999999999999999999999999999999999999999999999999999999999999')
+
+TRUE
+```
+
+### [bignumber_mul(first STRING, second STRING)](bignumber_mul.sqlx)
+Safely allows mathematical multiplication on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_mul(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"
+```
+
+### [bignumber_sub(first STRING, second STRING)](bignumber_sub.sqlx)
+Safely allows mathematical subtraction on numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sub(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876')
+
+"99999999999106572671267157337227408169608537817401563452213123123123"
+```
+
+### [bignumber_sum(numbers ARRAY<STRING>)](bignumber_sum.sqlx)
+Safely allows calculating the total sum of numbers of any magnitude. Returns the result as a string.
+
+```sql
+SELECT bqutil.fn.bignumber_sum(
+  '99999999999999999999999999999999999999999999999999999999999999999999', '893427328732842662772591830391462182598436547786876876876', '123456789123456789123456789123456789123456789123456789123456789123456789')
+
+"123556789123457682550785521966119561715287180585639387560004576000333664"
+```
 
 ### [csv_to_struct(strList STRING)](csv_to_struct.sqlx)
 Take a list of comma separated key-value pairs and creates a struct.
@@ -104,6 +328,764 @@ results:
 | c   | d     |
 | a   | b     |
 
+### [cw_array_compact(a ANY TYPE)](cw_array_compact.sqlx)
+Returns a compacted array with null values removed
+```sql
+SELECT bqutil.fn.cw_array_compact([1, 2, 3, null, 5]);
+
+[1, 2, 3, 5]
+```
+
+### [cw_array_distinct(arr ANY TYPE)](cw_array_distinct.sqlx)
+Returns distinct array.
+```sql
+SELECT bqutil.fn.cw_array_distinct([1, 2, 3, 4, 4, 5, 5]);
+
+[1, 2, 3, 4, 5]
+```
+
+### [cw_array_max(arr ANY TYPE)](cw_array_max.sqlx)
+Returns maximum of array.
+```sql
+SELECT bqutil.fn.cw_array_max([1, 2, 3, 4, 5, 6]);
+
+6
+```
+
+### [cw_array_median(arr ANY TYPE)](cw_array_median.sqlx)
+Returns median of array.
+```sql
+SELECT bqutil.fn.cw_array_median([1, 2, 3, 4, 5, 6]);
+
+3.5
+```
+
+### [cw_array_min(arr ANY TYPE)](cw_array_min.sqlx)
+Returns minimum of array.
+```sql
+SELECT bqutil.fn.cw_array_min([1, 2, 3, 4, 5]);
+
+1
+```
+
+### [cw_array_overlap(x ANY TYPE, y ANY TYPE)](cw_array_overlap.sqlx)
+Returns true if arrays are overlapped otherwise false.
+```sql
+SELECT bqutil.fn.cw_array_overlap([1, 2, 3], [4, 5, 6]);
+SELECT bqutil.fn.cw_array_overlap([1, 2, 3], [2, 3, 4]);
+
+false
+true
+```
+
+### [cw_array_stable_distinct(arr ANY TYPE)](cw_array_stable_distinct.sqlx)
+Returns distinct array with preserved elements order.
+```sql
+SELECT bqutil.fn.cw_array_stable_distinct([4, 1, 4, 9, 1, 10]);
+
+[4, 1, 9, 10]
+```
+
+### [cw_comparable_format_bigint(data ARRAT<INT64>)](cw_comparable_format_bigint.sqlx)
+Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values
+```sql
+SELECT bqutil.fn.cw_comparable_format_bigint([2, 8]);
+
+p                  2 p                  8
+```
+
+### [cw_comparable_format_bigint_t(part INT64)](cw_comparable_format_bigint_t.sqlx)
+Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values
+```sql
+SELECT bqutil.fn.cw_comparable_format_bigint_t(2);
+
+p                  2
+```
+
+### [cw_comparable_format_varchar(data ARRAY<STRING>)](cw_comparable_format_varchar.sqlx)
+Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--')
+```sql
+SELECT bqutil.fn.cw_comparable_format_varchar(["2", "8"]);
+
+32 38
+```
+
+### [cw_comparable_format_varchar_t(part STRING)](cw_comparable_format_varchar_t.sqlx)
+Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--')
+```sql
+SELECT bqutil.fn.cw_comparable_format_varchar_t("2");
+
+32
+```
+
+### [cw_convert_base(number STRING, from_base INT64, to_base INT64)](cw_from_base.sqlx)
+Convert string from given base to another base
+
+```sql
+SELECT bqutil.fn.cw_convert_base('001101011', 2, 10);
+SELECT bqutil.fn.cw_convert_base('A', 16, 2);
+
+107
+1010
+```
+
+
+### [cw_csvld(text string, comma string, quote string,len INT64)](cw_csvld.sqlx)
+Generates CSV array.
+```sql
+SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
+
+["Test", "123"]
+```
+
+### [cw_editdistance(a STRING, b STRING)](cw_editdistance.sqlx)
+Similar to teradata's editdistance without weightages
+```sql
+SELECT bqutil.fn.cw_editdistance('Jim D. Swain', 'Jim D. Swain');
+SELECT bqutil.fn.cw_editdistance('Jim D. Swain', 'John Smith');
+
+0
+9
+```
+
+### [cw_error_number(errmsg string)](cw_error_number.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_number('Error Message');
+
+1
+```
+
+### [cw_error_severity(errmsg string)](cw_error_severity.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_severity('Error Message');
+
+1
+```
+
+### [cw_error_state(errmsg string)](cw_error_state.sqlx)
+Convert BQ generated error string to a number appropriate for other DBs
+```sql
+SELECT bqutil.fn.cw_error_state('Error Message');
+
+1
+```
+
+### [cw_find_in_list(needle STRING, list STRING)](cw_find_in_list.sqlx)
+Find index of element in set.
+```sql
+SELECT bqutil.fn.cw_find_in_list("1", "[Test,1,2]");
+
+2
+```
+
+### [cw_from_base(number STRING, base INT64)](cw_from_base.sqlx)
+Convert string from given base to decimal
+```sql
+SELECT bqutil.fn.cw_from_base('001101011', 2);
+SELECT bqutil.fn.cw_from_base('A', 16);
+
+107
+10
+```
+
+### [cw_getbit(bits INT64, index INT64)](cw_getbit.sqlx)
+Get bit on given inex.
+```sql
+SELECT bqutil.fn.cw_getbit(11, 100);
+SELECT bqutil.fn.cw_getbit(11, 3);
+
+0
+1
+```
+
+### [cw_initcap(s STRING)](cw_initcap.sqlx)
+Takes an input string and returns input string with first letter capital.
+```sql
+SELECT bqutil.fn.cw_initcap('teststr');
+SELECT bqutil.fn.cw_initcap('test str');
+
+Teststr
+Test Str
+```
+
+### [cw_instr4(source STRING, search STRING, position INT64, ocurrence INT64)](cw_instr4.sqlx)
+Takes an input source string, search string within source, position and number of occurrence. It returns index number of last occurrence staring position from position in source.
+```sql
+SELECT bqutil.fn.cw_instr4('TestStr123456Str', 'Str', 1, 2);
+
+14
+```
+
+### [cw_json_array_contains_bool(json STRING, needle BOOL)](cw_json_array_contains_bool.sqlx)
+Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = boolean
+```sql
+SELECT bqutil.fn.cw_json_array_contains_bool('[1, 2, 3, "valid", true]', true);
+SELECT bqutil.fn.cw_json_array_contains_bool('[1, 2, 3, "valid", true]', false);
+
+true
+false
+```
+
+### [cw_json_array_contains_num(json STRING, needle FLOAT64)](cw_json_array_contains_num.sqlx)
+Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = number.
+```sql
+SELECT bqutil.fn.cw_json_array_contains_num('[1, 2, 3, "valid"]', 1.0);
+SELECT bqutil.fn.cw_json_array_contains_num('[1, 2, 3, "valid"]', 5.0);
+
+true
+false
+```
+
+### [cw_json_array_contains_str(json STRING, needle STRING)](cw_json_array_contains_str.sqlx)
+Determine if value exists in json (a string containing a JSON array).
+```sql
+SELECT bqutil.fn.cw_json_array_contains_str('["name", "test", "valid"]', 'test');
+
+true
+```
+
+### [cw_json_array_get(json STRING, loc FLOAT64)](cw_json_array_get.sqlx)
+Returns the element at the specified index into the json_array. The index is zero-based
+```sql
+SELECT bqutil.fn.cw_json_array_get('[{"name": "test"}, {"name": "test1"}]', 1.0);
+
+test1
+```
+
+### [cw_json_array_length(json STRING)](cw_json_array_length.sqlx)
+Returns the array length of json (a string containing a JSON array)
+```sql
+SELECT bqutil.fn.cw_json_array_length('[{"name": "test"}, {"name": "test1"}]');
+
+2
+```
+
+### [cw_json_enumerate_array(text STRING)](cw_json_enumerate_array.sqlx)
+Takes input JSON array and flatten it.
+```sql
+SELECT bqutil.fn.cw_json_enumerate_array('[{"name":"Cameron"}, {"name":"John"}]');
+```
+results:
+|   Row   |  f0_.ordinal   |  f0_.jsonvalue               |
+|---------|----------------|------------------------------|
+|    1    |       1        |     {"name":"Cameron"}       |
+|         |       2        |     {"name":"John"}          |
+
+### [cw_lower_case_ascii_only(str STRING)](cw_lower_case_ascii_only.sqlx)
+Lowercases only ASCII characters within a given string.
+```sql
+SELECT bqutil.fn.cw_lower_case_ascii_only('TestStr123456#');
+
+teststr123456#
+```
+
+### [cw_map_create(keys ANY TYPE, vals ANY TYPE)](cw_map_create.sqlx)
+Given an array of keys and values, creates an array of struct containing matched <key,value> from each array. Number of elements in each array should be equal otherwise remaining values will be ignored.
+```sql
+SELECT bqutil.fn.cw_map_create([1, 2, 3], ['A', 'B', 'C']);
+```
+
+results:
+|   Row   |  f0_.key    |  f0_.value  |
+|---------|-------------|-------------|
+|    1    |       1     |     A       |
+|         |       2     |     B       |
+|         |       3     |     C       |
+
+### [cw_map_get(maparray ANY TYPE, inkey ANY TYPE)](cw_map_get.sqlx)
+Given an array of struct and needle, searches an array to find struct whose key-field matches needle, then it returns the value-field in the given struct.
+```sql
+SELECT bqutil.fn.cw_map_get([STRUCT(1 as key, "ABC" as value)], 1);
+
+ABC
+```
+
+### [cw_map_parse(m string, pd string, kvd string)](cw_map_parse.sqlx)
+String to map convert.
+```sql
+SELECT bqutil.fn.cw_map_parse("a=1 b=42", " ", "=");
+
+([STRUCT("a" AS key, "1" AS value),
+STRUCT("b" AS key, "42" AS value)])
+```
+
+### [cw_months_between(et DATETIME, st DATETIME)](cw_months_between.sqlx)
+Similar to Teradata and Netezza's months_between function
+```sql
+SELECT bqutil.fn.months_between(DATETIME '2005-03-01 10:34:56', DATETIME '2005-02-28 11:22:33');
+
+0.12795698924731182795698924731182795699
+```
+
+### [cw_next_day(date_value DATE, day_name STRING)](cw_next_day.sqlx)
+Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument.
+```sql
+SELECT bqutil.fn.cw_next_day('2022-09-21', 'we');
+
+2022-09-28
+```
+
+### [cw_nvp2json1(nvp STRING)](cw_nvp2json1.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+```sql
+SELECT bqutil.fn.cw_nvp2json1('name=google&occupation=engineer&hair=color');
+
+{"name":"google","occupation":"engineer","hair":"color"}
+```
+
+### [cw_nvp2json3(nvp STRING,name_delim STRING, val_delim STRING)](cw_nvp2json3.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+name_delim is delimiter for keys. val_delim is delimiter for key-value.
+```sql
+SELECT bqutil.fn.cw_nvp2json3('name=google&occupation=engineer&hair=color', '&', '=');
+
+{"name":"google","occupation":"engineer","hair":"color"}
+```
+
+### [cw_nvp2json4(nvp STRING, name_delim STRING, val_delim STRING, ignore_char STRING)](cw_nvp2json4.sqlx)
+Convert an input string of name-value pairs to a JSON object.
+name_delim is delimiter for keys. val_delim is delimiter for key-value. ignore_char is to ignore and removed from output json.
+```sql
+SELECT bqutil.fn.cw_nvp2json4('name=google#1&occupation=engineer#2&hair=color#3', '&', '=', '#');
+
+{"name":"google1","occupation":"engineer2","hair":"color3"}
+```
+
+### [cw_otranslate(s STRING, key STRING, value STRING)](cw_otranslate.sqlx)
+Takes input source string with key and value. It returns source string with replacement of key with value.
+```sql
+SELECT bqutil.fn.cw_otranslate('Thin and Thick', 'Thk', 'Sp');
+
+Spin and Spic
+```
+
+### [cw_period_intersection(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_intersection.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_intersection(
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)
+```
+
+### [cw_period_ldiff(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_ldiff.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_ldiff(
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)
+```
+
+### [cw_period_rdiff(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_rdiff.sqlx)
+```sql
+SELECT bqutil.fn.cw_period_rdiff(
+  STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper),
+  STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper))
+
+STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)
+```
+
+### [cw_regex_mode(mode STRING)](cw_regex_mode.sqlx)
+Retrieve mode.
+```sql
+SELECT bqutil.fn.cw_regex_mode('i');
+SELECT bqutil.fn.cw_regex_mode('m');
+SELECT bqutil.fn.cw_regex_mode('n);
+
+ig
+mg
+sg
+```
+
+### [cw_regexp_extract(str STRING, regexp STRING)](cw_regexp_extract.sqlx)
+Returns the first substring matched by the regular expression regexp in str.
+```sql
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'Str');
+
+Str
+```
+
+### [cw_regexp_extract_all(str STRING, regexp STRING)](cw_regexp_extract_all.sqlx)
+Returns the substring(s) matched by the regular expression regexp in str.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'Str.*');
+
+[Str123456]
+```
+
+### [cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_all_n.sqlx)
+Finds all occurrences of the regular expression regexp in str and returns the capturing group number groupn.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_all_n('TestStr123456Str789', 'Str.*', 0);
+
+Str123456Str789
+```
+
+### [cw_regexp_extract_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_n.sqlx)
+Finds the first occurrence of the regular expression regexp in str and returns the capturing group number groupn.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_n('TestStr123456', 'Str', 0);
+
+Str
+```
+
+### [cw_regexp_instr_2(haystack STRING, needle STRING)](cw_regexp_instr_2.sqlx)
+Takes input haystack string with needle string. Returns starting index of needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_2('TestStr123456', 'Str');
+SELECT bqutil.fn.cw_regexp_instr_2('TestStr123456', '90');
+
+5
+0
+```
+
+### [cw_regexp_instr_3(haystack STRING, needle STRING, start INT64)](cw_regexp_instr_3.sqlx)
+Takes input haystack string, needle string and starting positin from where search will start. Returns starting index of needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_3('TestStr123456', 'Str', 0);
+SELECT bqutil.fn.cw_regexp_instr_3('TestStr123456', 'Str', 6);
+
+5
+0
+```
+
+### [cw_regexp_instr_4(haystack STRING, needle STRING, start INT64)](cw_regexp_instr_4.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start and number of occurance. Returns starting index of last needle.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456', 'Str', 1, 1);
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456Str', 'Str', 1, 2);
+SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456Str', 'Str', 1, 3);
+
+5
+14
+0
+```
+
+### [cw_regexp_instr_5(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64)](cw_regexp_instr_5.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance and returnopt number. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_5('TestStr123456', '123', 1, 1, 1);
+
+11
+```
+
+### [cw_regexp_instr_6(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING)](cw_regexp_instr_6.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance, returnopt number and mode. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_6('TestStr123456', 'Str', 1, 1, 1, 'g');
+
+8
+```
+
+### [cw_regexp_instr_generic(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING)](cw_regexp_instr_generic.sqlx)
+Takes input haystack string, needle string, starting positin from where search will start, number of occurance, returnopt number and mode. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_instr_generic('TestStr123456', 'Str', 1, 1, 1, 'g');
+
+8
+```
+
+### [cw_regexp_replace_4(haystack STRING, regexp STRING, replacement STRING, offset INT64)](cw_regexp_replace_4.sqlx)
+Takes input haystack string, regular expression, replacement string and starting offset. It returns new string with replacement string matches accordingly regular expression.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_4('TestStr123456', 'Str', 'Cad$', 1);
+
+TestCad$123456
+```
+
+### [cw_regexp_replace_5(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64)](cw_regexp_replace_5.sqlx)
+Takes input haystack string, regular expression, replacement string, starting offset and number of occurence which we want to replace. It returns new string with replacement string matches accordingly regular expression.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456', 'Str', 'Cad$', 1, 1);
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 2);
+SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 1);
+
+TestCad$123456
+TestStr123456Cad$
+TestCad$123456Str
+```
+
+### [cw_regexp_replace_6(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING)](cw_regexp_replace_6.sqlx)
+Takes input haystack string, regular expression, replacement string, starting offset, number of occurence which we want to replace and mode. It returns new string with replacement string matches accordingly regular expression. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_replace_6('TestStr123456', 'Str', '$:#>', 1, 1, 'i');
+
+Test$:#>123456
+```
+
+### [cw_regexp_replace_generic(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING)](cw_regexp_replace_generic.sqlx)
+Generic regexp_replace, which is the 6-args version with regexp_mode already decoded
+```sql
+SELECT bqutil.fn.cw_regexp_replace_generic('TestStr123456', 'Str', '$:#>', 1, 1, 'i');
+
+Test$:#>123456
+```
+
+### [cw_regexp_split(text string, delim string, flags string)](cw_regexp_split.sqlx)
+Takes input string, delimiter and flags. It generates pair from string tokenizer. Flags works like Regex mode of javascript.
+```sql
+SELECT bqutil.fn.cw_regexp_split('Test#1', '#', 'i');
+
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
+STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
+```
+
+### [cw_regexp_substr_4(h STRING, n STRING, p INT64, o INT64)](cw_regexp_substr_4.sqlx)
+Takes input haystack string, needle string, position and occurence. It returns needle from the starting position if present with number of occurence time in haystack.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456', 'Test', 1, 1);
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 2);
+SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 3);
+
+Test
+Test
+null
+```
+
+### [cw_regexp_substr_5(h STRING, n STRING, p INT64, o INT64, mode STRING)](cw_regexp_substr_5.sqlx)
+Takes input haystack string, needle string, position, occurence and mode. It returns needle from the starting position if present with number of occurence time in haystack. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456', 'Test', 1, 1, 'g');
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456Test', 'test', 1, 2, 'i');
+SELECT bqutil.fn.cw_regexp_substr_5('TestStr123456\nTest', 'Test', 1, 2, 'm');
+
+Test
+Test
+Test
+```
+
+### [cw_regexp_substr_6(h STRING, n STRING, p INT64, o INT64, mode STRING, g INT64)](cw_regexp_substr_6.sqlx)
+Takes input haystack string, needle string, position, occurence and mode. It returns needle from the starting position if present with number of occurence time in haystack. Mode can be g for global search, i for case insensetive search and m for multiline search.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_6('TestStr123456', 'Test', 1, 1, 'g', 0);
+
+Test
+```
+
+### [cw_regexp_substr_generic(str STRING, regexp STRING, p INT64, o INT64, mode STRING, g INT64)](cw_regexp_substr_generic.sqlx)
+Generic regex based substring function.
+```sql
+SELECT bqutil.fn.cw_regexp_substr_generic('TestStr123456', 'Test', 1, 1, 'g', 0);
+
+Test
+```
+
+### [cw_round_half_even(n BIGNUMERIC, d INT64)](cw_round_half_even.sqlx)
+Round half even number
+```sql
+SELECT bqutil.fn.cw_round_half_even(10, 10);
+
+10
+```
+
+### [cw_round_half_even_bignumeric(n BIGNUMERIC, d INT64)](cw_round_half_even_bignumeric.sqlx)
+Round half even bignumeric number
+```sql
+SELECT bqutil.fn.cw_round_half_even_bignumeric(10, 10);
+
+10
+```
+
+### [cw_runtime_parse_interval_seconds(ival STRING)](cw_runtime_parse_interval_seconds.sqlx)
+Kludge for interval translation - for now day->sec only
+```sql
+SELECT bqutil.fn.cw_runtime_parse_interval_seconds(1 DAY);
+
+86400
+```
+
+### [cw_setbit(bits INT64, index INT64)](cw_setbit.sqlx)
+Set bit and return new bits
+```sql
+SELECT bqutil.fn.cw_setbit(1001, 2);
+
+1005
+```
+
+### [cw_stringify_interval(x INT64)](cw_stringify_interval.sqlx)
+Formats the interval as 'day hour:minute:second
+```sql
+SELECT bqutil.fn.cw_stringify_interval(86100);
+
++0000 23:55:00
+```
+
+### [cw_strtok(text string, delim string)](cw_strtok.sqlx)
+Takes input string and delimiter. It generates pair from string tokenizer.
+```sql
+SELECT bqutil.fn.cw_strtok('Test#1', '#');
+
+([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
+STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])
+```
+
+### [cw_substrb(str STRING, startpos INT64, extent INT64)](cw_substrb.sqlx)
+Treats the multibyte character string as a string of octets (bytes).
+```sql
+SELECT bqutil.fn.cw_substrb('TestStr123', 0, 3);
+
+Te
+```
+
+### [cw_substring_index(str STRING, sep STRING, idx INT64)](cw_substring_index.sqlx)
+Takes input string, seperater string and index number. It returns index element.
+```sql
+SELECT bqutil.fn.cw_substring_index('TestStr123456,Test123', ',', 1);
+
+TestStr123456
+```
+
+### [cw_td_nvp(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64)](cw_td_nvp.sqlx)
+Extract a value from a key-value separated string
+```sql
+SELECT bqutil.fn.cw_td_nvp('entree:orange chicken#entree2:honey salmon', 'entree', '#', ':', 1);
+
+orange chicken
+```
+
+### [cw_threegrams(t STRING)](cw_threegrams.sqlx)
+Takes input string with space. Space delimiter words will repeat three times and generate array.
+```sql
+SELECT bqutil.fn.cw_threegrams('Test 1234 str abc');
+
+["Test 1234 str", "1234 str abc"]
+```
+
+### [cw_to_base(number INT64, base INT64)](cw_to_base.sqlx)
+Convert string from decimal to given base
+```sql
+SELECT bqutil.fn.cw_to_base(5, 2);
+SELECT bqutil.fn.cw_to_base(10, 16);
+
+101
+a
+```
+
+### [cw_ts_overlap_buckets(includeMeets BOOLEAN, inputs ARRAY<STRUCT<st TIMESTAMP, et TIMESTAMP>>)](cw_ts_overlap_buckets.sqlx)
+Merges two periods together if they overlap and returns unique id for each merged bucket. Coalesces meeting periods as well (not just overlapping periods) if includeMeets is true.
+```sql
+SELECT bqutil.fn.cw_ts_overlap_buckets(false, [STRUCT(TIMESTAMP("2008-12-25"), TIMESTAMP("2008-12-31")), STRUCT(TIMESTAMP("2008-12-26"), TIMESTAMP("2008-12-30"))]);
+```
+
+results:
+|   Row   |  f0_.bucketNo   |  f0_.st                      |  f0_.et                 |
+|---------|-----------------|------------------------------|-------------------------|
+|    1    |       1         |     2008-12-25 00:00:00 UTC  | 2008-12-31 00:00:00 UTC |
+
+### [cw_ts_pattern_match(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)](cw_ts_pattern_match.sqlx)
+ts_pattern_match is function that returns range of matched pattern in given UID, SID (user session)
+```sql
+SELECT bqutil.fn.cw_ts_pattern_match(['abc', 'abc'], ['abc']);
+```
+
+results:
+|   Row   |  f0_.pattern_id   |  f0_.start      |  f0_.stop    |
+|---------|-------------------|-----------------|--------------|
+|    1    |       1           |     1           |   1          |
+|         |       2           |     2           |   2          |
+
+### [cw_twograms(t STRING)](cw_twograms.sqlx)
+Takes input string with space. Space delimiter words will repeat two times and generate array.
+```sql
+SELECT bqutil.fn.cw_twograms('Test Str 123456 789');
+
+["Test Str", "Str 123456", "123456 789"]
+```
+
+### [cw_url_decode(path STRING)](cw_url_decode.sqlx)
+URL decode a string
+```sql
+SELECT bqutil.fn.cw_url_decode("%3F");
+SELECT bqutil.fn.cw_url_decode("%2F");
+
+?
+/
+```
+
+### [cw_url_encode(path STRING)](cw_url_encode.sqlx)
+URL encode a string
+```sql
+SELECT bqutil.fn.cw_url_encode("?");
+SELECT bqutil.fn.cw_url_encode("/");
+
+%3F
+%2F
+```
+
+### [cw_url_extract_authority(url STRING)](cw_url_extract_authority.sqlx)
+Extract the authority from a url, returns "" (empty string) if no authority is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_authority('https://localhost:8080/test?key=val');
+
+localhost:8080
+```
+
+### [cw_url_extract_file(url STRING)](cw_url_extract_file.sqlx)
+Extract the file from a url, returns "" (empty string) string if no file is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_file('https://www.test.com/collections-in-java#collectionmethods');
+
+/collections-in-java
+```
+
+### [cw_url_extract_fragment(url STRING)](cw_url_extract_fragment.sqlx)
+Extract the fragment from a url, returns "" (empty string) if no fragment is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_fragment('https://www.test.com/collections-in-java#collectionmethods');
+
+collectionmethods
+```
+
+### [cw_url_extract_host(url STRING)](cw_url_extract_host.sqlx)
+Extract the host from a url, return "" (empty string) if no host is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_host('https://google.com');
+
+google.com
+```
+
+### [cw_url_extract_parameter(url STRING, pname STRING)](cw_url_extract_parameter.sqlx)
+Extract the value of a query param from a url, returns null if the parameter isn't found.
+```sql
+SELECT bqutil.fn.cw_url_extract_parameter('https://www.test.com/collections-in-java&key=val#collectionmethods', 'key');
+
+val
+```
+
+### [cw_url_extract_path(url STRING)](cw_url_extract_path.sqlx)
+Extract the path from a url, returns "" (empty string) if no path is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_path('https://www.test.com/collections-in-java#collectionmethods');
+
+/collections-in-java
+```
+
+### [cw_url_extract_port(url STRING)](cw_url_extract_port.sqlx)
+Extract the port from a url, returns null if no port is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_port('https://localhost:8080/test?key=val');
+
+8080
+```
+
+### [cw_url_extract_protocol(url STRING)](cw_url_extract_protocol.sqlx)
+Extract the protocol from a url, return "" (empty string) if no protocol is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_protocol('https://google.com/test?key=val');
+
+https
+```
+
+### [cw_url_extract_query(url STRING)](cw_url_extract_query.sqlx)
+Extract the query from a url, returns "" (empty string) if no query is found.
+```sql
+SELECT bqutil.fn.cw_url_extract_query('https://localhost:8080/test?key=val');
+
+key=val
+```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)
 Returns the nth occurrence of the weekday in the month for the specified date. The result is an INTEGER value between 1 and 5.
@@ -308,6 +1290,7 @@ SELECT
 
 ### [json_extract_keys()](json_extract_keys.sqlx)
 Returns all keys in the input JSON as an array of string
+Returns NULL if invalid JSON string is passed,
 
 ```sql
 SELECT bqutil.fn.json_extract_keys(
@@ -321,6 +1304,8 @@ hat
 
 ### [json_extract_values()](json_extract_values.sqlx)
 Returns all values in the input JSON as an array of string
+Returns NULL if invalid JSON string is passed,
+
 
 ```sql
 SELECT bqutil.fn.json_extract_values(
@@ -348,6 +1333,14 @@ SELECT
        bqutil.fn.json_typeof(TO_JSON_STRING(NULL)),
 
 object, array, string, number, boolean, boolean, null
+```
+
+### [knots_to_mph(input_knots FLOAT64)](knots_to_mph.sqlx)
+Converts knots to miles per hour
+```sql
+SELECT bqutil.fn.knots_to_mph(37.7);
+
+43.384406
 ```
 
 ### [levenshtein(source STRING, target STRING) RETURNS INT64](levenshtein.sqlx)
@@ -405,6 +1398,38 @@ SELECT bqutil.fn.median([1,1,1,2,3,4,5,100,1000]) median_1
   , bqutil.fn.median([1,2,3,4]) median_3
 
 3.0, 2.0, 2.5
+```
+
+### [meters_to_miles(input_meters FLOAT64)](meters_to_miles.sqlx)
+Converts meters to miles
+```sql
+SELECT bqutil.fn.meters_to_miles(5000.0);
+
+3.1068559611866697
+```
+
+### [miles_to_meters(input_miles FLOAT64)](miles_to_meters.sqlx)
+Converts miles to meters
+```sql
+SELECT bqutil.fn.miles_to_meters(2.73);
+
+4393.50912
+```
+
+### [mph_to_knots(input_mph FLOAT64)](mph_to_knots.sqlx)
+Converts miles per hour to knots
+```sql
+SELECT bqutil.fn.mph_to_knots(75.5);
+
+65.607674794487224
+```
+
+### [nautical_miles_conversion(input_nautical_miles FLOAT64)](nautical_miles_conversion.sqlx)
+Converts nautical miles to miles
+```sql
+SELECT bqutil.fn.nautical_miles_conversion(1.12);
+
+1.2888736
 ```
 
 
@@ -507,6 +1532,59 @@ SELECT
   bqutil.fn.random_value(['tino', 'jordan', 'julie', 'elliott', 'felipe'])
 
 'tino', 'julie', 'jordan'
+```
+
+### [sure_cond(value STRING, cond BOOL)](sure_cond.sqlx)
+
+If `cond` is `FALSE` the function cause error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_cond`(x, x > 0)
+FROM UNNEST([1, 2, 3, 4]) as x
+```
+
+### [sure_like(value STRING, like_pattern STRING)](sure_like.sqlx)
+
+If argument `value` is matched by `like_pattern`, the function returns `value` as-is.
+Otherwise it causes error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_like`("[some_pattern]", "[%]") = "hoge";
+```
+
+### [sure_nonnull(value ANY TYPE)](sure_nonnull.sqlx)
+
+If non-NULL argument is passed, the function returns input `value` as-is.
+However if NULL value is passed, it causes error.
+
+```sql
+SELECT
+  bqutil.fn.sure_nonnull(1),
+  bqutil.fn.sure_nonnull("string"),
+  bqutil.fn.sure_nonnull([1, 2, 3]),
+```
+
+### [sure_range(value ANY TYPE)](sure_range.sqlx)
+
+Returns true if value is between lower_bound and upper_bound, inclusive.
+
+```sql
+SELECT
+  bqutil.fn.sure_range(1, 1, 10) == 1,
+  bqutil.fn.sure_range("b", "a", "b") == "b",
+```
+
+### [sure_values(value ANY TYPE, acceptable_value_array ANY TYPE)](sure_values.sqlx)
+
+If argument `value` is in `acceptable_value_array` or NULL, the function returns input `value` as-is.
+Otherwise it causes error.
+
+```sql
+SELECT
+  `bqutil.fn.sure_values`("hoge", ["hoge", "fuga"]) = "hoge",
+  `bqutil.fn.sure_values`(  NULL, ["hoge", "fuga"]) is NULL
 ```
 
 ### [to_binary(x INT64)](to_binary.sqlx)
@@ -763,7 +1841,7 @@ SELECT bqutil.fn.url_param(
 ```
 
 
-### [url_parse(urlString STRING, partToExtract STRING)](url_parse_udf.sqlx)
+### [url_parse(urlString STRING, partToExtract STRING)](url_parse.sqlx)
 
 Returns the specified part from the URL. Valid values for partToExtract include HOST, PATH, QUERY, REF, PROTOCOL
 For example, url_parse('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.

@@ -45,3 +45,10 @@ This time series graph breaks down the overall slot utilization by user. This ca
 This chart displays the average usage for every hour, sorted by days with the most slot usage.
 
 ![By Top Usage](../images/hourly_utilization/by_top_usage.png)
+
+
+### Hourly Heatmap
+This chart displays the average slot hours used broken down by day and hour.
+Cell color scales based on slot usage and the largest values are shown in red.
+
+![Hourly Heatmap](../images/hourly_utilization/hourly_heatmap.png)
