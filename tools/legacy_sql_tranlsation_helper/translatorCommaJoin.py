@@ -1,8 +1,19 @@
 from google.cloud import bigquery
+from readSQLToString import *
 import re
 
-legacy_sql = """Replace your SQL here. Reference: sample_sql/sample2.sql"""
+legacy_sql = """Replace your SQL here. """
+legacy_sql = """SELECT
+product,
+inventory,
+color
+FROM
+[celiaji-snap-dev:test.simple_table1],
+[celiaji-snap-dev:test.simple_table2]"""
+file_path = "sample_sql/sample1.sql"
 
+if file_path != "" and legacy_sql == "":
+    legacy_sql = read_file_path(file_path)
 
 class translatorCommaJoin:
 
@@ -59,22 +70,15 @@ class translatorCommaJoin:
         return table_name, dataset_id, project_id
 
 
-    def list_exist_col(self,table):
-        table_name, dataset_id, project_id = self.parse_table_name(table)
-
-        exist_col_type = {}
+    def list_exist_col(self,table_name):
+        table_name = table_name.replace("`", "")
         client = bigquery.Client()
-        query = """select
-        column_name, data_type
-        from {}.{}.INFORMATION_SCHEMA.COLUMNS
-        where table_name = {}""".format(project_id,dataset_id,table_name )
-
-        query_i_s = client.query(query)
-        for row in query_i_s:
-            exist_col_type[row[0]] = row[1]
-            self.col_type[row[0]] = row[1]
+        table = client.get_table(table_name)
+        schema = table.schema
+        exist_col_type = {}
+        for col in schema:
+            exist_col_type[col.name] = col.field_type
         return exist_col_type
-
 
     def check_col_exist(self, table, initial_col_list):
         exist_col_type = self.list_exist_col(table)
