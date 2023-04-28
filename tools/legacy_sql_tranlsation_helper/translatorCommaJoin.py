@@ -3,13 +3,6 @@ from readSQLToString import *
 import re
 
 legacy_sql = """Replace your SQL here. """
-legacy_sql = """SELECT
-product,
-inventory,
-color
-FROM
-[celiaji-snap-dev:test.simple_table1],
-[celiaji-snap-dev:test.simple_table2]"""
 file_path = "sample_sql/sample1.sql"
 
 if file_path != "" and legacy_sql == "":
