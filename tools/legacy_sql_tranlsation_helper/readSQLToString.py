@@ -4,12 +4,9 @@ import os
 def read_file_path(file_path):
     if os.path.isfile(file_path):
         #open text file in read mode
-        text_file = open(file_path, "r")
-        #read whole file to a string
-        data = text_file.read()
-        #close file
-        text_file.close()
-        return data
+        with open(file_path, "r") as text_file:
+            #read and return whole file as string
+            return text_file.read()
     else:
         print("file_path is invalid!")
 

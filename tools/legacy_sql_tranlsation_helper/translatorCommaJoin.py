@@ -1,16 +1,17 @@
 from google.cloud import bigquery
-from readSQLToString import *
+import readSQLToString
 import re
 
 legacy_sql = """Replace your SQL here. """
 file_path = "sample_sql/sample1.sql"
 
 if file_path != "" and legacy_sql == "":
-    legacy_sql = read_file_path(file_path)
+    legacy_sql = readSQLToString.read_file_path(file_path)
 
 class translatorCommaJoin:
 
     col_type = {}
+    client = bigquery.Client()
 
     #Fetch selected columns. Manual adjustment needed when having comma in the functions in the select statement.
     def list_sel_column(self, legacy_sql):
@@ -65,8 +66,7 @@ class translatorCommaJoin:
 
     def list_exist_col(self,table_name):
         table_name = table_name.replace("`", "")
-        client = bigquery.Client()
-        table = client.get_table(table_name)
+        table = self.client.get_table(table_name)
         schema = table.schema
         exist_col_type = {}
         for col in schema:

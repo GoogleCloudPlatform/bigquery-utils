@@ -1,12 +1,12 @@
 import re
-from readSQLToString import *
+import readSQLToString
 
 #Replace your legacy_sql or file_path here. Only use one and put the other as an empty string.
 legacy_sql = ""
 file_path = "sample_sql/sample1.sql"
 
 if file_path != "" and legacy_sql == "":
-    legacy_sql = read_file_path(file_path)
+    legacy_sql = readSQLToString.read_file_path(file_path)
 
 def legacy_sql_scan(legacy_sql):
     x = re.search(r"FROM\n*(.*)\[(.*)\],\s*\n*\s*\[", legacy_sql)
