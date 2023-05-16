@@ -92,6 +92,8 @@ SELECT bqutil.fn.int(1.684)
 * [cw_round_half_even_bignumeric](#cw_round_half_even_bignumericn-bignumeric-d-int64)
 * [cw_runtime_parse_interval_seconds](#cw_runtime_parse_interval_secondsival-string)
 * [cw_setbit](#cw_setbitbits-int64-index-int64)
+* [cw_signed_leftshift_128bit](#cw_signed_leftshift_128bitvalue-bignumeric-n-bignumeric)
+* [cw_signed_rightshift_128bit](#cw_signed_rightshift_128bitvalue-bignumeric-n-bignumeric)
 * [cw_stringify_interval](#cw_stringify_intervalx-int64)
 * [cw_strtok](#cw_strtoktext-string-delim-string)
 * [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
@@ -903,6 +905,34 @@ Set bit and return new bits
 SELECT bqutil.fn.cw_setbit(1001, 2);
 
 1005
+```
+
+### [cw_signed_leftshift_128bit(value BIGNUMERIC, n BIGNUMERIC)](cw_signed_leftshift_128bit.sqlx)
+Performs a signed shift left on BIGNUMERIC as if it was a 128 bit integer.
+```sql
+- SELECT bqutil.fn.cw_signed_leftshift_128bit(NUMERIC '1', NUMERIC '3');
+- SELECT bqutil.fn.cw_signed_leftshift_128bit(NUMERIC '1', NUMERIC '127');
+- SELECT bqutil.fn.cw_signed_leftshift_128bit(NUMERIC '-5', NUMERIC '2');
+
+- 8
+- -170141183460469231731687303715884105728
+- -20
+```
+
+### [cw_signed_rightshift_128bit(value BIGNUMERIC, n BIGNUMERIC)](cw_signed_rightshift_128bit.sqlx)
+Performs a signed shift right on BIGNUMERIC as if it was a 128 bit integer.
+```sql
+- SELECT bqutil.fn.cw_signed_rightshift_128bit(NUMERIC '32', NUMERIC '3');
+- SELECT bqutil.fn.cw_signed_rightshift_128bit(NUMERIC '7', NUMERIC '1');
+- SELECT bqutil.fn.cw_signed_rightshift_128bit(NUMERIC '-7', NUMERIC '1');
+- SELECT bqutil.fn.cw_signed_rightshift_128bit(NUMERIC '-1', NUMERIC '1');
+- SELECT bqutil.fn.cw_signed_rightshift_128bit(NUMERIC '-1', NUMERIC '100');
+
+- 4
+- 3
+- -4
+- -1
+- -1
 ```
 
 ### [cw_stringify_interval(x INT64)](cw_stringify_interval.sqlx)
