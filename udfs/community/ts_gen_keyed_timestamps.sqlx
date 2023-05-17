@@ -31,7 +31,11 @@ config { hasOutput: true }
 -- max_ts: the inclusive upper bound for the generated timestamps, normalized by the tumble_seconds
 -- Output: An array of generated timestamps for each key - ARRAY<STRUCT<series_key STRING, tumble_seconds TIMESTAMP>>
 CREATE OR REPLACE FUNCTION ${self()}(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts Timestamp)
-RETURNS ARRAY<STRUCT<series_key STRING, tumble_val TIMESTAMP>> AS ((
+RETURNS ARRAY<STRUCT<series_key STRING, tumble_val TIMESTAMP>> 
+OPTIONS (
+    description="Generate an array of key-timestamp structs with the specified min, max and interval timeseries"
+)
+AS ((
   SELECT ARRAY_AGG(x)
   FROM (
     SELECT series_key, tumble_val

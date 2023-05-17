@@ -23,6 +23,9 @@ config { hasOutput: true }
 -- kv_delimiter: string that has the delimiter between key and value e.g. ':'
 -- Output: struct for the above map.
 CREATE OR REPLACE FUNCTION ${self()}(strList STRING, entry_delimiter STRING, kv_delimiter STRING)
+OPTIONS (
+    description="Helper function for parsing key-value data from a string to struct"
+)
 AS (
   CASE
     WHEN REGEXP_CONTAINS(strList, entry_delimiter) OR REGEXP_CONTAINS(strList, kv_delimiter) THEN

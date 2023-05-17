@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Finds the first occurrence of the regular expression `regexp` in `str` and returns the capturing group number `groupn` */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING, groupn INT64) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Finds the first occurrence of the regular expression `regexp` in `str` and returns the capturing group number `groupn`"
+)
+AS """
   var r = new RegExp(regexp);
   var a = str.match(r);
   if (!a) return null;

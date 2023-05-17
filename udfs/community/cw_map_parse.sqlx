@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Similar to hive "str_to_map" */
 CREATE OR REPLACE FUNCTION ${self()}(m string, pd string, kvd string)
-   RETURNS ARRAY<STRUCT<key STRING, value STRING>> AS (
+   RETURNS ARRAY<STRUCT<key STRING, value STRING>> 
+   OPTIONS (
+    description="Similar to hive str_to_map"
+   )
+   AS (
   ARRAY(SELECT AS STRUCT kv[SAFE_OFFSET(0)] AS key, kv[SAFE_OFFSET(1)] AS value
       FROM (SELECT SPLIT(kv, kvd) AS kv FROM UNNEST(SPLIT(m, pd)) AS kv) r
 ));

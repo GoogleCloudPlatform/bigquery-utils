@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 -- Given a key and a list of key-value maps of the form [{'key': 'a', 'value': 'b'}, ...]
 -- returns the SCALAR type value.
-CREATE OR REPLACE FUNCTION ${self()}(get_key STRING, arr ANY TYPE) AS
+CREATE OR REPLACE FUNCTION ${self()}(get_key STRING, arr ANY TYPE) 
+OPTIONS (
+    description="Given a key and a list of key-value maps of the form [{'key': 'a', 'value': 'b'}, ...] returns the SCALAR type value."
+)
+AS
 (
   (SELECT value FROM UNNEST(arr) WHERE key = get_key)
 );

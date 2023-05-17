@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument */
-CREATE OR REPLACE FUNCTION ${self()}(date_value DATE, day_name STRING) RETURNS DATE AS (
+CREATE OR REPLACE FUNCTION ${self()}(date_value DATE, day_name STRING) RETURNS DATE 
+OPTIONS (
+    description="Returns the date of the first weekday (second arugment) that is later than the date specified by the first argument"
+)
+AS (
     (WITH t AS (SELECT
        CASE lower(substr(day_name, 1, 2))
        WHEN 'su' THEN 1

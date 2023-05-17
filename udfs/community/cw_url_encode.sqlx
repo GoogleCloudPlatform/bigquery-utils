@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* url encode a string */
 CREATE OR REPLACE FUNCTION ${self()}(path STRING) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="URL encode a string"
+)
+AS """
   if (path == null) return null;
   try {
     return encodeURIComponent(path);

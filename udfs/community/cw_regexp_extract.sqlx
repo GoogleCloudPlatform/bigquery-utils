@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Returns the first substring matched by the regular expression `regexp` in `str`. */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Returns the first substring matched by the regular expression `regexp` in `str`."
+)
+AS """
   var r = new RegExp(regexp);
   var a = str.match(r);
   return a[0];

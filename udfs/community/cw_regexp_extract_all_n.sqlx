@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Finds all occurrences of the regular expression `regexp` in `str` and returns the capturing group number `groupn`. */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING, groupn INT64) RETURNS ARRAY<STRING>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Finds all occurrences of the regular expression `regexp` in `str` and returns the capturing group number `groupn`."
+)
+AS """
   var r = new RegExp(regexp, 'g');
   var o = [];
   while ((a = r.exec(str)) !== null) {

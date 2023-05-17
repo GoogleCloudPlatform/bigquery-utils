@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
  /* Formats the interval as 'day hour:minute:second */
-CREATE OR REPLACE FUNCTION ${self()}(x INT64) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION ${self()}(x INT64) RETURNS STRING 
+OPTIONS (
+    description="Formats the interval as 'day hour:minute:second"
+)
+AS
 (
     concat(
        CASE WHEN x >= 0 THEN '+' ELSE '-' END,

@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Similar to Presto from_base function - convert string from given base to decimal */
-CREATE OR REPLACE FUNCTION ${self()}(number STRING, base INT64) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION ${self()}(number STRING, base INT64) RETURNS INT64 
+OPTIONS (
+    description="Similar to Presto from_base function - convert string from given base to decimal"
+)
+AS (
     (WITH chars AS (
         SELECT IF(ch >= 48 AND ch <= 57, ch - 48, IF(ch >= 65 AND ch <= 90, ch - 65 + 10, ch - 97 + 10)) pos, offset + 1 AS idx
         FROM UNNEST(TO_CODE_POINTS(number)) AS ch WITH OFFSET

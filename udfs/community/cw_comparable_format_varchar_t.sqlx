@@ -17,6 +17,9 @@ config { hasOutput: true }
 
 /* Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--') */
 CREATE OR REPLACE FUNCTION ${self()}(part STRING) RETURNS STRING
+OPTIONS (
+  description="Use hex to work around the separator problem (e.g. if separator = '-' then ['-', ''] and ['', '-'] both produce '--')"
+)
 AS (
     TO_HEX(CAST(part as BYTES))
 );

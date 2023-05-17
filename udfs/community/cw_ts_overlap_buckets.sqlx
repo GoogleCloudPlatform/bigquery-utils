@@ -21,7 +21,11 @@ config { hasOutput: true }
 */
 CREATE OR REPLACE FUNCTION ${self()}(includeMeets BOOLEAN, inputs ARRAY<STRUCT<st TIMESTAMP, et TIMESTAMP>>)
 RETURNS array<struct<bucketNo int64, st TIMESTAMP, et TIMESTAMP>>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Merges two periods together if they overlap and returns unique id for each merged bucket. Coalesces meeting periods as well (not just overlapping periods) if includeMeets is true."
+)
+AS """
     var ret = [ ]
     var bucketNo = 1;
     var st = null;

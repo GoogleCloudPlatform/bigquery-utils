@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Returns the array length of json (a string containing a JSON array) */
 CREATE OR REPLACE FUNCTION ${self()}(json STRING) RETURNS INT64
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Returns the array length of json (a string containing a JSON array)"
+)
+AS """
   if (json == null)
     return null;
   var parsedJson = JSON.parse(json);

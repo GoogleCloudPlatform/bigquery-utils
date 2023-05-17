@@ -18,6 +18,9 @@ config { hasOutput: true }
 /* Convert string from given base to another base. Similar to hive/spark CONV(string, int, int) */
 CREATE OR REPLACE FUNCTION ${self()}(value STRING, from_base INT64, to_base INT64)
   RETURNS STRING
+  OPTIONS (
+    description="Convert string from given base to another base. Similar to hive/spark CONV(string, int, int)"
+  )
   LANGUAGE js
   OPTIONS(
       description="""Convert string from given base to another base. Similar to hive/spark CONV(string, int, int)"""

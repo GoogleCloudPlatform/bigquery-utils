@@ -25,6 +25,9 @@ config { hasOutput: true }
 -- strList: string in which to search for.
 -- Output: Position of str in strList
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, strList STRING)
+OPTIONS (
+    description="Returns the first occurance of str in strList where strList is a comma-delimited string. Returns null if either argument is null. Returns 0 if the first argument contains any commas."
+)
 AS (
   CASE
     WHEN STRPOS(str, ',') > 0 THEN 0
