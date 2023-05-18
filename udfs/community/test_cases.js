@@ -3086,3 +3086,52 @@ generate_udf_test("sure_values", [
     expected_output: `NULL`
   }
 ]);
+
+generate_udf_test("job_url", [
+    {
+      inputs: [
+        `"my_project:us.my_job_id"`
+      ],
+      expected_output: `"https://console.cloud.google.com/bigquery?project=my_project&j=bq:us:my_job_id"`
+    },
+    {
+      inputs: [
+        `"my_job_id"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `NULL`
+      ],
+      expected_output: `NULL`
+    }
+]);
+  
+generate_udf_test("table_url", [
+    {
+      inputs: [
+        `"my_project.my_dataset.my_table"`
+      ],
+      expected_output: `"https://console.cloud.google.com/bigquery?p=my_project&d=my_dataset&t=my_table&page=table"`
+    },
+    {
+      inputs: [
+        `"my_dataset.my_table"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `"my_table"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `NULL`
+      ],
+      expected_output: `NULL`
+    }
+    
+  ]);
