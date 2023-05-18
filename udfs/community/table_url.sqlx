@@ -16,7 +16,8 @@ config { hasOutput: true }
  */
 
 /*
- * Generates a deep link to the BigQuery console for a table or view.
+ * Generates a deep link to the BigQuery console for a table or view
+ * in the form: "project.dataset.table"
  */
 CREATE OR REPLACE FUNCTION ${self()}(table_id STRING)
 RETURNS STRING
