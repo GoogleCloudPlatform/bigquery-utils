@@ -20,7 +20,7 @@ config { hasOutput: true }
 -- Output: STRING representing the input number in hexadecimal form
 CREATE OR REPLACE FUNCTION ${self()}(x INT64) 
 OPTIONS (
-    description="Decimal to hex"
+    description="Returns a hexadecimal representation of a number."
 )
 AS
 (
