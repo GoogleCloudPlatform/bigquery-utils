@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Similar to Snowflake ARRAY_COMPACT */
-CREATE OR REPLACE FUNCTION ${self()}(a ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(a ANY TYPE) 
+OPTIONS (
+  description="Similar to Snowflake ARRAY_COMPACT"
+)
+AS (
     ARRAY(SELECT v FROM UNNEST(a) v WHERE v IS NOT NULL)
 );

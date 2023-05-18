@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Similar to teradata NVP function - extract a value from a key-value separated string */
-CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64) RETURNS STRING 
+OPTIONS (
+    description="Similar to teradata NVP function - extract a value from a key-value separated string"
+)
+AS (
    NULLIF(ARRAY(SELECT ARRAY_TO_STRING((select ARRAY_AGG(v) from UNNEST(kv) v WITH OFFSET o WHERE o > 0), valuesep) FROM (
         SELECT SPLIT(pairs, valuesep) AS kv, o FROM UNNEST(SPLIT(haystack, pairsep)) AS pairs WITH OFFSET o
    ) t WHERE kv[SAFE_OFFSET(0)] = needle ORDER BY o ASC)[SAFE_ORDINAL(occurence)], '')

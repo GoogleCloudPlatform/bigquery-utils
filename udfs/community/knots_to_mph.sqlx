@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 
-CREATE OR REPLACE FUNCTION ${self()}(input_knots FLOAT64) AS (
+CREATE OR REPLACE FUNCTION ${self()}(input_knots FLOAT64) 
+OPTIONS (
+    description="Converts knots to miles per hour."
+)
+AS (
 input_knots * 1.15078
 );

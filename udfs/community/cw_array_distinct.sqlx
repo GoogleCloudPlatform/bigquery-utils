@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Similar to presto ARRAY_DISTINCT */
-CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) 
+OPTIONS (
+  description="Similar to presto ARRAY_DISTINCT"
+)
+AS (
    ARRAY( SELECT DISTINCT x FROM UNNEST(arr) AS x )
 );

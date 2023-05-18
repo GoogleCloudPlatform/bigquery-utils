@@ -18,7 +18,11 @@ config { hasOutput: true }
 -- from_binary:
 -- Input: STRING representing a number in binary form
 -- Output: INT64 number in decimal form
-CREATE OR REPLACE FUNCTION ${self()}(value STRING) AS
+CREATE OR REPLACE FUNCTION ${self()}(value STRING) 
+OPTIONS (
+    description="Returns a number in decimal form from its binary representation."
+)
+AS
 (
   (
     SELECT 

@@ -18,6 +18,10 @@ config { hasOutput: true }
 /*
   Returns the value of pi.
  */
-CREATE OR REPLACE FUNCTION ${self()}() AS (
+CREATE OR REPLACE FUNCTION ${self()}() 
+OPTIONS (
+    description="Returns the value of pi."
+)
+AS (
   ACOS(-1)
 );

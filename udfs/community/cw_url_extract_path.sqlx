@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Extract the path from a url, returns "" (empty string) if no path is found. */
  CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="""Extract the path from a url, returns "" (empty string) if no path is found."""
+)
+AS """
   var queryPos = url.indexOf('?');
   if (queryPos >= 0)
     url = url.slice(0,queryPos);

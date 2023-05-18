@@ -17,7 +17,11 @@ config { hasOutput: true }
 
  /* Extract the port from a url, returns null if no port is found. */
 CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS INT64
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Extract the port from a url, returns null if no port is found."
+)
+AS """
   var protPos = url.indexOf("//");
   if (protPos >= 0)
     url = url.slice(protPos+2);

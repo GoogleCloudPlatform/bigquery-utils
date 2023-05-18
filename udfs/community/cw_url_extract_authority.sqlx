@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Extract the authority from a url, returns "" (empty string) if no authority is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING as (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the authority from a url, returns "" (empty string) if no authority is found."""
+)
+AS (
   (WITH a AS (
    SELECT ${ref("cw_url_extract_host")}(url) AS host, ${ref("cw_url_extract_port")}(url) AS port
   ) SELECT IF(a.port is null, host, concat(host, ":", port)) FROM a)

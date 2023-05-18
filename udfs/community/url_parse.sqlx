@@ -19,6 +19,11 @@ config { hasOutput: true }
 --Returns the specified part from the URL. Valid values for partToExtract include PROTOCOL, HOST, PATH, QUERY, and REF.
 --For example, parse_url('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'.
 CREATE OR REPLACE FUNCTION ${self()}(url STRING, part STRING)
+OPTIONS (
+    description="""Returns the specified part from the URL. Valid values for partToExtract include PROTOCOL, HOST, PATH, QUERY, and REF.
+Returns the specified part from the URL. Valid values for partToExtract include PROTOCOL, HOST, PATH, QUERY, and REF.
+For example, parse_url('http://facebook.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST') returns 'facebook.com'."""
+)
 AS (
   CASE
     WHEN UPPER(part) = 'HOST'  THEN REGEXP_EXTRACT(url, r'(?:[a-zA-Z]+://)?([a-zA-Z0-9-.]+)/?')

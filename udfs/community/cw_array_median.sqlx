@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Similar to MEDIAN in Teradata */
-CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE) 
+OPTIONS (
+  description="Similar to MEDIAN in Teradata"
+)
+AS (
    ( SELECT PERCENTILE_CONT(x, 0.5) OVER() FROM UNNEST(arr) AS x LIMIT 1 )
 );

@@ -19,6 +19,10 @@ config { hasOutput: true }
   Given an array of struct and needle, searches an array to find struct whose
   key-field matches needle, then it returns the value-field in the given struct.
 */
-CREATE OR REPLACE FUNCTION ${self()}(maparray ANY TYPE, inkey ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(maparray ANY TYPE, inkey ANY TYPE) 
+OPTIONS (
+    description="Given an array of struct and needle, searches an array to find struct whose key-field matches needle, then it returns the value-field in the given struct."
+)
+AS (
   (SELECT ARRAY_AGG(kv.value)[SAFE_OFFSET(0)] FROM UNNEST(maparray) AS kv WHERE kv.key = inkey)
 );

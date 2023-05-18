@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Similar to Presto to_base function - convert decimal number to number with given base */
-CREATE OR REPLACE FUNCTION ${self()}(number INT64, base INT64) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(number INT64, base INT64) RETURNS STRING 
+OPTIONS (
+    description="Similar to Presto to_base function - convert decimal number to number with given base"
+)
+AS (
     (WITH chars AS (
         SELECT MOD(CAST(FLOOR(ABS(number)/POW(base, (FLOOR(LOG(ABS(number))/LOG(base)) + 1) - idx)) AS INT64), base) ch, idx
             from UNNEST(GENERATE_ARRAY(1, CAST(FLOOR(LOG(ABS(number))/LOG(base)) AS INT64) + 1)) idx

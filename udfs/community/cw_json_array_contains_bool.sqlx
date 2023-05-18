@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = boolean */
 CREATE OR REPLACE FUNCTION ${self()}(json STRING, needle BOOL) RETURNS BOOL
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Same as cw_json_array_contains_str(STRING, STRING) UDF but with needle = boolean"
+)
+AS """
   if (json == null || needle == null)
     return null;
   var parsedJson = JSON.parse(json);

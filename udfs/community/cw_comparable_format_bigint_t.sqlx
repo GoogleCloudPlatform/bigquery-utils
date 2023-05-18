@@ -17,6 +17,9 @@ config { hasOutput: true }
 
 /* Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values */
 CREATE OR REPLACE FUNCTION ${self()}(part INT64) RETURNS STRING
+OPTIONS (
+  description="Lexicographically '+' comes before '-' so we replace p(lus) and m(inus) and subtract LONG_MIN on negative values"
+)
 AS (
     FORMAT(
       CASE WHEN part < 0 THEN 'm' ELSE 'p' END || '%19d', -- 'm' < 'p' lexicographically

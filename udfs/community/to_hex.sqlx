@@ -18,7 +18,11 @@ config { hasOutput: true }
 -- to_hex:
 -- Input: INT64 number
 -- Output: STRING representing the input number in hexadecimal form
-CREATE OR REPLACE FUNCTION ${self()}(x INT64) AS
+CREATE OR REPLACE FUNCTION ${self()}(x INT64) 
+OPTIONS (
+    description="Returns a hexadecimal representation of a number."
+)
+AS
 (
   (
     SELECT 

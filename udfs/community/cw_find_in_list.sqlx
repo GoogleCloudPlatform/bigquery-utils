@@ -17,6 +17,9 @@ config { hasOutput: true }
 
 /* Similar to Hive "find_in_set" */
 CREATE OR REPLACE FUNCTION ${self()}(needle STRING, list STRING) RETURNS INT64
+OPTIONS (
+    description="Similar to Hive find_in_set"
+)
 AS (
   CASE WHEN needle IS NULL OR list IS NULL THEN NULL
   ELSE COALESCE((SELECT o + 1 FROM unnest(split(list, ',')) straw WITH OFFSET o WHERE straw = needle LIMIT 1), 0) END

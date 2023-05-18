@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Extract the file from a url, returns "" (empty string) string if no file is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING as (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the file from a url, returns "" (empty string) string if no file is found."""
+)
+AS (
   (WITH a AS (
    SELECT ${ref("cw_url_extract_path")}(url) AS path, ${ref("cw_url_extract_query")}(url) AS query
   ) SELECT IF(a.query is null or length(a.query) = 0, path, concat(path, "?", query)) FROM a)

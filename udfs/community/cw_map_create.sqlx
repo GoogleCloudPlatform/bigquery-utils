@@ -20,7 +20,11 @@ config { hasOutput: true }
   matched <key,value> from each array. Number of elements in each array should
   be equal otherwise remaining values will be ignored.
 */
-CREATE OR REPLACE FUNCTION ${self()}(keys ANY TYPE, vals ANY TYPE) AS (
+CREATE OR REPLACE FUNCTION ${self()}(keys ANY TYPE, vals ANY TYPE) 
+OPTIONS (
+    description="Given an array of keys and values, creates an array of struct containing matched <key,value> from each array. Number of elements in each array should be equal otherwise remaining values will be ignored."
+)
+AS (
   (SELECT
     ARRAY(
       SELECT AS STRUCT keys[SAFE_OFFSET(index)] AS key, vals[SAFE_OFFSET(index)] AS value

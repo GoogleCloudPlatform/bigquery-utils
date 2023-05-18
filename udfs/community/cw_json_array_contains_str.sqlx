@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Determine if value exists in json (a string containing a JSON array). */
 CREATE OR REPLACE FUNCTION ${self()}(json STRING, needle STRING) RETURNS BOOL
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Determine if value exists in json (a string containing a JSON array)."
+)
+AS """
   if (json == null || needle == null)
     return null;
   var parsedJson = JSON.parse(json);

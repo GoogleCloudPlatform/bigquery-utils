@@ -19,7 +19,14 @@ config { hasOutput: true }
 -- Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
 -- Input: random string length INT64
 -- Output: random string of specified length 
-CREATE OR REPLACE FUNCTION ${self()}(length INT64) AS
+CREATE OR REPLACE FUNCTION ${self()}(length INT64) 
+OPTIONS (
+    description="""Returns a random string of specified length.
+Individual characters are chosen uniformly at random from the following pool of characters: 0-9, a-z, A-Z.
+Input: random string length INT64
+Output: random string of specified length"""
+)
+AS
 ((
   SELECT 
     STRING_AGG([

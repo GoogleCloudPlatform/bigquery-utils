@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Extract the protocol from a url, return "" (empty string) if no protocol is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the protocol from a url, return "" (empty string) if no protocol is found."""
+)
+AS (
   (WITH a AS (
    SELECT STRPOS(url, "://") AS v
   ) SELECT IF(a.v <= 0, "", SUBSTR(url,1,a.v-1)) FROM a)
