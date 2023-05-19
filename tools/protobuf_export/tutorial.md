@@ -59,7 +59,7 @@ return pbwrapper.parse(message, input)
 ### 2. Use your newly created user-defined function to get protobuf columns
 
 ```sql
-bq query --use_legacy_sql=false 
+bq query --use_legacy_sql=false \
 'SELECT 
   mynamespace.toProto(STRUCT(word), 
     "dummypackage.DummyMessage") 
