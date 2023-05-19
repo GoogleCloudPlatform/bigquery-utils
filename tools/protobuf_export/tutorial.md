@@ -65,6 +65,8 @@ bq query --use_legacy_sql=false \
     "dummypackage.DummyMessage") 
 FROM 
   bigquery-public-data.samples.shakespeare' 
+LIMIT 
+  100
 ```
 
 ## Congratulations 🎉
