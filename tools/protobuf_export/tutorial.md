@@ -14,20 +14,24 @@ Now that you've already downloaded the example to Cloud Shell and you're in the
 example directory, you're ready to run the commands to get
 this example up and running. Follow these steps to run this example:
 
-### 1. Install the JavaScript dependencies in the Cloud Shell terminal:
-
+### 1. Navigate to protobuf_export folder
 ```bash
 cd tools/protobuf_export
+```
+
+### 2. Install the JavaScript dependencies in the Cloud Shell terminal:
+
+```bash
 npm install
 ```
 
-### 2. Generate the pbwrapper.js file by running the following:
+### 3. Generate the pbwrapper.js file by running the following:
 
 ```bash
 npx webpack --config webpack.config.js --stats-error-details
 ```
 
-### 3. Upload pbwrapper.js to GCS:
+### 4. Upload pbwrapper.js to GCS:
 ```bash
 gcloud storage cp dist/pbwrapper.js gs://DESTINATION_BUCKET_NAME/
 ```
@@ -42,26 +46,13 @@ To use pbwrapper.js, click **Next**.
 
 ```bash
 bq query --use_legacy_sql=false \
-'CREATE FUNCTION
-  mynamespace.toProto(input STRUCT<dummyField STRING>,
-    protoMessage STRING)
-  RETURNS BYTES
-  LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r"""
-let message = pbwrapper.setup(protoMessage)
-return pbwrapper.parse(message, input)
- """'
+'CREATE FUNCTION mynamespace.toProto(input STRUCT<dummyField STRING>, protoMessage STRING) RETURNS BYTES LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r""" let message = pbwrapper.setup(protoMessage) return pbwrapper.parse(message, input) """'
 ```
 
 ### 2. Use your newly created user-defined function to get protobuf columns
 
 ```bash
-bq query --use_legacy_sql=false \
-'SELECT
-  mynamespace.toProto(STRUCT(word),
-    "dummypackage.DummyMessage")
-FROM
-  `bigquery-public-data.samples.shakespeare`
-LIMIT 100'
+bq query --use_legacy_sql=false \ 'SELECT mynamespace.toProto(STRUCT(word), "dummypackage.DummyMessage") FROM `bigquery-public-data.samples.shakespeare` LIMIT 100'
 ```
 
 ## Congratulations 🎉
