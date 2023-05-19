@@ -36,7 +36,7 @@ npx webpack --config webpack.config.js --stats-error-details
 gcloud storage cp dist/pbwrapper.js gs://DESTINATION_BUCKET_NAME/
 ```
 
-Congratulations, you successfully uploaded dist/pbwrapper.js to GCS!
+Congratulations, you successfully uploaded pbwrapper.js to GCS!
 
 To use pbwrapper.js, click **Next**.
 
@@ -46,22 +46,25 @@ To use pbwrapper.js, click **Next**.
 
 ```bash
 bq query --use_legacy_sql=false \
-'CREATE OR REPLACE FUNCTION \
-mynamespace.toProto(input STRUCT<dummyField STRING>, protoMessage STRING) \
-RETURNS BYTES \
-LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) \
-AS r""" \
-let message = pbwrapper.setup(protoMessage); return \
-pbwrapper.parse(message, input) """'
+'CREATE FUNCTION
+  mynamespace.toProto(input STRUCT<dummyField STRING>,
+    protoMessage STRING)
+  RETURNS BYTES
+  LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r"""
+let message = pbwrapper.setup(protoMessage)
+return pbwrapper.parse(message, input)
+ """;'
 ```
 
 ### 2. Use your newly created user-defined function to get protobuf columns
 
 ```bash
 bq query --use_legacy_sql=false \
-'SELECT mynamespace.toProto(STRUCT(word), "dummypackage.DummyMessage") \
-FROM `bigquery-public-data.samples.shakespeare`  \
-LIMIT 100'
+'SELECT
+  mynamespace.toProto(STRUCT(word),
+    "dummypackage.DummyMessage")
+FROM
+  bigquery-public-data.samples.shakespeare'
 ```
 
 ## Congratulations 🎉
