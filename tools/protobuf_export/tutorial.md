@@ -17,6 +17,7 @@ this example up and running. Follow these steps to run this example:
 ### 1. Install the JavaScript dependencies in the Cloud Shell terminal:
 
 ```bash
+cd tools/protobuf_export
 npm install
 ```
 
@@ -48,7 +49,7 @@ bq query --use_legacy_sql=false \
   LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r"""
 let message = pbwrapper.setup(protoMessage)
 return pbwrapper.parse(message, input)
- """;'
+ """'
 ```
 
 ### 2. Use your newly created user-defined function to get protobuf columns
@@ -59,7 +60,8 @@ bq query --use_legacy_sql=false \
   mynamespace.toProto(STRUCT(word),
     "dummypackage.DummyMessage")
 FROM
-  `bigquery-public-data.samples.shakespeare`'
+  `bigquery-public-data.samples.shakespeare`
+LIMIT 100'
 ```
 
 ## Congratulations 🎉
