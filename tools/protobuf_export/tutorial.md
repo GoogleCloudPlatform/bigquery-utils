@@ -46,13 +46,22 @@ To use pbwrapper.js, click **Next**.
 
 ```bash
 bq query --use_legacy_sql=false \
-'CREATE FUNCTION mynamespace.toProto(input STRUCT<dummyField STRING>, protoMessage STRING) RETURNS BYTES LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r""" let message = pbwrapper.setup(protoMessage) return pbwrapper.parse(message, input) """'
+'CREATE OR REPLACE FUNCTION \
+mynamespace.toProto(input STRUCT<dummyField STRING>, protoMessage STRING) \
+RETURNS BYTES \
+LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) \
+AS r""" \
+let message = pbwrapper.setup(protoMessage); return \
+pbwrapper.parse(message, input) """'
 ```
 
 ### 2. Use your newly created user-defined function to get protobuf columns
 
 ```bash
-bq query --use_legacy_sql=false \ 'SELECT mynamespace.toProto(STRUCT(word), "dummypackage.DummyMessage") FROM `bigquery-public-data.samples.shakespeare` LIMIT 100'
+bq query --use_legacy_sql=false \
+'SELECT mynamespace.toProto(STRUCT(word), "dummypackage.DummyMessage") \
+FROM `bigquery-public-data.samples.shakespeare`  \
+LIMIT 100'
 ```
 
 ## Congratulations 🎉
