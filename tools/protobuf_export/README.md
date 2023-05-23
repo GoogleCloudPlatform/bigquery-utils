@@ -15,23 +15,24 @@ type to be exported.
 
 ```
 CREATE FUNCTION
-  <namespace>.toProto(input STRUCT<word STRING,
+  <namespace>.toMyProtoMessage(input STRUCT<word STRING,
     wordCount BIGNUMERIC>,
     protoMessage STRING)
   RETURNS BYTES
   LANGUAGE js OPTIONS ( library=["gs://{YOUR_GCS_BUCKET}/pbwrapper.js"] ) AS r"""
-let message = pbwrapper.setup(protoMessage)
+let message = pbwrapper.setup("<proto package name>.<proto message name>")
 return pbwrapper.parse(message, input)
  """;
  ```
  7. Use the created function like so:
 ```
 SELECT
-  <namespace>.toProto(STRUCT(word,
-      CAST(word_count AS BIGNUMERIC)),
-    "<proto package name>.<proto message name>") AS protoResult
+  <namespace>.toMyProtoMessage(STRUCT(word,
+      CAST(word_count AS BIGNUMERIC))) AS protoResult
 FROM
   `bigquery-public-data.samples.shakespeare`
+LIMIT
+  100;
 ```
 
 ## Caveats
