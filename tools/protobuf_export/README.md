@@ -16,8 +16,7 @@ type to be exported.
 ```
 CREATE FUNCTION
   <namespace>.toMyProtoMessage(input STRUCT<word STRING,
-    wordCount BIGNUMERIC>,
-    protoMessage STRING)
+    wordCount BIGNUMERIC>)
   RETURNS BYTES
   LANGUAGE js OPTIONS ( library=["gs://{YOUR_GCS_BUCKET}/pbwrapper.js"] ) AS r"""
 let message = pbwrapper.setup("<proto package name>.<proto message name>")
