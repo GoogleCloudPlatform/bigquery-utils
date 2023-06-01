@@ -34,5 +34,14 @@ LIMIT
   100;
 ```
 
+## Required permissions
+The following permissions may be required, depending on usage:
+
+1. bigquery.routines.create - Required to create a user defined function. Required one time for running this procedure.
+2. storage.objects.create - Required to upload pbwrapper.js to GCS. Required one time for running this procedure.
+3. bigquery.tables.export - Required to export data from BigQuery. Required for the user running the query.
+4. storage.objects.get - Required to read pbwrapper.js from GCS. Required for the user running the query.
+
+
 ## Caveats
 1. While the same pbwrapper.js can be used for all .proto files under protos folder, you will still need to create one such function per proto message. That is due to the fact that BigQuery structs are fully typed.
