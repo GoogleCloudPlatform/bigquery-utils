@@ -1,0 +1,20 @@
+{
+  "name": "protobuf-export",
+  "displayName": "protobuf_export",
+  "description": "protobuf_export allows to export protobuf columns from bigquery",
+  "version": "0.0.1",
+  "publisher": "google-cloud",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GoogleCloudPlatform/bigquery-utils.git",
+    "directory": "tools/protobuf_export"
+  },
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "dependencies": {
+    "protobufjs": "7.2.3"
+  },
+  "devDependencies": {
+    "raw-loader": "4.0.2"
+  }
+}
