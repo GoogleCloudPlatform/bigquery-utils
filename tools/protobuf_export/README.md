@@ -35,7 +35,7 @@ LIMIT
 ```
 
 ## Required permissions
-The following permissions may be required, depending on usage:
+The following permissions are required:
 
 1. bigquery.routines.create - Required to create a user defined function. Required one time for running this procedure.
 2. storage.objects.create - Required to upload pbwrapper.js to GCS. Required one time for running this procedure.
