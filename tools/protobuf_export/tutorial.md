@@ -47,7 +47,7 @@ To use pbwrapper.js, click **Next**.
 ```sql
 bq query --use_legacy_sql=false \
 'CREATE FUNCTION
-  mynamespace.toMyProtoMessage(input STRUCT<dummyField STRING>)
+  my-dataset-id.toMyProtoMessage(input STRUCT<dummyField STRING>)
   RETURNS BYTES
   LANGUAGE js OPTIONS ( library=["gs://{DESTINATION_BUCKET_NAME}/pbwrapper.js"] ) AS r"""
 let message = pbwrapper.setup("dummypackage.DummyMessage");
@@ -60,7 +60,7 @@ return pbwrapper.parse(message, input)
 ```sql
 bq query --use_legacy_sql=false \
 'SELECT
-  mynamespace.toMyProtoMessage(STRUCT(word))
+  my-dataset-id.toMyProtoMessage(STRUCT(word))
 FROM
   bigquery-public-data.samples.shakespeare
 LIMIT
