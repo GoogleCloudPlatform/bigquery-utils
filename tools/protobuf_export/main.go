@@ -47,13 +47,19 @@ func main() {
 func query(ctx context.Context, client *bigquery.Client) (*bigquery.RowIterator, error) {
 
 	query := client.Query(
-		`SELECT
-				concat(word , ":",corpus) as RowKey,
-				<dataset-id>.toMyProtoMessage(STRUCT(word,
-					  CAST(word_count AS BIGNUMERIC))) AS ProtoResult
-				FROM
-				  ` + "`bigquery-public-data.samples.shakespeare`" + `					
-				LIMIT 100;`)
+		`SELECT 
+  concat(word, ":", corpus) as RowKey, 
+  <dataset-id>.toMyProtoMessage(
+    STRUCT(
+      word, 
+      CAST(word_count AS BIGNUMERIC)
+    )
+  ) AS ProtoResult 
+FROM 
+  ` + "` bigquery - public - data.samples.shakespeare `" + ` 
+LIMIT 
+  100;
+`)
 	return query.Read(ctx)
 }
 
