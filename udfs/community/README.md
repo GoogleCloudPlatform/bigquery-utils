@@ -126,6 +126,7 @@ SELECT bqutil.fn.int(1.684)
 * [get_value](#get_valuek-string-arr-any-type)
 * [int](#intv-any-type)
 * [jaccard](#jaccard)
+* [job_url](#job_urljob_id-string)
 * [json_extract_keys](#json_extract_keys)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
@@ -158,6 +159,7 @@ SELECT bqutil.fn.int(1.684)
 * [sure_nonnull](#sure_nonnull)
 * [sure_range](#sure_range)
 * [sure_values](#sure_values)
+* [table_url](#table_urltable_id-string)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -1318,6 +1320,14 @@ SELECT
 1, 0.71, 1.0, 0.25, 0.67, 0.0
 ```
 
+### [job_url(job_id STRING)](job_url.sqlx)
+Generates a deep link to the BigQuery console for a given job_id in the form: `project:location.job_id`.
+```sql
+SELECT bqutil.fn.job_url("my_project:us.my_job_id")
+
+https://console.cloud.google.com/bigquery?project=my_project&j=bq:us:my_job_id
+```
+
 ### [json_extract_keys()](json_extract_keys.sqlx)
 Returns all keys in the input JSON as an array of string
 Returns NULL if invalid JSON string is passed,
@@ -1615,6 +1625,15 @@ Otherwise it causes error.
 SELECT
   `bqutil.fn.sure_values`("hoge", ["hoge", "fuga"]) = "hoge",
   `bqutil.fn.sure_values`(  NULL, ["hoge", "fuga"]) is NULL
+```
+
+### [table_url(table_id STRING)](table_url.sqlx)
+Generates a deep link to the BigQuery console for a table or view
+in the form: "project.dataset.table"
+```sql
+SELECT bqutil.fn.table_url("bigquery-public-data.new_york_citibike.citibike_trips")
+
+https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=new_york_citibike&t=citibike_trips&page=table
 ```
 
 ### [to_binary(x INT64)](to_binary.sqlx)
