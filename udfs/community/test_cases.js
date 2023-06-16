@@ -3009,7 +3009,96 @@ generate_udf_test("cw_period_rdiff", [
         expected_output: `NULL`
     },
 ]);
-
+generate_udf_test("cw_split_part_delimstr_idx", [
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `1`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `2`
+    ],
+    expected_output: `"bar"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `0`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-1`
+    ],
+    expected_output: `"baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `4`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-3`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-4`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo  bar baz"`,
+      `"  "`,
+      `2`
+    ],
+    expected_output: `"bar baz"`,
+  },
+  {
+    inputs: [
+      `NULL`,
+      `" "`,
+      `1`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `NULL`,
+      `1`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `NULL`
+    ],
+    expected_output: `NULL`,
+  }
+]);
 generate_udf_test("sure_nonnull", [
   {
     inputs: [

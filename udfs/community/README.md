@@ -94,6 +94,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_setbit](#cw_setbitbits-int64-index-int64)
 * [cw_signed_leftshift_128bit](#cw_signed_leftshift_128bitvalue-bignumeric-n-bignumeric)
 * [cw_signed_rightshift_128bit](#cw_signed_rightshift_128bitvalue-bignumeric-n-bignumeric)
+* [cw_split_part_delimstr_idx](#cw_split_part_delimstr_idxvalue-string-delimiter-string-part-int64)
 * [cw_stringify_interval](#cw_stringify_intervalx-int64)
 * [cw_strtok](#cw_strtoktext-string-delim-string)
 * [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
@@ -936,6 +937,21 @@ Performs a signed shift right on BIGNUMERIC as if it was a 128 bit integer.
 - -1
 - -1
 ```
+
+### [cw_split_part_delimstr_idx(value STRING, delimiter STRING, part INT64)](cw_split_part_delimstr_idx.sqlx)
+Extract a part from a string value delimited by a delimiter string.
+Indexing start from 1. Negative offsets count from the end.
+
+```SQL
+- SELECT bqutil.fn.cw_split_part_delimstr_idx('foo bar baz', ' ', 3)
+- SELECT bqutil.fn.cw_split_part_delimstr_idx('foo bar baz', ' ', -3)
+- SELECT bqutil.fn.cw_split_part_delimstr_idx('foo bar baz', ' ', 4)
+
+- bar
+- foo
+- NULL
+```
+
 
 ### [cw_stringify_interval(x INT64)](cw_stringify_interval.sqlx)
 Formats the interval as 'day hour:minute:second
