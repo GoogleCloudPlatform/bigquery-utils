@@ -13,10 +13,22 @@ Replace the following placeholders:\
 
 # Table Read Patterns
 
+## Enable BigQuery Clustering/Partitioning Recommender Tool
+
+```bash
+# The following script retrieves all distinct projects from the JOBS_BY_ORGANIZATION view
+# and then enables the recommender API for each project.
+for proj in $(bq query --nouse_legacy_sql --format=csv "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" | sed 1d); do
+  gcloud services --project="${proj}" enable recommender.googleapis.com &
+done
+```
+
 ## [table_read_patterns.sql](table_read_patterns.sql)
 This script will create a table called, `optimization_workshop.table_read_patterns`, and populate it with usage data to help you determine:
 * Which tables (when queried) are resulting in high slot consumption.
 * Which tables are most frequently queried.
+
+
 
 ### Examples
 
