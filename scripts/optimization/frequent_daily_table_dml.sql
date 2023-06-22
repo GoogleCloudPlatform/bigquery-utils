@@ -1,3 +1,7 @@
+/*
+* The following script will return the top 10 tables that 
+* have had the most DML statements run against them in the past 30 days.
+*/
 SELECT
   EXTRACT(DATE FROM creation_time) AS creation_date,
   COUNT(1) AS dml_per_table,
