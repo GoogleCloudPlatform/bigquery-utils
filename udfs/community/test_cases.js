@@ -3048,7 +3048,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `4`
     ],
-    expected_output: `NULL`,
+    expected_output: `""`,
   },
   {
     inputs: [
@@ -3064,7 +3064,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `-4`
     ],
-    expected_output: `NULL`,
+    expected_output: `""`,
   },
   {
     inputs: [
@@ -3073,6 +3073,22 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `2`
     ],
     expected_output: `"bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `1`
+    ],
+    expected_output: `"foo bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `2`
+    ],
+    expected_output: `""`,
   },
   {
     inputs: [
