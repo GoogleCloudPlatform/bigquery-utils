@@ -27,5 +27,6 @@ CREATE OR REPLACE FUNCTION ${self()}(value STRING, delimiter STRING, part INT64)
            n AS (SELECT CASE WHEN part = 0 THEN 1
                              WHEN part < 0 THEN ARRAY_LENGTH(s) + part + 1
                              ELSE part END AS i FROM t)
-        SELECT COALESCE(t.s[SAFE_ORDINAL(n.i)], '') FROM t, n)
+        SELECT CASE WHEN n.i < 1 OR n.i > ARRAY_LENGTH(t.s) THEN ''
+	            ELSE t.s[ORDINAL(n.i)] END FROM t, n)
 );

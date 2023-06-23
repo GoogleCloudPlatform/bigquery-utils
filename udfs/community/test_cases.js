@@ -3096,7 +3096,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `1`
     ],
-    expected_output: `NULL`,
+    expected_output: `CAST(NULL AS STRING)`,
   },
   {
     inputs: [
@@ -3104,7 +3104,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `NULL`,
       `1`
     ],
-    expected_output: `NULL`,
+    expected_output: `CAST(NULL AS STRING)`,
   },
   {
     inputs: [
@@ -3112,7 +3112,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `NULL`
     ],
-    expected_output: `NULL`,
+    expected_output: `CAST(NULL AS STRING)`,
   }
 ]);
 generate_udf_test("sure_nonnull", [
