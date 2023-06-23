@@ -3048,7 +3048,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `4`
     ],
-    expected_output: `""`,
+    expected_output: `CAST("" AS STRING)`,
   },
   {
     inputs: [
@@ -3064,7 +3064,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `-4`
     ],
-    expected_output: `""`,
+    expected_output: `CAST("" AS STRING)`,
   },
   {
     inputs: [
@@ -3088,7 +3088,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `""`,
       `2`
     ],
-    expected_output: `""`,
+    expected_output: `CAST("" AS STRING)`,
   },
   {
     inputs: [
