@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/*
+ * This script creates a table named, views_with_nonoptimal_join_condition,
+ * that contains a list of the views with non-optimal join conditions.
+ */
+
 DECLARE projects ARRAY<STRING> DEFAULT (
   SELECT 
     ARRAY_AGG(project_id)

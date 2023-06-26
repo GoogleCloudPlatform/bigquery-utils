@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
+/*
+ * This script creates a table named, top_bytes_scanning_queries_by_hash, 
+ * which contains the top 200 most expensive queries by total bytes scanned.
+ * Queries are grouped by their query pattern, which is the query text with
+ * all literals removed. This allows us to group queries that are logically
+ * the same, but have different literals. 
+ * 
+ * For example, the following queries would be grouped together:
+ *   SELECT * FROM `my-project.my_dataset.my_table` WHERE date = '2020-01-01'
+ *   SELECT * FROM `my-project.my_dataset.my_table` WHERE date = '2020-01-02'
+ *   SELECT * FROM `my-project.my_dataset.my_table` WHERE date = '2020-01-03'
+ */
+
 DECLARE start_date DATE DEFAULT CURRENT_DATE - 30;
 DECLARE end_date DATE DEFAULT CURRENT_DATE;
 DECLARE projects ARRAY<STRING> DEFAULT (

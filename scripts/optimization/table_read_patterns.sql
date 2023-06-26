@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/*
+ * The following script creates a table named, table_read_patterns,
+ * that contains a list of the most frequently read tables.
+ */
+
 DECLARE start_date DATE DEFAULT CURRENT_DATE - 7;
 DECLARE end_date DATE DEFAULT CURRENT_DATE;
 DECLARE projects ARRAY<STRING> DEFAULT (

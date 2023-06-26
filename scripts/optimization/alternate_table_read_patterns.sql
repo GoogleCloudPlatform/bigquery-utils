@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+
+/*
+ * This script creates a table that contains the most frequent table read patterns
+ */
+
 DECLARE start_date DATE DEFAULT CURRENT_DATE - 7;
 DECLARE end_date DATE DEFAULT CURRENT_DATE;
 DECLARE projects ARRAY<STRING> DEFAULT (

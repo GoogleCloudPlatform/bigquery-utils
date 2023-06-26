@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+/*
+ * This script creates a table named, largest_tables_without_part_clust,
+ * that contains a list of the largest tables which are:
+ *     - not partitioned
+ *     - not clustered
+ *     - neither partitioned nor clustered
+ */
+
 DECLARE projects ARRAY<STRING> DEFAULT (
   SELECT 
     ARRAY_AGG(project_id)
