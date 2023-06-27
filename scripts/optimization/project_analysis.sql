@@ -37,8 +37,7 @@
   *   - total TB spilled
  */
 
-DECLARE var_n_days INT64;
-SET var_n_days = 30;
+DECLARE var_n_days INT64 DEFAULT 30;
 
 CREATE OR REPLACE TABLE `<dest_project_id>.<dest_dataset>.PROJECT_ANALYSIS` AS
 SELECT
