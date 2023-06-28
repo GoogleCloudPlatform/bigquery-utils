@@ -1,5 +1,5 @@
 SELECT
-  `bigquery-public-data`.persistent_udfs.job_url(project_id || ':us.' || job_id),
+  `bigquery-public-data`.persistent_udfs.job_url(project_id || ':us.' || job_id) AS job_url,
   query_info.performance_insights.stage_performance_standalone_insights,
   query_info.performance_insights.stage_performance_change_insights
 FROM
