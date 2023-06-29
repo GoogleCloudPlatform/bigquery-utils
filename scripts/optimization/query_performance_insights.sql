@@ -15,7 +15,7 @@
  */
 
 /*
- * The following script retrieves the top 100 queries that have had performance insights
+ * This script retrieves the top 100 queries that have had performance insights
  * generated for them in the past 30 days.
  */
 

@@ -50,6 +50,44 @@ This script will create a table called, `optimization_workshop.table_read_patter
     LIMIT 10
     ```
 
+## [largest_tables_without_partitioning_or_clustering.sql](largest_freq_read_tables_without_partitioning_or_clustering.sql)
+
+This script creates a table named, `largest_tables_without_part_clust`,
+that contains a list of the largest tables which are:
+  - not partitioned
+  - not clustered
+  - neither partitioned nor clustered
+
+## [largest_freq_read_tables_without_partitioning_or_clustering.sql](largest_freq_read_tables_without_partitioning_or_clustering.sql)
+
+**Note:** This script depends on the `table_read_patterns` table so you must first run the [tables_read_patters.sql](table_read_patterns.sql) script.
+
+This script creates a table named, `largest_freq_read_tables_without_part`
+that contains a list of the most frequently read tables which are:
+  - not partitioned
+  - not clustered
+  - neither partitioned nor clustered
+
+
 # Query Patterns
 
-## 
+## [top_bytes_scanning_queries_by_hash.sql](top_bytes_scanning_queries_by_hash.sql)
+
+This script creates a table named, top_bytes_scanning_queries_by_hash, 
+which contains the top 200 most expensive queries by total bytes scanned.
+Queries are grouped by their normalized query pattern, which ignores
+comments, parameter values, UDFs, and literals in the query text.
+This allows us to group queries that are logically the same, but
+have different literals. 
+
+For example, the following queries would be grouped together because the date literal filters are ignored:
+  ```
+  SELECT * FROM my_table WHERE date = '2020-01-01';
+  SELECT * FROM my_table WHERE date = '2020-01-02';
+  SELECT * FROM my_table WHERE date = '2020-01-03';
+  ```
+
+## [query_performance_insights.sql](query_performance_insights.sql)
+
+This script retrieves the top 100 queries that have had performance insights
+generated for them in the past 30 days.
