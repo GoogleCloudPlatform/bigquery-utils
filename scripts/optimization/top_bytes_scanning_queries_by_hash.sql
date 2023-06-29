@@ -17,9 +17,10 @@
 /*
  * This script creates a table named, top_bytes_scanning_queries_by_hash, 
  * which contains the top 200 most expensive queries by total bytes scanned.
- * Queries are grouped by their query pattern, which is the query text with
- * all literals removed. This allows us to group queries that are logically
- * the same, but have different literals. 
+ * Queries are grouped by their normalized query pattern, which ignores
+ * comments, parameter values, UDFs, and literals in the query text.
+ * This allows us to group queries that are logically the same, but
+ * have different literals. 
  * 
  * For example, the following queries would be grouped together:
  *   SELECT * FROM `my-project.my_dataset.my_table` WHERE date = '2020-01-01'
@@ -45,8 +46,7 @@ DECLARE projects ARRAY<STRING> DEFAULT (
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.top_bytes_scanning_queries_by_hash
 (
-  Query_Pattern STRING,
-  Query_No_Literals STRING,
+  Query_Hash STRING,
   Query_Raw_Sample STRING,
   Job_Origin STRING,
   Ref_Tables STRING,
@@ -67,30 +67,6 @@ CREATE OR REPLACE TABLE optimization_workshop.top_bytes_scanning_queries_by_hash
   Labels STRING
 );
 
-CREATE TEMP FUNCTION sanitize_query(query STRING)
-RETURNS STRING AS(
-    LOWER(
-        REPLACE(
-            REPLACE(
-                REPLACE(
-                    REPLACE(
-                        REGEXP_REPLACE(
-                            REGEXP_REPLACE(
-                                REGEXP_REPLACE(query, r"'(.*?)'", "," -- remove literals between single quotes
-                                ), r"[0-9]+",","                      -- remove numbers
-                            ),r'"(.*?)"', ","                         -- remove literals between double quotes
-                        ),
-                        '`',''                                        -- remove the '`' character
-                    ),
-                    ' ',''                                            -- remove empty spaces
-                ),
-                '\n',''                                               -- remove new line characters
-            ),
-            ',',''                                                    -- remove commas
-        )
-    )
-);
-
 FOR p IN (
  SELECT project_id
  FROM
@@ -101,8 +77,7 @@ BEGIN
 EXECUTE IMMEDIATE FORMAT("""
 INSERT INTO optimization_workshop.top_bytes_scanning_queries_by_hash
 SELECT
-    TO_BASE64(MD5(query_no_literals))                                       AS Query_Pattern,
-    query_no_literals                                                       AS Query_No_Literals,
+    query_hash                                                              AS Query_Hash,
     ANY_VALUE(query_raw)                                                    AS Query_Raw_Sample,
     SPLIT(ANY_VALUE(job_ids)[OFFSET(0)], '_')[OFFSET(0)]                    AS Job_Origin,
     Ref_Tables                                                              AS Ref_Tables,
@@ -110,7 +85,7 @@ SELECT
     SUM(job_count)                                                          AS Job_Count,
     CAST(AVG(job_count) AS INT64)                                           AS Avg_Job_Count_Active_Days,
     Project_Id                                                              AS Project_Id,
-    'us'                                                                      AS BQ_Region,
+    'us'                                                                    AS BQ_Region,
     Reservation_Id                                                          AS Reservation_Id,
     CAST(SUM(total_gigabytes_processed) AS INT64)                           AS Total_Gigabytes_Processed,
     CAST(SUM(total_gigabytes_processed)/sum(job_count) AS INT64)            AS Total_Gigabytes_Processed_Per_Job,
@@ -123,7 +98,7 @@ SELECT
     STRING_AGG(DISTINCT labels_concat)                                      AS Labels
 FROM (
     SELECT
-        query_no_literals                                       AS query_no_literals,
+        query_hash,
         ANY_VALUE(query_raw)                                    AS query_raw,
         ref_tables                                              AS ref_tables,
         creation_dt                                             AS creation_dt,
@@ -139,11 +114,11 @@ FROM (
         SUM(total_slot_ms) / (1000 * 60 * 60)                   AS total_slot_hours_per_day,
         SUM(total_bytes_processed) / (1024 * 1024 * 1024)       AS total_gigabytes_processed, 
         AVG(job_duration_seconds)                               AS avg_job_duration_seconds,
-        ARRAY_AGG(DISTINCT user_email)                        AS user_email,
-        STRING_AGG(DISTINCT labels_concat)                                           AS labels_concat
+        ARRAY_AGG(DISTINCT user_email)                          AS user_email,
+        STRING_AGG(DISTINCT labels_concat)                      AS labels_concat
     FROM (
         SELECT
-            sanitize_query(query)                                                           AS query_no_literals,
+            query_info.query_hashes.normalized_literals                                     AS query_hash,
             query                                                                           AS query_raw,
             DATE(jbp.creation_time)                                                         AS creation_dt,
             jbp.project_id                                                                  AS project_id,
@@ -165,7 +140,7 @@ FROM (
                 'TEMP',
                 ref_tables.dataset_id) || '.' || ref_tables.table_id)                       AS ref_tables,
             user_email,
-            FORMAT("%%T", ARRAY_CONCAT_AGG(labels))                                          AS labels_concat 
+            FORMAT("%%T", ARRAY_CONCAT_AGG(labels))                                         AS labels_concat 
         FROM  
             `%s.region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT as jbp
         JOIN 
@@ -183,7 +158,7 @@ FROM (
 JOIN
     UNNEST(user_email) as users_emails
 GROUP BY
-    query_no_literals,
+    query_hash,
     ref_tables,
     project_id,
     BQ_Region,
