@@ -42,10 +42,6 @@ WHERE
   AND jbo.end_time > jbo.start_time
   AND jbo.error_result IS NULL
   AND jbo.statement_type != 'SCRIPT'
-  AND (
-    COALESCE(ARRAY_LENGTH(query_info.performance_insights.stage_performance_standalone_insights),0)
-    + COALESCE(ARRAY_LENGTH(query_info.performance_insights.stage_performance_change_insights),0) > 0
-  )
   AND EXISTS ( -- Only include queries which had performance insights
     SELECT
       1
