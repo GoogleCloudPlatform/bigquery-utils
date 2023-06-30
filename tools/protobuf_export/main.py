@@ -20,8 +20,8 @@ def main():
     """)
   rows = query_job.result()
   for row in rows:
-    message = awesome_pb2.DummyMessage()
+    message = awesome_pb2.TestMessage()
     message.ParseFromString(row.get("ProtoResult"))
     print(
-        "rowKey: {}, message: {}".format(row.get("RowKey"), message.dummy_field)
+        "rowKey: {}, message: {}".format(row.get("RowKey"), message)
     )
