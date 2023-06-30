@@ -9,14 +9,14 @@ def main():
   client = bigquery.Client(project=project_id)
   query_job = client.query(query="""
                SELECT
-				concat(word , ":",corpus) as RowKey,
-				  test.toProto(STRUCT(word, 
-              CAST(word_count AS BIGNUMERIC)),
-					"protopackage.TestMessage") AS ProtoResult
-				FROM
+			concat(word , ":",corpus) as RowKey,
+			test.toProto(STRUCT(word, 
+				CAST(word_count AS BIGNUMERIC)),
+				"protopackage.TestMessage") AS ProtoResult
+		FROM
 				  `bigquery-public-data.samples.shakespeare`
-					ORDER BY word_count DESC
-				LIMIT 20
+		ORDER BY word_count DESC
+		LIMIT 20
     """)
   rows = query_job.result()
   for row in rows:
