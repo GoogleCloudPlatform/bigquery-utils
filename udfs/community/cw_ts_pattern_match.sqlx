@@ -19,7 +19,11 @@ config { hasOutput: true }
 -- in given UID, SID (user session)
 CREATE OR REPLACE FUNCTION ${self()}(evSeries ARRAY<STRING>, regexpParts ARRAY<STRING>)
 RETURNS ARRAY<STRUCT<pattern_id INT64, start INT64, stop INT64>>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="ts_pattern_match is function that returns range of matched pattern in given UID, SID (user session)"
+)
+AS """
 
 var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var charIdx = 0;

@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Extract the query from a url, returns "" (empty string) if no query is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the query from a url, returns "" (empty string) if no query is found."""
+)
+AS (
   COALESCE(SUBSTR(SPLIT(REGEXP_EXTRACT(url, '[^\\?]+(\\?.*)?'),'#')[OFFSET(0)],2),'')
 );

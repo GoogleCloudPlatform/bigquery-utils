@@ -20,6 +20,11 @@ config { hasOutput: true }
 --inputs: x,y (arrays of samples, both should be one-dimensional, type: ARRAY<FLOAT64> )
 --        alt (Defines the alternative hypothesis. The following options are available: 'two-sided', 'less', and 'greater'
 CREATE OR REPLACE FUNCTION ${self()}(x ARRAY<FLOAT64>, y ARRAY<FLOAT64>, alt STRING) 
+OPTIONS (
+    description="""Computes the U statistics and the p value of the Mann–Whitney U test (also called Mann–Whitney–Wilcoxon).
+Inputs: x,y (arrays of samples, both should be one-dimensional, type: ARRAY<FLOAT64> )
+        alt (Defines the alternative hypothesis. The following options are available: 'two-sided', 'less', and 'greater'"""
+)
 AS (
 (   
   WITH statistics as (

@@ -18,7 +18,11 @@ config { hasOutput: true }
 -- from_hex:
 -- Input: STRING representing a number in hexadecimal form
 -- Output: INT64 number in decimal form
-CREATE OR REPLACE FUNCTION ${self()}(value STRING) AS
+CREATE OR REPLACE FUNCTION ${self()}(value STRING) 
+OPTIONS (
+    description="Returns a number in decimal form from its hexadecimal representation."
+)
+AS
 (
   (
     SELECT 

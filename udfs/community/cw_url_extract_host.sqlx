@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Extract the host from a url, return "" (empty string) if no host is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the host from a url, return "" (empty string) if no host is found."""
+)
+AS (
   COALESCE(NET.HOST(url), '')
 );

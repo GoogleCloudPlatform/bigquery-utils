@@ -49,6 +49,14 @@ generate_udf_test("json_extract_keys", [
         inputs: [`'{"int" : 1}'`],
         expected_output: `["int"]`
     },
+    {
+        inputs: [`'invalid_json'`],
+        expected_output: `cast(null as array<string>)`,
+    },
+    {
+        inputs: [`string(null)`],
+        expected_output: `cast(null as array<string>)`,
+    },
 ]);
 generate_udf_test("json_extract_values", [
     {
@@ -58,6 +66,14 @@ generate_udf_test("json_extract_values", [
     {
         inputs: [`'{"int" : 1}'`],
         expected_output: `["1"]`
+    },
+    {
+        inputs: [`'invalid_json'`],
+        expected_output: `cast(null as array<string>)`,
+    },
+    {
+        inputs: [`string(null)`],
+        expected_output: `cast(null as array<string>)`,
     },
 ]);
 generate_udf_test("json_typeof", [
@@ -151,6 +167,10 @@ generate_udf_test("typeof", [
     },
     {
         inputs: [`""`],
+        expected_output: `"STRING"`
+    },
+    {
+        inputs: [`'string containing " double-quote'`],
         expected_output: `"STRING"`
     },
 ]);
@@ -1636,6 +1656,26 @@ generate_udf_test("cw_array_distinct", [
         expected_output: `CAST([1, 2, 3, 4, 5] AS ARRAY<INT64>)`
     },
 ]);
+generate_udf_test("cw_array_stable_distinct", [
+    {
+        inputs: [
+            `(SELECT ARRAY[4, 1, 4, 9, 1, 10])`
+        ],
+        expected_output: `[4, 1, 9, 10]`
+    },
+    {
+        inputs: [
+            `(SELECT ARRAY[])`
+        ],
+        expected_output: `[]`
+    },
+    {
+        inputs: [
+            `(SELECT ARRAY[5, 5, 5, 5, 5, 5])`
+        ],
+        expected_output: `[5]`
+    },
+]);
 generate_udf_test("cw_next_day", [
     {
         inputs: [
@@ -2039,6 +2079,158 @@ generate_udf_test("cw_setbit", [
         expected_output: `CAST(1005 AS INT64)`
     },
 ]);
+generate_udf_test("cw_signed_leftshift_128bit", [
+    {
+        inputs: [
+            `BIGNUMERIC '1'`, `BIGNUMERIC '3'`
+        ],
+        expected_output: `BIGNUMERIC '8'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '1'`, `BIGNUMERIC '127'`
+        ],
+        expected_output: `BIGNUMERIC '-170141183460469231731687303715884105728'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '1'`, `BIGNUMERIC '300'`
+        ],
+        expected_output: `BIGNUMERIC '0'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '-5'`, `BIGNUMERIC '2'`
+        ],
+        expected_output: `BIGNUMERIC '-20'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '7'`, `BIGNUMERIC '0'`
+        ],
+        expected_output: `BIGNUMERIC '7'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '0'`, `BIGNUMERIC '10'`
+        ],
+        expected_output: `BIGNUMERIC '0'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '1'`
+        ],
+        expected_output: `BIGNUMERIC '113427455640312821154458202477256070484'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '2'`
+        ],
+        expected_output: `BIGNUMERIC '-113427455640312821154458202477256070488'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '3'`
+        ],
+        expected_output: `BIGNUMERIC '113427455640312821154458202477256070480'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '4'`
+        ],
+        expected_output: `BIGNUMERIC '-113427455640312821154458202477256070496'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '5'`
+        ],
+        expected_output: `BIGNUMERIC '113427455640312821154458202477256070464'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '6'`
+        ],
+        expected_output: `BIGNUMERIC '-113427455640312821154458202477256070528'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '56713727820156410577229101238628035242'`,
+            `BIGNUMERIC '7'`
+        ],
+        expected_output: `BIGNUMERIC '113427455640312821154458202477256070400'`
+    }
+]);
+generate_udf_test("cw_signed_rightshift_128bit", [
+    {
+        inputs: [
+            `BIGNUMERIC '32'`,
+            `BIGNUMERIC '3'`
+        ],
+        expected_output: `BIGNUMERIC '4'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '7'`,
+            `BIGNUMERIC '1'`
+        ],
+        expected_output: `BIGNUMERIC '3'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '-7'`,
+            `BIGNUMERIC '1'`
+        ],
+        expected_output: `BIGNUMERIC '-4'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '-1'`,
+            `BIGNUMERIC '1'`
+        ],
+        expected_output: `BIGNUMERIC '-1'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '-1'`,
+            `BIGNUMERIC '100'`
+        ],
+        expected_output: `BIGNUMERIC '-1'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '-1'`,
+            `BIGNUMERIC '300'`
+        ],
+        expected_output: `BIGNUMERIC '-1'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '1'`,
+            `BIGNUMERIC '1'`
+        ],
+        expected_output: `BIGNUMERIC '0'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '7'`,
+            `BIGNUMERIC '0'`
+        ],
+        expected_output: `BIGNUMERIC '7'`
+    },
+    {
+        inputs: [
+            `BIGNUMERIC '0'`,
+            `BIGNUMERIC '10'`
+        ],
+        expected_output: `BIGNUMERIC '0'`
+    }
+]);
 generate_udf_test("cw_lower_case_ascii_only", [
     {
         inputs: [
@@ -2239,6 +2431,29 @@ generate_udf_test("cw_ts_overlap_buckets", [
         expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
     },
 ]);
+generate_udf_test("cw_months_between", [
+    {
+        inputs: [
+            `DATETIME "2022-02-01 00:00:00"`,
+            `DATETIME "2022-01-31 00:00:00"`
+        ],
+        expected_output: `CAST("0.03225806451612903225806451612903225806" AS BIGNUMERIC)`
+    },
+    {
+        inputs: [
+            `DATETIME "2022-03-01 11:00:00"`,
+            `DATETIME "2022-02-01 10:00:00"`
+        ],
+        expected_output: `CAST("1" AS BIGNUMERIC)`
+    },
+    {
+        inputs: [
+            `DATETIME "2022-03-01 11:34:56"`,
+            `DATETIME "2022-02-28 10:22:33"`
+        ],
+        expected_output: `CAST("0.13064516129032258064516129032258064516" AS BIGNUMERIC)`
+    }
+]);
 generate_udf_test("interval_seconds", [
   {
     inputs: [
@@ -2265,3 +2480,763 @@ generate_udf_test("interval_micros", [
     expected_output: `CAST(-86400000000 AS INT64)`
   },
 ]);
+
+generate_udf_test("bignumber_add", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"2348592348793428978934278932746531725371625376152367153761536715376"`
+        ],
+        expected_output: `"102348592348793428978934278932746531725371625376152367153761536715375"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_div", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `"3"`
+    },
+    {
+        inputs: [
+            `"0"`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `""`,
+            `"33333333333333333333333333333333333333333333333333333333333333333333"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"0"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_mul", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"893427328732842662772591830391462182598436547786876876876"`
+        ],
+        expected_output: `"89342732873284266277259183039146218259843654778687687687599999999999106572671267157337227408169608537817401563452213123123124"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_sub", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"893427328732842662772591830391462182598436547786876876876"`
+        ],
+        expected_output: `"99999999999106572671267157337227408169608537817401563452213123123123"`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_sum", [
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `"123556789123457682550785521966119561715287180585639387560004576000333664"`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                NULL
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_avg", [
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "33333333333333333333333333333333333333333333333333333333333333333333",
+                "66666666666666666666666666666666666666666666666666666666666666666666"
+            ]`
+        ],
+        expected_output: `"66666666666666666666666666666666666666666666666666666666666666666666"`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "",
+                "123456789123456789123456789123456789123456789123456789123456789123456789"
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[
+                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "893427328732842662772591830391462182598436547786876876876",
+                NULL
+            ]`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `ARRAY<STRING>[]`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+
+generate_udf_test("bignumber_eq", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999998"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"100000000000000000000000000000000000000000000000000000000000000000000"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"-99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_gt", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999998"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"100000000000000000000000000000000000000000000000000000000000000000000"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"-99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_gte", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999998"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"100000000000000000000000000000000000000000000000000000000000000000000"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"-99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_lt", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999998"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"100000000000000000000000000000000000000000000000000000000000000000000"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"-99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("bignumber_lte", [
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999998"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"100000000000000000000000000000000000000000000000000000000000000000000"`
+        ],
+        expected_output: `CAST(true AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `"-99999999999999999999999999999999999999999999999999999999999999999999"`
+        ],
+        expected_output: `CAST(false AS BOOL)`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `""`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"99999999999999999999999999999999999999999999999999999999999999999999"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_intersection", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-10 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_ldiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-23 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+
+generate_udf_test("cw_period_rdiff", [
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-23 00:00:00' AS lower, TIMESTAMP '2001-11-25 00:00:00' AS upper)`
+        ],
+        expected_output: `STRUCT(TIMESTAMP '2001-11-25 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-15 00:00:00' AS lower, TIMESTAMP '2001-11-16 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
+            `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`
+        ],
+        expected_output: `NULL`
+    },
+]);
+generate_udf_test("cw_split_part_delimstr_idx", [
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `1`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `2`
+    ],
+    expected_output: `"bar"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `0`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-1`
+    ],
+    expected_output: `"baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `4`
+    ],
+    expected_output: `""`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-3`
+    ],
+    expected_output: `"foo"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `-4`
+    ],
+    expected_output: `""`,
+  },
+  {
+    inputs: [
+      `"foo  bar baz"`,
+      `"  "`,
+      `2`
+    ],
+    expected_output: `"bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `1`
+    ],
+    expected_output: `"foo bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `2`
+    ],
+    expected_output: `""`,
+  },
+  {
+    inputs: [
+      `NULL`,
+      `" "`,
+      `1`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `NULL`,
+      `1`
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `" "`,
+      `NULL`
+    ],
+    expected_output: `NULL`,
+  }
+]);
+generate_udf_test("sure_nonnull", [
+  {
+    inputs: [
+      `"string_example"`,
+    ],
+    expected_output: `"string_example"`
+  }
+]);
+
+generate_udf_test("sure_nonnull", [
+  {
+    inputs: [
+      `1`,
+    ],
+    expected_output: `1`
+  }
+]);
+
+generate_udf_test("sure_cond", [
+  {
+    inputs: [
+      `1`,
+      `TRUE`,
+    ],
+    expected_output: `1`
+  },
+]);
+
+generate_udf_test("sure_like", [
+  {
+    inputs: [
+      `"[Testcase]"`,
+      `"[%]"`,
+    ],
+    expected_output: `"[Testcase]"`
+  },
+]);
+
+generate_udf_test("sure_range", [
+  {
+    inputs: [
+      `1`,
+      `1`,
+      `10`,
+    ],
+    expected_output: `1`,
+  }
+]);
+
+generate_udf_test("sure_range", [
+  {
+    inputs: [
+      `"b"`,
+      `"a"`,
+      `"c"`,
+    ],
+    expected_output: `"b"`,
+  }
+]);
+
+generate_udf_test("sure_values", [
+  {
+    inputs: [
+      `"hoge"`,
+      `["hoge"]`
+    ],
+    expected_output: `"hoge"`
+  },
+  {
+    inputs: [
+      `STRING(null)`,
+      `["hoge"]`
+    ],
+    expected_output: `NULL`
+  }
+]);
+
+generate_udf_test("job_url", [
+    {
+      inputs: [
+        `"my_project:us.my_job_id"`
+      ],
+      expected_output: `"https://console.cloud.google.com/bigquery?project=my_project&j=bq:us:my_job_id"`
+    },
+    {
+      inputs: [
+        `"my_job_id"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `NULL`
+      ],
+      expected_output: `NULL`
+    }
+]);
+  
+generate_udf_test("table_url", [
+    {
+      inputs: [
+        `"my_project.my_dataset.my_table"`
+      ],
+      expected_output: `"https://console.cloud.google.com/bigquery?p=my_project&d=my_dataset&t=my_table&page=table"`
+    },
+    {
+      inputs: [
+        `"my_dataset.my_table"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `"my_table"`
+      ],
+      expected_output: `NULL`
+    },
+    {
+      inputs: [
+        `NULL`
+      ],
+      expected_output: `NULL`
+    }
+    
+  ]);

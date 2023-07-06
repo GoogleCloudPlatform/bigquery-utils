@@ -31,7 +31,23 @@ config { hasOutput: true }
 -- max_ts: the inclusive upper bound for the generated timestamps, normalized by the tumble_seconds
 -- Output: An array of generated timestamps for each key - ARRAY<STRUCT<series_key STRING, tumble_seconds TIMESTAMP>>
 CREATE OR REPLACE FUNCTION ${self()}(keys ARRAY<STRING>, tumble_seconds INT64, min_ts TIMESTAMP, max_ts Timestamp)
-RETURNS ARRAY<STRUCT<series_key STRING, tumble_val TIMESTAMP>> AS ((
+RETURNS ARRAY<STRUCT<series_key STRING, tumble_val TIMESTAMP>> 
+OPTIONS (
+    description="""Generate an array of key-timestamp structs with the specified min, max and interval timeseries
+Example Usage:
+SELECT *
+FROM UNNEST(bqutil.fn.ts_gen_keyed_timestamp(['abc'], 900, '2020-01-01', '2020-01-02') a
+LEFT JOIN dataset.table ON a.series_key = a.key AND a.tumble_val = b.timestamp
+
+Inputs:
+keys: strings that are cross joined with the generated timestamps
+tumble_seconds: the windowing interval for each generated timestamp
+min_ts: the inclusive lower bound for the generated timestamps, normalized by the tumble_seconds
+max_ts: the inclusive upper bound for the generated timestamps, normalized by the tumble_seconds
+
+Output: An array of generated timestamps for each key - ARRAY<STRUCT<series_key STRING, tumble_seconds TIMESTAMP>>"""
+)
+AS ((
   SELECT ARRAY_AGG(x)
   FROM (
     SELECT series_key, tumble_val

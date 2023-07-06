@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /** Similar to Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes). */
-CREATE OR REPLACE FUNCTION ${self()}(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(str STRING, startpos INT64 /* 1-based */, extent INT64 /* 1-based */) RETURNS STRING 
+OPTIONS (
+    description="Similar to Vertica SUBSTRB function, which treats the multibyte character string as a string of octets (bytes)."
+)
+AS (
     (WITH octets AS (
         SELECT oct FROM UNNEST(TO_CODE_POINTS(CAST(str as bytes))) AS oct WITH OFFSET off WHERE (off+1) >= startpos and (off+1) < startpos+extent ORDER BY off
     )

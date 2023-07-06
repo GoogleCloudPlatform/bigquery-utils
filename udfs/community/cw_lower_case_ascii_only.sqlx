@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /** Similar to Vertica LOWERB function, which lowercases only ASCII characters within a given string. */
-CREATE OR REPLACE FUNCTION ${self()}(str STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(str STRING) RETURNS STRING 
+OPTIONS (
+    description="Similar to Vertica LOWERB function, which lowercases only ASCII characters within a given string."
+)
+AS (
     (WITH chars AS (
         SELECT ch FROM UNNEST(TO_CODE_POINTS(str)) AS ch
     )

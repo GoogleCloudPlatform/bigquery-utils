@@ -27,6 +27,9 @@ config { hasOutput: true }
  * 'tino', 'julie', 'jordan'
  */
 CREATE OR REPLACE FUNCTION ${self()}(arr ANY TYPE)
+OPTIONS (
+    description="Returns a random value from an array."
+)
 AS
 (
   (

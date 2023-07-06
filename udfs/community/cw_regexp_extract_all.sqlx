@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Returns the substring(s) matched by the regular expression `regexp` in `str`. */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING) RETURNS ARRAY<STRING>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Returns the substring(s) matched by the regular expression `regexp` in `str`."
+)
+AS """
   var r = new RegExp(regexp, "g");
   return str.match(r);
 """;

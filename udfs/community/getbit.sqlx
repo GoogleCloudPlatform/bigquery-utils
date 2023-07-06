@@ -18,7 +18,13 @@ config { hasOutput: true }
 -- gitbit: Given an INTEGER value, returns the value of a bit at a specified position.
 -- Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 0 
 -- Output: value of the bit (0 or 1) at the specified position.
-CREATE OR REPLACE FUNCTION ${self()}(target_arg INT64, target_bit_arg INT64) AS
+CREATE OR REPLACE FUNCTION ${self()}(target_arg INT64, target_bit_arg INT64) 
+OPTIONS (
+    description="""Given an INTEGER value, returns the value of a bit at a specified position.
+Input: target_arg value, INT64 target_bit_arg position of the bit, starting at 0 
+Output: value of the bit (0 or 1) at the specified position."""
+)
+AS
 ((
     SELECT
       (target_arg & 1 << target_bit_arg) >> target_bit_arg

@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Returns the element at the specified index into the json_array. The index is zero-based */
 CREATE OR REPLACE FUNCTION ${self()}(json STRING, loc FLOAT64) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Returns the element at the specified index into the json_array. The index is zero-based"
+)
+AS """
   if (json == null || loc == null)
     return null;
   var parsedJson = JSON.parse(json);

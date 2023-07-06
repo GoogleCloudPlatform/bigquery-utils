@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Extract the value of a query param from a url, returns null if the parameter isn't found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING, pname STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING, pname STRING) RETURNS STRING 
+OPTIONS (
+    description="Extract the value of a query param from a url, returns null if the parameter isn't found."
+)
+AS (
   SPLIT(REGEXP_EXTRACT(url, CONCAT('[?&]',pname,'=([^&]+).*$')),'#')[OFFSET(0)]
 );

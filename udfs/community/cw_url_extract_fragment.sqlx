@@ -16,6 +16,10 @@ config { hasOutput: true }
  */
 
 /* Extract the fragment from a url, returns "" (empty string) if no fragment is found. */
-CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING AS (
+CREATE OR REPLACE FUNCTION ${self()}(url STRING) RETURNS STRING 
+OPTIONS (
+    description="""Extract the fragment from a url, returns "" (empty string) if no fragment is found."""
+)
+AS (
   COALESCE(REGEXP_EXTRACT(url,'#(.+)'),'')
 );

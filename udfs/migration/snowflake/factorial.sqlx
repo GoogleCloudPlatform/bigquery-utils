@@ -21,7 +21,11 @@ config { hasOutput: true }
 -- Input:
 -- integer_expr: INT64
 -- Output: NUMERIC
-CREATE OR REPLACE FUNCTION ${self()}(integer_expr INT64) AS (
+CREATE OR REPLACE FUNCTION ${self()}(integer_expr INT64) 
+OPTIONS (
+  description="Computes the factorial of its input. The input argument must be an integer expression in the range of 0 to 27."
+)
+AS (
   (
     SELECT 
       ARRAY<NUMERIC>[ 

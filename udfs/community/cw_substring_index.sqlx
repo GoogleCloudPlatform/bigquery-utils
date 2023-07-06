@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 /* Similar to MySQL SUBSTRING_INDEX */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, sep STRING, idx INT64) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Similar to MySQL SUBSTRING_INDEX"
+)
+AS """
   if (str === null || sep === null || idx === null) return null;
   if (sep == "") return "";
   var arr = str.split(sep);

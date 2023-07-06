@@ -20,6 +20,11 @@ config { hasOutput: true }
 -- strList: string that has map in the format a:b,c:d....
 -- Output: struct for the above map.
 CREATE OR REPLACE FUNCTION ${self()}(strList STRING)
+OPTIONS (
+  description="""Prepare struct for the csv with string that has map in the format a:b,c:d,...
+Input: string that has map in the format a:b,c:d....
+Output: struct for the above map."""
+)
 AS (
   ${ref("string_to_struct")}(strList, ',', ':')
 );

@@ -16,7 +16,11 @@ config { hasOutput: true }
  */
 
 /* Kludge for interval translation - for now day->sec only! */
-CREATE OR REPLACE FUNCTION ${self()}(ival STRING) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION ${self()}(ival STRING) RETURNS INT64 
+OPTIONS (
+    description="Kludge for interval translation - for now day->sec only!"
+)
+AS (
     CASE WHEN ival IS NULL THEN NULL
          WHEN ARRAY_LENGTH(SPLIT(ival,' ')) <> 2 THEN NULL
          WHEN SPLIT(ival,' ')[OFFSET(1)] NOT IN ('day','DAY') THEN NULL
