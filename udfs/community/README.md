@@ -706,19 +706,31 @@ sg
 ```
 
 ### [cw_regexp_extract(str STRING, regexp STRING)](cw_regexp_extract.sqlx)
-Returns the first substring matched by the regular expression regexp in str.
+Extracts the first substring matched by the regular expression regexp in str, returns null if the regex doesn't have a match or either str or regexp is null.
 ```sql
 SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'Str');
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'StrX');
+SELECT bqutil.fn.cw_regexp_extract(NULL, 'StrX');
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', NULL);
 
 Str
+NULL
+NULL
+NULL
 ```
 
 ### [cw_regexp_extract_all(str STRING, regexp STRING)](cw_regexp_extract_all.sqlx)
-Returns the substring(s) matched by the regular expression regexp in str.
+Returns the substring(s) matched by the regular expression regexp in str, returns null if the regex doesn't have a match or either str or regexp is null.
 ```sql
 SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'Str.*');
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'StrX.*');
+SELECT bqutil.fn.cw_regexp_extract_all(NULL, 'Str.*');
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', NULL);
 
 [Str123456]
+NULL
+NULL
+NULL
 ```
 
 ### [cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_all_n.sqlx)
