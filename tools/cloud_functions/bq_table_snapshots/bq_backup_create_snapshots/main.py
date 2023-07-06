@@ -62,6 +62,7 @@ def create_snapshot(message):
     logging.info(f"Creating snapshot for table: {snapshot_name}")
     return job
 
+
 def get_bq_client():
     client_info = http_client_info.ClientInfo(user_agent=f"google-pso-tool/bq-snapshots/0.0.1")
     client = bigquery.Client(project=BQ_JOBS_PROJECT_ID, client_info=client_info)
@@ -77,7 +78,7 @@ def main(event, context):
     {
         "source_dataset_name":"DATASET_1",
         "target_dataset_name":"SNAPSHOT_DATASET_1",
-        "crontab_format":"0 * * * *",
+        "crontab_format":"10 * * * *",
         "seconds_before_expiration":604800,
         "table_name": "project.dataset.table"
     }
@@ -96,3 +97,11 @@ def main(event, context):
             else:
                 return 'ok'
         time.sleep(2)
+
+
+message = {"crontab_format":"0 1 * * *"}
+timestamps = []
+for i in range(3):
+    timestamps.append(get_snapshot_timestamp)
+    time.sleep(1)
+print(timestamps)

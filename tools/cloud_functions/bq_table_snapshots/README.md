@@ -45,4 +45,39 @@ The following environemnt variables must be set:
 If DATASET_1 has 500 tables, 500 Pub/Sub messages are sent, and 500 Cloud Function invocations are performed. If the Cloud Function used the current time when it creates the snapshots then these 500 snapshots will represent different points in time. To avoid this the Cloud Function will create the snapshots for the table as they were when the Cloud Scheduler job (bq-snap-start-process) was triggered. To achieve this the Cloud Function will calculate the previous interval based on **crontab_format**.
 
 
+# Deployment
 
+## Declare Variables
+
+```
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+STORAGE_PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+SOURCE_DATASET_NAME="DATASET_1"
+TARGET_DATASET_NAME="SNAPSHOT_DATASET_1"
+CRONTAB_FORMAT="10 * * * *"
+SECONDS_BEFORE_EXPIRATION=604800
+```
+
+* `PROJECT_ID` is the project where processing will happen, where the resurces will be hosted (e.g. Pub / Sub topics, Cloud Functions).
+* `STORAGE_PROJECT_ID` is the project where BigQuery tables are stored.
+
+**Note**: in this case `PROJECT_ID` and `STORAGE_PROJECT_ID` are the same but that is not necesarily the case. 
+
+
+## Terraform Provisioning
+```
+git clone https://github.com/GoogleCloudPlatform/bigquery-utils.git
+cd ./bigquery-utils/tools/cloud_functions/bq_table_snapshots/terraform
+terraform init
+```
+
+```
+terraform apply \
+ -var="project_id=${PROJECT_ID}" \
+ -var="storage_project_id=${STORAGE_PROJECT_ID}" \
+ -var="source_dataset_name=${SOURCE_DATASET_NAME}" \
+ -var="target_dataset_name=${TARGET_DATASET_NAME}" \
+ -var="crontab_format=${CRONTAB_FORMAT}" \
+ -var="seconds_before_expiration=${SECONDS_BEFORE_EXPIRATION}" \
+ --auto-approve
+```
