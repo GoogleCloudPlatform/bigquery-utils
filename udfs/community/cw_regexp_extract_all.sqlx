@@ -15,13 +15,16 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Returns the substring(s) matched by the regular expression `regexp` in `str`. */
+/* Returns the substring(s) matched by the regular expression `regexp` in `str`, returns null if the regex doesn't have a match or either str or regexp is null. */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING) RETURNS ARRAY<STRING>
-LANGUAGE js 
+LANGUAGE js
 OPTIONS (
-    description="Returns the substring(s) matched by the regular expression `regexp` in `str`."
+    description="Returns the substring(s) matched by the regular expression `regexp` in `str`, returns null if the regex doesn't have a match or either str or regexp is null."
 )
 AS """
+  if (str == null || regexp == null) {
+    return null;
+  }
   var r = new RegExp(regexp, "g");
   return str.match(r);
 """;

@@ -15,14 +15,11 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Returns the first substring matched by the regular expression `regexp` in `str`. */
+/* Extracts the first substring matched by the regular expression `regexp` in `str`, returns null if the regex doesn't have a match or either str or regexp is null. */
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING) RETURNS STRING
-LANGUAGE js 
 OPTIONS (
-    description="Returns the first substring matched by the regular expression `regexp` in `str`."
+    description="""Extracts the first substring matched by the regular expression `regexp` in `str`, returns null if the regex doesn't have a match or either str or regexp is null."""
 )
-AS """
-  var r = new RegExp(regexp);
-  var a = str.match(r);
-  return a[0];
-""";
+AS (
+   ${ref("cw_regexp_extract_all")}(str, regexp)[SAFE_OFFSET(0)]
+);
