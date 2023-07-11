@@ -1372,6 +1372,24 @@ generate_udf_test("cw_regexp_substr_4", [
         ],
         expected_output: `"123"`
     },
+    {
+        inputs: [
+            `"Test123Str123456"`,
+            `"(Test|Str)123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"Test123"`
+    },
+    {
+        inputs: [
+            `"Test123Str123456"`,
+            `"(Test|Str)123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"Str123"`
+    },
 ]);
 generate_udf_test("cw_regexp_substr_generic", [
     {

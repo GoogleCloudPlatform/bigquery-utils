@@ -15,8 +15,8 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Implements regexp_substr/4 (haystack, needle, position, occurence) */
+/* Implements regexp_substr/4 (haystack, needle, position, occurence). Similar to Teradata's REGEXP_SUBSTR(haystack, needle, position, occurence) function. */
 CREATE OR REPLACE FUNCTION ${self()}(h STRING, n STRING, p INT64, o INT64) RETURNS STRING AS
 (
-    regexp_extract_all(substr(h, p), n)[safe_ordinal(o)]
+    ${ref("cw_regexp_extract_all")}(substr(h, p), n)[safe_ordinal(o)]
 );
