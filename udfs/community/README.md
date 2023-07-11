@@ -856,10 +856,14 @@ Takes input haystack string, needle string, position and occurence. It returns n
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456', 'Test', 1, 1);
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 2);
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 3);
+SELECT bqutil.fn.cw_regexp_substr_4('Test123Str123Test', '(Test|Str)123', 1, 1);
+SELECT bqutil.fn.cw_regexp_substr_4('Test123Str123Test', '(Test|Str)123', 1, 2);
 
 Test
 Test
 null
+Test123
+Str123
 ```
 
 ### [cw_regexp_substr_5(h STRING, n STRING, p INT64, o INT64, mode STRING)](cw_regexp_substr_5.sqlx)
