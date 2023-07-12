@@ -33,7 +33,7 @@ variable "source_dataset_name" {
 }
 
 variable "target_dataset_name" {
-  description = "Dataset where the snapshots will be written to"
+  description = "BigQuery dataset to which table snapshots will be written."
   type        = string
 }
 
