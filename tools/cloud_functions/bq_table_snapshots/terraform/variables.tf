@@ -18,7 +18,7 @@ variable "project_id" {
 }
 
 variable "storage_project_id" {
-  description = "GCP Project ID containing BigQuery tables which will be snapshotted"
+  description = "GCP Project ID containing BigQuery tables which will be snapshotted."
   type        = string
 }
 
