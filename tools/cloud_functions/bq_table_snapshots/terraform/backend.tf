@@ -13,5 +13,9 @@
 # limitations under the License.
 
 terraform {
-  backend "local" {}
+  backend "gcs" {
+    bucket = "<backend-bucket>"
+    prefix = "terraform/state"
+  }
 }
+
