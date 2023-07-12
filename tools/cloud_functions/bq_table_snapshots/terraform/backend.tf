@@ -14,7 +14,7 @@
 
 terraform {
   backend "gcs" {
-    bucket = "<>"
+    bucket = "YOUR_TF_STATE_CLOUD_STORAGE_BUCKET"
     prefix = "terraform/state"
   }
 }
