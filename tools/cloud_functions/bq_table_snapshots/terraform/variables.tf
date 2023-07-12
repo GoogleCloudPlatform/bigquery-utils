@@ -28,7 +28,7 @@ variable "region" {
 }
 
 variable "source_dataset_name" {
-  description = "Dataset for which snapshots will be created"
+  description = "BigQuery dataset from which table snapshots will be created."
   type        = string
 }
 
