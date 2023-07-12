@@ -23,7 +23,7 @@ variable "storage_project_id" {
 }
 
 variable "region" {
-  description = "GCP region in which to deploy cloud function"
+  description = "GCP region in which to deploy Cloud Function."
   default     = "us-central1"
 }
 
