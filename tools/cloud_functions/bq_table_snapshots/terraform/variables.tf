@@ -38,7 +38,7 @@ variable "target_dataset_name" {
 }
 
 variable "crontab_format" {
-  description = "Crontab schedule under which the solution will be executed"
+  description = "Crontab schedule under which the solution will be executed."
   type        = string
 }
 
