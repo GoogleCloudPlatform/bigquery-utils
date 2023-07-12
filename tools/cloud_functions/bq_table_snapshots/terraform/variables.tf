@@ -43,7 +43,7 @@ variable "crontab_format" {
 }
 
 variable "seconds_before_expiration" {
-  description = "Seconds before the snapshot will expire"
+  description = "Seconds before the snapshot will expire."
   type        = number
 }
 
