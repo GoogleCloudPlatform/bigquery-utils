@@ -64,7 +64,7 @@ In [backend.tf](./terraform/backend.tf) specify a bucket for persisting the terr
 
 `crontab_format` crontab for the execution of the solution
 
-`seconds_before_expiration` seconds after which snapshots will expire
+`seconds_before_expiration` seconds before the snapshot will expire
 
 ## Terraform Provisioning
 ```
@@ -74,6 +74,6 @@ cd ./bigquery-utils/tools/cloud_functions/bq_table_snapshots/terraform
 
 terraform init
 
-terraform apply --var-file=deployment_vars.tfvars --auto-approve
+terraform apply --auto-approve
 ```
 
