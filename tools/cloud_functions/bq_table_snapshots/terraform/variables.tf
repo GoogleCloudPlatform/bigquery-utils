@@ -13,7 +13,7 @@
 # limitations under the License.
 
 variable "project_id" {
-  description = "GCP Project ID containing Cloud Functions and Pub/Sub Topics"
+  description = "GCP Project ID containing Cloud Functions and Pub/Sub Topics."
   type        = string
 }
 
