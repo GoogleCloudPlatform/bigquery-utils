@@ -50,7 +50,7 @@ If DATASET_1 has 500 tables, 500 Pub/Sub messages are sent, and 500 Cloud Functi
 ## Declare Variables
 ### Set backend TF Bucket
 
-In [backend.tf](./terraform/backend.tf) peify a bucket for storing terraform state as an object (must be created before running terraform)
+In [backend.tf](./terraform/backend.tf) specify a bucket for persisting the terraform state in Cloud Storage (must be created before running terraform).
 
 ### Set the following variables in the [deployment_vars.tfvars](./terraform/deployment_vars.tfvars)
 
