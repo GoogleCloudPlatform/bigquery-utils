@@ -35,7 +35,7 @@ The following environemnt variables must be set:
 * `TABLE_NAME_PUBSUB_TOPIC_ID` ame of P/S topic where this code will publish to
 
 ## bq_backup_create_snapshots
-The **bq_backup_create_snapshots** cloud function will submit a BigQuery job to create a snapshot for each table in scope. This cloud function will suffix the snapshot name with the snapshot datetime to guarantee a unique name. It will also calculate and set the expiration time of the snapshot based on seconds_before_expiration. Finally, it will determine the snapshot time based on crontab_format. 
+The **bq_backup_create_snapshots** Cloud Function will submit a BigQuery job to create a snapshot for each table in scope. This Cloud Function will suffix the snapshot name with the snapshot datetime to guarantee a unique name. It will also calculate and set the expiration time of the snapshot based on seconds_before_expiration. Finally, it will determine the snapshot time based on crontab_format. 
 The following environemnt variables must be set:
 * `BQ_DATA_PROJECT_ID` id of project used for BQ storage
 * `BQ_JOBS_PROJECT_ID` id of project used for BQ compute
