@@ -37,7 +37,7 @@ The following environemnt variables must be set:
 ## bq_backup_create_snapshots
 The **bq_backup_create_snapshots** cloud function will submit a BigQuery job to create a snapshot for each table in scope. This cloud function will suffix the snapshot name with the snapshot datetime to guarantee a unique name. It will also calculate and set the expiration time of the snapshot based on seconds_before_expiration. Finally, it will determine the snapshot time based on crontab_format. 
 The following environemnt variables must be set:
-* `BQ_DATA_PROJECT_ID `id of project used for BQ storage
+* `BQ_DATA_PROJECT_ID` id of project used for BQ storage
 * `BQ_JOBS_PROJECT_ID` id of project used for BQ compute
 
 
@@ -48,36 +48,32 @@ If DATASET_1 has 500 tables, 500 Pub/Sub messages are sent, and 500 Cloud Functi
 # Deployment
 
 ## Declare Variables
+### Set backend TF Bucket
 
-```
-PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
-STORAGE_PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
-SOURCE_DATASET_NAME="DATASET_1"
-TARGET_DATASET_NAME="SNAPSHOT_DATASET_1"
-CRONTAB_FORMAT="10 * * * *"
-SECONDS_BEFORE_EXPIRATION=604800
-```
+In [backend.tf](./terraform/backend.tf) peify a bucket for storing terraform state as an object (must be created before running terraform)
 
-* `PROJECT_ID` is the project where processing will happen, where the resurces will be hosted (e.g. Pub / Sub topics, Cloud Functions).
-* `STORAGE_PROJECT_ID` is the project where BigQuery tables are stored.
+### Set the following variables in the [deployment_vars.tfvars](./terraform/deployment_vars.tfvars)
 
-**Note**: in this case `PROJECT_ID` and `STORAGE_PROJECT_ID` are the same but that is not necesarily the case. 
+`project_id` project in which solution will be executed 
 
+`storage_project_id` project used for storage 
+
+`source_dataset_name` dataset for which datasets will be made 
+
+`target_dataset_name` dataset where dataset will be stored 
+
+`crontab_format` crontab for the execution of the solution
+
+`seconds_before_expiration` seconds after which snapshots will expire
 
 ## Terraform Provisioning
 ```
 git clone https://github.com/GoogleCloudPlatform/bigquery-utils.git
+
 cd ./bigquery-utils/tools/cloud_functions/bq_table_snapshots/terraform
+
 terraform init
+
+terraform apply --var-file=deployment_vars.tfvars --auto-approve
 ```
 
-```
-terraform apply \
- -var="project_id=${PROJECT_ID}" \
- -var="storage_project_id=${STORAGE_PROJECT_ID}" \
- -var="source_dataset_name=${SOURCE_DATASET_NAME}" \
- -var="target_dataset_name=${TARGET_DATASET_NAME}" \
- -var="crontab_format=${CRONTAB_FORMAT}" \
- -var="seconds_before_expiration=${SECONDS_BEFORE_EXPIRATION}" \
- --auto-approve
-```

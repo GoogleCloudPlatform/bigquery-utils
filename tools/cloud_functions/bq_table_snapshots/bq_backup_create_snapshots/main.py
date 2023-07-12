@@ -98,10 +98,3 @@ def main(event, context):
                 return 'ok'
         time.sleep(2)
 
-
-message = {"crontab_format":"0 1 * * *"}
-timestamps = []
-for i in range(3):
-    timestamps.append(get_snapshot_timestamp)
-    time.sleep(1)
-print(timestamps)
