@@ -48,16 +48,14 @@ variable "seconds_before_expiration" {
 }
 
 variable "tables_to_include_list" {
+  description = "Tables from dataset to be included, if set only tables here will considered"
   type    = string
   default = "[]"
 }
 
 variable "tables_to_exclude_list" {
+  description = "Tables to be excluded from dataset, if set tables in this list will not be considered"
   type    = string
   default = "[]"
 }
 
-variable "tf_backend_bucket" {
-  type    = string
-  default = ""
-}
