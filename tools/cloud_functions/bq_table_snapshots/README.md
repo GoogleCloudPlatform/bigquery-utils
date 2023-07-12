@@ -4,7 +4,7 @@ This solution schedules and automates [BigQuery Snapshot](https://cloud.google.c
 
 This solution allows for:
 
-* Any number of datasets - This is especially useful for large organizations undergoing data growth since new datasets can be added just by adding a new cloud scheduler job.
+* Any number of datasets - This is especially useful for large organizations undergoing data growth since new datasets can be added just by adding a new Cloud Scheduler job.
 * Any frequency - Users can specify desired snapshot frequency (e.g. daily, weekly, monthly, …) by changing the crontab_format schedule. 
 * Customization for tables of choice - Specific tables can be easily included and excluded and snapshot duration easily specified by changing the triggering message body with minimal effort.
 
@@ -13,7 +13,7 @@ This solution allows for:
 ![alt text](./architecture_diagram.png)
 
 ## bq-snap-start-process
-The **bq-snap-start-process** Cloud Scheduloer Job will run monthly and trigger the snapshot creation process for dataset_1. The Pub/Sub message body will contain parameters for the snapshot creation, as shown in the example below:
+The **bq-snap-start-process** Cloud Scheduler Job will run monthly and trigger the snapshot creation process for dataset_1. The Pub/Sub message body will contain parameters for the snapshot creation, as shown in the example below:
  
 ```
 {
@@ -29,14 +29,14 @@ The **bq-snap-start-process** Cloud Scheduloer Job will run monthly and trigger 
 ## bq_backup_fetch_tables_names
 The **bq_backup_fetch_tables_names** cloud function will fetch all the table names in source_dataset_name. It will then apply filters based on tables_to_include_list and tables_to_exclude_list to determine the tables in scope. Finally, it will submit one Pub/Sub message per table. 
 
-The following environemnt variables must be set:
+The Cloud Function uses the following environment variables to determine which BigQuery project to use for compute and which to use for storing your BigQuery snapshots:
 * `DATA_PROJECT_ID` id of project used for BQ storage 
 * `PUBSUB_PROJECT_ID` id of project with P/S topic
-* `TABLE_NAME_PUBSUB_TOPIC_ID` ame of P/S topic where this code will publish to
+* `TABLE_NAME_PUBSUB_TOPIC_ID` name of P/S topic where this code will publish to
 
 ## bq_backup_create_snapshots
 The **bq_backup_create_snapshots** Cloud Function will submit a BigQuery job to create a snapshot for each table in scope. This Cloud Function will suffix the snapshot name with the snapshot datetime to guarantee a unique name. It will also calculate and set the expiration time of the snapshot based on seconds_before_expiration. Finally, it will determine the snapshot time based on crontab_format. 
-The following environemnt variables must be set:
+The following environment variables must be set:
 * `BQ_DATA_PROJECT_ID` id of project used for BQ storage
 * `BQ_JOBS_PROJECT_ID` id of project used for BQ compute
 
