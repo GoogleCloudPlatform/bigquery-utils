@@ -54,7 +54,7 @@ variable "tables_to_include_list" {
 }
 
 variable "tables_to_exclude_list" {
-  description = "Tables to be excluded from dataset, if set tables in this list will not be considered"
+  description = "List of BigQuery table names to exclude when snapshotting tables within the specified source_dataset_name. If this variable is set, the tables listed will be skipped and NOT snapshotted."
   type    = string
   default = "[]"
 }
