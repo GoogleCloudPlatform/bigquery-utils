@@ -48,7 +48,7 @@ variable "seconds_before_expiration" {
 }
 
 variable "tables_to_include_list" {
-  description = "Tables from dataset to be included, if set only tables here will considered"
+  description = "List of BigQuery table names to snapshot from the specified source_dataset_name. If this variable is set, only the tables listed will be snapshotted. If not set, all tables within the specified source_dataset_name will be snapshotted."
   type    = string
   default = "[]"
 }
