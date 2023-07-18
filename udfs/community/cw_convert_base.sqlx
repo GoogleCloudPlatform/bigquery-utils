@@ -23,5 +23,15 @@ CREATE OR REPLACE FUNCTION ${self()}(value STRING, from_base INT64, to_base INT6
       description="""Convert string from given base to another base. Similar to hive/spark CONV(string, int, int)"""
   )
   AS """
-  return parseInt(value, from_base).toString(to_base);
+  if (from_base == 10) {
+    return BigInt(value).toString(to_base);
+  } else if (from_base == 2) {
+    return BigInt("0b" + value).toString(to_base);
+  } else if (from_base == 8) {
+    return BigInt("0o" + value).toString(to_base);
+  } else if (from_base == 16) {
+    return BigInt("0x" + value).toString(to_base);
+  } else {
+    return parseInt(value, from_base).toString(to_base);
+  }
 """;
