@@ -58,4 +58,5 @@ WHERE 1=1 -- no op filter to allow easy commenting below
 AND creation_time > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
 -- Only look at DML statements
 AND statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
-GROUP BY dml_execution_date, table_id, table_url;
+GROUP BY dml_execution_date, table_id, table_url
+HAVING daily_dml_per_table > 24;
