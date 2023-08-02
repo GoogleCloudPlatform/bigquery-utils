@@ -68,6 +68,26 @@ that contains a list of the most frequently read tables which are:
   - not clustered
   - neither partitioned nor clustered
 
+## [frequent_daily_table_dml.sql](frequent_daily_table_dml.sql)
+
+This script creates a table named, `frequent_daily_table_dml`, that contains tables that have had the highest quantity of DML statements run against them in the past 30 days.
+
+### Examples
+
+* Top 10 tables with the most DML statements in a day
+
+  ```sql
+  SELECT
+    table_id,
+    table_url,
+    ANY_VALUE(dml_execution_date HAVING MAX daily_dml_per_table) AS sample_dml_execution_date,
+    ANY_VALUE(job_urls[OFFSET(0)] HAVING MAX daily_dml_per_table) AS sample_dml_job_url,
+    MAX(daily_dml_per_table) max_daily_table_dml,
+  FROM optimization_workshop.frequent_daily_table_dml
+  GROUP BY table_id, table_url
+  ORDER BY max_daily_table_dml DESC
+  LIMIT 10;
+  ```
 
 # Query Patterns
 
