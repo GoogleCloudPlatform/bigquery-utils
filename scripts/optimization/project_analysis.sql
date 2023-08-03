@@ -37,9 +37,34 @@
   *   - total TB spilled
  */
 
-DECLARE var_n_days INT64 DEFAULT 30;
+DECLARE num_days_to_scan INT64 DEFAULT 30;
 
-CREATE OR REPLACE TABLE `<dest_project_id>.<dest_dataset>.PROJECT_ANALYSIS` AS
+CREATE SCHEMA IF NOT EXISTS optimization_workshop;
+CREATE OR REPLACE TABLE optimization_workshop.project_analysis
+(
+  day DATE,
+  project_id STRING,
+  job_count INT64,
+  avg_total_slot_secs FLOAT64,
+  median_total_slot_secs FLOAT64,
+  p80_total_slot_secs FLOAT64,
+  total_slot_hours FLOAT64,
+  avg_time_secs FLOAT64,
+  median_time_secs FLOAT64,
+  total_time_hours FLOAT64,
+  p80_time_secs FLOAT64,
+  avg_gb_scanned FLOAT64,
+  p80_gb_scanned FLOAT64,
+  total_tb_scanned FLOAT64,
+  avg_gb_shuffled FLOAT64,
+  p80_gb_shuffled FLOAT64,
+  total_tb_shuffled FLOAT64,
+  avg_gb_spilled FLOAT64,
+  p80_gb_spilled FLOAT64,
+  total_tb_spilled FLOAT64
+);
+
+INSERT INTO optimization_workshop.project_analysis
 SELECT
   day, 
   project_id,
@@ -97,8 +122,9 @@ FROM(
     FROM
       `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
     WHERE
-      DATE(jbo.creation_time,"US/Central") >= CURRENT_DATE - var_n_days
-      AND jbo.project_id IN (<LIST_OF_PROJECT_IDS>)
+      DATE(jbo.creation_time,"US/Central") >= CURRENT_DATE - num_days_to_scan
+      -- Uncomment below to specify a list of projects to analyze
+      -- AND jbo.project_id IN (<LIST_OF_PROJECT_IDS>)
       AND jbo.job_type = 'QUERY'
       AND jbo.end_time > jbo.start_time
       AND jbo.error_result IS NULL

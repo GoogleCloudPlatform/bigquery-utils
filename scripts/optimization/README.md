@@ -3,13 +3,26 @@ Project level analysis enables us to understand key metrics such as slot_time, b
 
 ## [project_analysis.sql](project_analysis.sql)
 
-The script only considers "QUERY" jobs
-The script provides the metrics for a range of 30 days
+This script creates a table of all the following daily metrics (for a 30day period) for all your projects:
 
-Replace the following placeholders:\
-`<LIST_OF_PROJECT_IDS>`: with the actual list of projects that needs to be analyzed\
-`<dest_project_id>`: name of the GCP project used for storing the BQ optimization data\
-`<dest_dataset>`: name of the dataset used for storing the BQ optimization data
+  - total number of jobs
+  - average total slot seconds
+  - median total slot seconds
+  - p80 total slot seconds
+  - total slot hours
+  - average time seconds
+  - median time seconds
+  - p80 time seconds
+  - total time hours
+  - average GB scanned
+  - p80 GB scanned
+  - total TB scanned
+  - average GB shuffled
+  - p80 GB shuffled
+  - total TB shuffled
+  - average GB spilled
+  - p80 GB spilled
+  - total TB spilled
 
 # Table Read Patterns
 

@@ -19,8 +19,18 @@
  * generated for them in the past 30 days.
  */
 
-DECLARE var_n_days INT64 DEFAULT 30;
+DECLARE num_days_to_scan INT64 DEFAULT 30;
 
+CREATE SCHEMA IF NOT EXISTS optimization_workshop;
+CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights
+(
+  job_url STRING,
+  num_stages_with_slot_contention INT64,
+  num_stages_with_insufficient_shuffle_quota INT64,
+  records_read_diff_percentages ARRAY<FLOAT64>
+);
+
+INSERT INTO optimization_workshop.query_performance_insights
 SELECT
   bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
   (SELECT COUNT(1)
@@ -37,7 +47,7 @@ SELECT
 FROM
   `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
 WHERE
-  DATE(jbo.creation_time) >= CURRENT_DATE - var_n_days
+  DATE(jbo.creation_time) >= CURRENT_DATE - num_days_to_scan
   AND jbo.job_type = 'QUERY'
   AND jbo.end_time > jbo.start_time
   AND jbo.error_result IS NULL

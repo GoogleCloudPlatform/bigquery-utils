@@ -93,7 +93,8 @@ BEGIN
     table_url,
     is_clustered,
     is_partitioned
-  ORDER BY 5 DESC
+  ORDER BY 
+    logical_gigabytes DESC
   LIMIT 100
   ;
   """,

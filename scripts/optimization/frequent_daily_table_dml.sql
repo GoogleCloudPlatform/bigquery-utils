@@ -15,9 +15,11 @@
  */
 
 /*
- * The following script will return the top 10 tables that 
- * have had the most DML statements run against them in the past 30 days.
+ * The following script will return tables that have had > 24 DML statements
+ * run against in any one day within the past 30 days.
  */
+
+DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.frequent_daily_table_dml
@@ -55,7 +57,7 @@ FROM
   `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 WHERE 1=1 -- no op filter to allow easy commenting below
 -- Look at the past 30 days of jobs
-AND creation_time > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+AND creation_time > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL num_days_to_scan DAY)
 -- Only look at DML statements
 AND statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
 GROUP BY dml_execution_date, table_id, table_url

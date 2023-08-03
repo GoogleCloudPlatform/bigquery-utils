@@ -19,8 +19,8 @@
  * that contains a list of the most frequently read tables.
  */
 
-DECLARE start_date DATE DEFAULT CURRENT_DATE - 7;
-DECLARE end_date DATE DEFAULT CURRENT_DATE;
+DECLARE num_days_to_scan INT64 DEFAULT 30;
+
 DECLARE projects ARRAY<STRING> DEFAULT (
   SELECT 
     ARRAY_AGG(project_id)
@@ -149,7 +149,7 @@ WITH table_read_patterns AS (
     JOIN
       UNNEST(steps) AS js_steps
     WHERE
-      DATE(creation_time) BETWEEN %T AND %T
+      DATE(creation_time) >= CURRENT_DATE - %i
       AND js_steps.kind = 'READ'
       AND jbp.job_type = 'QUERY'
       AND jbp.statement_type != 'SCRIPT'
@@ -188,7 +188,7 @@ FROM
   ORDER BY 7 DESC, 8 DESC
   LIMIT 10;
 """,
-p.project_id, start_date, end_date);
+p.project_id, num_days_to_scan);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors
 END;
 END FOR;

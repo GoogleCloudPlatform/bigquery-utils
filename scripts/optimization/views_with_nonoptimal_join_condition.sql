@@ -41,6 +41,10 @@ CREATE OR REPLACE TABLE optimization_workshop.views_with_nonoptimal_join_conditi
   join_conditions ARRAY<STRING>
 );
 
+CREATE TEMP FUNCTION extract_nonoptimal_join_conditions(view_definition STRING) AS(
+  REGEXP_EXTRACT_ALL(REPLACE(UPPER(view_definition), " ON ", "\nON "), r"ON\s+(?:TRIM|UPPER|LOWER)+.*?=.*")
+);
+
 FOR p IN (
  SELECT project_id
  FROM
@@ -54,11 +58,11 @@ BEGIN
   table_name AS view_name,
   `bigquery-public-data`.persistent_udfs.table_url(table_catalog || '.' || table_schema || '.' || table_name) AS view_url,
   view_definition,
-  REGEXP_EXTRACT_ALL(REPLACE(UPPER(view_definition), " ON ", "\nON "), r"ON\s+(?:TRIM|UPPER|LOWER)+.*?=.*") AS join_conditions
+  extract_nonoptimal_join_conditions(view_definition) AS join_conditions
   FROM
     `%s.region-us.INFORMATION_SCHEMA.VIEWS`
   WHERE 
-    ARRAY_LENGTH(REGEXP_EXTRACT_ALL(REPLACE(UPPER(view_definition), " ON ", "\nON "), r"ON\s+(?:TRIM|UPPER|LOWER)+.*?=.*")) >= 1
+    ARRAY_LENGTH(extract_nonoptimal_join_conditions(view_definition)) >= 1
   """,
   p.project_id);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors

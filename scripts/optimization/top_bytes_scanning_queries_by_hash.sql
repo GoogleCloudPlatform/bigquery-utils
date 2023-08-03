@@ -28,8 +28,8 @@
  *   SELECT * FROM `my-project.my_dataset.my_table` WHERE date = '2020-01-03'
  */
 
-DECLARE start_date DATE DEFAULT CURRENT_DATE - 30;
-DECLARE end_date DATE DEFAULT CURRENT_DATE;
+DECLARE num_days_to_scan INT64 DEFAULT 30;
+
 DECLARE projects ARRAY<STRING> DEFAULT (
   SELECT 
     ARRAY_AGG(project_id)
@@ -146,7 +146,7 @@ FROM (
         JOIN 
             UNNEST(referenced_tables) ref_tables
         WHERE 
-            DATE(jbp.creation_time) BETWEEN %T AND %T
+            DATE(jbp.creation_time) >= CURRENT_DATE - %i
             AND jbp.end_time > jbp.start_time
             AND jbp.error_result IS NULL
             AND jbp.job_type = 'QUERY'
@@ -166,7 +166,7 @@ GROUP BY
 ORDER BY Total_Gigabytes_Processed DESC
 LIMIT 200;
 """,
-p.project_id, start_date, end_date);
+p.project_id, num_days_to_scan);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors
 END;
 END FOR;
