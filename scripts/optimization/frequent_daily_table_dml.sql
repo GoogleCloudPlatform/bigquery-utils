@@ -40,8 +40,6 @@ CREATE OR REPLACE TABLE optimization_workshop.frequent_daily_table_dml
   sum_avg_slots FLOAT64,
   avg_avg_slots FLOAT64,
 ) AS
-
-INSERT INTO optimization_workshop.frequent_daily_table_dml
 SELECT
   EXTRACT(DATE FROM creation_time) AS dml_execution_date,
   COUNT(1) AS daily_dml_per_table,
