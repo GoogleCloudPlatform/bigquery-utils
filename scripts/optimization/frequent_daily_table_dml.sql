@@ -17,6 +17,8 @@
 /*
  * The following script will return tables that have had > 24 DML statements
  * run against in any one day within the past 30 days.
+ * 30 days is the default timeframe, but you can change this by setting the
+ * num_days_to_scan variable to a different value.
  */
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;

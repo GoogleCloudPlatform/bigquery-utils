@@ -15,7 +15,7 @@
  */
 
 /*
- * This script creates a table named, largest_freq_read_tables_without_part_clust, 
+ * This script creates a table named, freq_read_tables_without_part_clust, 
  * that contains a list of the most frequently read tables which are:
  *     - not partitioned
  *     - not clustered
@@ -32,12 +32,12 @@ DECLARE projects ARRAY<STRING> DEFAULT (
       optimization_workshop.table_read_patterns
     GROUP BY 1
     ORDER BY SUM(total_slot_ms) DESC
-    LIMIT 10
+    LIMIT 100
   )
 );
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.largest_freq_read_tables_without_part_clust
+CREATE OR REPLACE TABLE optimization_workshop.freq_read_tables_without_part_clust
 (
   table_catalog STRING,
   table_schema STRING,
@@ -57,7 +57,7 @@ FOR p IN (
 DO 
 BEGIN
   EXECUTE IMMEDIATE FORMAT("""
-  INSERT INTO optimization_workshop.largest_freq_read_tables_without_part_clust
+  INSERT INTO optimization_workshop.freq_read_tables_without_part_clust
   SELECT
     s.table_catalog,
     s.table_schema,
@@ -92,11 +92,7 @@ BEGIN
     s.table_name,
     table_url,
     is_clustered,
-    is_partitioned
-  ORDER BY 
-    logical_gigabytes DESC
-  LIMIT 100
-  ;
+    is_partitioned;
   """,
   p.project_id);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors

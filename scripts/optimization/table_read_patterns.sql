@@ -16,7 +16,10 @@
 
 /*
  * The following script creates a table named, table_read_patterns,
- * that contains a list of the most frequently read tables.
+ * that contains a list of the most frequently read tables within the
+ * past 30 days.
+ * 30 days is the default timeframe, but you can change this by setting the
+ * num_days_to_scan variable to a different value.
  */
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;
@@ -30,7 +33,7 @@ DECLARE projects ARRAY<STRING> DEFAULT (
     WHERE DATE(creation_time) >= CURRENT_DATE - 7
     GROUP BY 1
     ORDER BY SUM(total_bytes_billed) DESC
-    LIMIT 10
+    LIMIT 100
   )
 );
 
@@ -44,7 +47,7 @@ CREATE OR REPLACE TABLE optimization_workshop.table_read_patterns
   operator STRING,
   value STRING,
   total_slot_ms INT64,
-  num_occurences INT64,
+  num_occurrences INT64,
   job_count INT64,
   job_id_array ARRAY<STRING>,
   job_url_array ARRAY<STRING>
@@ -178,15 +181,13 @@ SELECT
   (SELECT STRING_AGG(operator ORDER BY COLUMN) FROM UNNEST(predicates)) operator_list,
   (SELECT STRING_AGG(value ORDER BY COLUMN) FROM UNNEST(predicates)) value_list,
   SUM(stage_slot_ms) AS total_slot_ms,
-  COUNT(*) AS num_occurences,
+  COUNT(*) AS num_occurrences,
   COUNT(distinct job_id) as job_count,
   ARRAY_AGG(CONCAT(project_id,':us.',job_id) ORDER BY total_slot_ms LIMIT 10) AS job_id_array,
   ARRAY_AGG(`bigquery-public-data`.persistent_udfs.job_url(project_id || ':us.' || job_id)) AS job_url_array,
 FROM
   table_read_patterns
-  GROUP BY 1,2,3,4,5,6
-  ORDER BY 7 DESC, 8 DESC
-  LIMIT 10;
+  GROUP BY 1,2,3,4,5,6;
 """,
 p.project_id, num_days_to_scan);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors

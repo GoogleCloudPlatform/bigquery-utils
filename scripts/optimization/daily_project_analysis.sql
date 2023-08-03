@@ -15,32 +15,35 @@
  */
 
 /*
- * This script creates a table that contains the following information
-  * about BigQuery jobs for a given set of projects:
-  *   - total number of jobs
-  *   - average total slot seconds
-  *   - median total slot seconds
-  *   - p80 total slot seconds
-  *   - total slot hours
-  *   - average time seconds
-  *   - median time seconds
-  *   - p80 time seconds
-  *   - total time hours
-  *   - average GB scanned
-  *   - p80 GB scanned
-  *   - total TB scanned
-  *   - average GB shuffled
-  *   - p80 GB shuffled
-  *   - total TB shuffled
-  *   - average GB spilled
-  *   - p80 GB spilled
-  *   - total TB spilled
+ * This script creates a table that contains the following daily information
+ * about BigQuery jobs for a given set of projects within the past 30 days:
+ *   - total number of jobs
+ *   - average total slot seconds
+ *   - median total slot seconds
+ *   - p80 total slot seconds
+ *   - total slot hours
+ *   - average time seconds
+ *   - median time seconds
+ *   - p80 time seconds
+ *   - total time hours
+ *   - average GB scanned
+ *   - p80 GB scanned
+ *   - total TB scanned
+ *   - average GB shuffled
+ *   - p80 GB shuffled
+ *   - total TB shuffled
+ *   - average GB spilled
+ *   - p80 GB spilled
+ *   - total TB spilled
+ *
+ * 30 days is the default timeframe, but you can change this by setting the
+ * num_days_to_scan variable to a different value.
  */
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.project_analysis
+CREATE OR REPLACE TABLE optimization_workshop.daily_project_analysis
 (
   day DATE,
   project_id STRING,
@@ -64,7 +67,7 @@ CREATE OR REPLACE TABLE optimization_workshop.project_analysis
   total_tb_spilled FLOAT64
 );
 
-INSERT INTO optimization_workshop.project_analysis
+INSERT INTO optimization_workshop.daily_project_analysis
 SELECT
   day, 
   project_id,

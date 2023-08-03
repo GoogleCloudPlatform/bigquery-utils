@@ -15,7 +15,7 @@
  */
 
 /*
- * This script creates a table named, largest_tables_without_part_clust,
+ * This script creates a table named, tables_without_part_clust,
  * that contains a list of the largest tables which are:
  *     - not partitioned
  *     - not clustered
@@ -31,12 +31,12 @@ DECLARE projects ARRAY<STRING> DEFAULT (
     WHERE NOT deleted 
     GROUP BY 1
     ORDER BY SUM(total_logical_bytes) DESC
-    LIMIT 10
+    LIMIT 100
   )
 );
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.largest_tables_without_part_clust
+CREATE OR REPLACE TABLE optimization_workshop.tables_without_part_clust
 (
   table_catalog STRING,
   table_schema STRING,
@@ -58,7 +58,7 @@ BEGIN
   EXECUTE IMMEDIATE FORMAT(
   """  
   INSERT INTO
-    optimization_workshop.largest_tables_without_part_clust
+    optimization_workshop.tables_without_part_clust
   SELECT
     s.table_catalog,
     s.table_schema,
@@ -96,11 +96,7 @@ BEGIN
     s.table_name,
     table_url,
     is_clustered,
-    is_partitioned
-  ORDER BY
-    logical_gigabytes DESC
-  LIMIT 100
-  ;
+    is_partitioned;
   """,
   p.project_id);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors

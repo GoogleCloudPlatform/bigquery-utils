@@ -17,6 +17,8 @@
 /*
  * This script retrieves the top 100 queries that have had performance insights
  * generated for them in the past 30 days.
+ * 30 days is the default timeframe, but you can change this by setting the
+ * num_days_to_scan variable to a different value.
  */
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;
@@ -59,6 +61,4 @@ WHERE
       UNNEST(query_info.performance_insights.stage_performance_standalone_insights) AS perf_insight
     WHERE
       perf_insight.slot_contention OR perf_insight.insufficient_shuffle_quota
-  )
-ORDER BY num_stages_with_insufficient_shuffle_quota + num_stages_with_slot_contention DESC
-LIMIT 100
+  );

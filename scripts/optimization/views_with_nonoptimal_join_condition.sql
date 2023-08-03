@@ -16,10 +16,11 @@
 
 /*
  * This script creates a table named, views_with_nonoptimal_join_condition,
- * that contains a list of the views with non-optimal join conditions.
+ * that contains a list of views with non-optimal join conditions.
  */
 
 DECLARE projects ARRAY<STRING> DEFAULT (
+  -- The default list of projects is the top 100 projects with the most bytes stored.
   SELECT 
     ARRAY_AGG(project_id)
   FROM(
@@ -28,7 +29,7 @@ DECLARE projects ARRAY<STRING> DEFAULT (
     WHERE NOT deleted 
     GROUP BY 1
     ORDER BY SUM(total_logical_bytes) DESC
-    LIMIT 10
+    LIMIT 100
   )
 );
 
