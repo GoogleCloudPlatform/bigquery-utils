@@ -30,9 +30,7 @@ CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights
   num_stages_with_slot_contention INT64,
   num_stages_with_insufficient_shuffle_quota INT64,
   records_read_diff_percentages ARRAY<FLOAT64>
-);
-
-INSERT INTO optimization_workshop.query_performance_insights
+) AS
 SELECT
   bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
   (SELECT COUNT(1)

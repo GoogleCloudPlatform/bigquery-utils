@@ -65,9 +65,7 @@ CREATE OR REPLACE TABLE optimization_workshop.daily_project_analysis
   avg_gb_spilled FLOAT64,
   p80_gb_spilled FLOAT64,
   total_tb_spilled FLOAT64
-);
-
-INSERT INTO optimization_workshop.daily_project_analysis
+) AS
 SELECT
   day, 
   project_id,

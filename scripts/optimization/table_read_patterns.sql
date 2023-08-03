@@ -175,7 +175,7 @@ WITH table_read_patterns AS (
 ) ) )
 SELECT
   table_id,
-  `bigquery-public-data`.persistent_udfs.table_url(table_id) AS table_url,
+  bqutil.fn.table_url(table_id) AS table_url,
   DATE(creation_time) as day,
   (SELECT STRING_AGG(COLUMN ORDER BY COLUMN) FROM UNNEST(predicates)) column_list,
   (SELECT STRING_AGG(operator ORDER BY COLUMN) FROM UNNEST(predicates)) operator_list,
@@ -184,7 +184,7 @@ SELECT
   COUNT(*) AS num_occurrences,
   COUNT(distinct job_id) as job_count,
   ARRAY_AGG(CONCAT(project_id,':us.',job_id) ORDER BY total_slot_ms LIMIT 10) AS job_id_array,
-  ARRAY_AGG(`bigquery-public-data`.persistent_udfs.job_url(project_id || ':us.' || job_id)) AS job_url_array,
+  ARRAY_AGG(bqutil.fn.job_url(project_id || ':us.' || job_id)) AS job_url_array,
 FROM
   table_read_patterns
   GROUP BY 1,2,3,4,5,6;

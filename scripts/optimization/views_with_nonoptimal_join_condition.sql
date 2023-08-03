@@ -57,7 +57,7 @@ BEGIN
   INSERT INTO optimization_workshop.views_with_nonoptimal_join_condition
   SELECT
   table_name AS view_name,
-  `bigquery-public-data`.persistent_udfs.table_url(table_catalog || '.' || table_schema || '.' || table_name) AS view_url,
+  bqutil.fn.table_url(table_catalog || '.' || table_schema || '.' || table_name) AS view_url,
   view_definition,
   extract_nonoptimal_join_conditions(view_definition) AS join_conditions
   FROM

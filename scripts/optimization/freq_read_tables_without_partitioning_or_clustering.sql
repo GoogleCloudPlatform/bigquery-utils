@@ -62,7 +62,7 @@ BEGIN
     s.table_catalog,
     s.table_schema,
     s.table_name,
-    `bigquery-public-data`.persistent_udfs.table_url(s.table_catalog || '.' || s.table_schema || '.' || s.table_name) AS table_url,
+    bqutil.fn.table_url(s.table_catalog || '.' || s.table_schema || '.' || s.table_name) AS table_url,
     EXISTS(SELECT * FROM UNNEST(c.clustering) AS c WHERE c <> "NULL") is_clustered,
     EXISTS(SELECT * FROM UNNEST(c.partitioning) AS p WHERE p = "YES") is_partitioned,
     SUM(SAFE_DIVIDE(s.total_logical_bytes, POW(2,30))) AS logical_gigabytes,
