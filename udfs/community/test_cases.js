@@ -1372,6 +1372,24 @@ generate_udf_test("cw_regexp_substr_4", [
         ],
         expected_output: `"123"`
     },
+    {
+        inputs: [
+            `"Test123Str123456"`,
+            `"(Test|Str)123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `"Test123"`
+    },
+    {
+        inputs: [
+            `"Test123Str123456"`,
+            `"(Test|Str)123"`,
+            `CAST(1 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"Str123"`
+    },
 ]);
 generate_udf_test("cw_regexp_substr_generic", [
     {
@@ -1722,6 +1740,14 @@ generate_udf_test("cw_convert_base", [
         ],
         expected_output: `"23"`
     },
+    {
+        inputs: [
+            `"1234567890123456789012345678901234567890"`,
+            `CAST(10 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `"1110100000110010010010000001110101110000001101101111110011101110001010110010111100010111111001011011001110001111110000101011010010"`
+    },
 ])
 generate_udf_test("cw_from_base", [
     {
@@ -1922,6 +1948,34 @@ generate_udf_test("cw_regexp_extract", [
         ],
         expected_output: `"Str"`
     },
+    {
+        inputs: [
+            `"TestStr123456#?%&"`,
+            `"StrX"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"TestStr123456#?%&"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `"StrX"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
 ]);
 generate_udf_test("cw_regexp_extract_n", [
     {
@@ -1940,6 +1994,34 @@ generate_udf_test("cw_regexp_extract_all", [
             `"Str.*"`
         ],
         expected_output: `CAST(["Str123456"] AS ARRAY<STRING>)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"StrX"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `"StrX"`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `NULL`
+        ],
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("cw_regexp_extract_all_n", [
@@ -3048,7 +3130,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `4`
     ],
-    expected_output: `NULL`,
+    expected_output: `""`,
   },
   {
     inputs: [
@@ -3064,7 +3146,7 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `" "`,
       `-4`
     ],
-    expected_output: `NULL`,
+    expected_output: `""`,
   },
   {
     inputs: [
@@ -3073,6 +3155,22 @@ generate_udf_test("cw_split_part_delimstr_idx", [
       `2`
     ],
     expected_output: `"bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `1`
+    ],
+    expected_output: `"foo bar baz"`,
+  },
+  {
+    inputs: [
+      `"foo bar baz"`,
+      `""`,
+      `2`
+    ],
+    expected_output: `""`,
   },
   {
     inputs: [

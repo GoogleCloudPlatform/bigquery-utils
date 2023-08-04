@@ -706,19 +706,31 @@ sg
 ```
 
 ### [cw_regexp_extract(str STRING, regexp STRING)](cw_regexp_extract.sqlx)
-Returns the first substring matched by the regular expression regexp in str.
+Extracts the first substring matched by the regular expression regexp in str, returns null if the regex doesn't have a match or either str or regexp is null.
 ```sql
 SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'Str');
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', 'StrX');
+SELECT bqutil.fn.cw_regexp_extract(NULL, 'StrX');
+SELECT bqutil.fn.cw_regexp_extract('TestStr123456#?%&', NULL);
 
 Str
+NULL
+NULL
+NULL
 ```
 
 ### [cw_regexp_extract_all(str STRING, regexp STRING)](cw_regexp_extract_all.sqlx)
-Returns the substring(s) matched by the regular expression regexp in str.
+Returns the substring(s) matched by the regular expression regexp in str, returns null if the regex doesn't have a match or either str or regexp is null.
 ```sql
 SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'Str.*');
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', 'StrX.*');
+SELECT bqutil.fn.cw_regexp_extract_all(NULL, 'Str.*');
+SELECT bqutil.fn.cw_regexp_extract_all('TestStr123456', NULL);
 
 [Str123456]
+NULL
+NULL
+NULL
 ```
 
 ### [cw_regexp_extract_all_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_all_n.sqlx)
@@ -844,10 +856,14 @@ Takes input haystack string, needle string, position and occurence. It returns n
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456', 'Test', 1, 1);
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 2);
 SELECT bqutil.fn.cw_regexp_substr_4('TestStr123456Test', 'Test', 1, 3);
+SELECT bqutil.fn.cw_regexp_substr_4('Test123Str123Test', '(Test|Str)123', 1, 1);
+SELECT bqutil.fn.cw_regexp_substr_4('Test123Str123Test', '(Test|Str)123', 1, 2);
 
 Test
 Test
 null
+Test123
+Str123
 ```
 
 ### [cw_regexp_substr_5(h STRING, n STRING, p INT64, o INT64, mode STRING)](cw_regexp_substr_5.sqlx)
