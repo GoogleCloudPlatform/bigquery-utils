@@ -24,13 +24,7 @@
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights
-(
-  job_url STRING,
-  num_stages_with_slot_contention INT64,
-  num_stages_with_insufficient_shuffle_quota INT64,
-  records_read_diff_percentages ARRAY<FLOAT64>
-) AS
+CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights AS
 SELECT
   bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
   (SELECT COUNT(1)

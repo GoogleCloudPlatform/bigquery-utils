@@ -1,32 +1,43 @@
+# Optimzation Scripts
+
+This folder contains scripts that (when executed) create tables with information to help you optimize your BigQuery tables, views, and queries. The scripts are broken down by categories as shown below:
+
+* Project Analysis
+  * [Daily project metrics](#daily-project-metrics)
+* Table Analysis
+  * [BigQuery Clustering/Partitioning Recommender Tool](#bigquery-clusteringpartitioning-recommender-tool)
+  * [Tables with high slot consumption](#tables-with-high-slot-consumption)
+  * [Tables without partitioning or clustering](#tables-without-partitioning-or-clustering)
+  * [Frequently read tables without partitioning or clustering](#frequently-read-tables-without-partitioning-or-clustering)
+  * [Tables receiving high quantity of daily DML statements](#tables-receiving-high-quantity-of-daily-dml-statements)
+* Query Analysis
+  * [Queries grouped by hash](#queries-grouped-by-hash)
+  * [Queries with performance insights](#queries-with-performance-insights)
+
+
+
 # Project Analysis
 Project level analysis enables us to understand key metrics such as slot_time, bytes_scanned, bytes_shuffled  and bytes_spilled on a daily basis within a project. The metrics are examined as averages, medians and p80s. This enables us to understand at a high level what jobs within a project consume 80% of the time and 50% of the time daily.
 
 ## Daily project metrics
 
-The [daily_project_analysis.sql](daily_project_analysis.sql) script creates a table of all the following daily metrics (for a 30day period) for all your projects:
+The [daily_project_analysis.sql](daily_project_analysis.sql) script creates a table called,
+`daily_project_analysis` of daily slot consumption metrics (for a 30day period) for all your projects.
 
-  - total number of jobs
-  - average total slot seconds
-  - median total slot seconds
-  - p80 total slot seconds
-  - total slot hours
-  - average time seconds
-  - median time seconds
-  - p80 time seconds
-  - total time hours
-  - average GB scanned
-  - p80 GB scanned
-  - total TB scanned
-  - average GB shuffled
-  - p80 GB shuffled
-  - total TB shuffled
-  - average GB spilled
-  - p80 GB spilled
-  - total TB spilled
+### Examples
 
-# Table Read Patterns
+* Top 100 tables with highest slot consumption
 
-## Enable BigQuery Clustering/Partitioning Recommender Tool
+    ```sql
+    SELECT *
+    FROM optimization_workshop.daily_project_analysis
+    ORDER BY total_slot_ms DESC
+    LIMIT 100
+    ```
+
+# Table Analysis
+
+## BigQuery Clustering/Partitioning Recommender Tool
 
 ### Enable using gcloud
 
@@ -49,7 +60,7 @@ resource "google_project_service" "recommender_service" {
 
 ## Tables with high slot consumption 
 
-The [table_read_patterns.sql](table_read_patterns.sql) script will create a table called, `optimization_workshop.table_read_patterns`, and populate it with usage data to help you determine:
+The [table_read_patterns.sql](table_read_patterns.sql) script creates a table called, `table_read_patterns`, and populate it with usage data to help you determine:
 * Which tables (when queried) are resulting in high slot consumption.
 * Which tables are most frequently queried.
 
@@ -76,7 +87,7 @@ The [table_read_patterns.sql](table_read_patterns.sql) script will create a tabl
 ## Tables without partitioning or clustering
 
 The [tables_without_partitioning_or_clustering.sql](tables_without_partitioning_or_clustering.sql) script creates a table named, `tables_without_part_clust`,
-that contains a list of tables which are:
+that contains a list of tables which meet any of the following conditions:
   - not partitioned
   - not clustered
   - neither partitioned nor clustered
@@ -97,7 +108,7 @@ that contains a list of tables which are:
 **Note:** The [freq_read_tables_without_partitioning_or_clustering.sql](freq_read_tables_without_partitioning_or_clustering.sql) script depends on the `table_read_patterns` table so you must first run the [tables_read_patters.sql](table_read_patterns.sql) script.
 
 The [freq_read_tables_without_partitioning_or_clustering.sql](freq_read_tables_without_partitioning_or_clustering.sql) script creates a table named, `freq_read_tables_without_part`
-that contains a list of the most frequently read tables which are:
+that contains a list of the most frequently read tables which meet any of the following conditions:
   - not partitioned
   - not clustered
   - neither partitioned nor clustered
@@ -123,7 +134,7 @@ The [frequent_daily_table_dml.sql](frequent_daily_table_dml.sql) script creates 
   LIMIT 100;
   ```
 
-# Query Patterns
+# Query Analysis
 
 ## Queries grouped by hash
 
@@ -134,11 +145,12 @@ This allows us to group queries that are logically the same, but
 have different literals. 
 
 For example, the following queries would be grouped together because the date literal filters are ignored:
-  ```
-  SELECT * FROM my_table WHERE date = '2020-01-01';
-  SELECT * FROM my_table WHERE date = '2020-01-02';
-  SELECT * FROM my_table WHERE date = '2020-01-03';
-  ```
+  
+```sql
+SELECT * FROM my_table WHERE date = '2020-01-01';
+SELECT * FROM my_table WHERE date = '2020-01-02';
+SELECT * FROM my_table WHERE date = '2020-01-03';
+```
 
 ### Examples
 

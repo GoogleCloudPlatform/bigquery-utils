@@ -30,7 +30,7 @@ DECLARE projects ARRAY<STRING> DEFAULT (
   FROM(
     SELECT project_id
     FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
-    WHERE DATE(creation_time) >= CURRENT_DATE - 7
+    WHERE DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
     GROUP BY 1
     ORDER BY SUM(total_bytes_billed) DESC
     LIMIT 100

@@ -24,22 +24,7 @@
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.frequent_daily_table_dml
-(
-  dml_execution_date DATE,
-  daily_dml_per_table INT64,
-  table_id STRING,
-  table_url STRING,
-  job_ids ARRAY<STRING>,
-  job_urls ARRAY<STRING>,
-  statement_types ARRAY<STRING>,
-  sum_total_gb_processed FLOAT64,
-  avg_total_gb_processed FLOAT64,
-  sum_total_slot_ms INT64,
-  avg_total_slot_ms FLOAT64,
-  sum_avg_slots FLOAT64,
-  avg_avg_slots FLOAT64,
-) AS
+CREATE OR REPLACE TABLE optimization_workshop.frequent_daily_table_dml AS
 SELECT
   EXTRACT(DATE FROM creation_time) AS dml_execution_date,
   COUNT(1) AS daily_dml_per_table,
@@ -56,10 +41,10 @@ SELECT
   AVG(SAFE_DIVIDE(total_slot_ms, (TIMESTAMP_DIFF(end_time, start_time, MILLISECOND)))) AS avg_avg_slots,
 FROM
   `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
-WHERE 1=1 -- no op filter to allow easy commenting below
--- Look at the past 30 days of jobs
-AND creation_time > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL num_days_to_scan DAY)
--- Only look at DML statements
-AND statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
-GROUP BY dml_execution_date, table_id, table_url
-HAVING daily_dml_per_table > 24;
+WHERE
+  -- Look at the past 30 days of jobs
+  DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
+  -- Only look at DML statements
+  AND statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
+  GROUP BY dml_execution_date, table_id, table_url
+  HAVING daily_dml_per_table > 24;

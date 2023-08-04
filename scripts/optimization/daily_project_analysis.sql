@@ -15,26 +15,8 @@
  */
 
 /*
- * This script creates a table that contains the following daily information
- * about BigQuery jobs for a given set of projects within the past 30 days:
- *   - total number of jobs
- *   - average total slot seconds
- *   - median total slot seconds
- *   - p80 total slot seconds
- *   - total slot hours
- *   - average time seconds
- *   - median time seconds
- *   - p80 time seconds
- *   - total time hours
- *   - average GB scanned
- *   - p80 GB scanned
- *   - total TB scanned
- *   - average GB shuffled
- *   - p80 GB shuffled
- *   - total TB shuffled
- *   - average GB spilled
- *   - p80 GB spilled
- *   - total TB spilled
+ * This script creates a table that contains daily slot consumption information
+ * about BigQuery jobs for a given set of projects within the past 30 days.
  *
  * 30 days is the default timeframe, but you can change this by setting the
  * num_days_to_scan variable to a different value.
@@ -43,29 +25,7 @@
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.daily_project_analysis
-(
-  day DATE,
-  project_id STRING,
-  job_count INT64,
-  avg_total_slot_secs FLOAT64,
-  median_total_slot_secs FLOAT64,
-  p80_total_slot_secs FLOAT64,
-  total_slot_hours FLOAT64,
-  avg_time_secs FLOAT64,
-  median_time_secs FLOAT64,
-  total_time_hours FLOAT64,
-  p80_time_secs FLOAT64,
-  avg_gb_scanned FLOAT64,
-  p80_gb_scanned FLOAT64,
-  total_tb_scanned FLOAT64,
-  avg_gb_shuffled FLOAT64,
-  p80_gb_shuffled FLOAT64,
-  total_tb_shuffled FLOAT64,
-  avg_gb_spilled FLOAT64,
-  p80_gb_spilled FLOAT64,
-  total_tb_spilled FLOAT64
-) AS
+CREATE OR REPLACE TABLE optimization_workshop.daily_project_analysis AS
 SELECT
   day, 
   project_id,
@@ -112,7 +72,7 @@ FROM(
       OVER (PARTITION BY day, project_id)     AS p80_bytes_spilled
   FROM(
     SELECT 
-      DATE(jbo.creation_time,"US/Central") AS day,
+      DATE(jbo.creation_time) AS day,
       project_id,
       job_id,
       total_slot_ms,
@@ -123,7 +83,7 @@ FROM(
     FROM
       `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
     WHERE
-      DATE(jbo.creation_time,"US/Central") >= CURRENT_DATE - num_days_to_scan
+      DATE(jbo.creation_time) >= CURRENT_DATE - num_days_to_scan
       -- Uncomment below to specify a list of projects to analyze
       -- AND jbo.project_id IN (<LIST_OF_PROJECT_IDS>)
       AND jbo.job_type = 'QUERY'
