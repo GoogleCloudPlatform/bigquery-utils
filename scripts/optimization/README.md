@@ -1,6 +1,11 @@
 # Optimzation Scripts
 
-This folder contains scripts that (when executed) create tables with information to help you optimize your BigQuery tables, views, and queries. The scripts are broken down by categories as shown below:
+This folder contains scripts that (when executed) create several tables within a
+dataset named, `optimization_workshop`. These tables are populated with information to help you
+optimize your BigQuery tables, views, and queries. 
+
+The scripts are broken down by categories as
+shown below:
 
 * Project Analysis
   * [Daily project metrics](#daily-project-metrics)
@@ -14,7 +19,7 @@ This folder contains scripts that (when executed) create tables with information
   * [Queries grouped by hash](#queries-grouped-by-hash)
   * [Queries with performance insights](#queries-with-performance-insights)
 
-
+---
 
 # Project Analysis
 Project level analysis enables us to understand key metrics such as slot_time, bytes_scanned, bytes_shuffled  and bytes_spilled on a daily basis within a project. The metrics are examined as averages, medians and p80s. This enables us to understand at a high level what jobs within a project consume 80% of the time and 50% of the time daily.
@@ -38,6 +43,10 @@ The [daily_project_analysis.sql](daily_project_analysis.sql) script creates a ta
 # Table Analysis
 
 ## BigQuery Clustering/Partitioning Recommender Tool
+
+The BigQuery partitioning and clustering recommender analyzes workflows on your BigQuery tables and offers recommendations to better optimize your workflows and query costs using either table partitioning or table clustering. The recommender uses your BigQuery's workload execution data from the past 30 days to analyze each BigQuery table for suboptimal partitioning and clustering configurations.
+
+Before you can view partition and cluster recommendations, you need to [enable the Recommender API](https://cloud.google.com/recommender/docs/enabling) as shown in the following sections.
 
 ### Enable using gcloud
 

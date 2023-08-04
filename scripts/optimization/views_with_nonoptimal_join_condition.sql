@@ -43,8 +43,15 @@ CREATE OR REPLACE TABLE optimization_workshop.views_with_nonoptimal_join_conditi
 );
 
 CREATE TEMP FUNCTION extract_nonoptimal_join_conditions(view_definition STRING) AS(
-  REGEXP_EXTRACT_ALL(REPLACE(UPPER(view_definition), " ON ", "\nON "), r"ON\s+(?:TRIM|UPPER|LOWER)+.*?=.*")
-);
+  ARRAY_CONCAT(
+    REGEXP_EXTRACT_ALL(
+      REGEXP_REPLACE(UPPER(view_definition), r"\sON\s", "\nON "),
+      r"\nON\s+(?:CAST|TRIM|UPPER|LOWER)+.*?=.*"
+    ),
+    REGEXP_EXTRACT_ALL(
+      REGEXP_REPLACE(UPPER(view_definition), r"\sON\s", "\nON "),
+      r"\nON\s+.*?=\s*(?:CAST|TRIM|UPPER|LOWER)+.*"
+)));
 
 FOR p IN (
  SELECT project_id
