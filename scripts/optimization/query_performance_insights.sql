@@ -43,7 +43,6 @@ FROM
 WHERE
   DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
   AND job_type = 'QUERY'
-  AND end_time > jbo.start_time
   AND error_result IS NULL
   AND statement_type != 'SCRIPT'
   AND EXISTS ( -- Only include queries which had performance insights
