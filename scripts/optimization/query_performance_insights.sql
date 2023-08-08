@@ -28,7 +28,7 @@ CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights AS
 SELECT
   bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
   (SELECT COUNT(1)
-   FROM UNNEST(query_info.performance_insights.stage_performance_standalone_insights) perf_insight 
+   FROM UNNEST(query_info.performance_insights.stage_performance_standalone_insights) perf_insight
    WHERE perf_insight.slot_contention
   ) AS num_stages_with_slot_contention,
   (SELECT COUNT(1)
@@ -39,13 +39,13 @@ SELECT
    FROM UNNEST(query_info.performance_insights.stage_performance_change_insights) perf_insight
   ) AS records_read_diff_percentages
 FROM
-  `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
+  `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 WHERE
-  DATE(jbo.creation_time) >= CURRENT_DATE - num_days_to_scan
-  AND jbo.job_type = 'QUERY'
-  AND jbo.end_time > jbo.start_time
-  AND jbo.error_result IS NULL
-  AND jbo.statement_type != 'SCRIPT'
+  DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
+  AND job_type = 'QUERY'
+  AND end_time > jbo.start_time
+  AND error_result IS NULL
+  AND statement_type != 'SCRIPT'
   AND EXISTS ( -- Only include queries which had performance insights
     SELECT
       1
