@@ -43,6 +43,7 @@ FROM
 WHERE
   DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
   AND job_type = 'QUERY'
+  AND state = 'DONE'
   AND error_result IS NULL
   AND statement_type != 'SCRIPT'
   AND EXISTS ( -- Only include queries which had performance insights
