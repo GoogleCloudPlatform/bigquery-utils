@@ -1748,6 +1748,30 @@ generate_udf_test("cw_convert_base", [
         ],
         expected_output: `"1110100000110010010010000001110101110000001101101111110011101110001010110010111100010111111001011011001110001111110000101011010010"`
     },
+    {
+        inputs: [
+            `NULL`,
+            `CAST(10 AS INT64)`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"100"`,
+            `NULL`,
+            `CAST(2 AS INT64)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"100"`,
+            `CAST(10 AS INT64)`,
+            `NULL`
+        ],
+        expected_output: `NULL`
+    },
 ])
 generate_udf_test("cw_from_base", [
     {
@@ -3294,7 +3318,7 @@ generate_udf_test("job_url", [
       expected_output: `NULL`
     }
 ]);
-  
+
 generate_udf_test("table_url", [
     {
       inputs: [
@@ -3320,5 +3344,5 @@ generate_udf_test("table_url", [
       ],
       expected_output: `NULL`
     }
-    
+
   ]);

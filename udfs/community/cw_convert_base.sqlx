@@ -23,6 +23,9 @@ CREATE OR REPLACE FUNCTION ${self()}(value STRING, from_base INT64, to_base INT6
       description="""Convert string from given base to another base. Similar to hive/spark CONV(string, int, int)"""
   )
   AS """
+  if (value == null || from_base == null || to_base == null) {
+    return null;
+  }
   if (from_base == 10) {
     return BigInt(value).toString(to_base);
   } else if (from_base == 2) {
