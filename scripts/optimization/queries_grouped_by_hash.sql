@@ -33,136 +33,49 @@
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
-DECLARE projects ARRAY<STRING> DEFAULT (
-  SELECT 
-    ARRAY_AGG(project_id)
-  FROM(
-    SELECT project_id
-    FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
-    WHERE DATE(creation_time) >= CURRENT_DATE - 30
-    GROUP BY 1
-    ORDER BY SUM(total_bytes_billed) DESC
-    LIMIT 100
-  )
-);
-
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash
-(
-  Query_Hash STRING,
-  Query_Raw_Sample STRING,
-  Job_Origin STRING,
-  Ref_Tables STRING,
-  Days_Active INT64,
-  Job_Count INT64,
-  Avg_Job_Count_Active_Days INT64,
-  Project_Id STRING,
-  BQ_Region STRING,
-  Reservation_Id STRING,
-  Total_Gigabytes_Processed INT64,
-  Total_Gigabytes_Processed_Per_Job INT64,
-  Avg_Gigabytes_Processed INT64,
-  Total_Slot_Hours INT64,
-  Avg_Total_Slot_Hours_per_Active_Day INT64,
-  Avg_Job_Duration_Seconds INT64,
-  Any_Job_Ids ARRAY<STRING>,
-  User_Emails STRING,
-  Labels STRING
-);
-
-FOR p IN (
- SELECT project_id
- FROM
-   UNNEST(projects) project_id
-)
-DO
-BEGIN
-EXECUTE IMMEDIATE FORMAT("""
-INSERT INTO optimization_workshop.queries_grouped_by_hash
+CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS
 SELECT
-    query_hash                                                              AS Query_Hash,
-    ANY_VALUE(query_raw)                                                    AS Query_Raw_Sample,
-    SPLIT(ANY_VALUE(job_ids)[OFFSET(0)], '_')[OFFSET(0)]                    AS Job_Origin,
-    Ref_Tables                                                              AS Ref_Tables,
-    COUNT(DISTINCT creation_dt)                                             AS Days_Active,
-    SUM(job_count)                                                          AS Job_Count,
-    CAST(AVG(job_count) AS INT64)                                           AS Avg_Job_Count_Active_Days,
-    Project_Id                                                              AS Project_Id,
-    'us'                                                                    AS BQ_Region,
-    Reservation_Id                                                          AS Reservation_Id,
-    CAST(SUM(total_gigabytes_processed) AS INT64)                           AS Total_Gigabytes_Processed,
-    CAST(SUM(total_gigabytes_processed)/sum(job_count) AS INT64)            AS Total_Gigabytes_Processed_Per_Job,
-    CAST(AVG(total_gigabytes_processed) AS INT64)                           AS Avg_Gigabytes_Processed,
-    CAST(SUM(total_slot_hours_per_day) AS INT64)                            AS Total_Slot_Hours,
-    CAST(AVG(total_slot_hours_per_day) AS INT64)                            AS Avg_Total_Slot_Hours_per_Active_Day,
-    CAST(AVG(avg_job_duration_seconds) AS INT64)                            AS Avg_Job_Duration_Seconds,
-    ANY_VALUE(job_ids)                                                      AS Any_Job_Ids,
-    STRING_AGG(DISTINCT user_emails_unnest)                                 AS User_Emails,
-    STRING_AGG(DISTINCT labels_concat)                                      AS Labels
-FROM (
-    SELECT
-        query_hash,
-        ANY_VALUE(query_raw)                                    AS query_raw,
-        ref_tables                                              AS ref_tables,
-        creation_dt                                             AS creation_dt,
-        project_id                                              AS project_id,
-        reservation_id                                          AS reservation_id,
-        COUNT(*)                                                AS job_count,
-        ARRAY_AGG(job_id ORDER BY total_slot_ms DESC LIMIT 10)  AS job_ids,
-        SUM(total_slot_ms) / (1000 * 60 * 60)                   AS total_slot_hours_per_day,
-        SUM(total_bytes_processed) / (1024 * 1024 * 1024)       AS total_gigabytes_processed, 
-        AVG(job_duration_seconds)                               AS avg_job_duration_seconds,
-        ARRAY_AGG(DISTINCT user_email)                          AS user_emails,
-        STRING_AGG(DISTINCT labels_concat)                      AS labels_concat
-    FROM (
-        SELECT
-            query_info.query_hashes.normalized_literals                                     AS query_hash,
-            query                                                                           AS query_raw,
-            DATE(jbp.creation_time)                                                         AS creation_dt,
-            jbp.project_id                                                                  AS project_id,
-            jbp.reservation_id                                                              AS reservation_id,
-            jbp.job_id                                                                      AS job_id,
-            jbp.total_bytes_processed                                                       AS total_bytes_processed,
-            jbp.total_slot_ms                                                               AS total_slot_ms,
-            jbp.total_slot_ms / TIMESTAMP_DIFF(jbp.end_time, jbp.start_time, MILLISECOND)   AS slots,
-            TIMESTAMP_DIFF(jbp.end_time, jbp.start_time, SECOND)                            AS job_duration_seconds,
-            user_email,
-            STRING_AGG(ref_tables.project_id || '.' ||
-                IF
-                (STARTS_WITH(ref_tables.dataset_id, '_'),
-                'TEMP',
-                ref_tables.dataset_id) || '.' || ref_tables.table_id
-                ORDER BY
-                    ref_tables.project_id || '.' ||
-                IF
-                (STARTS_WITH(ref_tables.dataset_id, '_'),
-                'TEMP',
-                ref_tables.dataset_id) || '.' || ref_tables.table_id)                       AS ref_tables,
-            FORMAT("%%T", ARRAY_CONCAT_AGG(labels))                                         AS labels_concat 
-        FROM  
-            `%s.region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT as jbp
-        JOIN 
-            UNNEST(referenced_tables) ref_tables
-        WHERE 
-            DATE(jbp.creation_time) >= CURRENT_DATE - %i
-            AND jbp.end_time > jbp.start_time
-            AND jbp.error_result IS NULL
-            AND jbp.job_type = 'QUERY'
-            AND jbp.statement_type != 'SCRIPT'
-            AND ref_tables.table_id not like '%%INFORMATION_SCHEMA%%' 
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-    )
-    GROUP BY 1, 3, 4, 5, 6)
-JOIN
-    UNNEST(user_emails) as user_emails_unnest
-GROUP BY
-    Query_Hash,
-    Ref_Tables,
-    Project_Id,
-    BQ_Region,
-    Reservation_Id;
-""",
-p.project_id, num_days_to_scan);
-EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors
-END;
-END FOR;
+  query_info.query_hashes.normalized_literals                              AS query_hash,
+  COUNT(DISTINCT DATE(creation_time))                                      AS days_active,
+  jbo.project_id                                                           AS project_id,
+  reservation_id                                                           AS reservation_id,
+  COUNT(1)                                                                 AS job_count,
+  ARRAY_AGG(
+      bqutil.fn.job_url(jbo.project_id || ':us.' || job_id) 
+      ORDER BY total_slot_ms DESC LIMIT 10)                                AS top_10_job_urls_by_most_slot_ms,
+  ANY_VALUE(bqutil.fn.job_url(jbo.project_id || ':us.' || job_id))         AS any_job_url,
+  SUM(total_slot_ms) / (1000 * 60 * 60)                                    AS total_slot_hours_per_day,
+  ARRAY_AGG(DISTINCT user_email)                                           AS user_emails,
+  SUM(total_bytes_processed) / (1024 * 1024 * 1024)                        AS total_gigabytes_processed,
+  AVG(total_bytes_processed) / (1024 * 1024 * 1024)                        AS avg_gigabytes_processed,
+  SUM(total_slot_ms) / (1000 * 60 * 60)                                    AS total_slot_hours,
+  AVG(total_slot_ms) / (1000 * 60 * 60)                                    AS avg_total_slot_hours_per_active_day,
+  AVG(TIMESTAMP_DIFF(end_time, start_time, SECOND) )                       AS avg_job_duration_seconds,
+  FORMAT("%T", ARRAY_CONCAT_AGG(labels))                                   AS labels,
+  SUM(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS total_slots,
+  AVG(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS avg_total_slots,
+  STRING_AGG(ref_table.project_id || '.' ||
+      IF
+      (STARTS_WITH(ref_table.dataset_id, '_'),
+      'TEMP',
+      ref_table.dataset_id) || '.' || ref_table.table_id
+      ORDER BY
+          ref_table.project_id || '.' ||
+      IF
+      (STARTS_WITH(ref_table.dataset_id, '_'),
+      'TEMP',
+      ref_table.dataset_id) || '.' || ref_table.table_id)                  AS ref_tables,
+FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
+JOIN UNNEST(referenced_tables) ref_table
+WHERE 
+  DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
+  AND state = 'DONE'
+  AND error_result IS NULL
+  AND job_type = 'QUERY'
+  AND statement_type != 'SCRIPT'
+  AND ref_table.table_id NOT LIKE '%INFORMATION_SCHEMA%' 
+GROUP BY 
+  query_hash,
+  project_id,
+  reservation_id
