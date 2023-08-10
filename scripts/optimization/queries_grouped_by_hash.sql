@@ -55,17 +55,10 @@ SELECT
   FORMAT("%T", ARRAY_CONCAT_AGG(labels))                                   AS labels,
   SUM(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS total_slots,
   AVG(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS avg_total_slots,
-  STRING_AGG(ref_table.project_id || '.' ||
-      IF
-      (STARTS_WITH(ref_table.dataset_id, '_'),
-      'TEMP',
-      ref_table.dataset_id) || '.' || ref_table.table_id
-      ORDER BY
-          ref_table.project_id || '.' ||
-      IF
-      (STARTS_WITH(ref_table.dataset_id, '_'),
-      'TEMP',
-      ref_table.dataset_id) || '.' || ref_table.table_id)                  AS ref_tables,
+  ARRAY_AGG(DISTINCT
+    ref_table.project_id || '.' || 
+    IF(STARTS_WITH(ref_table.dataset_id, '_'), 'TEMP', ref_table.dataset_id)
+    || '.' || ref_table.table_id IGNORE NULLS)                             AS ref_tables,
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
 JOIN UNNEST(referenced_tables) ref_table
 WHERE 
