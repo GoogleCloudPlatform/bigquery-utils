@@ -37,7 +37,7 @@ CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS
 SELECT
   query_info.query_hashes.normalized_literals                              AS query_hash,
-  COUNT(DISTINCT DATE(creation_time))                                      AS days_active,
+  COUNT(DISTINCT DATE(start_time))                                         AS days_active,
   ARRAY_AGG(DISTINCT jbo.project_id IGNORE NULLS)                          AS project_ids,
   ARRAY_AGG(DISTINCT reservation_id IGNORE NULLS)                          AS reservation_ids,
   COUNT(1)                                                                 AS job_count,
@@ -69,7 +69,7 @@ SELECT
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
 JOIN UNNEST(referenced_tables) ref_table
 WHERE 
-  DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
+  DATE(start_time) >= CURRENT_DATE - num_days_to_scan
   AND state = 'DONE'
   AND error_result IS NULL
   AND job_type = 'QUERY'
