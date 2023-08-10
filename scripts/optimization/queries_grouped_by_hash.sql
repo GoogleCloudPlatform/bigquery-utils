@@ -38,8 +38,8 @@ CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS
 SELECT
   query_info.query_hashes.normalized_literals                              AS query_hash,
   COUNT(DISTINCT DATE(creation_time))                                      AS days_active,
-  jbo.project_id                                                           AS project_id,
-  reservation_id                                                           AS reservation_id,
+  ARRAY_AGG(DISTINCT jbo.project_id IGNORE NULLS)                          AS project_ids,
+  ARRAY_AGG(DISTINCT reservation_id IGNORE NULLS)                          AS reservation_ids,
   COUNT(1)                                                                 AS job_count,
   ARRAY_AGG(
       bqutil.fn.job_url(jbo.project_id || ':us.' || job_id) 
@@ -75,7 +75,4 @@ WHERE
   AND job_type = 'QUERY'
   AND statement_type != 'SCRIPT'
   AND ref_table.table_id NOT LIKE '%INFORMATION_SCHEMA%' 
-GROUP BY 
-  query_hash,
-  project_id,
-  reservation_id
+GROUP BY query_hash
