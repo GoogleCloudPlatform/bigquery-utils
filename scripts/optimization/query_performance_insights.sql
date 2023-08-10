@@ -27,17 +27,7 @@ CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.query_performance_insights AS
 SELECT
   bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
-  (SELECT COUNT(1)
-   FROM UNNEST(query_info.performance_insights.stage_performance_standalone_insights) perf_insight
-   WHERE perf_insight.slot_contention
-  ) AS num_stages_with_slot_contention,
-  (SELECT COUNT(1)
-   FROM UNNEST(query_info.performance_insights.stage_performance_standalone_insights) perf_insight
-   WHERE perf_insight.insufficient_shuffle_quota
-  ) AS num_stages_with_insufficient_shuffle_quota,
-  (SELECT ARRAY_AGG(perf_insight.input_data_change.records_read_diff_percentage IGNORE NULLS)
-   FROM UNNEST(query_info.performance_insights.stage_performance_change_insights) perf_insight
-  ) AS records_read_diff_percentages
+  query_info.performance_insights AS performance_insights
 FROM
   `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 WHERE

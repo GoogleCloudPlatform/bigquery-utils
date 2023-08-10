@@ -188,10 +188,22 @@ generated for them in the past 30 days.
 
 ### Examples
 
-* Top 100 queries with most query stage performance insights
+* Top 100 queries with most # of performance insights
 
   ```sql
-  SELECT *
+  SELECT
+    job_url,
+    (SELECT COUNT(1)
+    FROM UNNEST(performance_insights.stage_performance_standalone_insights) perf_insight
+    WHERE perf_insight.slot_contention
+    ) AS num_stages_with_slot_contention,
+    (SELECT COUNT(1)
+    FROM UNNEST(performance_insights.stage_performance_standalone_insights) perf_insight
+    WHERE perf_insight.insufficient_shuffle_quota
+    ) AS num_stages_with_insufficient_shuffle_quota,
+    (SELECT ARRAY_AGG(perf_insight.input_data_change.records_read_diff_percentage IGNORE NULLS)
+    FROM UNNEST(performance_insights.stage_performance_change_insights) perf_insight
+    ) AS records_read_diff_percentages
   FROM optimization_workshop.query_performance_insights
   ORDER BY (
     num_stages_with_slot_contention 
