@@ -44,7 +44,6 @@ SELECT
   ARRAY_AGG(
       bqutil.fn.job_url(jbo.project_id || ':us.' || job_id) 
       ORDER BY total_slot_ms DESC LIMIT 10)                                AS top_10_job_urls_by_most_slot_ms,
-  ANY_VALUE(bqutil.fn.job_url(jbo.project_id || ':us.' || job_id))         AS any_job_url,
   SUM(total_slot_ms) / (1000 * 60 * 60)                                    AS total_slot_hours_per_day,
   ARRAY_AGG(DISTINCT user_email)                                           AS user_emails,
   SUM(total_bytes_processed) / (1024 * 1024 * 1024)                        AS total_gigabytes_processed,
