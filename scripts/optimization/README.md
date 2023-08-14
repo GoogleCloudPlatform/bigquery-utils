@@ -29,7 +29,7 @@ Project level analysis enables us to understand key metrics such as slot_time, b
 The [daily_project_analysis.sql](daily_project_analysis.sql) script creates a table called,
 `daily_project_analysis` of daily slot consumption metrics (for a 30day period) for all your projects.
 
-### Examples
+### Examples of querying script results
 
 * Top 100 tables with highest slot consumption
 
@@ -53,7 +53,14 @@ Before you can view partition and cluster recommendations, you need to [enable t
 ```bash
 # The following script retrieves all distinct projects from the JOBS_BY_ORGANIZATION view
 # and then enables the recommender API for each project.
-for proj in $(bq query --nouse_legacy_sql --format=csv "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" | sed 1d); do
+projects=$(
+  bq query \
+    --nouse_legacy_sql \
+    --format=csv \
+    "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" \
+    | sed 1d
+);
+for proj in $projects; do
   gcloud services --project="${proj}" enable recommender.googleapis.com &
 done
 ```
@@ -73,7 +80,7 @@ The [table_read_patterns.sql](table_read_patterns.sql) script creates a table ca
 * Which tables (when queried) are resulting in high slot consumption.
 * Which tables are most frequently queried.
 
-### Examples
+### Examples of querying script results
 
 * Top 100 tables with highest slot consumption
 
@@ -101,7 +108,7 @@ that contains a list of tables which meet any of the following conditions:
   - not clustered
   - neither partitioned nor clustered
 
-### Example queries
+### Examples of querying script results
 
 * Top 100 largest tables without partitioning or clustering
 
@@ -126,7 +133,7 @@ that contains a list of the most frequently read tables which meet any of the fo
 
 The [frequent_daily_table_dml.sql](frequent_daily_table_dml.sql) script creates a table named, `frequent_daily_table_dml`, that contains tables that have had more than 24 daily DML statements run against them in the past 30 days.
 
-### Examples
+### Examples of querying script results
 
 * Top 100 tables with the most DML statements per table in a day
 
@@ -161,7 +168,7 @@ SELECT * FROM my_table WHERE date = '2020-01-02';
 SELECT * FROM my_table WHERE date = '2020-01-03';
 ```
 
-### Examples
+### Examples of querying script results
 
 * Top 100 tables with highest bytes processed
 
@@ -172,7 +179,7 @@ SELECT * FROM my_table WHERE date = '2020-01-03';
   LIMIT 100
   ```
 
-* Top 100 tables with highest bytes processed
+* Top 100 tables with highest slot hours consumed
 
   ```sql
   SELECT *
@@ -186,7 +193,7 @@ SELECT * FROM my_table WHERE date = '2020-01-03';
 The [query_performance_insights.sql](query_performance_insights.sql) script creates a table named, `query_performance_insights` retrieves all queries that have had performance insights
 generated for them in the past 30 days.
 
-### Examples
+### Examples of querying script results
 
 * Top 100 queries with most # of performance insights
 

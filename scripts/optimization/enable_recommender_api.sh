@@ -14,18 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
-
-# Run the table_read_patterns.sql file first because it's a dependency for
-# some of the other scripts.
-bq query --use_legacy_sql=false --nouse_cache < table_read_patterns.sql
-
-# Run all the .sql files in the current directory
-for f in *.sql; do
-  if [ $f = "table_read_patterns.sql" ]; then
-    # Skip this file, it's already been run
-    continue
-  fi
-  bq query --use_legacy_sql=false --nouse_cache < $f
+# The following script retrieves all distinct projects from the JOBS_BY_ORGANIZATION view
+# and then enables the recommender API for each project.
+projects=$(
+  bq query \
+    --nouse_legacy_sql \
+    --format=csv \
+    "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" \
+    | sed 1d
+);
+for proj in $projects; do
+  gcloud services --project="${proj}" enable recommender.googleapis.com &
 done
