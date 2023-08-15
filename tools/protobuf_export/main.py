@@ -10,9 +10,12 @@ def main():
   query_job = client.query(query="""
                SELECT
 			concat(word , ":",corpus) as RowKey,
-			test.toProto(STRUCT(word, 
-				CAST(word_count AS BIGNUMERIC)),
-				"protopackage.TestMessage") AS ProtoResult
+			<dataset-id>.toMyProtoMessage(
+			    STRUCT(
+			      word, 
+			      CAST(word_count AS BIGNUMERIC)
+			    )
+			  ) AS ProtoResult 
 		FROM
 				  `bigquery-public-data.samples.shakespeare`
 		ORDER BY word_count DESC
