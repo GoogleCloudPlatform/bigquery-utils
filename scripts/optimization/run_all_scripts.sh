@@ -16,6 +16,11 @@
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
+# Set the following flags for the bq command:
+#   --quiet: suppress status updates while jobs are running
+#   --nouse_legacy_sql: use standard SQL syntax
+#   --nouse_cache: do not use cached results
+bq_flags="--quiet --nouse_legacy_sql --nouse_cache"
 
 # Run all the .sql files in the current directory in parallel,
 # except for table_read_patterns.sql
@@ -27,10 +32,10 @@ for f in *.sql; do
     # Skip this file, it's already been run
     continue
   fi
-  bq query --use_legacy_sql=false --nouse_cache < $f &
+  bq query ${bq_flags} < $f &
 done
 
 # Run the table_read_patterns.sql file first because it's a dependency for
 # freq_read_tables_without_partitioning_or_clustering.sql
-bq query --use_legacy_sql=false --nouse_cache <table_read_patterns.sql
-bq query --use_legacy_sql=false --nouse_cache <freq_read_tables_without_partitioning_or_clustering.sql &
+bq query ${bq_flags} <table_read_patterns.sql
+bq query ${bq_flags} <freq_read_tables_without_partitioning_or_clustering.sql &
