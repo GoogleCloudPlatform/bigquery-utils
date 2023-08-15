@@ -20,9 +20,9 @@ projects=$(
   bq query \
     --nouse_legacy_sql \
     --format=csv \
-    "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" \
-    | sed 1d
-);
+    "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" |
+    sed 1d
+)
 for proj in $projects; do
   gcloud services --project="${proj}" enable recommender.googleapis.com &
 done

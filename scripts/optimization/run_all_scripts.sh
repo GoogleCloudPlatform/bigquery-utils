@@ -17,15 +17,20 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Run the table_read_patterns.sql file first because it's a dependency for
-# some of the other scripts.
-bq query --use_legacy_sql=false --nouse_cache < table_read_patterns.sql
-
-# Run all the .sql files in the current directory
+# Run all the .sql files in the current directory in parallel,
+# except for table_read_patterns.sql
+# and freq_read_tables_without_partitioning_or_clustering.sql
+# since they'll be run sequentially due to the depedency between them.
 for f in *.sql; do
-  if [ $f = "table_read_patterns.sql" ]; then
+  if [[ $f = "table_read_patterns.sql" ||
+    $f = "freq_read_tables_without_partitioning_or_clustering.sql" ]]; then
     # Skip this file, it's already been run
     continue
   fi
-  bq query --use_legacy_sql=false --nouse_cache < $f
+  bq query --use_legacy_sql=false --nouse_cache < $f &
 done
+
+# Run the table_read_patterns.sql file first because it's a dependency for
+# freq_read_tables_without_partitioning_or_clustering.sql
+bq query --use_legacy_sql=false --nouse_cache <table_read_patterns.sql
+bq query --use_legacy_sql=false --nouse_cache <freq_read_tables_without_partitioning_or_clustering.sql &
