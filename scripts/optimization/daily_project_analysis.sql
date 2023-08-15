@@ -76,7 +76,7 @@ FROM(
       project_id,
       job_id,
       total_slot_ms,
-      TIMESTAMP_DIFF(jbo.end_time,jbo.creation_time, SECOND) AS time_secs,
+      TIMESTAMP_DIFF(jbo.end_time,jbo.start_time, SECOND) AS time_secs,
       total_bytes_billed total_bytes_scanned,
       (SELECT SUM(stage.shuffle_output_bytes) FROM UNNEST(job_stages) stage) AS bytes_shuffled,
       (SELECT SUM(stage.shuffle_output_bytes_spilled) FROM UNNEST(job_stages) stage) AS bytes_spilled

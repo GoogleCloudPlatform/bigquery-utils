@@ -40,10 +40,12 @@ WHERE
     SELECT 1
     FROM UNNEST(
       query_info.performance_insights.stage_performance_standalone_insights
-    ) AS perf_insight
+    )
+    WHERE slot_contention OR insufficient_shuffle_quota 
     UNION ALL
     SELECT 1
     FROM UNNEST(
       query_info.performance_insights.stage_performance_change_insights
-    ) AS perf_insight
+    )
+    WHERE input_data_change.records_read_diff_percentage IS NOT NULL
   );

@@ -26,10 +26,12 @@ DECLARE num_days_to_scan INT64 DEFAULT 30;
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.frequent_daily_table_dml AS
 SELECT
+  destination_table.project_id,
+  destination_table.dataset_id,
+  destination_table.table_id,
   EXTRACT(DATE FROM creation_time) AS dml_execution_date,
-  COUNT(1) AS daily_dml_per_table,
-  destination_table.project_id || '.' || destination_table.dataset_id || '.' || destination_table.table_id AS table_id,
   bqutil.fn.table_url(destination_table.project_id || '.' || destination_table.dataset_id || '.' || destination_table.table_id) AS table_url,
+  COUNT(1) AS daily_dml_per_table,
   ARRAY_AGG(job_id) AS job_ids,
   ARRAY_AGG(bqutil.fn.job_url(project_id || ':us.' || job_id) IGNORE NULLS) AS job_urls,
   ARRAY_AGG(DISTINCT statement_type) AS statement_types,
@@ -46,5 +48,5 @@ WHERE
   DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
   -- Only look at DML statements
   AND statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
-  GROUP BY dml_execution_date, table_id, table_url
+  GROUP BY 1,2,3,4,5
   HAVING daily_dml_per_table > 24;

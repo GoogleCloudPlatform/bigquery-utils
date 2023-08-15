@@ -29,26 +29,48 @@ CREATE TEMP FUNCTION total_shuffle_bytes_spilled(job_stages ANY TYPE) AS ((
   FROM UNNEST(job_stages) stage
 ));
 
-SELECT
-  parent.job_id,
-  parent.start_time,
-  ARRAY_AGG(STRUCT(
+CREATE SCHEMA IF NOT EXISTS optimization_workshop;
+CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_script AS
+SELECT * REPLACE((
+  SELECT
+    ARRAY_AGG(DISTINCT table.table_id)
+  FROM UNNEST(referenced_tables) table
+  ) AS referenced_tables)
+FROM(
+  SELECT
     bqutil.fn.job_url(
-      child.project_id || ':us.' || child.job_id)           AS job_url,
-    child.reservation_id                                    AS reservation_id,
-    EXTRACT(DATE FROM child.creation_time)                  AS creation_date,
-    SAFE_DIVIDE(TIMESTAMP_DIFF(
-      child.end_time, child.start_time, MILLISECOND), 1000) AS job_duration_seconds,
-    child.total_slot_ms                                     AS total_slot_ms,
-    SAFE_DIVIDE(child.total_slot_ms,TIMESTAMP_DIFF(
-      child.end_time, child.start_time, MILLISECOND))       AS job_avg_slots,
-    job_stage_max_slots(child.job_stages)                   AS job_stage_max_slots,
-    total_bytes_shuffled(child.job_stages)                  AS total_bytes_shuffled,
-    total_shuffle_bytes_spilled(child.job_stages)           AS total_shuffle_bytes_spilled
-  ) ORDER BY child.start_time )
-FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION AS parent
-JOIN `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION AS child
-ON parent.job_id = child.parent_job_id
-WHERE 
-  DATE(parent.creation_time) >= CURRENT_DATE - num_days_to_scan
-GROUP BY 1,2;
+        parent.project_id || ':us.' || parent.job_id)              AS job_url,
+    parent.user_email,
+    parent.start_time,
+    SUM(COALESCE(SAFE_DIVIDE(child.total_slot_ms, TIMESTAMP_DIFF(
+      child.end_time, child.start_time, MILLISECOND)), 0))         AS total_slots,
+    SUM(COALESCE(child.total_slot_ms, 0))                          AS total_slot_ms,
+    SUM(COALESCE(child.total_slot_ms / (1000 * 60 * 60), 0))       AS total_slot_hours,
+    SUM(COALESCE(child.total_bytes_processed, 0)) / POW(1024, 3)   AS total_gigabytes_processed,
+    SUM(COALESCE(child.total_bytes_processed, 0)) / POW(1024, 4)   AS total_terabytes_processed,
+    ARRAY_CONCAT_AGG(child.referenced_tables)                      AS referenced_tables,
+    ARRAY_AGG(STRUCT(
+      bqutil.fn.job_url(
+        child.project_id || ':us.' || child.job_id)                AS job_url,
+      child.reservation_id                                         AS reservation_id,
+      EXTRACT(DATE FROM child.creation_time)                       AS creation_date,
+      TIMESTAMP_DIFF(child.end_time, child.start_time, SECOND)     AS job_duration_seconds,
+      child.total_slot_ms                                          AS total_slot_ms,
+      SAFE_DIVIDE(child.total_slot_ms,TIMESTAMP_DIFF(
+        child.end_time, child.start_time, MILLISECOND))            AS job_avg_slots,
+      job_stage_max_slots(child.job_stages)                        AS job_stage_max_slots,
+      total_bytes_shuffled(child.job_stages)                       AS total_bytes_shuffled,
+      total_shuffle_bytes_spilled(child.job_stages)                AS total_shuffle_bytes_spilled) 
+      ORDER BY child.start_time
+    )                                                              AS children_jobs_details
+  FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION AS parent
+  JOIN `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION AS child
+  ON parent.job_id = child.parent_job_id
+  WHERE 
+    DATE(parent.creation_time) >= CURRENT_DATE - num_days_to_scan
+    AND parent.state = 'DONE'
+    AND parent.error_result IS NULL
+  GROUP BY job_url, user_email, start_time
+  HAVING 
+    ARRAY_LENGTH(children_jobs_details) > 1 
+    AND total_slot_ms > 0);

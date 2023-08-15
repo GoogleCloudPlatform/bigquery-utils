@@ -110,7 +110,7 @@ FROM (
         COUNT(*)                                                AS job_count,
         ARRAY_AGG(job_id ORDER BY total_slot_ms DESC LIMIT 10)  AS job_ids,
         SUM(total_slot_ms) / (1000 * 60 * 60)                   AS total_slot_hours_per_day,
-        SUM(total_bytes_processed) / (1024 * 1024 * 1024)       AS total_gigabytes_processed, 
+        SUM(total_bytes_processed) / POW(1024, 3)               AS total_gigabytes_processed, 
         AVG(job_duration_seconds)                               AS avg_job_duration_seconds,
         ARRAY_AGG(DISTINCT user_email)                          AS user_emails,
         STRING_AGG(DISTINCT labels_concat)                      AS labels_concat

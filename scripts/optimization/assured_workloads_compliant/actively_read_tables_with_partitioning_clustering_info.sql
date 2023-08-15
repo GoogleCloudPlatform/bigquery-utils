@@ -14,36 +14,25 @@
  * limitations under the License.
  */
 
-/*
- * This script creates a table named, tables_without_part_clust,
- * that contains a list of the largest tables which are:
- *     - not partitioned
- *     - not clustered
- *     - neither partitioned nor clustered
- */
 
 DECLARE projects ARRAY<STRING> DEFAULT (
-  SELECT 
-    ARRAY_AGG(project_id)
-  FROM(
-    SELECT project_id
-    FROM `region-us.INFORMATION_SCHEMA.TABLE_STORAGE_BY_ORGANIZATION`
-    WHERE NOT deleted 
-    GROUP BY 1
-    ORDER BY SUM(total_logical_bytes) DESC
-    LIMIT 100
-  )
+  SELECT ARRAY_AGG(DISTINCT project_id)
+  FROM optimization_workshop.table_read_patterns
 );
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.tables_without_part_clust
+CREATE OR REPLACE TABLE optimization_workshop.actively_read_tables_with_part_clust_info
 (
-  table_catalog STRING,
-  table_schema STRING,
-  table_name STRING,
-  table_url STRING,
+  project_id STRING,
+  dataset_id STRING,
+  table_id STRING,
+  total_slot_ms FLOAT64,
+  total_jobs INT64,
+  max_slot_ms_job_url STRING,
+  num_days_queried INT64,
   partitioning_column STRING,
   clustering_columns STRING,
+  table_url STRING,
   logical_gigabytes FlOAT64,
   logical_terabytes FLOAT64
 );
@@ -55,21 +44,33 @@ FOR p IN (
 )
 DO 
 BEGIN
-  EXECUTE IMMEDIATE FORMAT(
-  """  
-  INSERT INTO
-    optimization_workshop.tables_without_part_clust
+  EXECUTE IMMEDIATE FORMAT("""
+  INSERT INTO optimization_workshop.actively_read_tables_with_part_clust_info
   SELECT
-    s.table_catalog,
-    s.table_schema,
-    s.table_name,
-    bqutil.fn.table_url(s.table_catalog || '.' || s.table_schema || '.' || s.table_name) AS table_url,
+    rp.*,
     partitioning_column,
     clustering_columns,
+    bqutil.fn.table_url(rp.project_id || '.' || rp.dataset_id || '.' || rp.table_id) AS table_url,
     SUM(SAFE_DIVIDE(s.total_logical_bytes, POW(2,30))) AS logical_gigabytes,
     SUM(SAFE_DIVIDE(s.total_logical_bytes, POW(2,40))) AS logical_terabytes,
   FROM
     `region-us.INFORMATION_SCHEMA.TABLE_STORAGE_BY_ORGANIZATION` s
+  JOIN (
+    SELECT
+      project_id,
+      dataset_id,
+      table_id,
+      SUM(total_slot_ms) AS total_slot_ms,
+      COUNT(DISTINCT job_id) AS total_jobs,
+      ANY_VALUE(job_url HAVING MAX(total_slot_ms)) AS max_slot_ms_job_url,
+      COUNT(DISTINCT date) AS num_days_queried,
+    FROM optimization_workshop.table_read_patterns
+    GROUP BY
+      project_id,
+      dataset_id,
+      table_id
+    ) rp
+    ON (s.project_id = rp.project_id AND s.table_schema = rp.dataset_id AND s.table_name = rp.table_id)
   JOIN (
     SELECT
       table_catalog,
@@ -83,15 +84,18 @@ BEGIN
     FROM `%s.region-us.INFORMATION_SCHEMA.COLUMNS`
     GROUP BY 1,2,3
   ) c ON (s.project_id = c.table_catalog AND s.table_schema = c.table_schema AND s.table_name = c.table_name)
-  WHERE
-    clustering_columns IS NULL OR partitioning_column IS NULL
   GROUP BY
-    s.table_catalog,
-    s.table_schema,
-    s.table_name,
+    project_id,
+    dataset_id,
+    table_id,
     table_url,
+    total_slot_ms,
+    total_jobs,
+    max_slot_ms_job_url,
+    num_days_queried,
     partitioning_column,
-    clustering_columns;
+    clustering_columns,
+    total_slot_ms;
   """,
   p.project_id);
 EXCEPTION WHEN ERROR THEN SELECT @@error.message; --ignore errors

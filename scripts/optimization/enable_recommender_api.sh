@@ -16,6 +16,8 @@
 
 # The following script retrieves all distinct projects from the JOBS_BY_ORGANIZATION view
 # and then enables the recommender API for each project.
+# This is useful for when you have a large number of projects and you want to enable the
+# recommender API for all of them.
 projects=$(
   bq query \
     --nouse_legacy_sql \

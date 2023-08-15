@@ -20,17 +20,9 @@
  */
 
 DECLARE projects ARRAY<STRING> DEFAULT (
-  -- The default list of projects is the top 100 projects with the most bytes stored.
-  SELECT 
-    ARRAY_AGG(project_id)
-  FROM(
-    SELECT project_id
-    FROM `region-us.INFORMATION_SCHEMA.TABLE_STORAGE_BY_ORGANIZATION`
-    WHERE NOT deleted 
-    GROUP BY 1
-    ORDER BY SUM(total_logical_bytes) DESC
-    LIMIT 100
-  )
+  SELECT ARRAY_AGG(DISTINCT project_id)
+  FROM `region-us.INFORMATION_SCHEMA.TABLE_STORAGE_BY_ORGANIZATION`
+  WHERE NOT deleted
 );
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
@@ -46,11 +38,11 @@ CREATE TEMP FUNCTION extract_nonoptimal_join_conditions(view_definition STRING) 
   ARRAY_CONCAT(
     REGEXP_EXTRACT_ALL(
       REGEXP_REPLACE(UPPER(view_definition), r"\sON\s", "\nON "),
-      r"\nON\s+(?:CAST|TRIM|UPPER|LOWER)+.*?=.*"
+      r"\nON\s+[A-Z_]+?\([^=]*?=[^=]*"
     ),
     REGEXP_EXTRACT_ALL(
       REGEXP_REPLACE(UPPER(view_definition), r"\sON\s", "\nON "),
-      r"\nON\s+.*?=\s*(?:CAST|TRIM|UPPER|LOWER)+.*"
+      r"\nON\s+[^=]*?=\s*[A-Z_]+?\([^=]*"
 )));
 
 FOR p IN (

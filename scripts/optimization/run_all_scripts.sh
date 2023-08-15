@@ -24,11 +24,11 @@ bq_flags="--quiet --nouse_legacy_sql --nouse_cache"
 
 # Run all the .sql files in the current directory in parallel,
 # except for table_read_patterns.sql
-# and freq_read_tables_without_partitioning_or_clustering.sql
+# and actively_read_tables_with_partitioning_clustering_info.sql
 # since they'll be run sequentially due to the depedency between them.
 for f in *.sql; do
   if [[ $f = "table_read_patterns.sql" ||
-    $f = "freq_read_tables_without_partitioning_or_clustering.sql" ]]; then
+    $f = "actively_read_tables_with_partitioning_clustering_info.sql" ]]; then
     # Skip this file, it's already been run
     continue
   fi
@@ -36,6 +36,6 @@ for f in *.sql; do
 done
 
 # Run the table_read_patterns.sql file first because it's a dependency for
-# freq_read_tables_without_partitioning_or_clustering.sql
+# actively_read_tables_with_partitioning_clustering_info.sql
 bq query ${bq_flags} <table_read_patterns.sql
-bq query ${bq_flags} <freq_read_tables_without_partitioning_or_clustering.sql &
+bq query ${bq_flags} <actively_read_tables_with_partitioning_clustering_info.sql &
