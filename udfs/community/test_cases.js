@@ -1510,9 +1510,57 @@ generate_udf_test("cw_regexp_instr_3", [
         inputs: [
             `"TestStr123456"`,
             `"Str"`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `CAST(-1 AS INT64)`
+        ],
+        expected_output: `CAST(5 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
             `CAST(6 AS INT64)`
         ],
         expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"7"`,
+            `CAST(1 AS INT64)`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [
+            `NULL`,
+            `"Str"`,
+            `CAST(6 AS INT64)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `NULL`,
+            `CAST(6 AS INT64)`
+        ],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [
+            `"TestStr123456"`,
+            `"Str"`,
+            `NULL`
+        ],
+        expected_output: `NULL`
     },
 ]);
 generate_udf_test("cw_regexp_instr_4", [

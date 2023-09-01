@@ -16,8 +16,8 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, needle STRING, start INT64) RETURNS INT64 AS (
-  CASE WHEN REGEXP_CONTAINS(substr(haystack, start), needle) THEN
-    LENGTH(REGEXP_REPLACE(substr(haystack, start), CONCAT('(.*?)', needle, '(.*)'), '\\1')) + 1 + start
+  CASE WHEN REGEXP_CONTAINS(substr(haystack, GREATEST(start, 1)), needle) THEN
+    LENGTH(REGEXP_REPLACE(substr(haystack, GREATEST(start, 1)), CONCAT('(.*?)', needle, '(.*)'), '\\1')) + GREATEST(start, 1)
   WHEN needle IS NULL OR haystack IS NULL or start IS NULL THEN
     NULL
   ELSE 0
