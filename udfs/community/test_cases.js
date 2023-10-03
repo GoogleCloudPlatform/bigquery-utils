@@ -2458,6 +2458,91 @@ generate_udf_test("cw_strtok", [
                            STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])`
     },
 ]);
+generate_udf_test("cw_td_strtok", [
+    {
+        inputs: [
+          `"foo;bar;baz"`,
+          `";"`,
+          `1`,
+        ],
+        expected_output: `"foo"`
+    },
+    {
+        inputs: [
+          `"foo;bar;baz"`,
+          `";"`,
+          `3`,
+        ],
+        expected_output: `"baz"`
+    },
+    {
+        inputs: [
+          `";foo;bar;baz"`,
+          `";"`,
+          `1`,
+        ],
+        expected_output: `"foo"`
+    },
+    {
+        inputs: [
+          `";foo;;bar;baz"`,
+          `";"`,
+          `2`,
+        ],
+        expected_output: `"bar"`
+    },
+
+    {
+        inputs: [
+          `";foo;;"`,
+          `";"`,
+          `2`,
+        ],
+        expected_output: `null`
+    },
+    {
+        inputs: [
+          `";;;"`,
+          `";"`,
+          `1`
+        ],
+        expected_output: `""`
+    },
+    {
+        inputs: [
+          `";;;"`,
+          `";"`,
+          `2`
+        ],
+        expected_output: `null`
+    },
+    {
+        inputs: [
+          `"a-b;c"`,
+          `";-"`,
+          `3`
+        ],
+        expected_output: `"c"`
+    },
+    {
+        inputs: [
+          `"aa"`,
+          `";"`,
+          `1'`
+        ],
+        expected_output: `"aa"`
+    },
+    {
+        inputs: [
+          `"aa"`,
+          `";"`,
+          `2`
+        ],
+        expected_output: `null`
+    },
+]);
+
+
 generate_udf_test("cw_regexp_split", [
     {
         inputs: [
