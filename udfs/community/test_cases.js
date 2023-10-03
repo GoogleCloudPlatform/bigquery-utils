@@ -2528,7 +2528,7 @@ generate_udf_test("cw_td_strtok", [
         inputs: [
           `"aa"`,
           `";"`,
-          `1'`
+          `1`
         ],
         expected_output: `"aa"`
     },
