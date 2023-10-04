@@ -20,6 +20,10 @@ CREATE OR REPLACE FUNCTION ${self()}(input STRING, delim STRING, num INT64)
   AS '''
   var start = 0;
   var end = 0;
+  if (input === null || delim === null || num === null) {
+    return null;
+  }
+
   for (var i = 0; i < num; i++) {
     // strtok first removes all preceding delimiters
     for (start = end; start < input.length; start++) {
