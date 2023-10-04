@@ -2540,6 +2540,30 @@ generate_udf_test("cw_td_strtok", [
         ],
         expected_output: `null`
     },
+    {
+        inputs: [
+            `NULL`,
+            `";"`,
+            `1`,
+        ],
+        expected_output: `null`,
+    },
+    {
+        inputs: [
+            `"foo;bar;baz;"`,
+            `null`,
+            `1`
+        ],
+        expected_output: `null`,
+    },
+    {
+        inputs: [
+            `"foo:bar:baz;"`,
+            `";"`,
+            `null`
+        ],
+        expected_output: `null`,
+    },
 ]);
 
 
