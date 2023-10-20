@@ -20,7 +20,7 @@
 
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
-
+CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.table_read_patterns_by_query_hash
 CLUSTER BY project_id, dataset_id, table_id AS
 SELECT
