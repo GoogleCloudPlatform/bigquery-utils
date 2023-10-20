@@ -45,7 +45,7 @@ SELECT
       )
     ORDER BY avg_slot_hours * days_active * job_count DESC LIMIT 10
   ) AS top_10_slot_ms_patterns,
-  SUM(avg_slot_hours) AS total_avg_slot_hours_across_all_patterns
+  MAX(avg_slot_hours) AS max_avg_slot_hours_across_all_patterns
 FROM(
   SELECT
     referenced_table.project_id,
