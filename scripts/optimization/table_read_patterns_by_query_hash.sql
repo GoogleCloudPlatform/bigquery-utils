@@ -31,8 +31,7 @@ SELECT
   ARRAY_AGG(
     STRUCT(
       query_pattern,
-      top_10_jobs[0].job_url AS job_url,
-      top_10_jobs[0].parent_job_url AS parent_job_url,
+      top_10_slot_ms_jobs, 
       avg_slot_hours,
       days_active,
       job_count,
@@ -44,8 +43,8 @@ SELECT
       total_slots,
       avg_total_slots
       )
-    ORDER BY avg_slot_hours * days_active * job_count DESC
-  ) AS top_slot_ms_jobs,
+    ORDER BY avg_slot_hours * days_active * job_count DESC LIMIT 10
+  ) AS top_10_slot_ms_patterns,
   SUM(avg_slot_hours) AS total_avg_slot_hours_across_all_patterns
 FROM(
   SELECT
@@ -54,11 +53,11 @@ FROM(
     referenced_table.table_id,
     query_info.query_hashes.normalized_literals                              AS query_pattern,
     ARRAY_AGG(STRUCT(
-      bqutil.fn.job_url(jbo.project_id || ':us.' || job_id) AS job_url,
+      bqutil.fn.job_url(jbo.project_id || ':us.' || job_id) AS job_url, 
       bqutil.fn.job_url(jbo.project_id || ':us.' || parent_job_id) AS parent_job_url
       )
       ORDER BY total_slot_ms DESC LIMIT 10
-    )                                                                        AS top_10_jobs,
+    )                                                                        AS top_10_slot_ms_jobs,
     COUNT(DISTINCT DATE(start_time))                                         AS days_active,
     ARRAY_AGG(DISTINCT jbo.project_id IGNORE NULLS)                          AS project_ids,
     ARRAY_AGG(DISTINCT reservation_id IGNORE NULLS)                          AS reservation_ids,
