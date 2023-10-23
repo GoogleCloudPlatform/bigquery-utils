@@ -14,6 +14,7 @@ SELECT bqutil.sf.factorial(0)
 ## UDFs
 
 * [factorial](#factorial)
+* [flatten](#flatten)
 
 
 ## Documentation
@@ -25,3 +26,17 @@ SELECT bqutil.sf.factorial(10)
 
 3628800
 ```
+
+### [flatten(input JSON, path STRING, outer_ BOOL, recursive_ BOOL, mode STRING)](flatten.sqlx)
+Emulates the 'flatten' function present in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/flatten)
+```sql
+SELECT bqutil.sf.flatten(json_object('a', 1 , 'b', json_array(77, 88), 'c', json_object('d', 'X')), '', false, true, 'both');
+```
+SEQ|KEY|PATH|INDEX|VALUE|THIS
+---|---|----|-----|-----|----
+1|a|a|null|1|{"a":1,"b":[77,88],"c":{"d":"X"}}
+2|b|b|null|[77,88]|{"a":1,"b":[77,88],"c":{"d":"X"}}
+1|null|b[0]|0|77|[77,88]
+2|null|b[1]|1|88|[77,88]
+3|c|c|null|{"d":"X"}|{"a":1,"b":[77,88],"c":{"d":"X"}}
+1|d|c.d|null|"X"|{"d":"X"}
