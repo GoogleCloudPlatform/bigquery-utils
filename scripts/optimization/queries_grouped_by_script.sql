@@ -33,7 +33,7 @@ CREATE SCHEMA IF NOT EXISTS optimization_workshop;
 CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_script AS
 SELECT * REPLACE((
   SELECT
-    ARRAY_AGG(DISTINCT table.table_id)
+    ARRAY_AGG(DISTINCT table.project_id || "." || table.dataset_id || "." || table.table_id)
   FROM UNNEST(referenced_tables) table
   ) AS referenced_tables)
 FROM(
