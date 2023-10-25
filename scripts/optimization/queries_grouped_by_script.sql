@@ -42,6 +42,7 @@ FROM(
         parent.project_id || ':us.' || parent.job_id)              AS job_url,
     parent.user_email,
     parent.start_time,
+    ANY_VALUE(parent.labels) AS labels,
     SUM(COALESCE(SAFE_DIVIDE(child.total_slot_ms, TIMESTAMP_DIFF(
       child.end_time, child.start_time, MILLISECOND)), 0))         AS total_slots,
     SUM(COALESCE(child.total_slot_ms, 0))                          AS total_slot_ms,
