@@ -1,0 +1,212 @@
+config { hasOutput: true }
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Takes string representation of number, parses it according to Teradata rules and returns a "normalized" string, that is parseable by BigQuery.
+ */
+CREATE OR REPLACE FUNCTION ${self()}(str STRING)
+  RETURNS STRING
+  LANGUAGE js
+  OPTIONS (
+    description="Takes string representation of number, parses it according to Teradata rules and returns a normalized string, that is parseable by BigQuery."
+  )
+  AS r"""
+  if (str === null) {
+    return null;
+  }
+  let parts = {
+    integral: '', fractional: '', exponent: '',
+  };
+  let digits = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
+  let separators = new Set(['%', ',', '/', ':']);
+  let decimalSeen = false;
+  let digitSeen = false;
+  let exponentPos = undefined;
+  let dashCount = 0;
+  let sign = '';
+  let exponentSign = '';
+
+  let strEnd = str.length - 1;
+  // Remove trailing spaces.
+  while (strEnd >= 0 && str.charAt(strEnd) === ' ') {
+    strEnd--;
+  }
+  if (strEnd >= 0 && str.charAt(strEnd) === 'e' || str.charAt(strEnd) === 'E') {
+    if (strEnd < str.length - 1) {
+      // Keep one space after E.
+      strEnd++;
+    } else {
+      // Illegal: E has to be followed by a sign, digit or a single space.
+      return 'ILLEGAL_NUMBER(' + str + ')';
+    }
+  }
+
+  // Look for the last digit.
+  let lastDigitPos = undefined;
+  for (let i = strEnd; i >= 0; i--) {
+    let current = str.charAt(i);
+    if (digits.has(current)) {
+      lastDigitPos = i;
+      break;
+    }
+  }
+
+  let part = 'integral';
+  for (let i = 0; i <= strEnd; i++) {
+    let current = str.charAt(i);
+
+    if (separators.has(current)) {
+      if (i === exponentPos + 1) {
+        // Illegal: separator cannot directly follow E.
+        return 'ILLEGAL_NUMBER(' + str + ')';
+      }
+      continue;
+    }
+
+    if (digits.has(current)) {
+      digitSeen = true;
+      parts[part] += current;
+      continue;
+    }
+
+    if (current === ' ') {
+      if ((digitSeen || decimalSeen || exponentPos >= 0)
+        && i !== exponentPos + 1) {
+        // Illegal: space is not legal in this context.
+        return 'ILLEGAL_NUMBER(' + str + ')';
+      }
+      continue;
+    }
+
+    if (current === '.') {
+      if (decimalSeen) {
+        // Illegal: multiple decimal separators.
+        return 'ILLEGAL_NUMBER(' + str + ')';
+      }
+      if (part === 'exponent') {
+        // Illegal: decimal separator in exponent.
+        return 'ILLEGAL_NUMBER(' + str + ')';
+      }
+      decimalSeen = true;
+      part = 'fractional';
+      continue;
+    }
+
+    if (current === 'e' || current === 'E') {
+      if (exponentPos >= 0) {
+        // Illegal: multiple exponents.
+        return 'ILLEGAL_NUMBER(' + str + ')';
+      }
+      part = 'exponent';
+      exponentPos = i;
+      continue;
+    }
+
+    if (current === '-' || current === '+') {
+      if (!digitSeen && !decimalSeen && !(exponentPos >= 0)) {
+        if (sign) {
+          // Illegal: multiple signs.
+          return 'ILLEGAL_NUMBER(' + str + ')';
+        } else {
+          sign = current;
+        }
+        continue;
+      }
+      if (exponentPos >= 0 && (!parts.exponent || i > lastDigitPos)) {
+        if (exponentSign) {
+          // Multiple exponent signs not allowed.
+          return 'ILLEGAL_NUMBER(' + str + ')';
+        }
+        exponentSign = current;
+        continue;
+      }
+      if (i > lastDigitPos) {
+        if (part === 'fractional' && (i < str.length - 1)) {
+          // It's illegal to have anything after a trailing sign after decimal.
+          return 'ILLEGAL_NUMBER(' + str + ')';
+        }
+        if (sign) {
+          return 'ILLEGAL_NUMBER(' + str + ')';
+        }
+        sign = current;
+        continue;
+      }
+      if (part === 'integral' && current === '-') {
+        if (sign) {
+          // Illegal: cannot use dash separators if sign is present.
+          return 'ILLEGAL_NUMBER(' + str + ')';
+        } else {
+          dashCount++;
+          continue;
+        }
+      }
+      // Illegal: sign not allowed in this context.
+      return 'ILLEGAL_NUMBER(' + str + ')';
+    }
+
+    // Illegal
+    return 'ILLEGAL_NUMBER(' + str + ')';
+  }
+
+  if (dashCount > 0 && (sign || exponentPos >= 0)) {
+    // Illegal: cannot use dash separators if sign or exponent is present.
+    return 'ILLEGAL_NUMBER(' + str + ')';
+  }
+
+  // Shift decimal separator according to exponent.
+  let exponentShift = parseInt(
+      exponentSign + (parts.exponent ? parts.exponent : '0'));
+  let decimalPos = parts.integral.length + exponentShift;
+  let result = parts.integral + parts.fractional;
+  if (decimalPos <= 0) {
+    result = '0.' + '0'.repeat(-decimalPos) + result;
+  } else if (decimalPos >= result.length) {
+    result = result + '0'.repeat(decimalPos - result.length);
+  } else {
+    result = result.substring(0, decimalPos) + '.' + result.substring(
+        decimalPos);
+  }
+
+  // Trim leading zeros in integral part and trailing zeros in fractional.
+  if (decimalPos <= 0) {
+    decimalPos = 1;
+  }
+  let start = 0, end = result.length - 1;
+  while (start < decimalPos - 1 && result.charAt(start) === '0') {
+    start++;
+  }
+  while (end > decimalPos && result.charAt(end) === '0') {
+    end--;
+  }
+
+  // Do not display trailing decimal separator.
+  if (end === decimalPos) {
+    end--;
+  }
+  result = result.substring(start, end + 1);
+
+  // Do not display sign if result is zero.
+  if (result === '0') {
+    return '0';
+  }
+
+  // Do not display '+' sign.
+  if (sign === '-') {
+    result = '-' + result;
+  }
+  return result;
+""";

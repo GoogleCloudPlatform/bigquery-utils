@@ -2174,6 +2174,324 @@ generate_udf_test("cw_substring_index", [
         expected_output: `"TestStr123456"`
     },
 ]);
+generate_udf_test("cw_td_normalize_number", [
+    {
+        inputs: [`"3-7-1"`],
+        expected_output: `"371"`
+    },
+    {
+        inputs: [`"2023-06"`],
+        expected_output: `"202306"`
+    },
+    {
+        inputs: [`",,,3,,,7,,,1,,"`],
+        expected_output: `"371"`
+    },
+    {
+        inputs: [`":3//7/%/-/:/:/-/%1%/"`],
+        expected_output: `"371"`
+    },
+    {
+        inputs: [`":3//7/%//:/://%1%/-  "`],
+        expected_output: `"-371"`
+    },
+    {
+        inputs: [`"-    371"`],
+        expected_output: `"-371"`
+    },
+    {
+        inputs: [`"/- %: 371"`],
+        expected_output: `"-371"`
+    },
+    {
+        inputs: [`"1/2/3/%.%/:7/8"`],
+        expected_output: `"123.78"`
+    },
+    {
+        inputs: [`" / %: 371/: "`],
+        expected_output: `"371"`
+    },
+    {
+        inputs: [`"123E-%1"`],
+        expected_output: `"12.3"`
+    },
+    {
+        inputs: [`"123E %-1"`],
+        expected_output: `"12.3"`
+    },
+    {
+        inputs: [`"123E2-"`],
+        expected_output: `"1.23"`
+    },
+    {
+        inputs: [`"-123E2-"`],
+        expected_output: `"-1.23"`
+    },
+    {
+        inputs: [`"123.7/8/9"`],
+        expected_output: `"123.789"`
+    },
+    {
+        inputs: [`"123/-  "`],
+        expected_output: `"-123"`
+    },
+    {
+        inputs: [`"123-/  "`],
+        expected_output: `"-123"`
+    },
+    {
+        inputs: [`"."`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`""`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`NULL`],
+        expected_output: `NULL`
+    },
+    {
+        inputs: [`"-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"-   "`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`" /+/./  "`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`".4-"`],
+        expected_output: `"-0.4"`
+    },
+    {
+        inputs: [`"E4-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`".E4-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"3.E4-"`],
+        expected_output: `"0.0003"`
+    },
+    {
+        inputs: [`"-23.17e 002+"`],
+        expected_output: `"-2317"`
+    },
+    {
+        inputs: [`"e+"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"e "`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"e +"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"3e -"`],
+        expected_output: `"3"`
+    },
+    {
+        inputs: [`"3-e -"`],
+        expected_output: `"-3"`
+    },
+    {
+        inputs: [`"3-.e -"`],
+        expected_output: `"-3"`
+    },
+    {
+        inputs: [`"3-.e %:/-"`],
+        expected_output: `"-3"`
+    },
+    {
+        inputs: [`"3e -0"`],
+        expected_output: `"3"`
+    },
+    {
+        inputs: [`"3e 0-"`],
+        expected_output: `"3"`
+    },
+    {
+        inputs: [`"e        "`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"e /:%    "`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"-e+"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"11-."`],
+        expected_output: `"-11"`
+    },
+    {
+        inputs: [`"11.-"`],
+        expected_output: `"-11"`
+    },
+    {
+        inputs: [`"11.+"`],
+        expected_output: `"11"`
+    },
+    {
+        inputs: [`"11-.37"`],
+        expected_output: `"11.37"`
+    },
+    {
+        inputs: [`"11-.0"`],
+        expected_output: `"11"`
+    },
+    {
+        inputs: [`"11.0-"`],
+        expected_output: `"-11"`
+    },
+    {
+        inputs: [`"-."`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"0.-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"000.-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`".0-"`],
+        expected_output: `"0"`
+    },
+    {
+        inputs: [`"23.e-"`],
+        expected_output: `"23"`
+    },
+    {
+        inputs: [`"23-.e-"`],
+        expected_output: `"-23"`
+    },
+    {
+        inputs: [`"1-2-3.45"`],
+        expected_output: `"123.45"`
+    },
+    {
+        inputs: [`"3-7-1+"`],
+        expected_output: `"ILLEGAL_NUMBER(3-7-1+)"`
+    },
+    {
+        inputs: [`"1/23E/10"`],
+        expected_output: `"ILLEGAL_NUMBER(1/23E/10)"`
+    },
+    {
+        inputs: [`"123.7-8-9"`],
+        expected_output: `"ILLEGAL_NUMBER(123.7-8-9)"`
+    },
+    {
+        inputs: [`"1-23E2"`],
+        expected_output: `"ILLEGAL_NUMBER(1-23E2)"`
+    },
+    {
+        inputs: [`"123E%-1"`],
+        expected_output: `"ILLEGAL_NUMBER(123E%-1)"`
+    },
+    {
+        inputs: [`"123- / "`],
+        expected_output: `"ILLEGAL_NUMBER(123- / )"`
+    },
+    {
+        inputs: [`"0xFF"`],
+        expected_output: `"ILLEGAL_NUMBER(0xFF)"`
+    },
+    {
+        inputs: [`"Hello World"`],
+        expected_output: `"ILLEGAL_NUMBER(Hello World)"`
+    },
+    {
+        inputs: [`"e"`],
+        expected_output: `"ILLEGAL_NUMBER(e)"`
+    },
+    {
+        inputs: [`"e  :%    "`],
+        expected_output: `"ILLEGAL_NUMBER(e  :%    )"`
+    },
+    {
+        inputs: [`"e ++"`],
+        expected_output: `"ILLEGAL_NUMBER(e ++)"`
+    },
+    {
+        inputs: [`"11--."`],
+        expected_output: `"ILLEGAL_NUMBER(11--.)"`
+    },
+    {
+        inputs: [`"3-.E4-"`],
+        expected_output: `"ILLEGAL_NUMBER(3-.E4-)"`
+    },
+    {
+        inputs: [`"3-.e0-"`],
+        expected_output: `"ILLEGAL_NUMBER(3-.e0-)"`
+    },
+    {
+        inputs: [`"11-.-"`],
+        expected_output: `"ILLEGAL_NUMBER(11-.-)"`
+    },
+    {
+        inputs: [`".+"`],
+        expected_output: `"ILLEGAL_NUMBER(.+)"`
+    },
+    {
+        inputs: [`".-"`],
+        expected_output: `"ILLEGAL_NUMBER(.-)"`
+    },
+    {
+        inputs: [`"23.-e-"`],
+        expected_output: `"ILLEGAL_NUMBER(23.-e-)"`
+    },
+    {
+        inputs: [`"3.0-e -"`],
+        expected_output: `"ILLEGAL_NUMBER(3.0-e -)"`
+    },
+    {
+        inputs: [`"23.-e -"`],
+        expected_output: `"ILLEGAL_NUMBER(23.-e -)"`
+    },
+    {
+        inputs: [`"2-3.e "`],
+        expected_output: `"ILLEGAL_NUMBER(2-3.e )"`
+    },
+    {
+        inputs: [`"1-2-3e2"`],
+        expected_output: `"ILLEGAL_NUMBER(1-2-3e2)"`
+    },
+    {
+        inputs: [`"1-2-3e "`],
+        expected_output: `"ILLEGAL_NUMBER(1-2-3e )"`
+    },
+    {
+        inputs: [`"23-e :::  -"`],
+        expected_output: `"ILLEGAL_NUMBER(23-e :::  -)"`
+    },
+    {
+        inputs: [`"11.3+,"`],
+        expected_output: `"ILLEGAL_NUMBER(11.3+,)"`
+    },
+    {
+        inputs: [`"11.3+  "`],
+        expected_output: `"ILLEGAL_NUMBER(11.3+  )"`
+    },
+    {
+        inputs: [`"11.3-e3"`],
+        expected_output: `"ILLEGAL_NUMBER(11.3-e3)"`
+    },
+]);
 generate_udf_test("cw_editdistance", [
     {
         inputs: [
