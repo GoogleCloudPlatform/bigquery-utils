@@ -55,7 +55,7 @@ SELECT
       bqutil.fn.job_url(project_id || ':us.' || parent_job_id) AS parent_job_url,
       bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url
     )
-    ORDER BY total_slot_ms * num_stages_with_perf_insights(query_info)
+    ORDER BY total_slot_ms
     DESC LIMIT 10)                                                         AS top_10_job_urls,
   ARRAY_AGG(DISTINCT user_email)                                           AS user_emails,
   SUM(total_bytes_processed) / POW(1024, 3)                                AS total_gigabytes_processed,
