@@ -324,7 +324,7 @@ SELECT * FROM my_table WHERE date = '2020-01-03';
 
 ### Examples of querying script results
 
-* Top 100 tables with the highest bytes processed
+* Top 100 queries with the highest bytes processed
 
   ```sql
   SELECT *
@@ -333,12 +333,12 @@ SELECT * FROM my_table WHERE date = '2020-01-03';
   LIMIT 100
   ```
 
-* Top 100 tables with the highest slot hours consumed
+* Top 100 recurring queries with the highest slot hours consumed
 
   ```sql
   SELECT *
   FROM optimization_workshop.queries_grouped_by_hash
-  ORDER BY total_slot_hours DESC 
+  ORDER BY total_slot_hours * days_active * job_count DESC 
   LIMIT 100
   ```
 
