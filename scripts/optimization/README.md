@@ -393,6 +393,17 @@ want to see which particular scripts are most inefficient.
 
 </details>
 
+<details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
+
+## Hourly slot consumption by query hash
+
+The [hourly_slot_consumption_by_query_hash](hourly_slot_consumption_by_query_hash.sql) script
+creates a table named,
+`hourly_slot_consumption_by_query_hash`. This table groups queries by their query hash and then shows 
+for every hour timeslice how much of that hour's slots each query hash consumed.
+
+</details>
+
 <details><summary><b>&#128269; Queries with performance insights</b></summary>
 
 ## Queries with performance insights
