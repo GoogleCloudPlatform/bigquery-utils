@@ -1,0 +1,443 @@
+# Optimization Scripts
+
+This folder contains scripts that (when executed) create a dataset
+named, `optimization_workshop`, with several tables inside the dataset. \
+These tables are populated with information to help you optimize your BigQuery
+tables, views, and queries.
+
+Run all the scripts within this folder using the following commands:
+
+```bash
+gcloud auth login &&
+bash run_all_scripts.sh
+```
+
+The scripts are described in more detail in the following sections.
+
+---
+
+# Project Analysis
+
+Project level analysis enables us to understand key metrics such as slot_time,
+bytes_scanned, bytes_shuffled and bytes_spilled on a daily basis within a
+project. The metrics are examined as averages, medians and p80s. This enables us
+to understand at a high level what jobs within a project consume 80% of the time
+and 50% of the time daily.
+
+<details><summary><b>&#128269; Daily project metrics</b></summary>
+
+## Daily project metrics
+
+The [daily_project_analysis.sql](daily_project_analysis.sql) script creates a
+table called,
+`daily_project_analysis` of daily slot consumption metrics (for a 30day period)
+for all your projects.
+
+### Examples of querying script results
+
+* Top 100 tables with the highest slot consumption
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.daily_project_analysis
+    ORDER BY total_slot_ms DESC
+    LIMIT 100
+    ```
+
+</details>
+
+# Table Analysis
+
+<details><summary><b>&#128269; BigQuery Clustering/Partitioning Recommender Tool</b></summary>
+
+## BigQuery Clustering/Partitioning Recommender Tool
+
+The BigQuery partitioning and clustering recommender analyzes workflows on your
+BigQuery tables and offers recommendations to better optimize your workflows and
+query costs using either table partitioning or table clustering. The recommender
+uses your BigQuery's workload execution data from the past 30 days to analyze
+each BigQuery table for suboptimal partitioning and clustering configurations.
+
+> [!IMPORTANT]
+> Before you can view partition and cluster recommendations, you
+> need to [enable the Recommender API](https://cloud.google.com/recommender/docs/enabling)
+> as shown in the following sections.
+
+### Enable using gcloud
+
+```bash
+# The following script retrieves all distinct projects from the JOBS_BY_ORGANIZATION view
+# and then enables the recommender API for each project.
+projects=$(
+  bq query \
+    --nouse_legacy_sql \
+    --format=csv \
+    "SELECT DISTINCT project_id FROM \`region-us\`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION" \
+    | sed 1d
+);
+for proj in $projects; do
+  gcloud services --project="${proj}" enable recommender.googleapis.com &
+done
+```
+
+### Enable using Terraform
+
+```hcl
+resource "google_project_service" "recommender_service" {
+  project = "your-project"
+  service = "recommender.googleapis.com"
+}
+```
+
+### View your partition and cluster recommendations
+
+Once you've enabled the Recommender API,
+you can [view your partition and cluster recommendations](https://cloud.google.com/bigquery/docs/view-partition-cluster-recommendations#view_recommendations)
+in the Cloud Console or via the gcloud command-line tool.
+
+> [!NOTE]
+> The most scalable method for viewing your partition and cluster
+> recommendations is to export your recommendations to BigQuery. 
+> You can do this by creating a Data Transfer Service (DTS) job to export your
+> recommendations to BigQuery.
+> See [Exporting recommendations to BigQuery](https://cloud.google.com/recommender/docs/bq-export/export-recommendations-to-bq#create_a_data_transfer_for_recommendations)
+> for more information.
+
+Once you set up the DTS job to export your recommendations to BigQuery, you can 
+run the following query to get the most recent recommendations for partitioning
+and clustering your tables.
+
+```sql
+CREATE TEMP FUNCTION extract_table(target_resources ARRAY<STRING>) AS((
+  SELECT ARRAY_AGG(
+    REGEXP_REPLACE(REGEXP_EXTRACT(target_resource, r'\/projects\/(.*?\/datasets\/.*?\/tables\/.*)'), "(/datasets/|/tables/)", ".")
+  ) 
+  FROM UNNEST(target_resources) target_resource)[OFFSET(0)]
+);
+SELECT
+  MAX(last_refresh_time) AS latest_recommendation_time,
+  recommender_subtype AS recommendation,
+  MAX_BY(JSON_VALUE_ARRAY(COALESCE(
+    PARSE_JSON(recommendation_details).overview.partitionColumns,
+    PARSE_JSON(recommendation_details).overview.clusterColumns)),
+  last_refresh_time) AS columns_to_cluster_or_partition,
+  extract_table(target_resources) AS table,
+  bqutil.fn.table_url(extract_table(target_resources)) AS table_url,
+  JSON_VALUE(PARSE_JSON(recommendation_details).overview.partitionTimeUnit) AS partition_time_unit,
+-- Replace the table below with your own table that you created when you 
+-- set up the DTS job to export your recommendations to BigQuery.
+FROM YOUR_PROJECT.YOUR_DATASET.recommendations_export
+WHERE recommender = "google.bigquery.table.PartitionClusterRecommender"
+GROUP BY recommendation, table, partition_time_unit, table_url
+```
+
+</details>
+
+<details><summary><b>&#128269; Tables with query read patterns</b></summary>
+
+## Tables with query read patterns
+
+The [table_read_patterns.sql](table_read_patterns.sql) script creates a table
+named, `table_read_patterns`, that contains usage data to help you determine:
+
+* Which tables (when queried) are resulting in high slot consumption.
+* Which tables are most frequently queried.
+
+### Examples of querying script results
+
+* Tables grouped by similar filter predicates
+
+    ```sql
+    SELECT
+      table_id,
+      bqutil.fn.table_url(table_id) AS table_url,
+      (SELECT STRING_AGG(column ORDER BY COLUMN) FROM UNNEST(predicates)) column_list,
+      (SELECT STRING_AGG(operator ORDER BY COLUMN) FROM UNNEST(predicates)) operator_list,
+      (SELECT STRING_AGG(value ORDER BY COLUMN) FROM UNNEST(predicates)) value_list,
+      SUM(stage_slot_ms) AS total_slot_ms,
+      COUNT(DISTINCT DATE(creation_time)) as num_days_queried,
+      COUNT(*) AS num_occurrences,
+      COUNT(DISTINCT job_id) as job_count,
+      ARRAY_AGG(CONCAT(project_id,':us.',job_id) ORDER BY total_slot_ms LIMIT 10) AS job_id_array,
+      ARRAY_AGG(bqutil.fn.job_url(project_id || ':us.' || job_id)) AS job_url_array,
+    FROM optimization_workshop.table_read_patterns
+    GROUP BY 1,2,3,4,5;
+    ```
+
+* Top 100 tables with the highest slot consumption
+
+    ```sql  
+    SELECT
+      table_id,
+      bqutil.fn.table_url(table_id) AS table_url,
+      SUM(stage_slot_ms) AS total_slot_ms,
+      COUNT(DISTINCT DATE(creation_time)) as num_days_queried,
+      COUNT(*) AS num_occurrences,
+      COUNT(DISTINCT job_id) as job_count,
+    FROM optimization_workshop.table_read_patterns
+    GROUP BY 1,2
+    ORDER BY total_slot_ms DESC
+    LIMIT 100
+    ```
+
+* Top 100 most frequently queried tables
+
+    ```sql
+    SELECT
+      table_id,
+      bqutil.fn.table_url(table_id) AS table_url,
+      SUM(stage_slot_ms) AS total_slot_ms,
+      COUNT(DISTINCT DATE(creation_time)) as num_days_queried,
+      COUNT(*) AS num_occurrences,
+      COUNT(DISTINCT job_id) as job_count,
+    FROM optimization_workshop.table_read_patterns
+    GROUP BY 1,2
+    ORDER BY num_occurrences DESC
+    LIMIT 100
+    ```
+
+</details>
+
+<details><summary><b>&#128269; Tables without partitioning or clustering</b></summary>
+
+## Tables without partitioning or clustering
+
+The [tables_without_partitioning_or_clustering.sql](tables_without_partitioning_or_clustering.sql)
+script creates a table named, `tables_without_part_clust`,
+that contains a list of tables which meet any of the following conditions:
+
+- not partitioned
+- not clustered
+- neither partitioned nor clustered
+
+### Examples of querying script results
+
+* Top 100 largest tables without partitioning or clustering
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.tables_without_part_clust
+    ORDER BY logical_gigabytes DESC
+    LIMIT 100
+    ```
+
+</details>
+
+<details><summary><b>&#128269; Actively read tables with partitioning and clustering information</b></summary>
+
+## Actively read tables with partitioning and clustering information
+
+> [!IMPORTANT]
+> The [actively_read_tables_with_partitioning_clustering_info.sql](optimization/actively_read_tables_with_partitioning_clustering_info.sql) 
+> script depends on the `table_read_patterns` table so you must first run the
+> [table_read_patterns.sql](optimization/table_read_patterns.sql) script.
+
+The [actively_read_tables_with_partitioning_clustering_info.sql](actively_read_tables_with_partitioning_clustering_info.sql)
+script creates a table named, `actively_read_tables_with_part_clust_info`
+that contains a list of actively read tables along with their partitioning and
+clustering information.
+
+### Examples of querying script results
+
+* Top 100 largest **actively read** tables without partitioning or clustering
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.actively_read_tables_with_part_clust_info
+    WHERE clustering_columns IS NULL OR partitioning_column IS NULL
+    ORDER BY logical_gigabytes DESC
+    LIMIT 100
+    ```
+
+</details>
+
+<details><summary><b>&#128269; Tables receiving high quantity of daily DML statements</b></summary>
+
+## Tables receiving high quantity of daily DML statements
+
+The [frequent_daily_table_dml.sql](frequent_daily_table_dml.sql) script creates
+a table named, `frequent_daily_table_dml`, that contains tables that have had
+more than 24 daily DML statements run against them in the past 30 days.
+
+### Examples of querying script results
+
+* Top 100 tables with the most DML statements per table in a day
+
+  ```sql
+  SELECT
+    table_id,
+    table_url,
+    ANY_VALUE(dml_execution_date HAVING MAX daily_dml_per_table) AS sample_dml_execution_date,
+    ANY_VALUE(job_urls[OFFSET(0)] HAVING MAX daily_dml_per_table) AS sample_dml_job_url,
+    MAX(daily_dml_per_table) max_daily_table_dml,
+  FROM optimization_workshop.frequent_daily_table_dml
+  GROUP BY table_id, table_url
+  ORDER BY max_daily_table_dml DESC
+  LIMIT 100;
+  ```
+
+</details>
+
+<details><summary><b>&#128269; Views with non-optimal JOIN conditions</b></summary>
+
+## Views with non-optimal JOIN conditions
+
+The [views_with_nonoptimal_join_condition.sql](views_with_nonoptimal_join_condition.sql)
+script creates a table named, `views_with_nonoptimal_join_condition`, that
+contains views with JOINs where the JOIN condition is potentially non-optimal.
+
+</details>
+
+# Query Analysis
+
+<details><summary><b>&#128269; Queries grouped by hash</b></summary>
+
+## Queries grouped by hash
+
+The [queries_grouped_by_hash.sql](queries_grouped_by_hash.sql) script creates a
+table named,
+`queries_grouped_by_hash`. This table groups queries by their normalized query
+pattern, which ignores
+comments, parameter values, UDFs, and literals in the query text.
+This allows us to group queries that are logically the same, but
+have different literals. The `queries_grouped_by_hash` table does not expose the
+raw SQL text of the queries.
+
+The [viewable_queries_grouped_by_hash.sql](viewable_queries_grouped_by_hash.sql)
+script creates a table named,
+`viewable_queries_grouped_by_hash`. This table is similar to
+the `queries_grouped_by_hash` table, but it
+exposes the raw SQL text of the queries.
+The `viewable_queries_grouped_by_hash.sql` script runs much slower
+in execution than the `queries_grouped_by_hash.sql` script because it has to
+loop over all projects and for each
+project query the `INFORMATION_SCHEMA.JOBS_BY_PROJECT` view.
+
+For example, the following queries would be grouped together because the date
+literal filters are ignored:
+
+```sql
+SELECT * FROM my_table WHERE date = '2020-01-01';
+SELECT * FROM my_table WHERE date = '2020-01-02';
+SELECT * FROM my_table WHERE date = '2020-01-03';
+```
+
+### Examples of querying script results
+
+* Top 100 queries with the highest bytes processed
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_hash
+  ORDER BY total_gigabytes_processed DESC
+  LIMIT 100
+  ```
+
+* Top 100 recurring queries with the highest slot hours consumed
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_hash
+  ORDER BY total_slot_hours * days_active * job_count DESC 
+  LIMIT 100
+  ```
+
+</details>
+
+<details><summary><b>&#128269; Queries grouped by script</b></summary>
+
+## Queries grouped by script
+
+The [queries_grouped_by_script.sql](queries_grouped_by_script.sql) script
+creates a table named,
+`queries_grouped_by_script`. This table groups queries by their parent job id
+which means that any queries that
+were executed as part of a script (multi-statement query) will be grouped
+together. This table is helpful if you
+want to see which particular scripts are most inefficient.
+
+### Examples of querying script results
+
+* Top 100 scripts with the highest bytes processed
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_script
+  ORDER BY total_gigabytes_processed DESC
+  LIMIT 100
+  ```
+
+* Top 100 scripts with the highest slot hours consumed
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_script
+  ORDER BY total_slot_hours DESC
+  LIMIT 100
+  ```
+
+* Top 100 scripts with the highest slot hours consumed that doesn't include
+  INFO_SCHEMA views
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_script
+  WHERE NOT EXISTS(
+    SELECT 1
+    FROM UNNEST(referenced_tables) table
+    WHERE table LIKE "INFORMATION_SCHEMA%"
+  )
+  ORDER BY total_slots DESC
+  LIMIT 100
+  ```
+
+</details>
+
+<details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
+
+## Hourly slot consumption by query hash
+
+The [hourly_slot_consumption_by_query_hash](hourly_slot_consumption_by_query_hash.sql) script
+creates a table named,
+`hourly_slot_consumption_by_query_hash`. This table groups queries by their query hash and then shows 
+for every hour timeslice how much of that hour's slots each query hash consumed.
+
+</details>
+
+<details><summary><b>&#128269; Queries with performance insights</b></summary>
+
+## Queries with performance insights
+
+The [query_performance_insights.sql](query_performance_insights.sql) script
+creates a table named, `query_performance_insights` retrieves all queries that
+have had performance insights
+generated for them in the past 30 days.
+
+### Examples of querying script results
+
+* Top 100 queries with most # of performance insights
+
+  ```sql
+  SELECT
+    job_url,
+    (SELECT COUNT(1)
+    FROM UNNEST(performance_insights.stage_performance_standalone_insights) perf_insight
+    WHERE perf_insight.slot_contention
+    ) AS num_stages_with_slot_contention,
+    (SELECT COUNT(1)
+    FROM UNNEST(performance_insights.stage_performance_standalone_insights) perf_insight
+    WHERE perf_insight.insufficient_shuffle_quota
+    ) AS num_stages_with_insufficient_shuffle_quota,
+    (SELECT ARRAY_AGG(perf_insight.input_data_change.records_read_diff_percentage IGNORE NULLS)
+    FROM UNNEST(performance_insights.stage_performance_change_insights) perf_insight
+    ) AS records_read_diff_percentages
+  FROM optimization_workshop.query_performance_insights
+  ORDER BY (
+    num_stages_with_slot_contention 
+    + num_stages_with_insufficient_shuffle_quota
+    + ARRAY_LENGTH(records_read_diff_percentages)
+  ) DESC
+  LIMIT 100
+  ```
+
+</details>
