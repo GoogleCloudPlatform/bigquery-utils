@@ -99,6 +99,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_strtok](#cw_strtoktext-string-delim-string)
 * [cw_substrb](#cw_substrbstr-string-startpos-int64-extent-int64)
 * [cw_substring_index](#cw_substring_indexstr-string-sep-string-idx-int64)
+* [cw_td_normalize_number](#cw_td_normalize_numberstr-string)
 * [cw_td_nvp](#cw_td_nvphaystack-string-needle-string-pairsep-string-valuesep-string-occurence-int64)
 * [cw_threegrams](#cw_threegramst-string)
 * [cw_to_base](#cw_to_basenumber-int64-base-int64)
@@ -1000,6 +1001,20 @@ Takes input string, seperater string and index number. It returns index element.
 SELECT bqutil.fn.cw_substring_index('TestStr123456,Test123', ',', 1);
 
 TestStr123456
+```
+
+### [#cw_td_normalize_number(str STRING)](#cw_td_normalize_number.sqlx)
+Takes string representation of number, parses it according to Teradata rules and returns a normalized string, that is parseable by BigQuery.
+```sql
+SELECT bqutil.fn.cw_td_normalize_number('12:34:56');
+SELECT bqutil.fn.cw_td_normalize_number('3.14e-1');
+SELECT bqutil.fn.cw_td_normalize_number('00042-');
+SELECT bqutil.fn.cw_td_normalize_number('Hello World!');
+
+'123456'
+'0.314'
+'-42'
+'ILLEGAL_NUMBER(Hello World!)'
 ```
 
 ### [cw_td_nvp(haystack STRING, needle STRING, pairsep STRING, valuesep STRING, occurence INT64)](cw_td_nvp.sqlx)

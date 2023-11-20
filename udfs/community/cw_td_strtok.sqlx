@@ -1,0 +1,44 @@
+config { hasOutput: true }
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+CREATE OR REPLACE FUNCTION ${self()}(input STRING, delim STRING, num INT64)
+  RETURNS STRING
+  LANGUAGE js
+  AS '''
+  var start = 0;
+  var end = 0;
+  if (input === null || delim === null || num === null) {
+    return null;
+  }
+
+  for (var i = 0; i < num; i++) {
+    // strtok first removes all preceding delimiters
+    for (start = end; start < input.length; start++) {
+      if (delim.indexOf(input.charAt(start)) < 0) {
+	break;
+      }
+    }
+    for (end = start; end < input.length; end++) {
+      if (delim.indexOf(input.charAt(end)) >= 0) {
+	break;
+      }
+    }
+  }
+  if (start == input.length && num > 1) {
+    return null;
+  }
+  return input.substring(start, end);
+''';
