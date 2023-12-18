@@ -53,10 +53,11 @@ SELECT
   ARRAY_AGG(
     STRUCT(
       bqutil.fn.job_url(project_id || ':us.' || parent_job_id) AS parent_job_url,
-      bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url
+      bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
+      query as query_text
     )
     ORDER BY total_slot_ms
-    DESC LIMIT 10)                                                         AS top_10_job_urls,
+    DESC LIMIT 10)                                                         AS top_10_jobs,
   ARRAY_AGG(DISTINCT user_email)                                           AS user_emails,
   SUM(total_bytes_processed) / POW(1024, 3)                                AS total_gigabytes_processed,
   AVG(total_bytes_processed) / POW(1024, 3)                                AS avg_gigabytes_processed,
