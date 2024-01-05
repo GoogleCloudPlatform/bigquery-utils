@@ -9,7 +9,7 @@ CREATE TEMP FUNCTION num_stages_with_perf_insights(query_info ANY TYPE) AS (
 
 CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_labels AS
 SELECT
-  FORMAT("%T", labels)                                                     AS labels,
+  FORMAT("%p", JSON_ARRAY(labels))                                         AS labels,
   COUNT(DISTINCT DATE(start_time))                                         AS days_active,
   ARRAY_AGG(DISTINCT project_id IGNORE NULLS)                              AS project_ids,
   ARRAY_AGG(DISTINCT reservation_id IGNORE NULLS)                          AS reservation_ids,
