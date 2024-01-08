@@ -393,14 +393,15 @@ want to see which particular scripts are most inefficient.
 
 </details>
 
-<details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
+<details><summary><b>&#128269; Queries grouped by labels</b></summary>
 
-## Hourly slot consumption by query hash
+## Queries grouped by labels
 
-The [hourly_slot_consumption_by_query_hash](hourly_slot_consumption_by_query_hash.sql) script
+The [queries_grouped_by_labels.sql](queries_grouped_by_labels.sql) script
 creates a table named,
-`hourly_slot_consumption_by_query_hash`. This table groups queries by their query hash and then shows 
-for every hour timeslice how much of that hour's slots each query hash consumed.
+`queries_grouped_by_labels`. This table groups queries by their labels 
+(after formatting all labels as a STRUCT string) which allows you to analyze
+different groups of queries based on their labels.
 
 </details>
 
@@ -439,5 +440,53 @@ generated for them in the past 30 days.
   ) DESC
   LIMIT 100
   ```
+
+</details>
+
+# Workload Analysis
+
+<details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
+
+## Hourly slot consumption by query hash
+
+The [hourly_slot_consumption_by_query_hash](hourly_slot_consumption_by_query_hash.sql) script
+creates a table named, `hourly_slot_consumption_by_query_hash`. This table
+groups queries by their query hash and then shows for every hour timeslice how
+much of that hour's slots each query hash consumed.
+
+### Examples of querying script results
+
+* Top 10 hours which had the highest slot consumption along with the top 10 
+  query hashes/patterns that consumed the most slots during those hours.
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.hourly_slot_consumption_by_query_hash
+  ORDER BY period_total_slot_hours DESC
+  LIMIT 10
+  ``` 
+
+</details>
+
+<details><summary><b>&#128269; Hourly slot consumption by labels</b></summary>
+
+## Hourly slot consumption by labels
+
+The [hourly_slot_consumption_by_labels](hourly_slot_consumption_by_labels.sql)
+script creates a table named, `hourly_slot_consumption_by_labels`. This table
+groups queries by their labels and then shows for every hour timeslice how much
+of that hour's slots each grouping of labels consumed.
+
+### Examples of querying script results
+
+* Top 10 hours which had the highest slot consumption and the top 10 query
+  labels that consumed the most slots during those hours.
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.hourly_slot_consumption_by_labels
+  ORDER BY period_total_slot_hours DESC
+  LIMIT 10
+  ``` 
 
 </details>

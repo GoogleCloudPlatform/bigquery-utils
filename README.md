@@ -17,6 +17,7 @@ This repository is broken up into:
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
     *   [billing](/scripts/billing) - Example queries over the GCP billing
         export
+    *   [optimization](/scripts/optimization) - Scripts to help identify areas for optimization in your BigQuery warehouse.
 *   [Stored Procedures](/stored_procedures) - Example stored procedures
 *   [Third Party](/third_party) - Relevant third party libraries for BigQuery 
     *   [compilerworks](/third_party/compilerworks) - BigQuery UDFs which mimic the behavior of proprietary functions in other databases
