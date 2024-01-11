@@ -1,10 +1,13 @@
 #standardSQL
 
 -- Query: Monthly CUD and SUD savings
--- Last Updated: 2019-07-23
+-- Last Updated: 2024-01-11
 --
 -- This query calculates the monthly amount of savings from Committed Use Discounts (CUD)
 -- and Sustained Use Discounts (SUD).
+-- Committed Use Discounts are divided into 2 types:
+-- Resource Based: Resource-based committed use discounts provide a discount in exchange for your commitment to use a minimum level of Compute Engine resources in a particular region.
+-- Spend Based: Spend-based committed use discounts provide a discount in exchange for your commitment to spend a minimum amount for a product or service.
 
 WITH 
   gce_data AS
@@ -26,10 +29,10 @@ WITH
           0)) AS usage_costs,
       SUM(IF(NOT REGEXP_CONTAINS(LOWER(sku.description),r"commitment (- dollar based)") AND LOWER(sku.description) LIKE "%commitment%",
           cost,
-          0)) AS commitment_resource_costs,
+          0)) AS commitment_resource_costs, -- Resource based
       SUM(IF(REGEXP_CONTAINS(LOWER(sku.description),r"commitment (- dollar based)"),
           cost,
-          0)) AS commitment_spend_costs
+          0)) AS commitment_spend_costs -- Spend based
     FROM gce_data
     GROUP BY 1, 2
   ),
