@@ -6,7 +6,7 @@ The schema for the BigQuery tables generated from this export is given in the se
 
 Here are the scripts that are provided.
 
-### BigQuery Table Readers
+### [BigQuery Table Readers](./bq_table_all_readers.sql)
 
 This script will help Data Stewards or Platform Owners determine the which are the IAM Principals (groups, user or service accounts) that can read data from a BigQuery table.
 
@@ -14,7 +14,7 @@ The access to the principal could be applied at any level of the resource hierar
 
 
 
-### BigQuery Table Readers
+### [BigQuery Table Editors](./bq_table_all_editors.sql)
 
 This script will help Data Stewards or Platform Owners determine the which are the IAM Principals (groups, user or service accounts) that can edit/write data to a BigQuery table.
 
