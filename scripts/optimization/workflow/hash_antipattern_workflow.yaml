@@ -65,8 +65,7 @@ main:
         - queryHash: ${queryHash+" "+ "AND state = 'DONE'"}
         - queryHash: ${queryHash+" "+ "AND error_result IS NULL"}
         - queryHash: ${queryHash+" "+ "AND job_type = 'QUERY'"}
-        - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT'"}
-        - queryHash: ${queryHash+" "+ "GROUP BY statement_type, query_hash;"}
+        - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT' GROUP BY statement_type, query_hash;"}
         - queryHash: ${queryHash+" "+ "alter table `optimization_workshop.queries_grouped_by_hash` add column query string;"}
         - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text WHERE true;"}
     - runQueriesGroupedByHash:
@@ -79,7 +78,7 @@ main:
     - runAntiPatternJob:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-            name: ${"namespaces/" + args.project +  "/jobs/bigquery-antipattern-recognition"}
+            name: ${"namespaces/" + args.project +  "/jobs/bigquery-antipattern-recognition2"}
             location: "us-central1"
     - runJoinAntiPattern:
         call: googleapis.bigquery.v2.jobs.query
