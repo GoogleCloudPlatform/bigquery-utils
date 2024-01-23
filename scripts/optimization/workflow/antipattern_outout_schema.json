@@ -1,0 +1,59 @@
+[
+    {
+      "name": "job_id",
+      "mode": "",
+      "type": "STRING",
+      "description": null,
+      "fields": []
+    },
+    {
+      "name": "user_email",
+      "mode": "",
+      "type": "STRING",
+      "description": null,
+      "fields": []
+    },
+    {
+      "name": "query",
+      "mode": "",
+      "type": "STRING",
+      "description": null,
+      "fields": []
+    },
+    {
+      "name": "recommendation",
+      "mode": "REPEATED",
+      "type": "RECORD",
+      "description": null,
+      "fields": [
+        {
+          "name": "name",
+          "mode": "",
+          "type": "STRING",
+          "description": null,
+          "fields": []
+        },
+        {
+          "name": "description",
+          "mode": "",
+          "type": "STRING",
+          "description": null,
+          "fields": []
+        }
+      ]
+    },
+    {
+      "name": "slot_hours",
+      "mode": "",
+      "type": "FLOAT",
+      "description": null,
+      "fields": []
+    },
+    {
+      "name": "process_timestamp",
+      "mode": "",
+      "type": "TIMESTAMP",
+      "description": null,
+      "fields": []
+    }
+  ]
