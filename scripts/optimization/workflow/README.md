@@ -17,7 +17,7 @@
     ``` bash
     bq mk \
     -t \
-    $DATASET.antipattern_output_table \
+    $OUTPUT_TABLE \
     antipattern_output_schema.json
     ```
 
