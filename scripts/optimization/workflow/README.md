@@ -13,11 +13,15 @@
 
     export CLOUD_RUN_JOB_NAME="bigquery-antipattern-recognition"  # Name for the Cloud Run job
     export CLOUD_RUN_JOB_SA=""  # Service account associated to the Cloud Run job
-    export INPUT_TABLE="$PROJECT_ID.$DATASET_ID.queries_grouped_by_hash"
+    export INPUT_TABLE="$PROJECT_ID.$DATASET_ID.hash_raw"
     export OUTPUT_TABLE="$PROJECT_ID.$DATASET_ID.antipattern_output_table"  # Ex: "project.dataset.table" BigQuery output table for the Anti Pattern Detector
     ```
-2. Create BQ Antipattern output table
+2. Create BQ dataset + Antipattern output table
     ``` bash
+    bq --location=US mk \
+    -d \
+    $DATASET_ID
+
     bq mk \
     -t \
     $OUTPUT_TABLE \
@@ -71,5 +75,5 @@
     6. Run workflow
     ``` bash
     gcloud workflows run hashAntiPattern \
-    --data='{"project":"$PROJECT_ID"}'
+    --data='{"project":"afleisc-bng-dev"}'
     ```
