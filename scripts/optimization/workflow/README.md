@@ -17,7 +17,7 @@
     bq mk \
     -t \
     $DATASET.antipattern_output_table \
-    antipattern_output-schema.json
+    antipattern_output_schema.json
     ```
 
 2. Create an Artifact Registry Repository, if necessary
@@ -33,6 +33,9 @@
 
     ``` bash
     gcloud auth configure-docker $REGION-docker.pkg.dev
+
+    git clone https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition.git
+    cd bigquery-antipattern-recognition
 
     mvn clean package jib:build \
         -DskipTests \
