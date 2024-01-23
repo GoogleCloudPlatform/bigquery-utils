@@ -29,7 +29,7 @@ main:
         - queryHash: ${queryHash+" "+ "CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS"}
         - queryHash: ${queryHash+" "+ "SELECT"}
         - queryHash: ${queryHash+" "+ "statement_type,"}
-        - queryHash: ${queryHash+" "+ "query_info.query_hashes.normalized_literals                              AS query_hash,"}
+        - queryHash: ${queryHash+" "+ "query_info.query_hashes.normalized_literals                              AS id,"}
         - queryHash: ${queryHash+" "+ "COUNT(DISTINCT DATE(start_time))                                         AS days_active,"}
         - queryHash: ${queryHash+" "+ "ARRAY_AGG(DISTINCT project_id IGNORE NULLS)                              AS project_ids,"}
         - queryHash: ${queryHash+" "+ "ARRAY_AGG(DISTINCT reservation_id IGNORE NULLS)                          AS reservation_ids,"}
@@ -67,6 +67,8 @@ main:
         - queryHash: ${queryHash+" "+ "AND job_type = 'QUERY'"}
         - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT'"}
         - queryHash: ${queryHash+" "+ "GROUP BY statement_type, query_hash;"}
+        - queryHash: ${queryHash+" "+ "alter table `optimization_workshop.queries_grouped_by_hash` add column query string;"}
+        - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text WHERE true;"}
     - runQueriesGroupedByHash:
         call: googleapis.bigquery.v2.jobs.query
         args:
@@ -74,20 +76,6 @@ main:
             body:
                 useLegacySql: false
                 query: ${queryHash}
-    - runExtractRawQueryFromHash:
-        call: googleapis.bigquery.v2.jobs.query
-        args:
-            projectId: ${args.project}
-            body:
-                useLegacySql: false
-                query: "CREATE OR REPLACE TABLE optimization_workshop.hash_raw AS (SELECT query_hash as id,top_10_jobs[OFFSET(0)].query_text as query FROM optimization_workshop.queries_grouped_by_hash)"
-    - runSafeDeleteQuery:
-        call: googleapis.bigquery.v2.jobs.query
-        args:
-            projectId: ${args.project}
-            body:
-                useLegacySql: false
-                query: "delete from `optimization_workshop.hash_raw` where id is NULL"
     - runAntiPatternJob:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
@@ -99,6 +87,5 @@ main:
             projectId: ${args.project}
             body:
                 useLegacySql: false
-                # Query name and gender of most popular names
-                query: "CREATE OR REPLACE TABLE optimization_workshop.test AS (select r.*, o.recommendation from optimization_workshop.queries_grouped_by_hash as r full outer join optimization_workshop.antipattern_output_table as o ON r.query_hash = o.job_id)"
+                query: "CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS (select r.*, o.recommendation from optimization_workshop.queries_grouped_by_hash as r full outer join optimization_workshop.antipattern_output_table as o ON r.query_hash = o.job_id)"
            
