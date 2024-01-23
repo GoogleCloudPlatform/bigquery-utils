@@ -1,6 +1,9 @@
 1. Setup deployment configuration
 
     ``` bash
+    gcloud services enable run.googleapis.com
+    gcloud services enable workflows.googleapis.com
+
     export PROJECT_ID=""  # Project ID where resources are created
     export DATASET_ID="optimization_workshop"
     export REGION="us-central1"  # Region for Artifact Registry, Cloud Run and Cloud Scheduler
@@ -18,7 +21,7 @@
     bq mk \
     -t \
     $OUTPUT_TABLE \
-    antipattern_output_schema.json
+    ./antipattern_output_schema.json
     ```
 
 2. Create an Artifact Registry Repository, if necessary
@@ -60,7 +63,7 @@
     5. Deploy workflow
 
     ``` bash
-    gcloud workflows deploy hashAntiPattern --source=hash_anti_pattern_workflow.yaml \
+    gcloud workflows deploy hashAntiPattern --source=hash_antipattern_workflow.yaml \
     --service-account=$CLOUD_RUN_JOB_SA
     
     ```
