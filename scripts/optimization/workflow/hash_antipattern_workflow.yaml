@@ -86,5 +86,5 @@ main:
             projectId: ${args.project}
             body:
                 useLegacySql: false
-                query: "CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS (select r.*, o.recommendation from optimization_workshop.queries_grouped_by_hash as r full outer join optimization_workshop.antipattern_output_table as o ON r.query_hash = o.job_id)"
+                query: "CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS (select r.*, o.recommendation from optimization_workshop.queries_grouped_by_hash as r full outer join optimization_workshop.antipattern_output_table as o ON r.id = o.job_id)"
            
