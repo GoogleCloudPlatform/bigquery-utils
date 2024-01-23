@@ -78,7 +78,7 @@ main:
     - runAntiPatternJob:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
-            name: ${"namespaces/" + args.project +  "/jobs/bigquery-antipattern-recognition2"}
+            name: ${"namespaces/" + args.project +  "/jobs/bigquery-antipattern-recognition"}
             location: "us-central1"
     - runJoinAntiPattern:
         call: googleapis.bigquery.v2.jobs.query
