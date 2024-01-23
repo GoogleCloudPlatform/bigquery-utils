@@ -12,7 +12,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-# 
+
 main:
     params: [args]
     steps:
@@ -67,33 +67,33 @@ main:
         - queryHash: ${queryHash+" "+ "AND job_type = 'QUERY'"}
         - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT'"}
         - queryHash: ${queryHash+" "+ "GROUP BY statement_type, query_hash;"}
-    - runHashQuery:
+    - runQueriesGroupedByHash:
         call: googleapis.bigquery.v2.jobs.query
         args:
             projectId: ${args.project}
             body:
                 useLegacySql: false
                 query: ${queryHash}
-    - runRawQuery:
+    - runExtractRawQueryFromHash:
         call: googleapis.bigquery.v2.jobs.query
         args:
             projectId: ${args.project}
             body:
                 useLegacySql: false
                 query: "CREATE OR REPLACE TABLE optimization_workshop.hash_raw AS (SELECT query_hash as id,top_10_jobs[OFFSET(0)].query_text as query FROM optimization_workshop.queries_grouped_by_hash)"
-    - runDeleteQuery:
+    - runSafeDeleteQuery:
         call: googleapis.bigquery.v2.jobs.query
         args:
             projectId: ${args.project}
             body:
                 useLegacySql: false
                 query: "delete from `optimization_workshop.hash_raw` where id is NULL"
-    - run_job:
+    - runAntiPatternJob:
         call: googleapis.run.v1.namespaces.jobs.run
         args:
             name: ${"namespaces/" + args.project +  "/jobs/bigquery-antipattern-recognition"}
             location: "us-central1"
-    - joinAntiPattern:
+    - runJoinAntiPattern:
         call: googleapis.bigquery.v2.jobs.query
         args:
             projectId: ${args.project}
