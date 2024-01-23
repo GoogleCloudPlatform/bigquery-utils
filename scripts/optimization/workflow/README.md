@@ -2,7 +2,7 @@
 
     ``` bash
     export PROJECT_ID=""  # Project ID where resources are created
-    export DATASET_ID=""
+    export DATASET_ID="optimization_workshop"
     export REGION="us-central1"  # Region for Artifact Registry, Cloud Run and Cloud Scheduler
     export REPOSITORY="bigquery-antipattern-recognition"  # Artifact Registry repository name
 
@@ -10,7 +10,8 @@
 
     export CLOUD_RUN_JOB_NAME="bigquery-antipattern-recognition"  # Name for the Cloud Run job
     export CLOUD_RUN_JOB_SA=""  # Service account associated to the Cloud Run job
-    export OUTPUT_TABLE=""  # Ex: "project.dataset.table" BigQuery output table for the Anti Pattern Detector
+    export INPUT_TABLE="$PROJECT_ID.$DATASET_ID.queries_grouped_by_hash"
+    export OUTPUT_TABLE="$PROJECT_ID.$DATASET_ID.antipattern_output_table"  # Ex: "project.dataset.table" BigQuery output table for the Anti Pattern Detector
     ```
 2. Create BQ Antipattern output table
     ``` bash
