@@ -61,7 +61,13 @@
     5. Deploy workflow
 
     ``` bash
-    gcloud workflows deploy hashAntiPattern --source=mhash_anti_pattern_workflow.yaml \
+    gcloud workflows deploy hashAntiPattern --source=hash_anti_pattern_workflow.yaml \
     --service-account=$CLOUD_RUN_JOB_SA
     
+    ```
+
+    6. Run workflow
+    ``` bash
+    gcloud workflows run hashAntiPattern \
+    --data='{"project":"$PROJECT_ID"}'
     ```
