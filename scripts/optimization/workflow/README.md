@@ -45,8 +45,6 @@
 
 4. Create the Cloud Run Job
 
-   This example configuration reads all queries for the previous day from `INFORMATION_SCHEMA`, runs antipattern detection and writes the result to the configured `OUTPUT_TABLE`.
-
     ``` bash
     gcloud run jobs create $CLOUD_RUN_JOB_NAME \
         --image=$CONTAINER_IMAGE \
