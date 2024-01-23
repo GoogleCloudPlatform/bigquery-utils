@@ -64,15 +64,16 @@
         --project=$PROJECT_ID
     ```
 
-    5. Deploy workflow
+5. Deploy workflow
 
     ``` bash
     gcloud workflows deploy hashAntiPattern --source=hash_antipattern_workflow.yaml \
     --service-account=$CLOUD_RUN_JOB_SA
-    
+
     ```
 
-    6. Run workflow
+6. Run workflow
+
     ``` bash
     gcloud workflows run hashAntiPattern \
     --data='{"project":"afleisc-bng-dev"}'
