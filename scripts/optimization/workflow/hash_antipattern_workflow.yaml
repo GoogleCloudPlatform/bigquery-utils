@@ -100,5 +100,5 @@ main:
             projectId: ${args.project}
             body:
                 useLegacySql: false
-                query: "CREATE OR REPLACE TABLE optimization_workshop.top_hash_jobs AS (select * from  optimization_workshop.top_hash_jobs as t JOIN `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT as j ON t.job_id = j.job_id)"
+                query: "CREATE OR REPLACE TABLE optimization_workshop.top_hash_jobs AS (SELECT j.*, t.recommendation  from  optimization_workshop.top_hash_jobs as t JOIN `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT as j ON t.job_id = j.job_id)"
                     
