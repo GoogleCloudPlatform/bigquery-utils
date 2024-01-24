@@ -39,7 +39,7 @@ main:
         - queryHash: ${queryHash+" "+ "STRUCT("}
         - queryHash: ${queryHash+" "+ "bqutil.fn.job_url(project_id || ':us.' || parent_job_id) AS parent_job_url,"}
         - queryHash: ${queryHash+" "+ "bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,"}
-        - queryHash: ${queryHash+" "+ "query as query_text"}
+        - queryHash: ${queryHash+" "+ "parent_job_id, query as query_text"}
         - queryHash: ${queryHash+" "+ ")"}
         - queryHash: ${queryHash+" "+ "ORDER BY total_slot_ms"}
         - queryHash: ${queryHash+" "+ "DESC LIMIT 10)                                                         AS top_10_jobs,"}
@@ -66,8 +66,8 @@ main:
         - queryHash: ${queryHash+" "+ "AND error_result IS NULL"}
         - queryHash: ${queryHash+" "+ "AND job_type = 'QUERY'"}
         - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT' GROUP BY statement_type, id;"}
-        - queryHash: ${queryHash+" "+ "alter table `optimization_workshop.queries_grouped_by_hash` add column query string;"}
-        - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text WHERE true;"}
+        - queryHash: ${queryHash+" "+ "alter table `optimization_workshop.queries_grouped_by_hash` add column query string, add column job_id string;"}
+        - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text, job_id = top_10_jobs[OFFSET(0)].  WHERE true;"}
     - runQueriesGroupedByHash:
         call: googleapis.bigquery.v2.jobs.query
         args:
