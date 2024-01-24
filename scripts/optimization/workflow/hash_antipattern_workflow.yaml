@@ -67,7 +67,7 @@ main:
         - queryHash: ${queryHash+" "+ "AND job_type = 'QUERY'"}
         - queryHash: ${queryHash+" "+ "AND statement_type != 'SCRIPT' GROUP BY statement_type, id;"}
         - queryHash: ${queryHash+" "+ "alter table `optimization_workshop.queries_grouped_by_hash` add column query string, add column job_id string;"}
-        - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text, job_id = top_10_jobs[OFFSET(0)] WHERE true;"}
+        - queryHash: ${queryHash+" "+ "update `optimization_workshop.queries_grouped_by_hash` set query = top_10_jobs[OFFSET(0)].query_text, job_id = top_10_jobs[OFFSET(0)].parent_job_id WHERE true;"}
     - runQueriesGroupedByHash:
         call: googleapis.bigquery.v2.jobs.query
         args:
@@ -87,4 +87,18 @@ main:
             body:
                 useLegacySql: false
                 query: "CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS (select r.*, o.recommendation from optimization_workshop.queries_grouped_by_hash as r full outer join optimization_workshop.antipattern_output_table as o ON r.id = o.job_id)"
-           
+    - runCreateTopJobs:
+            call: googleapis.bigquery.v2.jobs.query
+            args:
+                projectId: ${args.project}
+                body:
+                    useLegacySql: false
+                    query: "CREATE OR REPLACE TABLE optimization_workshop.top_hash_jobs AS (select id as hash_id, job_id, query, recommendation from optimization_workshop.queries_grouped_by_hash order by total_slots desc limit 5 )"
+    - runCreateTopJobs:
+        call: googleapis.bigquery.v2.jobs.query
+        args:
+            projectId: ${args.project}
+            body:
+                useLegacySql: false
+                query: "CREATE OR REPLACE TABLE optimization_workshop.top_hash_jobs AS (select * from  optimization_workshop.top_hash_jobs as t JOIN `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT as j ON t.job_id = j.job_id)"
+                    
