@@ -94,7 +94,7 @@ main:
                 body:
                     useLegacySql: false
                     query: "CREATE OR REPLACE TABLE optimization_workshop.top_hash_jobs AS (select id as hash_id, job_id, query, recommendation from optimization_workshop.queries_grouped_by_hash order by total_slots desc limit 5 )"
-    - runCreateTopJobs:
+    - runCreateTopJobsInfoSchema:
         call: googleapis.bigquery.v2.jobs.query
         args:
             projectId: ${args.project}
