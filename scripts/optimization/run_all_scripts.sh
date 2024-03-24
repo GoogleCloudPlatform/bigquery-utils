@@ -39,3 +39,29 @@ done
 # actively_read_tables_with_partitioning_clustering_info.sql
 bq query ${bq_flags} <table_read_patterns.sql
 bq query ${bq_flags} <actively_read_tables_with_partitioning_clustering_info.sql &
+
+
+# Run setup for anti pattern recognition tool
+bq query ${bq_flags} <anti_pattern_recoginition_tool_tables.sql
+
+{ # try
+  
+  ## build anti-pattern recognition tool locally
+  git clone https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition.git
+  (cd bigquery-antipattern-recognition && mvn clean package jib:dockerBuild -DskipTests)
+  
+  ## build anti-pattern recognition tool locally
+  export PROJECT_ID=$(gcloud config get-value project)
+  docker run -i bigquery-antipattern-recognition \
+  --input_bq_table ${PROJECT_ID}.optimization_workshop.antipattern_tool_input_view \
+  --output_table ${PROJECT_ID}.optimization_workshop.antipattern_output_table
+
+  # write anti pattern output to queries by has table
+  bq query ${bq_flags} <update_queries_by_hash_w_anti_patterns.sql
+  
+} || { # catch
+    echo 'Error: could not run Anti-pattern Recognition Tool. Try using GCP Cloud Shell https://cloud.google.com/shell/docs/launching-cloud-shell'
+}
+
+# Clean up anti pattern recognition tool
+rm -rf bigquery-antipattern-recognition 
