@@ -30,6 +30,8 @@ SELECT
   Query_Raw_Sample query 
 FROM 
   optimization_workshop.viewable_queries_grouped_by_hash 
+WHERE
+  Query_Hash is not null
 ORDER BY 
   Total_Slot_Hours desc
 LIMIT 
