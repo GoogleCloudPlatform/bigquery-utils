@@ -13,7 +13,7 @@ SELECT
   query_hash id, 
   top_10_jobs[SAFE_OFFSET(0)].query_text query 
 FROM 
-  `pso-dev-cs-cdwp.optimization_workshop.queries_grouped_by_hash` 
+  optimization_workshop.viewable_queries_grouped_by_hash 
 ORDER BY 
   avg_total_slots desc
 LIMIT 
