@@ -15,7 +15,7 @@
  */
 
 ALTER TABLE optimization_workshop.viewable_queries_grouped_by_hash
-ADD COLUMN recommendation ARRAY<STRUCT<name STRING, description STRING>>;
+ADD COLUMN IF NOT EXISTS recommendation ARRAY<STRUCT<name STRING, description STRING>>;
 
 UPDATE optimization_workshop.viewable_queries_grouped_by_hash t1
 SET t1.recommendation = t2.recommendation
