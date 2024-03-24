@@ -31,7 +31,7 @@ SELECT
 FROM 
   optimization_workshop.viewable_queries_grouped_by_hash 
 ORDER BY 
-  avg_total_slots desc
+  Total_Slot_Hours desc
 LIMIT 
   1000
 ;
