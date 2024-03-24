@@ -25,7 +25,7 @@ CREATE OR REPLACE TABLE optimization_workshop.antipattern_output_table (
 );
 
 CREATE OR REPLACE VIEW optimization_workshop.antipattern_tool_input_view AS
-SELECT 
+SELECT DISTINCT
   Query_Hash id, 
   Query_Raw_Sample query 
 FROM 
