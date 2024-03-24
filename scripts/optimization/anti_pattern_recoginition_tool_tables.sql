@@ -25,15 +25,17 @@ CREATE OR REPLACE TABLE optimization_workshop.antipattern_output_table (
 );
 
 CREATE OR REPLACE VIEW optimization_workshop.antipattern_tool_input_view AS
-SELECT DISTINCT
+SELECT 
   Query_Hash id, 
-  Query_Raw_Sample query 
+  ANY_VALUE(Query_Raw_Sample) query,
 FROM 
   optimization_workshop.viewable_queries_grouped_by_hash 
 WHERE
   Query_Hash is not null
+GROUP BY 
+  Query_Hash 
 ORDER BY 
-  Total_Slot_Hours desc
+  ANY_VALUE(Total_Slot_Hours) desc
 LIMIT 
   1000
 ;
