@@ -12,6 +12,11 @@ gcloud auth login &&
 bash run_all_scripts.sh
 ```
 
+Run [Anti-pattern Recognition Tool](https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition/tree/main): 
+```bash
+bash run_anti_pattern_tool.sh
+```
+
 The scripts are described in more detail in the following sections.
 
 ---
@@ -321,6 +326,8 @@ SELECT * FROM my_table WHERE date = '2020-01-01';
 SELECT * FROM my_table WHERE date = '2020-01-02';
 SELECT * FROM my_table WHERE date = '2020-01-03';
 ```
+
+Running the `run_anti_pattern_tool.sh` bash script will build and run the Anti-Pattern Recognition tool and output the results to the `viewable_queries_grouped_by_hash` table in the `recommendation` column. The tool will identify syntaxes that are know to frequently cause performance issues. 
 
 ### Examples of querying script results
 
