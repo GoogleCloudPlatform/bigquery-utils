@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-ALTER TABLE optimization_workshop.viewable_queries_grouped_by_hash
+ALTER TABLE <input_table>
 ADD COLUMN IF NOT EXISTS recommendation ARRAY<STRUCT<name STRING, description STRING>>;
 
-UPDATE optimization_workshop.viewable_queries_grouped_by_hash t1
+UPDATE <input_table> t1
 SET t1.recommendation = t2.recommendation
 FROM optimization_workshop.antipattern_output_table t2
-WHERE t1.Query_Hash = t2.job_id;
+WHERE t1.<input_table_id_col_name> = t2.job_id;

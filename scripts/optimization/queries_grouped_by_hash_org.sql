@@ -41,7 +41,7 @@ CREATE TEMP FUNCTION num_stages_with_perf_insights(query_info ANY TYPE) AS (
 );
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
-CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash AS
+CREATE OR REPLACE TABLE optimization_workshop.queries_grouped_by_hash_org AS
 SELECT
   statement_type,
   query_info.query_hashes.normalized_literals                              AS query_hash,
@@ -53,8 +53,7 @@ SELECT
   ARRAY_AGG(
     STRUCT(
       bqutil.fn.job_url(project_id || ':us.' || parent_job_id) AS parent_job_url,
-      bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url,
-      query as query_text
+      bqutil.fn.job_url(project_id || ':us.' || job_id) AS job_url
     )
     ORDER BY total_slot_ms
     DESC LIMIT 10)                                                         AS top_10_jobs,
