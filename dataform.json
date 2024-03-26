@@ -1,7 +1,8 @@
 {
-  "warehouse": "bigquery",
   "defaultSchema": "dataform",
   "assertionSchema": "dataform_assertions",
+  "warehouse": "bigquery",
   "defaultDatabase": "bigquery-utils-project",
-  "useRunCache": false
+  "defaultLocation": "US"
 }
+    

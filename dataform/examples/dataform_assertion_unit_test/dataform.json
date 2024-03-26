@@ -2,6 +2,6 @@
     "warehouse": "bigquery",
     "defaultSchema": "dataform",
     "assertionSchema": "dataform_assertions",
-    "defaultDatabase": "YOUR_PROJECT_ID",
+    "defaultDatabase": "bigquery-utils-project",
     "useRunCache": false
 }
