@@ -12,7 +12,8 @@ gcloud auth login &&
 bash run_all_scripts.sh
 ```
 
-Run the [Anti-pattern Recognition Tool](https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition/tree/main): 
+The `anti-pattern-recognittion-tool-scripts` subfolder contains additional scripts that need to be executed separetly to run 
+the [Anti-pattern Recognition Tool](https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition/tree/main): 
 ```bash
 bash ./anti-pattern-recognittion-tool-scripts/run_anti_pattern_tool.sh \
 --input_table_name="optimization_workshop.viewable_queries_grouped_by_hash" \
