@@ -16,6 +16,35 @@
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
+
+# Get input_table name as input 
+for i in "$@"; do
+  case $i in
+    --input_table_name=*)
+      input_table_name="${i#*=}"
+      shift # past argument=value
+      ;;
+    --input_table_id_col_name=*)
+      input_table_id_col_name="${i#*=}"
+      shift # past argument=value
+      ;;
+    --input_table_query_text_col_name=*)
+      input_table_query_text_col_name="${i#*=}"
+      shift # past argument=value
+      ;;
+    --input_table_slots_col_name=*)
+      input_table_slots_col_name="${i#*=}"
+      shift # past argument=value
+      ;;
+    -*|--*)
+      echo "Unknown option $i"
+      exit 1
+      ;;
+    *)
+      ;;
+  esac
+done
+
 # Set the following flags for the bq command:
 #   --quiet: suppress status updates while jobs are running
 #   --nouse_legacy_sql: use standard SQL syntax
@@ -24,7 +53,13 @@ bq_flags="--quiet --nouse_legacy_sql --nouse_cache"
 
 
 # Run setup for anti pattern recognition tool
-bq query ${bq_flags} <anti_pattern_recoginition_tool_tables.sql
+anti_pattern_recoginition_tool_tables_sql=$(sed -e "s/<input_table>/$input_table_name/g" \
+                                                -e "s/<input_table_id_col_name>/$input_table_id_col_name/g" \
+                                                -e "s/<input_table_query_text_col_name>/$input_table_query_text_col_name/g" \
+                                                -e "s/<input_table_slots_col_name>/$input_table_slots_col_name/g" \
+                                                "./anti-pattern-recognittion-tool-scripts/anti_pattern_recoginition_tool_tables.sql")
+
+bq query ${bq_flags} <<< "$anti_pattern_recoginition_tool_tables_sql"
 
 { # try
   
@@ -38,8 +73,11 @@ bq query ${bq_flags} <anti_pattern_recoginition_tool_tables.sql
   --input_bq_table ${PROJECT_ID}.optimization_workshop.antipattern_tool_input_view \
   --output_table ${PROJECT_ID}.optimization_workshop.antipattern_output_table
 
-  # write anti pattern output to queries by has table
-  bq query ${bq_flags} <update_queries_by_hash_w_anti_patterns.sql
+    # write anti pattern output to queries by has table
+  update_queries_by_hash_w_anti_patterns_sql=$(sed -e "s/<input_table>/$input_table_name/g" \
+                                                   -e "s/<input_table_id_col_name>/$input_table_id_col_name/g" \
+                                                   "./anti-pattern-recognittion-tool-scripts/update_queries_by_hash_w_anti_patterns.sql")
+  bq query ${bq_flags} <<< "$update_queries_by_hash_w_anti_patterns_sql"
   
 } || { # catch
     echo 'Error: could not run Anti-pattern Recognition Tool. Try using GCP Cloud Shell https://cloud.google.com/shell/docs/launching-cloud-shell'

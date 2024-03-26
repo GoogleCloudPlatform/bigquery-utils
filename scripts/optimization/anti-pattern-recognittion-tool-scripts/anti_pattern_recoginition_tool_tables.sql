@@ -26,16 +26,16 @@ CREATE OR REPLACE TABLE optimization_workshop.antipattern_output_table (
 
 CREATE OR REPLACE VIEW optimization_workshop.antipattern_tool_input_view AS
 SELECT 
-  Query_Hash id, 
-  ANY_VALUE(Query_Raw_Sample) query,
+  <input_table_id_col_name> id, 
+  ANY_VALUE(<input_table_query_text_col_name>) query
 FROM 
-  optimization_workshop.viewable_queries_grouped_by_hash 
+  <input_table>
 WHERE
-  Query_Hash is not null
+  <input_table_id_col_name> is not null
 GROUP BY 
-  Query_Hash 
+  <input_table_id_col_name>
 ORDER BY 
-  ANY_VALUE(Total_Slot_Hours) desc
+  ANY_VALUE(<input_table_slots_col_name>) desc
 LIMIT 
   1000
 ;
