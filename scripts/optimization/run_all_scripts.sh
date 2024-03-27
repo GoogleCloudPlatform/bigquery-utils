@@ -39,3 +39,4 @@ done
 # actively_read_tables_with_partitioning_clustering_info.sql
 bq query ${bq_flags} <table_read_patterns.sql
 bq query ${bq_flags} <actively_read_tables_with_partitioning_clustering_info.sql &
+
