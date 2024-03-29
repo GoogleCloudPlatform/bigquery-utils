@@ -1,7 +1,7 @@
 # BigQuery Policy Tag Extractor
 
 ## Introduction
-This repo contains a bash script for extracting BigQuery policy tag information from a given dataset. The script will review all the tables in a dataset, and output the table name, column, name, and policy tag ID in a CSV format.
+This directory contains the [policy_tag_export.sh](policy_tag_extractor) bash script which extracts BigQuery policy tag information from a given dataset. The script will iterate through at most 10K tables in a dataset and then for every column with a policy tag, it will output the table name, column name, and policy tag ID in CSV format.
 
 ## Instructions for use
 The simplest way to execute this script is to run it directly in Cloud Shell, but if needed it can be executed as part of a larger CI/CD pipeline or process.
