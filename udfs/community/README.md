@@ -131,6 +131,7 @@ SELECT bqutil.fn.int(1.684)
 * [job_url](#job_urljob_id-string)
 * [json_extract_keys](#json_extract_keys)
 * [json_extract_values](#json_extract_values)
+* [json_merge](#json_merge)
 * [json_typeof](#json_typeofjson-string)
 * [knots_to_mph](#knots_to_mphinput_knots-float64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
@@ -1403,7 +1404,18 @@ cat
 dog
 rat
 ```
-
+  
+### [json_merge()](json_merge.sqlx)
+Merges given two json and returns merged json. Attributes from second json are added if missing and replaced if they are exists.
+  
+```sql
+SELECT TO_JSON_STRING(
+  dwh.json_merge(PARSE_JSON('{"field1":"val1","field2":"value2"}'),PARSE_JSON('{"field2":"updatedvalue2", "field3":"val3"}'))
+  )
+  
+'{"field1":"val1","field2":"updatedvalue2","field3":"val3"}'
+```
+  
 ### [json_typeof(json string)](json_typeof.sqlx)
 
 Returns the type of JSON value. It emulates [`json_typeof` of PostgreSQL](https://www.postgresql.org/docs/12/functions-json.html).
