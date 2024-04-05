@@ -22,7 +22,10 @@ config { hasOutput: true }
     // case 'x': not supported
 */
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64, mode STRING) RETURNS INT64
-LANGUAGE js AS """
+LANGUAGE js
+OPTIONS (
+    description="""Implements regexp_instr_generic (haystack, needle, position, occurence, returnopt)."""
+) AS """
   if (haystack == null || regexp == null || p == null || o == null || returnopt == null || mode == null) return null;
   p = p -1;
   o = o -1;

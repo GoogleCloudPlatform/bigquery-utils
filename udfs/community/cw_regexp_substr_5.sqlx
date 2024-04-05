@@ -16,7 +16,10 @@ config { hasOutput: true }
  */
 
 /* Implements regexp_substr/5 (haystack, needle, position, occurence, mode) */
-CREATE OR REPLACE FUNCTION ${self()}(h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION ${self()}(h STRING, n STRING, p INT64, o INT64, mode STRING) RETURNS STRING 
+OPTIONS (
+    description="""Implements regexp_substr/5 (haystack, needle, position, occurence, mode)"""
+) AS
 (
     ${ref("cw_regexp_substr_generic")}(h, n, p, o, ${ref("cw_regex_mode")}(mode), 0)
 );

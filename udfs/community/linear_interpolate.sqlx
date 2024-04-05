@@ -22,7 +22,10 @@ config { hasOutput: true }
 -- next: the x,y coordinate of the following value
 -- Output: the interpolated y value
 CREATE OR REPLACE FUNCTION ${self()}(pos INT64, prev STRUCT<x INT64,y FLOAT64>, next STRUCT<x INT64,y FLOAT64>)
-RETURNS FLOAT64 AS (
+RETURNS FLOAT64
+OPTIONS (
+    description="Linear_interpolate."
+) AS (
   CASE
     WHEN pos IS NULL OR prev IS NULL OR next IS NULL THEN NULL
     ELSE

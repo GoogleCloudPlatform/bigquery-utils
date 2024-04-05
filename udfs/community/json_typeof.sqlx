@@ -19,6 +19,9 @@ config { hasOutput: true }
 -- Input: JSON string
 -- Output: The JSON value type of the argument or NULL if the argument is an unknown value
 CREATE OR REPLACE FUNCTION ${self()}(json STRING)
+OPTIONS (
+    description="Converts JSON string to the JSON value type of the argument or NULL if the argument is an unknown value."
+)
 AS ( (
     SELECT AS VALUE
       CASE
