@@ -18,6 +18,7 @@ To exceute in Cloud Shell:
 
 ## Considerations
 * Ensure either you or the service account executing the bash script has the bigquery.metadataViewer role to access the required level of information.
+* Currently, the extractor only handles simple column types. RECORD type columns with nested policy tags are not supported.
 * The extractor can identify specific policy tags on columns, but is limited to the information available to the bq command line tool. In it's current state, this is the full policy tag identifier:
 
 projects/<PROJECT_ID>/locations/<LOCATION>/taxonomies/<TAXONOMY_ID>/policyTags/<TAG_ID>
