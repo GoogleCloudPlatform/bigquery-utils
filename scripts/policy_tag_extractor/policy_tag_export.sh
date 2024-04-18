@@ -20,7 +20,7 @@ if [ -z "$DATASET" ]; then
 fi
 
 #write all tables in a dataset to a reference TXT file
-bq ls --max_results=10000 ${DATASET} | awk '{ print $1 }' | sed '1,2d' > table_list.txt
+bq --format=sparse ls --max_results=10000 ${DATASET} | awk '{ print $1 }' | sed '1,2d' > table_list.txt
 
 #loop through each table and export policy tags (if any) to a CSV
 echo "Writing to CSV..."
