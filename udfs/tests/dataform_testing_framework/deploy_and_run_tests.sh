@@ -246,7 +246,7 @@ main() {
       # which is mapped in dir_to_dataset_map.yaml
       local dataset_id
       dataset_id=$(sed -rn "s/${udf_dir}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
-      if [[ "${BQ_LOCATION}" = "EU" ]]; then
+      if [[ "${PROJECT_ID}" = "bqutil" && "${BQ_LOCATION}" = "EU" ]]; then
         dataset_id="${dataset_id}_eu"
       fi
       printf "*************** "
