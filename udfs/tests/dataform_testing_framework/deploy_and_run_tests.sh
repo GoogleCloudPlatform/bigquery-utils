@@ -249,7 +249,7 @@ main() {
       dataset_id=$(sed -rn "s/${udf_dir}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
       # Region suffixes are used to deploy UDFs globally in bqutil without naming conflicts
       if [[ "${PROJECT_ID}" = "bqutil" ]]; then
-        dataset_id="${dataset_id}__${region_suffix}"
+        dataset_id="${dataset_id}_${region_suffix}"
       fi
       printf "*************** "
       printf "Testing UDFs in BigQuery dataset: %s%s" "${dataset_id}" "${SHORT_SHA}"
