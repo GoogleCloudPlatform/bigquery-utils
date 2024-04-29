@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  project = "wpe-tam-sandbox-anthos" #testing
+  project = "bqutil" 
 }
 
 data "local_file" "regions_file" {
