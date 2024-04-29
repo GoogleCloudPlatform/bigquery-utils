@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "google" {
-  project = "bqutil" 
+  project = "bqutil"
 }
 
 data "local_file" "regions_file" {
@@ -20,11 +20,11 @@ locals {
 }
 
 resource "google_storage_bucket" "regional_bucket" {
-  for_each      = local.regions_map
-  name          = "bqutil-lib-${replace(each.value, "_", "-")}"
+  for_each                    = local.regions_map
+  name                        = "bqutil-lib-${replace(each.value, "_", "-")}"
   uniform_bucket_level_access = true
-  location      = each.key
-  force_destroy = true 
+  location                    = each.key
+  force_destroy               = true
 }
 
 resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
@@ -37,7 +37,7 @@ resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
   filename = "cloudbuild.yaml"
 
   github {
-    owner = "googlecloudplatform"
+    owner = "GoogleCloudPlatform"
     name  = "bigquery-utils"
     push {
       branch = "^master$"
