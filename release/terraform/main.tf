@@ -12,7 +12,7 @@ provider "google" {
 }
 
 data "local_file" "regions_file" {
-  filename = "../udfs/region_to_dataset_suffix_map.yaml"
+  filename = "../../udfs/region_to_dataset_suffix_map.yaml"
 }
 
 locals {
@@ -21,7 +21,7 @@ locals {
 
 resource "google_storage_bucket" "regional_bucket" {
   for_each      = local.regions_map
-  name          = "bqutil-lib-${each.value}"
+  name          = "bqutil-lib-${replace(each.value, "_", "-")}"
   uniform_bucket_level_access = true
   location      = each.key
   force_destroy = true 
@@ -33,12 +33,12 @@ resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
   ]
   for_each = local.regions_map
   location = "global"
-  name     = "udf-regional-trigger-${each.value}"
+  name     = "udf-regional-trigger-${replace(each.value, "_", "-")}"
   filename = "cloudbuild.yaml"
 
   github {
-    owner = "afleisc"
-    name  = "antipattern-cicd"
+    owner = "googlecloudplatform"
+    name  = "bigquery-utils"
     push {
       branch = "^master$"
     }
@@ -48,9 +48,8 @@ resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
 
   substitutions = {
     _BQ_LOCATION = "${each.key}"
-    _JS_BUCKET   = "bqutil-lib-${each.value}"
+    _JS_BUCKET   = "bqutil-lib-${replace(each.value, "_", "-")}"
   }
 
-  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 }
 
