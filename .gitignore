@@ -2,6 +2,9 @@
 *.class
 *.pyc
 
+# Terraform files
+*.tfstate*
+
 # Log file
 *.log
 
