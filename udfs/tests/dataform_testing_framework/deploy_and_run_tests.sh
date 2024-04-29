@@ -241,7 +241,7 @@ main() {
     # Get the list of directory names which contain UDFs
     udf_dirs=$(sed 's/:.*//g' <../../dir_to_dataset_map.yaml)
     region_suffix=$(sed -rn "s/${BQ_LOCATION}: (.*)/\1/p" <../../region_to_dataset_suffix_map.yaml)
-    printf "Region suffix from mapping file: %s" "${region_suffix}"
+    printf "Region suffix from mapping file: %s" "${region_suffix}\n"
 
     for udf_dir in ${udf_dirs}; do
       # Get the short-hand version of the dataset_id
@@ -251,6 +251,7 @@ main() {
       # Region suffixes are used to deploy UDFs globally to bqutil without naming conflicts
       if [[  "${BQ_LOCATION^^}" != "US" ]]; then
         dataset_id="${dataset_id}_${region_suffix}"
+        printf "Dataset ID with region suffix: %s" "${dataset_id}\n"
       fi
       printf "*************** "
       printf "Testing UDFs in BigQuery dataset: %s%s" "${dataset_id}" "${SHORT_SHA}"
