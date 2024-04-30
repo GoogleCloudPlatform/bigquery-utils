@@ -11,6 +11,6 @@ steps:
       if [[ "$PROJECT_ID" = "bqutil" ]]; then 
         terraform init --backend-config=config/prod.config
       else
-        terraform init --backend-config=config/dev.config -reconfigure
+        terraform init --backend-config=config/dev.config 
       fi
       terraform apply -auto-approve
