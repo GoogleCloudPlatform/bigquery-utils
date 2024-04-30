@@ -2,9 +2,15 @@ steps:
 
 - id: 'tf init and apply'
   name: 'hashicorp/terraform:1.0.0'
+  env:
+  - 'TF_VAR_project=$PROJECT_ID'
   entrypoint: 'sh'
   args: 
   - '-c'
-  - | 
-      terraform init
+  - |
+      if [[ "$PROJECT_ID" = "bqutil" ]]; then 
+        terraform init --backend-config=config/prod.config
+      else
+        terraform init --backend-config=config/dev.config -reconfigure
+      fi
       terraform apply -auto-approve

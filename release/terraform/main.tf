@@ -1,14 +1,11 @@
 terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "4.51.0"
-    }
+  backend "gcs" {
+    prefix  = "terraform/state"
   }
 }
 
 provider "google" {
-  project = "bqutil"
+  project = var.project
 }
 
 data "local_file" "regions_file" {
@@ -21,7 +18,7 @@ locals {
 
 resource "google_storage_bucket" "regional_bucket" {
   for_each                    = local.regions_map
-  name                        = "bqutil-lib-${replace(each.value, "_", "-")}"
+  name                        = "${var.project}-lib-${replace(each.value, "_", "-")}"
   uniform_bucket_level_access = true
   location                    = each.key
   force_destroy               = true
@@ -37,10 +34,10 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   filename = "cloudbuild.yaml"
 
   github {
-    owner = "GoogleCloudPlatform"
-    name  = "bigquery-utils"
+    owner = "afleisc"
+    name  = "antipattern-cicd"
     push {
-      branch = "^master$"
+      branch = "^main$"
     }
   }
   ignored_files  = ["cloudbuild.yaml", ".*\\.md", "images/*", "udfs/**"]
@@ -48,7 +45,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
 
   substitutions = {
     _BQ_LOCATION = "${each.key}"
-    _JS_BUCKET   = "bqutil-lib-${replace(each.value, "_", "-")}"
+    _JS_BUCKET   = "${var.project}-lib-${replace(each.value, "_", "-")}"
   }
 
 }
