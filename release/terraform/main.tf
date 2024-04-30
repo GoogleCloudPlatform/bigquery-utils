@@ -34,10 +34,10 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   filename = "cloudbuild.yaml"
 
   github {
-    owner = "afleisc"
-    name  = "antipattern-cicd"
+    owner = "GoogleCloudPlatform"
+    name  = "bigquery-utils"
     push {
-      branch = "^main$"
+      branch = "^master$"
     }
   }
   ignored_files  = ["cloudbuild.yaml", ".*\\.md", "images/*", "udfs/**"]
