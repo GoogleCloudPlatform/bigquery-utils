@@ -130,6 +130,7 @@ function build_udfs() {
   # Create all UDFs in a test dataset unique to the commit SHORT_SHA.
   # Perform unit tests on any UDFs which have test cases.
   # Delete test datasets when finished
+  cp terraform/region_to_dataset_suffix_map.yaml ../udfs/region_to_dataset_suffix_map.yaml
   if ! gcloud builds submit "${UDF_DIR}"/ \
     --config="${UDF_DIR}"/cloudbuild.yaml \
     --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
@@ -221,7 +222,7 @@ function deploy_udfs() {
   num_files=$(echo "${sql_files}" | wc -l)
 
   replace_js_udf_bucket_placeholder
-
+  cp terraform/region_to_dataset_suffix_map.yaml ../udfs/region_to_dataset_suffix_map.yaml
   # For prod deploys, do not set SHORT_SHA so that BQ dataset
   # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \

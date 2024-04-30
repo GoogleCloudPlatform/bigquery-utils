@@ -12,7 +12,7 @@ provider "google" {
 }
 
 data "local_file" "regions_file" {
-  filename = "../../udfs/region_to_dataset_suffix_map.yaml"
+  filename = "region_to_dataset_suffix_map.yaml"
 }
 
 locals {
@@ -27,7 +27,7 @@ resource "google_storage_bucket" "regional_bucket" {
   force_destroy               = true
 }
 
-resource "google_cloudbuild_trigger" "include-build-logs-trigger" {
+resource "google_cloudbuild_trigger" "regional_trigger" {
   depends_on = [
     google_storage_bucket.regional_bucket
   ]
