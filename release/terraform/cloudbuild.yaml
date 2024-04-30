@@ -8,9 +8,5 @@ steps:
   args: 
   - '-c'
   - |
-      if [[ "$PROJECT_ID" = "bqutil" ]]; then 
-        terraform init --backend-config=config/prod.config
-      else
-        terraform init --backend-config=config/dev.config 
-      fi
+      terraform init --backend-config="bucket=${PROJECT_ID}-tfstate" -reconfigure
       terraform apply -auto-approve
