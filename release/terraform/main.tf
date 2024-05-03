@@ -37,7 +37,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
 
   substitutions = {
     _BQ_LOCATION = "${each.value}"
-    _JS_BUCKET   = "${var.project}-lib-${each.value}"
+    _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
   }
 
 }
