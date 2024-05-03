@@ -5,6 +5,7 @@ steps:
   env:
   - 'TF_VAR_project=$PROJECT_ID'
   entrypoint: 'sh'
+  dir: 'release/terraform'
   args: 
   - '-c'
   - |
