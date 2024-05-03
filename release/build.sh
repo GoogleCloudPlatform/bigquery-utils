@@ -139,8 +139,7 @@ function build_udfs() {
     datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
     for dataset in ${datasets}; do
         if [[  "${BQ_LOCATION^^}" != "US" ]]; then
-          local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]')
-          region_suffix=$(echo "$region_suffix" | tr '-' '_')
+          local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
           dataset="${dataset}_${region_suffix}"
         fi
       printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
