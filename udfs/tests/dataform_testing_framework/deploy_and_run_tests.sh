@@ -250,7 +250,7 @@ main() {
       if [[  "${BQ_LOCATION^^}" != "US" ]]; then
         local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
         dataset_id="${dataset_id}_${region_suffix}"
-        printf "Dataset ID with region suffix: %s" "${dataset_id}\n"
+        printf "Dataset ID with region suffix: %s\n" "${dataset_id}"
       fi
       printf "*************** "
       printf "Testing UDFs in BigQuery dataset: %s%s" "${dataset_id}" "${SHORT_SHA}"
