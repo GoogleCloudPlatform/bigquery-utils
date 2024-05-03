@@ -13,7 +13,7 @@ resource "google_storage_bucket" "regional_bucket" {
   name                        = "${var.project}-lib-${each.value}"
   uniform_bucket_level_access = true
   location                    = each.key
-  force_destroy               = true
+  force_destroy               = false
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
