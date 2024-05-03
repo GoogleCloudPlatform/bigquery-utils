@@ -248,8 +248,7 @@ main() {
       dataset_id=$(sed -rn "s/${udf_dir}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
       # Region suffixes are used to deploy UDFs globally to bqutil without naming conflicts
       if [[  "${BQ_LOCATION^^}" != "US" ]]; then
-        local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]')
-        region_suffix=$(echo "$region_suffix" | tr '-' '_')
+        local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
         dataset_id="${dataset_id}_${region_suffix}"
         printf "Dataset ID with region suffix: %s" "${dataset_id}\n"
       fi
