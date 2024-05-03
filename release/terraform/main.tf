@@ -21,7 +21,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
     google_storage_bucket.regional_bucket
   ]
   for_each = toset(var.bq_regions)
-  location = "global"
+  location = "${each.value}"
   name     = "udf-regional-trigger-${each.value}"
   filename = "cloudbuild.yaml"
 
