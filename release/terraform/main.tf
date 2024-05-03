@@ -28,12 +28,12 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   github {
     owner = "GoogleCloudPlatform"
     name  = "bigquery-utils"
-    push {
+    pull_request {
       branch = "^master$"
     }
   }
-  ignored_files  = ["cloudbuild.yaml", ".*\\.md", "images/*", "udfs/**"]
-  included_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**"]
+  included_files = ["udfs/**"]
+  ignored_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**"]
 
   substitutions = {
     _BQ_LOCATION = "${each.value}"
