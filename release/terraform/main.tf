@@ -38,9 +38,5 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
     _BQ_LOCATION = "${each.value}"
     _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
   }
-
-  options {
-    worker_pool = "projects/${var.project}/workerPools/udf-unit-testing"
-  }
 }
 
