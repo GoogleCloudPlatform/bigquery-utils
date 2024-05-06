@@ -58,9 +58,9 @@ steps:
   ###########################################################
 - name: gcr.io/bqutil/bq_udf_ci
   id: copy_js_to_gcs
-  entrypoint: gsutil
+  entrypoint: gcloud
   args:
-    - '-m'
+    - storage
     - cp
     - js_builds/*
     - ${_JS_BUCKET}
