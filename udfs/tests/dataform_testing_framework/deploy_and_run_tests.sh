@@ -132,7 +132,7 @@ deploy_udfs() {
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
 
-  printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
+  printf "Deploying UDFs using dataform run command:\n%s\n" "dataform run ${udfs_target_dir}"
   if ! dataform run "${udfs_target_dir}"; then
     # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
     # If SHORT_SHA is not null, then we know a test dataset was used.
