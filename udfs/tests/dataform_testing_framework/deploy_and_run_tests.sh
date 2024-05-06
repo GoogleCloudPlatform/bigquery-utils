@@ -91,6 +91,7 @@ generate_dataform_config_and_creds() {
   # in order to have Dataform pick up application default credentials
   # https://cloud.google.com/docs/authentication/production#automatically
   echo "{\"projectId\": \"${project_id}\", \"location\": \"${BQ_LOCATION}\"}" >"${target_dir}"/.df-credentials.json
+  printf "Credentials file created: %s\n" "${target_dir}/.df-credentials.json"
 }
 
 #######################################
