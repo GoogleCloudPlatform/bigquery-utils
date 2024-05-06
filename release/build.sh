@@ -133,7 +133,7 @@ function build_udfs() {
   if ! gcloud builds submit "${UDF_DIR}"/ \
     --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
-    --polling-interval="10s" \
+    --polling-interval="10" \
     --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
     # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
     printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
@@ -232,7 +232,7 @@ function deploy_udfs() {
   gcloud builds submit "${UDF_DIR}"/ \
     --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
-    --polling-interval="10s" \
+    --polling-interval="10" \
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 
