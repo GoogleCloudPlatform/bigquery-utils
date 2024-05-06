@@ -112,7 +112,7 @@ function replace_js_udf_bucket_placeholder() {
 #######################################
 function remove_gcs_js_directory(){
   printf "Deleting Cloud Storage directory: %s\n" "${_JS_BUCKET}"
-  gsutil rm -rf "${_JS_BUCKET}"
+  gsutil rm -rf "${_JS_BUCKET}"/**
 }
 
 #######################################
