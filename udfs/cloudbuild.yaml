@@ -81,4 +81,5 @@ steps:
 
 timeout: 1800s # 30 minutes
 options:
-  machineType: N1_HIGHCPU_32
+  pool: 
+    name: projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing
