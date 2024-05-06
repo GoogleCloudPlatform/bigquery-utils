@@ -169,6 +169,7 @@ test_udfs() {
     cp "${udfs_source_dir}"/test_cases.js "${udfs_target_dir}"/definitions/test_cases.js
     generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
     add_symbolic_dataform_dependencies "${udfs_target_dir}"
+    printf "Testing UDFs using dataform test command\n"
     if ! (cd "${udfs_target_dir}" && dataform test .); then
       # If any error occurs when testing, delete BigQuery testing dataset before exiting with status code 1.
       # If SHORT_SHA is not null, then we know a test dataset was used.
