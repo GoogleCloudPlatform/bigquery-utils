@@ -198,7 +198,7 @@ function build() {
   files_changed=$(git diff --name-only origin/master)
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
-  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
+  if [[ $(echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci) || -n "${_BUILD_IMAGE}" ]]; then
     build_udf_testing_image
   fi
   # Only build the BigQuery UDFs if any files in the
