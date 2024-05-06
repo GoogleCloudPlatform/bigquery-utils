@@ -131,6 +131,7 @@ function build_udfs() {
   # Perform unit tests on any UDFs which have test cases.
   # Delete test datasets when finished
   if ! gcloud builds submit "${UDF_DIR}"/ \
+    --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
     --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
     # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
@@ -228,6 +229,7 @@ function deploy_udfs() {
   # For prod deploys, do not set SHORT_SHA so that BQ dataset
   # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \
+    --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
