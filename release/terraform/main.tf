@@ -35,9 +35,18 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   github {
     owner = "GoogleCloudPlatform"
     name  = "bigquery-utils"
-    pull_request {
-      branch = "^master$"
-      comment_control = "COMMENTS_ENABLED"
+    dynamic "pull_request" {
+      for_each = var.project == "bqutil-test" ? [1] : []
+      content {
+        branch = "^master$"
+        comment_control = "COMMENTS_ENABLED"
+      }
+    }
+    dynamic "push" {
+      for_each = var.project == "bqutil" ? [1] : []
+      content {
+        branch = "^master$"
+      }
     }
   }
   included_files = ["udfs/**"]
