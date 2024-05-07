@@ -91,6 +91,7 @@ generate_dataform_config_and_creds() {
   # in order to have Dataform pick up application default credentials
   # https://cloud.google.com/docs/authentication/production#automatically
   echo "{\"projectId\": \"${project_id}\", \"location\": \"${BQ_LOCATION}\"}" >"${target_dir}"/.df-credentials.json
+  printf "Credentials file created: %s\n" "${target_dir}/.df-credentials.json"
 }
 
 #######################################
@@ -131,8 +132,8 @@ deploy_udfs() {
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
 
-  printf "Deploying UDFs from %s using dataform run command.\n" "${udfs_source_dir}"
-  if ! dataform run "${udfs_target_dir}"; then
+  printf "Deploying UDFs using dataform run command\n"
+  if ! (cd "${udfs_target_dir}" && dataform run .); then
     # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
     # If SHORT_SHA is not null, then we know a test dataset was used.
     if [[ -n "${SHORT_SHA}" ]]; then
@@ -168,7 +169,9 @@ test_udfs() {
     cp "${udfs_source_dir}"/test_cases.js "${udfs_target_dir}"/definitions/test_cases.js
     generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
     add_symbolic_dataform_dependencies "${udfs_target_dir}"
-    if ! dataform test "${udfs_target_dir}"; then
+    
+    printf "Testing UDFs using dataform test command\n"
+    if ! (cd "${udfs_target_dir}" && dataform test .); then
       # If any error occurs when testing, delete BigQuery testing dataset before exiting with status code 1.
       # If SHORT_SHA is not null, then we know a test dataset was used.
       if [[ -n "${SHORT_SHA}" ]]; then
@@ -246,6 +249,13 @@ main() {
       # which is mapped in dir_to_dataset_map.yaml
       local dataset_id
       dataset_id=$(sed -rn "s/${udf_dir}: (.*)/\1/p" <../../dir_to_dataset_map.yaml)
+      # Region suffixes are used to deploy UDFs globally to bqutil without naming conflicts
+      # US multi-region datasets remain without suffix to avoid breaking changes to legacy users
+      if [[  "${BQ_LOCATION^^}" != "US" ]]; then
+        local region_suffix=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+        dataset_id="${dataset_id}_${region_suffix}"
+        printf "Dataset ID with region suffix: %s\n" "${dataset_id}"
+      fi
       printf "*************** "
       printf "Testing UDFs in BigQuery dataset: %s%s" "${dataset_id}" "${SHORT_SHA}"
       printf " ***************\n"

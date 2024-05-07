@@ -1,0 +1,13 @@
+steps:
+
+- id: 'tf init and apply'
+  name: 'hashicorp/terraform:latest'
+  env:
+  - 'TF_VAR_project=$PROJECT_ID'
+  entrypoint: 'sh'
+  dir: 'release/terraform'
+  args: 
+  - '-c'
+  - |
+      terraform init --backend-config="bucket=${PROJECT_ID}-tfstate" -reconfigure
+      terraform apply -auto-approve

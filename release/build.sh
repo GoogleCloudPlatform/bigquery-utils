@@ -112,7 +112,7 @@ function replace_js_udf_bucket_placeholder() {
 #######################################
 function remove_gcs_js_directory(){
   printf "Deleting Cloud Storage directory: %s\n" "${_JS_BUCKET}"
-  gsutil rm -rf "${_JS_BUCKET}"
+  gcloud storage rm -r "${_JS_BUCKET}/**"
 }
 
 #######################################
@@ -131,13 +131,19 @@ function build_udfs() {
   # Perform unit tests on any UDFs which have test cases.
   # Delete test datasets when finished
   if ! gcloud builds submit "${UDF_DIR}"/ \
+    --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
+    --polling-interval="10" \
     --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
     # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
     printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
     local datasets
     datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
     for dataset in ${datasets}; do
+      if [[  "${_BQ_LOCATION^^}" != "US" ]]; then
+        local region_suffix=$(echo "$_BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+        dataset="${dataset}_${region_suffix}"
+      fi
       printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
       bq --headless --synchronous_mode rm -r -f "${dataset}_test_${SHORT_SHA}"
     done
@@ -192,7 +198,7 @@ function build() {
   files_changed=$(git diff --name-only origin/master)
   # Only build the Cloud Build image (used for testing UDFs)
   # if any files in the udfs/tests/ directory have changed.
-  if echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci; then
+  if [[ $(echo "${files_changed}" | grep -q "${UDF_DIR}"/tests/Dockerfile.ci) || -n "${_BUILD_IMAGE}" ]]; then
     build_udf_testing_image
   fi
   # Only build the BigQuery UDFs if any files in the
@@ -221,11 +227,12 @@ function deploy_udfs() {
   num_files=$(echo "${sql_files}" | wc -l)
 
   replace_js_udf_bucket_placeholder
-
   # For prod deploys, do not set SHORT_SHA so that BQ dataset
   # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \
+    --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
+    --polling-interval="10" \
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 

@@ -44,6 +44,7 @@ steps:
     - _JS_BUCKET=${_JS_BUCKET}
     - _PR_NUMBER=${_PR_NUMBER}
     - _BQ_LOCATION=${_BQ_LOCATION}
+    - _BUILD_IMAGE=${_BUILD_IMAGE}
 
 substitutions:
   _JS_BUCKET: gs://bqutil-lib/test_bq_js_libs/${SHORT_SHA} # default value
@@ -51,4 +52,5 @@ substitutions:
 
 timeout: 1800s # 30 minutes
 options:
-  machineType: N1_HIGHCPU_8
+  pool: 
+    name: projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing

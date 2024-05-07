@@ -2,6 +2,13 @@
 *.class
 *.pyc
 
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
 # Log file
 *.log
 
