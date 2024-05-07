@@ -37,6 +37,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
     name  = "bigquery-utils"
     pull_request {
       branch = "^master$"
+      comment_control = "COMMENTS_ENABLED"
     }
   }
   included_files = ["udfs/**"]
