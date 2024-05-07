@@ -1,7 +1,7 @@
 steps:
 
 - id: 'tf init and apply'
-  name: 'hashicorp/terraform:1.0.0'
+  name: 'hashicorp/terraform:latest'
   env:
   - 'TF_VAR_project=$PROJECT_ID'
   entrypoint: 'sh'
