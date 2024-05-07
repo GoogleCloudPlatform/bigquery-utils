@@ -17,19 +17,11 @@ resource "google_storage_bucket" "regional_bucket" {
   force_destroy               = false
 }
 
-data "google_iam_policy" "bqutil_bucket_policy" {
-  binding {
-    role = "roles/storage.objectViewer"
-    members = [
-      "allAuthenticatedUsers",
-    ]
-  }
-}
-
-resource "google_storage_bucket_iam_policy" "allAuthenticatedUsers" {
+resource "google_storage_bucket_iam_member" "member" {
   for_each = var.project == "bqutil" ? toset(var.bq_regions) : []
   bucket = "${var.project}-lib-${each.value}"
-  policy_data = data.google_iam_policy.bqutil_bucket_policy.policy_data
+  role = "roles/storage.objectViewer"
+  member = "allAuthenticatedUsers"
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
