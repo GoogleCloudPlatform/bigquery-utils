@@ -12,8 +12,24 @@ resource "google_storage_bucket" "regional_bucket" {
   for_each                    = toset(var.bq_regions)
   name                        = "${var.project}-lib-${each.value}"
   uniform_bucket_level_access = true
+  public_access_prevention    = var.project == "bqutil" ? false : true
   location                    = each.key
   force_destroy               = false
+}
+
+data "google_iam_policy" "bqutil_bucket_policy" {
+  binding {
+    role = "roles/storage.objectViewer"
+    members = [
+      "allAuthenticatedUsers",
+    ]
+  }
+}
+
+resource "google_storage_bucket_iam_policy" "allAuthenticatedUsers" {
+  for_each = var.project == "bqutil" ? toset(var.bq_regions) : []
+  bucket = "${var.project}-lib-${each.value}"
+  policy_data = data.google_iam_policy.bqutil_bucket_policy.policy_data
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
