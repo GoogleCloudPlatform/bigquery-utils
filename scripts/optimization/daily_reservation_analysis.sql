@@ -116,7 +116,7 @@ FROM
                 FROM
                     `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION jbo
                 WHERE
-                    DATE(jbo.creation_time, "US/Central") >= CURRENT_DATE - var_n_days
+                    DATE(jbo.creation_time, "US/Central") >= CURRENT_DATE - num_days_to_scan
                     AND jbo.end_time > jbo.start_time
                     AND jbo.error_result IS NULL
                     AND jbo.statement_type != 'SCRIPT'
