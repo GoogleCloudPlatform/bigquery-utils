@@ -45,7 +45,7 @@ function execute_query() {
   local dry_run=$2
 
   printf "%s%s%s\n" "${BOLD}" "${file}" "${NORMAL}"
-  if [[ ${dry_run} = true ]]; then
+  if [[ ${dry_run} == true ]]; then
     if ! bq query \
     --headless --nouse_legacy_sql --dry_run < "${file}" ; then
       printf "Failed to dry run: %s" "${file}"
@@ -121,6 +121,7 @@ function remove_gcs_js_directory(){
 #   UDF_DIR
 #   _JS_BUCKET
 #   SHORT_SHA
+#   _BQ_LOCATION
 # Arguments:
 #   None
 # Returns:
@@ -140,7 +141,7 @@ function build_udfs() {
     local datasets
     datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
     for dataset in ${datasets}; do
-      if [[  "${_BQ_LOCATION^^}" != "US" ]]; then
+      if [[ "${_BQ_LOCATION^^}" != "US" ]]; then
         local region_suffix=$(echo "$_BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
         dataset="${dataset}_${region_suffix}"
       fi
@@ -159,27 +160,29 @@ function build_udfs() {
 # udfs/ and the tools/ directories
 # since they're tested separately.
 # Globals:
-#   None
+#   _BQ_LOCATION
 # Arguments:
 #   None
 # Returns:
 #   None
 #######################################
 function dry_run_all_sql() {
-  # Get list of all .sql files
-  # (excluding udfs/ and tools/ directories)
-  local sql_files
-  sql_files=$(find . \
-  -wholename "./udfs/*" -prune -o \
-  -wholename "./tools/*" -prune -o \
-  -type f -name "*.sql" -print)
-  local num_files
-  num_files=$(echo "${sql_files}" | wc -l)
+  if [[ "${_BQ_LOCATION^^}" == "US" ]]; then
+    # Get list of all .sql files
+    # (excluding udfs/ and tools/ directories)
+    local sql_files
+    sql_files=$(find . \
+    -wholename "./udfs/*" -prune -o \
+    -wholename "./tools/*" -prune -o \
+    -type f -name "*.sql" -print)
+    local num_files
+    num_files=$(echo "${sql_files}" | wc -l)
 
-  printf "Dry-running %s SQL assets...\n" "${num_files}"
-  while read -r file; do
-    execute_query "${file}" true
-  done <<<"${sql_files}"
+    printf "Dry-running %s SQL assets...\n" "${num_files}"
+    while read -r file; do
+      execute_query "${file}" true
+    done <<<"${sql_files}"
+  fi
 }
 
 #######################################
@@ -187,6 +190,7 @@ function dry_run_all_sql() {
 # assets within the repository.
 # Globals:
 #   UDF_DIR
+#   _BUILD_IMAGE (true/false)
 # Arguments:
 #   None
 # Returns:
@@ -215,6 +219,8 @@ function build() {
 # within the bqutil project
 # Globals:
 #   UDF_DIR
+#   _JS_BUCKET
+#   _BQ_LOCATION
 # Arguments:
 #   None
 # Returns:
@@ -236,20 +242,26 @@ function deploy_udfs() {
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 
-#######################################
+##############################################
 # Deploys Stored Procedures to the
-# "procedure" bqutil dataset.
+# US multi-region "procedure" bqutil dataset.
+# Globals:
+#   _BQ_LOCATION
+# Arguments:
+#   None
 # Returns:
 #   None
-#######################################
+##############################################
 function deploy_stored_procs() {
-  local sql_files=$(find $SP_DIR -type f -name "*.sql")
-  local num_files=$(echo "$sql_files" | wc -l)
+  if [[ "${_BQ_LOCATION^^}" == "US" ]]; then
+    local sql_files=$(find $SP_DIR -type f -name "*.sql")
+    local num_files=$(echo "$sql_files" | wc -l)
 
-  printf "Creating or updating $num_files stored procedures...\n"
-  while read -r file; do
-    execute_query $file false "procedure"
-  done <<< "$sql_files"
+    printf "Creating or updating $num_files stored procedures...\n"
+    while read -r file; do
+      execute_query $file false "procedure"
+    done <<< "$sql_files"
+  fi
 }
 
 #######################################
@@ -266,7 +278,7 @@ function main() {
   # Only deploy UDFs when building master branch and there is
   # no associated pull request, meaning the PR was approved
   # and this is now building a commit on master branch.
-  if [[ "${BRANCH_NAME}" = "master" && -z "${_PR_NUMBER}" ]]; then
+  if [[ "${BRANCH_NAME}" == "master" && -z "${_PR_NUMBER}" ]]; then
     deploy_udfs
     deploy_stored_procs
   else
