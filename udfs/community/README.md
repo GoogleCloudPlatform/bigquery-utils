@@ -130,6 +130,7 @@ SELECT bqutil.fn.int(1.684)
 * [jaccard](#jaccard)
 * [job_url](#job_urljob_id-string)
 * [json_extract_keys](#json_extract_keys)
+* [json_extract_key_value_pairs](#json_extract_key_value_pairs)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
 * [knots_to_mph](#knots_to_mphinput_knots-float64)
@@ -1387,6 +1388,25 @@ SELECT bqutil.fn.json_extract_keys(
 foo
 bar
 hat
+```
+
+### [json_extract_key_value_pairs()](json_extract_key_value_pairs.sqlx)
+Returns all key/values pairs in the input JSON as an array
+of STRUCT<key STRING, value STRING>
+Returns NULL if invalid JSON string is passed,
+
+
+```sql
+SELECT * FROM UNNEST(
+  bqutil.fn.json_extract_key_value_pairs(
+    '{"foo" : "cat", "bar": [1,2,3], "hat": {"qux": true}}'
+  )
+)
+
+key,value
+foo,"cat"
+bar,[1,2,3]
+hat,{"qux":true}
 ```
 
 ### [json_extract_values()](json_extract_values.sqlx)

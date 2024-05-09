@@ -58,6 +58,24 @@ generate_udf_test("json_extract_keys", [
         expected_output: `cast(null as array<string>)`,
     },
 ]);
+generate_udf_test("json_extract_key_value_pairs", [
+    {
+        inputs: [`'{"foo" : "cat", "bar": 42, "hat": [1,2,3], "qux": {"bat": true}}'`],
+        expected_output: `([STRUCT("foo" AS key, "cat" AS value), STRUCT("bar" AS key, "42" AS value), STRUCT("hat" AS key, "[1,2,3]" AS value), STRUCT("qux" AS key, '{"bat":true}' AS value)])`
+    },
+    {
+        inputs: [`'{}'`],
+        expected_output: `[]`
+    },
+    {
+        inputs: [`'invalid_json'`],
+        expected_output: `cast(null as array<struct<key string, value string>>)`,
+    },
+    {
+        inputs: [`string(null)`],
+        expected_output: `cast(null as array<struct<key string, value string>>)`,
+    },
+]);
 generate_udf_test("json_extract_values", [
     {
         inputs: [`'{"foo" : "cat", "bar": "dog", "hat": "rat"}'`],
