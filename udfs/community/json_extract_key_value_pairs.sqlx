@@ -15,7 +15,7 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(input STRING)
+CREATE OR REPLACE FUNCTION ${self()}(json_str STRING)
 RETURNS ARRAY<STRUCT<key STRING, value STRING>>
 LANGUAGE js 
 OPTIONS(
