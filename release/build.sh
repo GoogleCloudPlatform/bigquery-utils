@@ -131,27 +131,30 @@ function build_udfs() {
   # Create all UDFs in a test dataset unique to the commit SHORT_SHA.
   # Perform unit tests on any UDFs which have test cases.
   # Delete test datasets when finished
-  if ! gcloud builds submit "${UDF_DIR}"/ \
-    --region="us-central1" \
-    --config="${UDF_DIR}"/cloudbuild.yaml \
-    --polling-interval="10" \
-    --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
-    # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
-    printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
-    local datasets
-    datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
-    for dataset in ${datasets}; do
-      if [[ "${_BQ_LOCATION^^}" != "US" ]]; then
-        local region_suffix=$(echo "$_BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
-        dataset="${dataset}_${region_suffix}"
-      fi
-      printf "Deleting BigQuery dataset: %s_test_%s\n" "${dataset}" "${SHORT_SHA}"
-      bq --headless --synchronous_mode rm -r -f "${dataset}_test_${SHORT_SHA}"
-    done
+  if [[ -n "${SHORT_SHA}" ]]; then
+    if ! gcloud builds submit "${UDF_DIR}"/ \
+      --region="us-central1" \
+      --config="${UDF_DIR}"/cloudbuild.yaml \
+      --polling-interval="10" \
+      --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
+      --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
+      # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
+      printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
+      local datasets
+      datasets=$(sed 's/.*: //g' < udfs/dir_to_dataset_map.yaml)
+      for dataset in ${datasets}; do
+        if [[ "${_BQ_LOCATION^^}" != "US" ]]; then
+          local region_suffix=$(echo "$_BQ_LOCATION" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+          dataset="${dataset}_${region_suffix}"
+        fi
+        printf "Deleting BigQuery dataset: %s%s\n" "${dataset}" "${SHORT_SHA}"
+        bq --headless --synchronous_mode rm -r -f "${dataset}${SHORT_SHA}"
+      done
+      remove_gcs_js_directory
+      exit 1
+    fi
     remove_gcs_js_directory
-    exit 1
   fi
-  remove_gcs_js_directory
 }
 
 #######################################
@@ -239,6 +242,7 @@ function deploy_udfs() {
     --region="us-central1" \
     --config="${UDF_DIR}"/cloudbuild.yaml \
     --polling-interval="10" \
+    --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
 }
 

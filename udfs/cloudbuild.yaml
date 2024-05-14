@@ -80,7 +80,3 @@ steps:
     - JS_BUCKET=${_JS_BUCKET}
 
 timeout: 1800s # 30 minutes
-options:
-  pool:
-    # Prefer regional worker pool for higher build concurrency
-    name: projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing
