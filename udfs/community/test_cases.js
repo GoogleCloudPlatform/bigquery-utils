@@ -3839,3 +3839,105 @@ generate_udf_test("table_url", [
     }
 
   ]);
+
+generate_udf_test("cw_overlapping_partition_by_regexp", [
+    {
+      inputs: [
+        `1`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([1, 2, 3] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `2`,
+        `"A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([ 2, 3] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `3`,
+        `"B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `4`,
+        `"A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([4, 5] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `5`,
+        `"B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `101`,
+        `"A@101#A@102#B@103#A@104#B@105#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([101, 102, 103] AS ARRAY<INT64>)`
+    }
+  ]);
+
+generate_udf_test("cw_disjoint_partition_by_regexp", [
+    {
+      inputs: [
+        `1`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([1, 2, 3] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `2`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `3`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `4`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([4, 5] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `5`,
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<INT64>)`
+    },
+    {
+      inputs: [
+        `104`,
+        `"A@101#A@102#B@103#A@104#B@105#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([104, 105] AS ARRAY<INT64>)`
+    }
+  ]);

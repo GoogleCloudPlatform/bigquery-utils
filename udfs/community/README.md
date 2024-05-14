@@ -40,6 +40,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
 * [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
 * [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
+* [cw_disjoint_partition_by_regexp](#cw_disjoint_partition_by_regexpfirstrn-int64-haystack-string-regex-string)
 * [cw_editdistance](#cw_editdistancea-string-b-string)
 * [cw_error_number](cw_error_numbererrmsg-string)
 * [cw_error_severity](cw_error_severityerrmsg-string)
@@ -65,6 +66,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_nvp2json3](#cw_nvp2json3nvp-string-name_delim-string-val_delim-string)
 * [cw_nvp2json4](#cw_nvp2json4nvp-string-name_delim-string-val_delim-string-ignore_char-string)
 * [cw_otranslate](#cw_otranslates-string-key-string-value-string)
+* [cw_overlapping_partition_by_regexp](#cw_overlapping_partition_by_regexpfirstrn-int64-haystack-string-regex-string)
 * [cw_period_intersection](#cw_period_intersectionp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_period_ldiff](#cw_period_ldiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_period_rdiff](#cw_period_rdiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
@@ -445,6 +447,22 @@ SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
 ["Test", "123"]
 ```
 
+### [cw_disjoint_partition_by_regexp(firstRn INT64, haystack STRING, regex STRING)](cw_disjoint_partition_by_regexp.sqlx)
+Partitions rows into disjoint segments by matching their sequence with the provided regex pattern.
+```sql
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(2, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(3, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(4, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(5, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+
+[1, 2, 3]
+[]
+[]
+[4, 5]
+[]
+```
+
 ### [cw_editdistance(a STRING, b STRING)](cw_editdistance.sqlx)
 Similar to teradata's editdistance without weightages
 ```sql
@@ -667,6 +685,23 @@ SELECT bqutil.fn.cw_otranslate('Thin and Thick', 'Thk', 'Sp');
 
 Spin and Spic
 ```
+
+### [cw_overlapping_partition_by_regexp(firstRn INT64, haystack STRING, regex STRING)](cw_overlapping_partition_by_regexp.sqlx)
+Partitions rows into overlapping segments by matching their sequence with the provided regex pattern.
+```sql
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(2, 'A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(3, 'B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(4, 'A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_partition_by_regexp(5, 'B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+
+[1, 2, 3]
+[2, 3]
+[]
+[4, 5]
+[]
+```
+
 
 ### [cw_period_intersection(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_intersection.sqlx)
 ```sql
