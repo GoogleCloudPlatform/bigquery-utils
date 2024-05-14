@@ -39,6 +39,7 @@ steps:
   args:
     - release/build.sh
   env:
+    - PROJECT_ID=${PROJECT_ID}
     - BRANCH_NAME=${BRANCH_NAME}
     - SHORT_SHA=${SHORT_SHA}
     - _JS_BUCKET=${_JS_BUCKET}
