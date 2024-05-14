@@ -25,7 +25,7 @@
 #   None
 ##############################################
 build_image_if_not_exists() {
-  if ! gcloud container images describe "gcr.io/${PROJECT_ID}/bq_udf_ci"; then
+  if ! gcloud container images describe "gcr.io/${PROJECT_ID}/bq_udf_ci" 2> /dev/null; then
     printf "Build image does not exist. Building image %s.\n" "gcr.io/${PROJECT_ID}/bq_udf_ci"
     gcloud builds submit tests/ --config=tests/cloudbuild_udf_test_image.yaml
   fi
