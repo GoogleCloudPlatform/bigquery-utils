@@ -1,0 +1,69 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+-- simplified_query_insights:
+-- Helper function to retrieve query insights for a BigQuery job as a list of strings.
+-- Input:
+-- performanceInsights: query_info.performance_insights in the JOBS Information Schema view
+-- https://cloud.google.com/bigquery/docs/information-schema-jobs-by-organization#schema
+-- Output: An array of structs representing each performance insight and their count throughout the stages of a job.
+CREATE OR REPLACE FUNCTION ${self()}(performanceInsights STRUCT<stage_performance_standalone_insights ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>, stage_performance_change_insights ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>>)
+OPTIONS (
+    description="""Helper function to retrieve query insights for a BigQuery job as a list of strings.
+    Input:
+    performanceInsights: query_info.performance_insights in the JOBS Information Schema view
+    https://cloud.google.com/bigquery/docs/information-schema-jobs-by-organization#schema
+    Output: An array of structs representing each performance insight and their count throughout the stages of a job.
+"""
+)
+AS ( (
+    WITH
+      all_insights AS (
+      SELECT
+        ARRAY_AGG(insight) AS insights_name
+      FROM (
+        SELECT
+          CASE
+            WHEN stage.slot_contention THEN 'Slot contention'
+            WHEN stage.insufficient_shuffle_quota THEN 'Shuffle quota issue'
+            WHEN ARRAY_LENGTH(stage.bi_engine_reasons) > 0 THEN 'BI Engine issues'
+        END
+          AS insight
+        FROM
+          UNNEST(performanceInsights.stage_performance_standalone_insights) AS stage
+        UNION ALL
+        SELECT
+          'Input data change' AS insight
+        FROM
+          UNNEST(performanceInsights.stage_performance_change_insights) AS change
+        WHERE
+          change.input_data_change.records_read_diff_percentage IS NOT NULL )
+      WHERE
+        insight IS NOT NULL ),
+      aggregated_insights AS (
+      SELECT
+        STRUCT(insight,
+          COUNT(*) AS num_stages) AS insights_data
+      FROM
+        all_insights,
+        UNNEST(all_insights.insights_name) AS insight
+      GROUP BY
+        insight )
+    SELECT
+      ARRAY_AGG(aggregated_insights.insights_data)
+    FROM
+      aggregated_insights ));
