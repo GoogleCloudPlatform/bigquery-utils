@@ -15,8 +15,9 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/*
- Returns overlapping matches for the regex with the sequence of rows encoded in
+CREATE OR REPLACE FUNCTION ${self()}(firstRn INT64, haystack STRING, regex STRING)
+  RETURNS ARRAY<INT64> 
+  OPTIONS(description="""Returns overlapping matches for the regex with the sequence of rows encoded in
  custom format. The expected input haystack format is
  "row-1@row-number-1#row-2@row-number-2# ... #row-n@row-number-n#".
  If the regex matches, then it returns all rows matched at the prefix of the
@@ -39,9 +40,8 @@ config { hasOutput: true }
  3          "B@3#A@4#B@5#"          []
  4          "A@4#B@5#"              [4, 5]
  5          "B@5#"                  []
- */
-CREATE OR REPLACE FUNCTION ${self()}(firstRn INT64, haystack STRING, regex STRING)
-  RETURNS ARRAY<INT64> AS (
+""")
+  AS (
    (WITH t AS (
       SELECT ARRAY_LENGTH(REGEXP_EXTRACT_ALL(REGEXP_EXTRACT(haystack, '^(' || regex || ')'), '@\\d+#')) AS n_rows
     )
