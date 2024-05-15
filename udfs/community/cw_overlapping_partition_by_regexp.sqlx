@@ -1,0 +1,49 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(firstRn INT64, haystack STRING, regex STRING)
+  RETURNS ARRAY<INT64> 
+  OPTIONS(description="""Returns overlapping matches for the regex with the sequence of rows encoded in
+ custom format. The expected input haystack format is
+ "row-1@row-number-1#row-2@row-number-2# ... #row-n@row-number-n#".
+ If the regex matches, then it returns all rows matched at the prefix of the
+ haystack,  e.g. if firstRn is 1, firstRn is "A@1#A@2#B@3#A@4#B@5#" and regex
+ is "(?:A@\\d+#)+(?:B@\\d+#)" then it will return [1, 2, 3] as output since
+ matched subsequence is "A@1#A@2#B@3#". If haystack is "B@3#A@4#B@5#" for the
+ same regex it will return an empty array since regex does not match at the
+ prefix of the haystack.
+
+ By repeatedly calling cw_overlapping_partition_by_regexp with increasing values
+ of firstRn and a substring of sequence starting at firstRn, this UDF
+ effectively returns overlapping sets of row numbers that match the given regex.
+
+ Continuing the above example, if we call this UDF with firstRn having
+ increasing values, and haystack having substring starting with firstRn, then we
+ get corresponding outputs as follows:
+ firstRn    haystack                output
+ 1          "A@1#A@2#B@3#A@4#B@5#"  [1, 2, 3]
+ 2          "A@2#B@3#A@4#B@5#"      [2, 3]
+ 3          "B@3#A@4#B@5#"          []
+ 4          "A@4#B@5#"              [4, 5]
+ 5          "B@5#"                  []
+""")
+  AS (
+   (WITH t AS (
+      SELECT ARRAY_LENGTH(REGEXP_EXTRACT_ALL(REGEXP_EXTRACT(haystack, '^(' || regex || ')'), '@\\d+#')) AS n_rows
+    )
+    SELECT GENERATE_ARRAY(firstRn, firstRn + n_rows- 1) FROM t)
+  );
