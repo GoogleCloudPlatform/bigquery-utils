@@ -1652,7 +1652,6 @@ SELECT
 `[
     STRUCT('Slot contention', 1),
     STRUCT('Shuffle quota issue', 1),
-    STRUCT('BI Engine issues', 2),
     STRUCT('Input data change', 1)
   ]`
 ```

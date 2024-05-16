@@ -62,6 +62,21 @@ generate_udf_test("insight_counts", [
     },
 ]);
 
+generate_udf_test("insight_counts", [
+
+    {
+        inputs: [`STRUCT(
+            NULL AS avgPreviousExecutionMs,  
+            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[] AS stage_performance_standalone_insights,
+            ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[] AS stage_performance_change_insights)`
+        ],
+        expected_output: `[
+            STRUCT(NULL AS insight, NULL AS count)
+        ]` 
+    },
+]);
+
+
 generate_udf_test("json_extract_keys", [
     {
         inputs: [`'{"foo" : "cat", "bar": "dog", "hat": "rat"}'`],
