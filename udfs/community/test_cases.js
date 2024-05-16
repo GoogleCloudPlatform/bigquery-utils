@@ -55,9 +55,9 @@ generate_udf_test("insight_counts", [
             ] AS stage_performance_change_insights)`
         ],
         expected_output: `[
-            STRUCT('Slot contention', 2),
-            STRUCT('Shuffle quota issue', 2),
-            STRUCT('Input data change', 1)
+            STRUCT('Slot contention' AS insight, 2 AS count),
+            STRUCT('Shuffle quota issue' AS insight, 2 AS count),
+            STRUCT('Input data change' AS insight, 1 AS count)
         ]`
     },
 ]);
