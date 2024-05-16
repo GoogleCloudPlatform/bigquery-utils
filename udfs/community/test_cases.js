@@ -40,7 +40,7 @@ generate_udf_test("int", [
         expected_output: `CAST(7 AS INT64)`
     },
 ]);
-generate_udf_test("simplified_query_insights", [
+generate_udf_test("insight_counts", [
 
     {
         inputs: [`STRUCT(
