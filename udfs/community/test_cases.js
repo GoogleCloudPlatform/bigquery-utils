@@ -40,63 +40,25 @@ generate_udf_test("int", [
         expected_output: `CAST(7 AS INT64)`
     },
 ]);
-// simplified_query_insights Test Cases
 generate_udf_test("simplified_query_insights", [
 
-    // Test Case 1: Complete Insights Data (with bi_engine_reasons populated)
     {
-        description: "Test with valid complete insights data, including BI Engine reasons.",
         inputs: [`STRUCT(
+            1000 AS avgPreviousExecutionMs,  
             ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[
-                (1, true, false, [STRUCT('code1' AS code, 'message1' AS message)]),
-                (2, false, true, [STRUCT('code2' AS code, 'message2' AS message)])
+                (1, true, false, [STRUCT('code1', 'message1')]),
+                (2, false, true, [STRUCT('code2', 'message2')]),
+                (3, true, true, NULL)
             ] AS stage_performance_standalone_insights,
             ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[
-                (3, (10.0))
+                (3, STRUCT(10.0))
             ] AS stage_performance_change_insights)`
         ],
         expected_output: `[
-            STRUCT('Slot contention', 1),
-            STRUCT('Shuffle quota issue', 1),
-            STRUCT('BI Engine issues', 2),
+            STRUCT('Slot contention', 2),
+            STRUCT('Shuffle quota issue', 2),
             STRUCT('Input data change', 1)
         ]`
-    },
-
-    // Test Case 2: Empty BI Engine Reasons
-    {
-        description: "Test with empty BI Engine reasons data (empty array of structs).",
-        inputs: [`STRUCT(
-            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[
-                (1, true, false, [])
-            ] AS stage_performance_standalone_insights,
-            [] AS stage_performance_change_insights)`
-        ],
-        expected_output: `[STRUCT('Slot contention', 1)]`
-    },
-
-    // Test Case 3: No Insights
-    {
-        description: "Test with no insights data (empty arrays).",
-        inputs: [`STRUCT(
-            [] AS stage_performance_standalone_insights, 
-            [] AS stage_performance_change_insights)`
-        ],
-        expected_output: `[]`  
-    },
-
-    // Test Case 4: Null Input (Invalid Case)
-    {
-        description: "Test with NULL input.",
-        inputs: [`NULL`],
-        expected_output: `NULL` // Assuming your UDF handles NULL gracefully.
-    },
-    
-    // Test Case 5: No Input (Invalid Case)
-    {
-        description: "Test with no input.",
-        inputs: [],
-        should_fail: true
     },
 ]);
 

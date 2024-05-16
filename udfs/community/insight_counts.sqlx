@@ -30,40 +30,32 @@ OPTIONS (
     Output: An array of structs representing each performance insight and their count throughout the stages of a job.
 """
 )
-AS ( (
-    WITH
-      all_insights AS (
-      SELECT
-        ARRAY_AGG(insight) AS insights_name
+AS (   
+  ARRAY(
+  SELECT AS STRUCT insight, COUNT(*) AS count
+  FROM (SELECT insight FROM UNNEST(
+    (
+      SELECT ARRAY_CONCAT_AGG(insight) AS insights_name
       FROM (
         SELECT
           CASE
-            WHEN stage.slot_contention THEN 'Slot contention'
-            WHEN stage.insufficient_shuffle_quota THEN 'Shuffle quota issue'
-            WHEN ARRAY_LENGTH(stage.bi_engine_reasons) > 0 THEN 'BI Engine issues'
+            WHEN stage.slot_contention AND NOT stage.insufficient_shuffle_quota THEN ['Slot contention']
+            WHEN stage.insufficient_shuffle_quota AND NOT stage.slot_contention THEN ['Shuffle quota issue']
+            WHEN stage.insufficient_shuffle_quota AND stage.slot_contention THEN ['Shuffle quota issue', 'Slot contention']
         END
           AS insight
         FROM
           UNNEST(performanceInsights.stage_performance_standalone_insights) AS stage
         UNION ALL
         SELECT
-          'Input data change' AS insight
+          ['Input data change'] AS insight
         FROM
           UNNEST(performanceInsights.stage_performance_change_insights) AS change
         WHERE
           change.input_data_change.records_read_diff_percentage IS NOT NULL )
       WHERE
-        insight IS NOT NULL ),
-      aggregated_insights AS (
-      SELECT
-        STRUCT(insight,
-          COUNT(*) AS num_stages) AS insights_data
-      FROM
-        all_insights,
-        UNNEST(all_insights.insights_name) AS insight
-      GROUP BY
-        insight )
-    SELECT
-      ARRAY_AGG(aggregated_insights.insights_data)
-    FROM
-      aggregated_insights ));
+        insight IS NOT NULL 
+    )
+  ) AS insight)
+  GROUP BY insight
+));
