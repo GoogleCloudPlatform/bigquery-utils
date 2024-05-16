@@ -60,6 +60,17 @@ generate_udf_test("insight_counts", [
             STRUCT('Input data change' AS insight, 1 AS count)
         ]`
     },
+    {
+        inputs: [`STRUCT(
+            1000 AS avgPreviousExecutionMs,  
+            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[
+                (1, true, false, NULL),
+                (2, true, false, NULL)
+            ] AS stage_performance_standalone_insights,
+            ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[] AS stage_performance_change_insights)`
+        ],
+        expected_output: `[STRUCT('Slot contention' AS insight, 2 AS count)]` 
+    },
 ]);
 
 generate_udf_test("insight_counts", [
@@ -70,9 +81,7 @@ generate_udf_test("insight_counts", [
             ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[] AS stage_performance_standalone_insights,
             ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[] AS stage_performance_change_insights)`
         ],
-        expected_output: `[
-            STRUCT(NULL AS insight, NULL AS count)
-        ]` 
+        expected_output: `[]` 
     },
 ]);
 
