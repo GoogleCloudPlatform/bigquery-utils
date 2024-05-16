@@ -119,6 +119,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_url_extract_port](#cw_url_extract_porturl-string)
 * [cw_url_extract_protocol](#cw_url_extract_protocolurl-string)
 * [cw_url_extract_query](#cw_url_extract_queryurl-string)
+* [cw_width_bucket](#cw_width_bucketvalue_expression-float64-lower_bound-float64-upper_bound-float64-partition_count-int64)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
 * [find_in_set](#find_in_setstr-string-strlist-string)
@@ -1200,6 +1201,20 @@ Extract the query from a url, returns "" (empty string) if no query is found.
 SELECT bqutil.fn.cw_url_extract_query('https://localhost:8080/test?key=val');
 
 key=val
+```
+
+### [cw_width_bucket(value_expression FLOAT64, lower_bound FLOAT64, upper_bound FLOAT64, partition_count INT64)](cw_width_bucket.sqlx)
+Emulates WIDTH_BUCKET present in many dialects.
+```sql
+- SELECT bqutil.fn.cw_width_bucket(4, 0, 10, 6);
+- SELECT bqutil.fn.cw_width_bucket(4, 10, 0, 6);
+- SELECT bqutil.fn.cw_width_bucket(15, 0, 10, 6);
+- SELECT bqutil.fn.cw_width_bucket(-10, 0, 10, 6);
+
+- 3
+- 4
+- 7
+- 0
 ```
 
 ### [day_occurrence_of_month(date_expression ANY TYPE)](day_occurrence_of_month.sqlx)

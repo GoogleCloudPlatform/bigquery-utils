@@ -2721,6 +2721,44 @@ generate_udf_test("cw_signed_rightshift_128bit", [
         expected_output: `BIGNUMERIC '0'`
     }
 ]);
+generate_udf_test("cw_width_bucket", [
+    {
+        inputs: [
+            `4`,
+            `0`,
+            `10`,
+            `6`
+        ],
+        expected_output: `3`
+    },
+    {
+        inputs: [
+            `4`,
+            `10`,
+            `0`,
+            `6`
+        ],
+        expected_output: `4`
+    },
+    {
+        inputs: [
+            `15`,
+            `0`,
+            `10`,
+            `6`
+        ],
+        expected_output: `7`
+    },
+    {
+        inputs: [
+            `-10`,
+            `0`,
+            `10`,
+            `6`
+        ],
+        expected_output: `0`
+    }
+]);
 generate_udf_test("cw_lower_case_ascii_only", [
     {
         inputs: [
