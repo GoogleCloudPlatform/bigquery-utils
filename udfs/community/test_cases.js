@@ -346,6 +346,24 @@ generate_udf_test("typeof", [
         expected_output: `"NUMERIC"`
     },
 ]);
+generate_udf_test("typeof", [
+    {
+        inputs: [`RANGE<DATE> "[null, 2024-04-25)"`],
+        expected_output: `"RANGE<DATE>"`
+    },
+]);
+generate_udf_test("typeof", [
+    {
+        inputs: [`RANGE<DATETIME> "[2021-01-01, 2024-04-25)"`],
+        expected_output: `"RANGE<DATETIME>"`
+    },
+]);
+generate_udf_test("typeof", [
+    {
+        inputs: [`RANGE(current_timestamp() - interval 5 day, current_timestamp())`],
+        expected_output: `"RANGE<TIMESTAMP>"`
+    },
+]);
 generate_udf_test("url_decode", [
     {
         inputs: [

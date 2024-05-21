@@ -32,6 +32,9 @@ AS ( (
         WHEN literal LIKE '[%' THEN 'ARRAY'
         WHEN REGEXP_CONTAINS(literal, r'^(STRUCT)?\(') THEN 'STRUCT'
         WHEN literal LIKE 'ST_%' THEN 'GEOGRAPHY'
+        WHEN literal LIKE 'RANGE<DATE>%' THEN 'RANGE<DATE>'
+        WHEN literal LIKE 'RANGE<DATETIME>%' THEN 'RANGE<DATETIME>'
+        WHEN literal LIKE 'RANGE<TIMESTAMP>%' THEN 'RANGE<TIMESTAMP>'
         WHEN literal = 'NULL' THEN 'NULL'
       ELSE
       'UNKNOWN'
