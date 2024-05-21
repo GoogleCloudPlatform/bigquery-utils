@@ -348,11 +348,11 @@ generate_udf_test("typeof", [
 ]);
 generate_udf_test("typeof", [
     {
-        inputs: [`RANGE<DATE> '[null, 2024-04-25)'`],
+        inputs: [`RANGE<DATE> "[null, 2024-04-25)"`],
         expected_output: `"RANGE<DATE>"`
     },
     {
-        inputs: [`RANGE<DATETIME> '[2021-01-01, 2024-04-25)'`],
+        inputs: [`RANGE<DATETIME> "[2021-01-01, 2024-04-25)"`],
         expected_output: `"RANGE<DATETIME>"`
     },
     {
