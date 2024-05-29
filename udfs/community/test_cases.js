@@ -1225,6 +1225,10 @@ generate_udf_test("jaccard", [
         inputs: [`"edge case"`, `"no match"`],
         expected_output: `CAST(0.25 AS FLOAT64)`
     },
+    {
+        inputs: [`"12"`, `"123"`],
+        expected_output: `CAST(0.67 AS FLOAT64)`
+    },
 ]);
 generate_udf_test("knots_to_mph", [
     {
