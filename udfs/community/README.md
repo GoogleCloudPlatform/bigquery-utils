@@ -517,7 +517,7 @@ SELECT bqutil.fn.cw_from_base('A', 16);
 ```
 
 ### [cw_getbit(bits INT64, index INT64)](cw_getbit.sqlx)
-Get bit on given index.
+Return bit of INT64 input at given index, starting from 0 for the least significant bit.
 ```sql
 SELECT bqutil.fn.cw_getbit(11, 100);
 SELECT bqutil.fn.cw_getbit(11, 3);
@@ -527,7 +527,7 @@ SELECT bqutil.fn.cw_getbit(11, 3);
 ```
 
 ### [cw_getbit_binary(bits BYTES, index INT64)](cw_getbit_binary.sqlx)
-Get bit on given index.
+Return bit of BYTES input at given index, starting from 0 for the least significant bit.
 ```sql
 SELECT bqutil.fn.cw_getbit_binary(b'\x0B', 100);
 SELECT bqutil.fn.cw_getbit_binary(b'\x0B', 3);
