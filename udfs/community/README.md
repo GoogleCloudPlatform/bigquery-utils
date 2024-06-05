@@ -449,7 +449,7 @@ SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
 ["Test", "123"]
 ```
 
-### [cw_disjoint_all_partitions_by_regexp(haystack STRING, regex STRING)](cw_disjoint_partition_by_regexp.sqlx)
+### [cw_disjoint_all_partitions_by_regexp(haystack STRING, regex STRING)](cw_disjoint_all_partitions_by_regexp.sqlx)
 Partitions rows into disjoint segments and returns all the partitions by matching row-sequence with the provided regex pattern.
 ```sql
 SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
