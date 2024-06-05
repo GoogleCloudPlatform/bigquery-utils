@@ -3947,6 +3947,30 @@ generate_udf_test("cw_overlapping_partition_by_regexp", [
     }
   ]);
 
+generate_udf_test("cw_disjoint_all_partitions_by_regexp", [
+    {
+      inputs: [
+        `"A@1#A@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([STRUCT(0, 1), (0, 2), (0, 3), (1, 4), (1, 5)] AS ARRAY<STRUCT<p INT64, rn INT64>>)`
+    },
+    {
+      inputs: [
+        `"A@1#B@2#B@3#A@4#B@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([STRUCT(0, 1), (0, 2), (1, 4), (1, 5)] AS ARRAY<STRUCT<p INT64, rn INT64>>)`
+    },
+    {
+      inputs: [
+        `"B@1#B@2#B@3#B@4#A@5#"`,
+        `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`
+      ],
+      expected_output: `CAST([] AS ARRAY<STRUCT<p INT64, rn INT64>>)`
+    }
+  ]);
+
 generate_udf_test("cw_disjoint_partition_by_regexp", [
     {
       inputs: [
