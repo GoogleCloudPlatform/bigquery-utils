@@ -40,6 +40,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
 * [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
 * [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
+* [cw_disjoint_all_partitions_by_regexp](#cw_disjoint_all_partitions_by_regexphaystack-string-regex-string)
 * [cw_disjoint_partition_by_regexp](#cw_disjoint_partition_by_regexpfirstrn-int64-haystack-string-regex-string)
 * [cw_editdistance](#cw_editdistancea-string-b-string)
 * [cw_error_number](cw_error_numbererrmsg-string)
@@ -448,8 +449,20 @@ SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
 ["Test", "123"]
 ```
 
+### [cw_disjoint_all_partitions_by_regexp(haystack STRING, regex STRING)](cw_disjoint_all_partitions_by_regexp.sqlx)
+Partitions rows into disjoint segments and returns all the partitions by matching row-sequence with the provided regex pattern.
+```sql
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'A@1#B@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'B@1#B@2#B@3#B@4#A@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+
+[(0, 1), (0, 2), (0, 3), (1, 4), (1, 5)]
+[(0, 1), (0, 2), (1, 4), (1, 5)]
+[]
+```
+
 ### [cw_disjoint_partition_by_regexp(firstRn INT64, haystack STRING, regex STRING)](cw_disjoint_partition_by_regexp.sqlx)
-Partitions rows into disjoint segments by matching their sequence with the provided regex pattern.
+Partitions rows into disjoint segments and returns a partition associated with the given row-number by matching row-sequence with the provided regex pattern.
 ```sql
 SELECT bqutil.fn.cw_disjoint_partition_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
 SELECT bqutil.fn.cw_disjoint_partition_by_regexp(2, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
