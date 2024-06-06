@@ -2578,6 +2578,22 @@ generate_udf_test("cw_getbit", [
         expected_output: `CAST(1 AS INT64)`
     },
 ]);
+generate_udf_test("cw_getbit_binary", [
+    {
+        inputs: [
+            `b'\\x0B'`,
+            `CAST(100 AS INT64)`
+        ],
+        expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [
+            `b'\\x0B'`,
+            `CAST(3 AS INT64)`
+        ],
+        expected_output: `CAST(1 AS INT64)`
+    },
+]);
 generate_udf_test("cw_setbit", [
     {
         inputs: [
