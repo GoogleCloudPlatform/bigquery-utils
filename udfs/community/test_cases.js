@@ -1209,7 +1209,7 @@ generate_udf_test("studentt_cdf", [
     {
         inputs: [
 		`CAST(1.0 AS FLOAT64)`,
-		`CAST(2 AS INT64)`
+		`CAST(2.0 AS FLOAT64)`
 	],
 	expected_output: `CAST(0.788675134594813 AS FLOAT64)`
     },

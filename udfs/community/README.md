@@ -162,7 +162,7 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
-* [studentt_cdf](#studentt_cdfx-float64-dof-int64)
+* [studentt_cdf](#studentt_cdfx-float64-dof-float64)
 * [sure_cond](#sure_cond)
 * [sure_like](#sure_like)
 * [sure_nonnull](#sure_nonnull)
@@ -2360,7 +2360,7 @@ Results:
 
 ---
 
-### [studentt_cdf(x FLOAT64, dof INT64)](studentt_cdf.sqlx)
+### [studentt_cdf(x FLOAT64, dof FLOAT64)](studentt_cdf.sqlx)
 
 Returns the value of x in the cdf of the Student's T distribution with dof degrees of freedom.
 

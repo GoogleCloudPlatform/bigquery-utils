@@ -17,7 +17,7 @@ config { hasOutput: true }
  */
 
 
-CREATE OR REPLACE FUNCTION ${self()}(x FLOAT64, dof INT64)
+CREATE OR REPLACE FUNCTION ${self()}(x FLOAT64, dof FLOAT64)
 RETURNS FLOAT64
 LANGUAGE js AS """
   return jstat['jStat']['studentt']['cdf']( x, dof )
