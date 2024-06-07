@@ -1205,6 +1205,15 @@ generate_udf_test("normal_cdf", [
 	expected_output: `CAST(0.3820885778110474 AS FLOAT64)`
     },
 ]);
+generate_udf_test("studentt_cdf", [
+    {
+        inputs: [
+		`CAST(1.0 AS FLOAT64)`,
+		`CAST(2 AS INT64)`
+	],
+	expected_output: `CAST(0.788675134594813 AS FLOAT64)`
+    },
+]);
 //
 // End of StatsLib work tests
 //
@@ -1503,7 +1512,7 @@ generate_udf_test("cw_map_create", [
             `CAST([1, 2, 3] AS ARRAY<INT64>)`,
             `CAST(["A", "B", "C"] AS ARRAY<STRING>)`
         ],
-        expected_output: `([STRUCT(CAST(1 AS INT64) AS key, "A" AS value), 
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS key, "A" AS value),
                            STRUCT(CAST(2 AS INT64) AS key, "B" AS value),
                            STRUCT(CAST(3 AS INT64) AS key, "C" AS value)])`
     },
@@ -2862,7 +2871,7 @@ generate_udf_test("cw_strtok", [
             `"Test#1"`,
             `"#"`
         ],
-        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
                            STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])`
     },
 ]);
@@ -2982,7 +2991,7 @@ generate_udf_test("cw_regexp_split", [
             `"#"`,
             `"i"`
         ],
-        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token), 
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS tokennumber, "Test" AS token),
                            STRUCT(CAST(2 AS INT64) AS tokennumber, "1" AS token)])`
     },
 ]);
@@ -3002,7 +3011,7 @@ generate_udf_test("cw_json_enumerate_array", [
         inputs: [
             `'[{"name":"Cameron"}, {"name":"John"}]'`
         ],
-        expected_output: `([STRUCT(CAST(1 AS INT64) AS ordinal, '{"name":"Cameron"}' AS jsonvalue), 
+        expected_output: `([STRUCT(CAST(1 AS INT64) AS ordinal, '{"name":"Cameron"}' AS jsonvalue),
                            STRUCT(CAST(2 AS INT64) AS ordinal, '{"name":"John"}' AS jsonvalue)])`
     },
 ]);
@@ -3056,7 +3065,7 @@ generate_udf_test("cw_map_parse", [
             `" "`,
             `"="`
         ],
-        expected_output: `([STRUCT("a" AS key, "1" AS value), 
+        expected_output: `([STRUCT("a" AS key, "1" AS value),
                            STRUCT("b" AS key, "42" AS value)])`
     },
 ]);
@@ -3096,7 +3105,7 @@ generate_udf_test("cw_ts_overlap_buckets", [
     {
         inputs: [
             `CAST(false AS BOOL)`,
-            `([STRUCT(TIMESTAMP("2008-12-25"), TIMESTAMP("2008-12-31")), 
+            `([STRUCT(TIMESTAMP("2008-12-25"), TIMESTAMP("2008-12-31")),
             STRUCT(TIMESTAMP("2008-12-26"), TIMESTAMP("2008-12-30"))])`
         ],
         expected_output: `([STRUCT(1 AS bucketNo, CAST("2008-12-25 00:00:00 UTC" AS TIMESTAMP) AS st, CAST("2008-12-31 00:00:00 UTC" AS TIMESTAMP) AS et)])`
@@ -3287,7 +3296,7 @@ generate_udf_test("bignumber_sum", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "893427328732842662772591830391462182598436547786876876876",
                 "123456789123456789123456789123456789123456789123456789123456789123456789"
             ]`
@@ -3297,7 +3306,7 @@ generate_udf_test("bignumber_sum", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "",
                 "123456789123456789123456789123456789123456789123456789123456789123456789"
             ]`
@@ -3307,7 +3316,7 @@ generate_udf_test("bignumber_sum", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "893427328732842662772591830391462182598436547786876876876",
                 NULL
             ]`
@@ -3320,7 +3329,7 @@ generate_udf_test("bignumber_avg", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "33333333333333333333333333333333333333333333333333333333333333333333",
                 "66666666666666666666666666666666666666666666666666666666666666666666"
             ]`
@@ -3330,7 +3339,7 @@ generate_udf_test("bignumber_avg", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "",
                 "123456789123456789123456789123456789123456789123456789123456789123456789"
             ]`
@@ -3340,7 +3349,7 @@ generate_udf_test("bignumber_avg", [
     {
         inputs: [
             `ARRAY<STRING>[
-                "99999999999999999999999999999999999999999999999999999999999999999999", 
+                "99999999999999999999999999999999999999999999999999999999999999999999",
                 "893427328732842662772591830391462182598436547786876876876",
                 NULL
             ]`
