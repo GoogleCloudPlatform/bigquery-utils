@@ -1205,6 +1205,15 @@ generate_udf_test("normal_cdf", [
 	expected_output: `CAST(0.3820885778110474 AS FLOAT64)`
     },
 ]);
+generate_udf_test("studentt_cdf", [
+    {
+        inputs: [
+		`CAST(1.0 AS FLOAT64)`,
+		`CAST(2.0 AS FLOAT64)`
+	],
+	expected_output: `CAST(0.788675134594813 AS FLOAT64)`
+    },
+]);
 //
 // End of StatsLib work tests
 //
