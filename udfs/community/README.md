@@ -2367,7 +2367,7 @@ Returns the value of x in the cdf of the Student's T distribution with dof degre
 Sample Query:
 
 ```SQL
-SELECT `bqutils.fn.studentt_cdf`(1.0, 2) as studentt_cdf;
+SELECT `bqutils.fn.studentt_cdf`(1.0, 2.0) as studentt_cdf;
 ```
 
 Results:
