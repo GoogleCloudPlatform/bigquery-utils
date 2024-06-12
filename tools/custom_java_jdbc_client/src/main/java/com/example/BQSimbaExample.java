@@ -57,16 +57,10 @@ public class BQSimbaExample {
         String datasetId = "my-dataset";
         String tableId = "my-table";
 
-        // Set authentication configuration.
-        String serviceAccountEmail = "my-service-account@my-project.iam.gserviceaccount.com";
-        String serviceAccountFile = "/Path/to/service-account-keyfile.json";
-                // argMap.get("serviceAccountFilePath");
-                // "$HOME/.config/gcloud/application_default_credentials.json";
-
+        // Create OAuth config for Application Default Credentials.
+        // For details on setting up ADC, refer to https://cloud.google.com/docs/authentication/provide-credentials-adc.
         OAuthUserConfig oAuthUserConfig = new OAuthUserConfig
-                .Builder(OAuthUserType.SERVICE_ACCOUNT, projectId)
-                .setServiceAccountEmail(serviceAccountEmail)
-                .setKeyFilePath(serviceAccountFile)
+                .Builder(OAuthUserType.APPLICATION_DEFAULT_CREDENTIALS, projectId)
                 .build();
 
         // Set configuration options for the query. See the JDBC driver documentation for details (link in README.md).
