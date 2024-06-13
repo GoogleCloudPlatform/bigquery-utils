@@ -29,7 +29,7 @@ public class BQSimbaExample {
     private static HashMap<String, String> commandLineArgParser(String[] args) {
         HashMap<String, String> argMap = new HashMap<>();
         for (String arg : args){
-            String[] kvPair = arg.split("=",2);
+            String[] kvPair = arg.split("=", 2);
             if (kvPair.length != 2) {
                 throw new IllegalArgumentException(
                         String.format("Invalid CLI argument: %s. CLI args should be key-value pairs with the format key=value.", arg)
