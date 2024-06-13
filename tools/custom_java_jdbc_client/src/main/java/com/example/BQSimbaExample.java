@@ -23,12 +23,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class BQSimbaExample {
     private static HashMap<String, String> commandLineArgParser(String[] args) {
         HashMap<String, String> argMap = new HashMap<>();
         for (String arg : args){
-            String[] kvPair = arg.split("=");
+            String[] kvPair = arg.split("=",2);
+            if (kvPair.length != 2) {
+                throw new IllegalArgumentException(
+                        String.format("Invalid CLI argument: %s. CLI args should be key-value pairs with the format key=value.", arg)
+                );
+            }
             argMap.put(kvPair[0], kvPair[1]);
         }
         return argMap;
@@ -49,13 +55,17 @@ public class BQSimbaExample {
     }
 
     public static void main(String[] args) {
-//        HashMap<String, String> argMap = commandLineArgParser(args);  // If args input via command line flags is preferred.
+        // Parse CLI args
+        HashMap<String, String> argMap = commandLineArgParser(args);
+        String query = argMap.get("query");  // eg. "SELECT column1, column2 FROM mydataset.mytable;"
+        if (query == null) {
+            throw new IllegalArgumentException("The 'query' command line argument must be provided, eg. `query=SELECT id FROM mydataset.mytable;`");
+        }
 
-        // Set default values.
-        String projectId = "my-billing-project";  // Used as billing project
-        String additionalDataProjects = "my-data-project";
-        String datasetId = "my-dataset";
-        String tableId = "my-table";
+        // Get project and dataset values from CLI args, else use defaults configured
+        String projectId = Objects.requireNonNullElse(argMap.get("projectId"), "my-billing-project");
+        String additionalDataProjects = Objects.requireNonNullElse(argMap.get("additionalDataProjects"),"my-data-project");
+        String defaultDataset = Objects.requireNonNullElse(argMap.get("defaultDataset"),"my-dataset");
 
         // Create OAuth config for Application Default Credentials.
         // For details on setting up ADC, refer to https://cloud.google.com/docs/authentication/provide-credentials-adc.
@@ -67,22 +77,21 @@ public class BQSimbaExample {
         HashMap<String, String> configOptions = new HashMap<String, String>();
         configOptions.put("AdditionalProjects", additionalDataProjects);
         configOptions.put("QueryProperties",String.format("dataset_project_id=%s", additionalDataProjects));
-        configOptions.put("DefaultDataset", datasetId);
+        configOptions.put("DefaultDataset", defaultDataset);
         configOptions.put("FilterTablesOnDefaultDataset", "1");
 
         // Create connection URL containing auth and options to use for the query.
         String connectionUrl = generateConnectionUrl(oAuthUserConfig, configOptions);
-        System.out.println("connectionUrl: " + connectionUrl);
+        System.out.println("JDBC connection URL: " + connectionUrl);
 
         // Create the connection, execute the query, and retrieve the results.
         try (Connection conn = DriverManager.getConnection(connectionUrl);
              Statement stmt = conn.createStatement()) {
-
-            String query = String.format("SELECT * FROM `%s.%s` LIMIT 5", datasetId, tableId);
             System.out.println("Executing query: " + query);
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
+                // Print the first column of each row.
                 System.out.println(rs.getString(1));
             }
         } catch (SQLException e) {

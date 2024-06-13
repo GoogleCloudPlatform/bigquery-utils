@@ -13,7 +13,7 @@ The following files are provided:
   * Main example showing how to authenticate, configure, and execute queries.
 * src/main/java/com/example/OAuthUserConfig.java
   * OAuth user config object and builder.
-* src/main/java/com/example/OAuthUserType.java
+* src/main/java/com/example/OAuthUserType.javaa
   * Enum for available OAuth user types.
 * pom.xml
   * Project configuration and dependencies.
@@ -35,7 +35,11 @@ The following files are provided:
    ```
 
 3. Configure the required variables in BQSimbaExample.main:
-   1. Set the default project vars (ie. `projectId`, `additionalDataProjects`, ...).
-   2. Configure the auth variables to use a service account (ie. `serviceAccountEmail`, `serviceAccountFile`). Take a look at the driver documentation along with the `OAuthUserType` and `OAuthUserConfig` classes to see how you can authenticate as a type other than Service Account.   
+   1. Set default values for projects and datasets (ie. `projectId`, `additionalDataProjects`, `defaultDataset`). These are fallback values if they are not specified using command line args.
+   2. The example uses Application Default Credentials for GCP authentication. Refer to the [ADC documentation](https://cloud.google.com/docs/authentication/provide-credentials-adc) to set this up. Take a look at the JDBC driver documentation, along with the `OAuthUserType` and `OAuthUserConfig` classes, for other authentication options.  
 
-4. Execute `BQSimbaExample.main`.
+4. Run `mvn clean package` to build the jar. Then, execute `BQSimbaExample` with the following args:
+   1. Required: query, eg. `query="SELECT id, name FROM mydataset.mytable WHERE id > 100;"`. 
+   2. Optional: `projectId`, `additionalDataProjects`, `defaultDataset`. If not specified, these will use the defaults set in step 3i above.
+   3. Example command using `mvn exec`:
+   ```mvn exec:java -Dexec.args="query=\"SELECT id, name FROM dataset1.table1 WHERE id='2'\" projectId=pso-amex-data-platform additionalDataProjects=pso-amex-data-platform defaultDataset=dataset1"```.
