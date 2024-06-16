@@ -1,0 +1,28 @@
+name: Sanitize
+
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: Address Sanitizer
+    runs-on: ubuntu-latest
+            
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Configure
+        run: cmake -B build -S . -DSANITIZE=address
+      - name: Build C++ unit tests
+        run: cmake --build build --config Release
+      - name: Run C++ tests
+        run: cmake --build build --config Release --target test

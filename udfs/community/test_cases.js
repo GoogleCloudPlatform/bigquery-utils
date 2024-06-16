@@ -4046,3 +4046,68 @@ generate_udf_test("cw_disjoint_partition_by_regexp", [
       expected_output: `CAST([104, 105] AS ARRAY<INT64>)`
     }
   ]);
+
+generate_udf_test("theta_sketch_extract", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`
+        ],
+        expected_output: `3.0`
+    }
+]);
+
+generate_udf_test("theta_sketch_a_not_b", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
+            `FROM_BASE64('AQMDAAAazJMV+X3LvYahBQ==')`
+        ],
+        expected_output: `FROM_BASE64('AgMDAAAazJMCAAAAAAAAAMOX/BKBcJ0eukCzwdoGaV0=')`
+    }
+]);
+
+generate_udf_test("tuple_sketch_extract_count", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+        ],
+        expected_output: `3`
+    }
+]);
+
+generate_udf_test("tuple_sketch_extract_sum", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+        ],
+        expected_output: `6`
+    }
+]);
+
+generate_udf_test("tuple_sketch_extract_avg", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+        ],
+        expected_output: `2`
+    }
+]);
+
+generate_udf_test("tuple_sketch_extract_summary", [
+    {
+        inputs: [
+            `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+        ],
+        expected_output: `STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64>(3,6,2)`
+    }
+]);
+
+generate_udf_test("kll_sketch_quantile", [
+    {
+        inputs: [
+            `FROM_BASE64('BQEPAPoACAADAAAAAAAAAPoAAQD3AAAAAACAPwAAQEAAAEBAAAAAQAAAgD8=')`,
+            `0.5`
+        ],
+        expected_output: `2.0`
+    }
+]);

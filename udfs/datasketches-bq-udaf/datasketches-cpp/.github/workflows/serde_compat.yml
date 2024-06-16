@@ -1,0 +1,30 @@
+name: Java SerDe Compatibility Test
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: SerDe Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Checkout Java
+        uses: actions/checkout@v3
+        with:
+          repository: apache/datasketches-java
+          path: java
+      - name: Run Java
+        run: cd java && mvn test -P generate-java-files
+      - name: Copy files
+        run: cp java/serialization_test_data/java_generated_files/*.sk java
+      - name: Run cmake
+        run: cd build && cmake .. -DSERDE_COMPAT=true
+      - name: Build C++ unit tests
+        run: cmake --build build --config Release
+      - name: Run C++ tests
+        run: cmake --build build --config Release --target test
