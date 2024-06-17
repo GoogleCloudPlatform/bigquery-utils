@@ -58,7 +58,7 @@ steps:
   #########################################################################
 - name: docker.io/emscripten/emsdk
   id: build_wasm_libs
-  dir: datasketches-bq-udaf
+  dir: datasketches
   entrypoint: bash
   args:
   - '-c'
