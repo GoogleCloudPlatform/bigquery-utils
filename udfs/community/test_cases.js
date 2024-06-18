@@ -3332,3 +3332,23 @@ generate_udaf_test("scaled_average", {
     ])`,
   expected_output: `0.66666666666666663`,
 });
+
+generate_udaf_test("scaled_sum", {
+  input_columns: [`dividend`, `4.0 NOT AGGREGATE`],
+  input_rows: `SELECT 1 AS dividend
+      UNION ALL
+      SELECT 3
+      UNION ALL
+      SELECT 5`,
+  expected_output: `2.25`,
+});
+
+generate_udaf_test("scaled_sum", {
+  input_columns: [`dividend`, `4.0 NOT AGGREGATE`],
+  input_rows: `SELECT * FROM UNNEST([
+      1,
+      3,
+      3
+    ]) AS dividend`,
+  expected_output: `1.75`,
+});
