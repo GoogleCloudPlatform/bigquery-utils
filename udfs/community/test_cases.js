@@ -3352,6 +3352,14 @@ generate_udf_test("theta_sketch_a_not_b", [
   }
 ]);
 
+generate_udaf_test("theta_sketch_intersection", {
+  input_columns: [`theta_sketch`],
+  input_rows: `SELECT FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==') as theta_sketch
+              UNION ALL
+              SELECT FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
+  expected_output: `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
+});
+
 generate_udf_test("tuple_sketch_extract_count", [
   {
     inputs: [
