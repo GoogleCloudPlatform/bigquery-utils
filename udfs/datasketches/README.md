@@ -1,5 +1,22 @@
 # Supporting Datasketches in BigQuery
 
+## Contents
+<!-- TOC -->
+* [Introduction](#introduction)
+* [Featured Sketches in this Integration](#featured-sketches-in-this-integration)
+* [Solution Approach](#solution-approach)
+* [Theta Sketch](#theta-sketch)
+  * [Lg_k - Precision parameter](#lgk---precision-parameter)
+  * [Examples](#examples)
+* [KLL Sketch](#kll-sketch)
+  * [K - Precision Parameter](#k---precision-parameter)
+  * [Examples](#examples-1)
+* [Tuple Sketch](#tuple-sketch)
+  * [Lg_k - Precision parameter](#lgk---precision-parameter-1)
+  * [Examples](#examples-2)
+<!-- TOC -->
+
+## Introduction
 This project enhances Google BigQuery by integrating a suite of powerful sketch functions from [Apache DataSketches](https://datasketches.apache.org/), enabling efficient probabilistic data analysis on massive datasets.
 
 Apache Datasketches is an open source, high-performance library of stochastic streaming algorithms commonly called "sketches" in the data sciences. Sketches are small, stateful programs that process massive data as a stream and can provide approximate answers, with mathematical guarantees, to computationally difficult queries orders-of-magnitude faster than traditional, exact methods.
@@ -8,18 +25,17 @@ Apache Datasketches is an open source, high-performance library of stochastic st
 
 This project focuses on incorporating the following sketch types
 
-1. **Theta Sketch**: A sketch ideal for cardinality estimation and set operations (union, intersection, difference).
-2. **KLL Sketch**: A sketch designed for quantile estimation.
-3. **Tuple Sketch**: An extension of the Theta Sketch that supports associating values with the estimated unique items.
+1. [**Theta Sketch**](#theta-sketch): A sketch ideal for cardinality estimation and set operations (union, intersection, difference).
+2. [**KLL Sketch**](#kll-sketch): A sketch designed for quantile estimation.
+3. [**Tuple Sketch**](#tuple-sketch): An extension of the Theta Sketch that supports associating values with the estimated unique items.
 
 
 ## Solution Approach 
 
 Custom sketch C++ implementation using Apache Datasketches [C++ core library](https://github.com/apache/datasketches-cpp) is compiled to [WebAssembly](https://webassembly.org/) (WASM) libraries using [emscripten](https://emscripten.org/) toolchain and loaded in BigQuery [JS UDAFs](https://cloud.google.com/bigquery/docs/user-defined-aggregates) and [JS UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions#javascript-udf-structure)
+ 
 
-## Function Specs 
-
-### Theta Sketch
+## Theta Sketch
 A [Theta Sketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html) is a data structure and algorithm used to perform approximate count discount calculations on a large dataset without having to store them all individually. More details can be found in this [Apache Datasketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html) public doc. 
 
 | Type      | Function Spec                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -31,14 +47,14 @@ A [Theta Sketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework
 | Scalar    | **FunctionName**: theta_sketch_a_not_b(theta_sketch_a, theta_sketch_b ) <br> **Input**: Sketch Bytes <br> **Output**: sketch Bytes<br> **Description**: Takes in 2 theta sketches, performs a difference op / a_not_b op (i.e SetA - SetB)  and returns a theta_sketch                                                                                                                                     |
 | Scalar    | **FunctionName**: theta_sketch_extract(theta_sketch) <br> **Input**: theta_sketch -> Bytes <br> **Output**: FLOAT64 <br> **Description**: Takes in a theta sketch, returns approx distinct count of entries of the id_col used to create the theta sketch                                                                                                                                                  |
 
-#### Lg_k Theta Sketch Precision parameter
+### Lg_k - Precision parameter
 
 Lg_k is one of the parameters in select theta sketch functions.    
 Choice of lg_k int64 parameter is important as it has direct correlation between your query slot usage, theta_sketch size and relative error.
 - Lg_k vs K vs Relative error comparison can be found in [this public doc](https://datasketches.apache.org/docs/Theta/ThetaErrorTable.html)
 - theta_sketch size vs K comparison can be found in [this public doc](https://datasketches.apache.org/docs/Theta/ThetaSize.html)
 
-#### Examples
+### Examples
 
 1. Generates 2 tables with sample data ( treated as SetA, setB)
 
@@ -134,7 +150,7 @@ select
 FROM agg_data_set_a_b, set_difference;
 ```
 
-### KLL Sketch 
+## KLL Sketch 
 [KLL sketch](https://datasketches.apache.org/docs/KLL/KLLSketch.html) is a quantile type mergeable streaming sketch algorithm to estimate the distribution of values, and approximately answer queries about quantiles (median, min, max, 95th percentile and such).
 
 | Type      | Function Spec                                                                                                                                                                                                                                                                                  |
@@ -144,11 +160,11 @@ FROM agg_data_set_a_b, set_difference;
 | Aggregate | **FunctionName**: kll_sketch_merge(kll_sketch, k) <br> **Input**: Bytes_col -> BYTES,  k -> INT64(constant) <br> **Output:** Sketch Bytes <br> **Description:** Aggregates KLL sketches, k arg, performs a union op and returns a merged KLL sketch.                                           |
 | Scalar    | **FunctionName**: kll_sketch_quantile(kll_sketch, rank ) <br> **Input**: Sketch Bytes, rank -> FLOAT64 in range [0,1] <br> **Output**: FLOAT64 <br> **Description**: Takes in KLL sketch and rank value and returns quantile value. eg. a rank of 0.5 will return median, rank = 1 returns max |
 
-#### Argument K - KLL-Sketch Precision
+### K - Precision Parameter
 k is one of the arguments in select KLL sketch functions. Choice of k int64 is important as it has direct correlation between your query runtime, slot usage, kll_sketch size and relative error.
 - K vs Relative error vs KLL-sketch size comparison can be found in [this public doc](https://datasketches.apache.org/docs/KLL/KLLAccuracyAndSize.html)
 
-#### Examples
+### Examples
 
 1. Creating sample data with 10B records ( 1 through 10B) split in 100 nearly equal sized groups of 100M values
 Note: This sample data generation query might run for a long time ( > 30 mins ) to generate 10B records. Try reducing the size for a faster outcome.
@@ -194,7 +210,7 @@ total_count
 FROM agg_data;
 ```
 
-### Tuple Sketch 
+## Tuple Sketch 
 A [Tuple Sketch](https://datasketches.apache.org/docs/Tuple/TupleOverview.html) is an extension of the [Theta Sketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html). Tuple sketches store an additional summary value with each retained entry which makes the sketch ideal for summarizing attributes such as impressions or clicks. Tuple sketches enable set operations over a stream of data, and can also be used for cardinality estimation.
 
 | Type      | Function Spec                                                                                                                                                                                                                                                                                                                                                                     |
@@ -206,7 +222,7 @@ A [Tuple Sketch](https://datasketches.apache.org/docs/Tuple/TupleOverview.html) 
 | Scalar    | **FunctionName**: tuple_sketch_extract_avg(tuple_sketch) <br> **Input**: tuple_sketch -> Bytes <br> **Output**: INT64 <br> **Description**:  Takes in a tuple sketch, combines the summary values of the value_col (using sum) from the random sample of id_col stored within the Tuple sketch, calculates an estimate that applies to the entire dataset and returns average.    |
 | Scalar    | FunctionName: tuple_sketch_extract_summary(tuple_sketch) <br> **Input**: tuple_sketch -> Bytes <br> **Output**: STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64> <br> **Description**: Takes in a tuple sketch and returns summary of key and value cols i.e struct<uniq_count, sum, avg>. This function combines output of the other 3 scalar functions above. |
                                                                                                                                                                                                                                                                                                                          |
-#### Lg_k Theta Sketch Precision parameter
+###  Lg_k - Precision parameter
 
 Lg_k is one of the parameters in select tuple sketch functions.    
 Choice of lg_k int64 parameter is important as it has direct correlation between your query slot usage, tuple_sketch size and relative error.
@@ -215,7 +231,7 @@ Choice of lg_k int64 parameter is important as it has direct correlation between
 
 Note:  As there is no dedicated tuple_sketch size vs lg_k table, You can assume tuple_sketch size will be nearly double of the theta_sketch size due to additional summary col maintained per hash key in the sketch. 
 
-#### Examples
+### Examples
 
 1. Creating sample data with 100M records ( 1 through 100M) split in 10 nearly equal sized groups of 10M values
 
