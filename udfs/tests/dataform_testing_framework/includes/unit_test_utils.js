@@ -32,8 +32,42 @@ function generate_udf_test(udf_name, test_cases) {
     );
 }
 
+function generate_udaf_test(udaf_name, test_case) {
+    const test_name = `${udaf_name}_${uuidv4()}`;
+    create_dataform_udaf_test_view(test_name, udaf_name, test_case);
+    let expected_output_select_statements = [];
+    let test_input_select_statements = [];
+    let udf_positional_inputs = [];
+    test_case.input_columns.forEach((input, index) => {
+        udf_positional_inputs.push(`${input} AS test_input_${index}`);
+    });
+    test_input_select_statements.push(`\n  SELECT ${udf_positional_inputs.join(', ')} FROM (${test_case.input_rows})`);
+    expected_output_select_statements.push(`SELECT ${test_case.expected_output} AS udf_output`);
+    run_dataform_test(
+        test_name,
+        test_input_select_statements,
+        expected_output_select_statements
+    );
+}
+
 function create_dataform_test_view(test_name, udf_name, test_cases) {
     const inputs = Object.keys(test_cases[0].inputs);
+    let udf_input_aliases = [];
+    inputs.forEach((input, index) => {
+        udf_input_aliases.push(`test_input_${index}`);
+    });
+    udf_input_aliases = udf_input_aliases.join(',');
+    const udf_invocation_str = `${get_udf_project_and_dataset(udf_name)}${udf_name}(${udf_input_aliases})`;
+    publish(test_name)
+        .type("view")
+        .query(
+            (ctx) => `SELECT ${udf_invocation_str} AS udf_output\n` +
+                `FROM ${ctx.resolve("test_inputs")}`
+        );
+}
+
+function create_dataform_udaf_test_view(test_name, udf_name, test_case) {
+    const inputs = Object.keys(test_case.input_columns);
     let udf_input_aliases = [];
     inputs.forEach((input, index) => {
         udf_input_aliases.push(`test_input_${index}`);
@@ -94,4 +128,5 @@ function uuidv4() {
 
 module.exports = {
     generate_udf_test,
+    generate_udaf_test,
 };
