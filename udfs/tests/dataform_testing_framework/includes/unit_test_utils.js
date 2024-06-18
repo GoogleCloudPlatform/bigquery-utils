@@ -39,7 +39,9 @@ function generate_udaf_test(udaf_name, test_case) {
     let test_input_select_statements = [];
     let udf_positional_inputs = [];
     test_case.input_columns.forEach((input, index) => {
-        udf_positional_inputs.push(`${input} AS test_input_${index}`);
+        if (!input.includes(' NOT AGGREGATE')) {
+            udf_positional_inputs.push(`${input} AS test_input_${index}`);
+        }
     });
     test_input_select_statements.push(`\n  SELECT ${udf_positional_inputs.join(', ')} FROM (${test_case.input_rows})`);
     expected_output_select_statements.push(`SELECT ${test_case.expected_output} AS udf_output`);
@@ -67,10 +69,13 @@ function create_dataform_test_view(test_name, udf_name, test_cases) {
 }
 
 function create_dataform_udaf_test_view(test_name, udf_name, test_case) {
-    const inputs = Object.keys(test_case.input_columns);
     let udf_input_aliases = [];
-    inputs.forEach((input, index) => {
-        udf_input_aliases.push(`test_input_${index}`);
+    test_case.input_columns.forEach((input, index) => {
+        if (input.includes(' NOT AGGREGATE')) {
+            udf_input_aliases.push(`${input.split(' NOT AGGREGATE')[0]}`);
+        } else {
+            udf_input_aliases.push(`test_input_${index}`);
+        }
     });
     udf_input_aliases = udf_input_aliases.join(',');
     const udf_invocation_str = `${get_udf_project_and_dataset(udf_name)}${udf_name}(${udf_input_aliases})`;

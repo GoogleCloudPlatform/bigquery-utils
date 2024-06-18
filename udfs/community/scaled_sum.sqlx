@@ -17,7 +17,7 @@ config { hasOutput: true }
 
 CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(
   dividend FLOAT64,
-  divisor FLOAT64
+  divisor FLOAT64 NOT AGGREGATE
 ) RETURNS FLOAT64 AS (
-  AVG(dividend / divisor)
+  SUM(dividend) / divisor
 );
