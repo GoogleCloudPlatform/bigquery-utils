@@ -53,6 +53,22 @@ steps:
   args:
     - run-script
     - build-all-libs
+  #########################################################################
+  # Clone datasketches-cpp github repo as dependency for building WASM libraries
+  # Build (via emscripten) all WASM libraries for BigQuery Sketch UD(A)Fs
+  #########################################################################
+- name: docker.io/emscripten/emsdk
+  id: build_wasm_libs
+  dir: datasketches
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    git clone https://github.com/apache/datasketches-cpp.git
+    for dir in kll-sketch theta-sketch tuple-sketch; do
+      cd $dir && make clean && make all
+      cd ..
+    done
   ###########################################################
   # Copy all libs to GCS bucket
   ###########################################################
