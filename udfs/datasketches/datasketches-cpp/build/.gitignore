@@ -1,7 +1,0 @@
-# build/ directory for convenience, but should remain empty
-
-# Ignore everything in here
-*
-
-# Add an exception for this file
-!.gitignore

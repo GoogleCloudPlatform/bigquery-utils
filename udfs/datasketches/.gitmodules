@@ -1,3 +1,0 @@
-[submodule "datasketches-cpp"]
-	path = datasketches-cpp
-	url = https://github.com/apache/datasketches-cpp
