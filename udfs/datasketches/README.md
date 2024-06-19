@@ -33,7 +33,10 @@ This project focuses on incorporating the following sketch types
 ## Solution Approach 
 
 Custom sketch C++ implementation using Apache Datasketches [C++ core library](https://github.com/apache/datasketches-cpp) is compiled to [WebAssembly](https://webassembly.org/) (WASM) libraries using [emscripten](https://emscripten.org/) toolchain and loaded in BigQuery [JS UDAFs](https://cloud.google.com/bigquery/docs/user-defined-aggregates) and [JS UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions#javascript-udf-structure)
- 
+
+Note: 
+- All the functions defined below are deployed in `bqutil.fn` and `bqutil.fn_<bq_region>` public datasets
+- You can also deploy these functions in your own dataset. Refer to this [README](../README.md).
 
 ## Theta Sketch
 A [Theta Sketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html) is a data structure and algorithm used to perform approximate count discount calculations on a large dataset without having to store them all individually. More details can be found in this [Apache Datasketch](https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html) public doc. 
@@ -81,7 +84,7 @@ CREATE OR REPLACE TABLE `$BQ_PROJECT.$BQ_DATASET`.theta_agg_by_key_set_a AS
 select
     group_key,
     count(*) as total_count,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_int64(x,14) as theta_sketch
+    bqutil.fn.theta_sketch_int64(x,14) as theta_sketch
 from `$BQ_PROJECT.$BQ_DATASET`.set_a
 group by group_key;
 
@@ -89,7 +92,7 @@ CREATE OR REPLACE TABLE `$BQ_PROJECT.$BQ_DATASET`.theta_agg_by_key_set_b AS
 select
     group_key,
     count(*) as total_count,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_int64(x,14) as theta_sketch
+    bqutil.fn.theta_sketch_int64(x,14) as theta_sketch
 from `$BQ_PROJECT.$BQ_DATASET`.set_b
 group by group_key;
 ```
@@ -99,21 +102,21 @@ group by group_key;
 WITH
     union_data_set_a AS (
         SELECT
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_union(theta_sketch,14) as merged_theta_sketch,
+            bqutil.fn.theta_sketch_union(theta_sketch,14) as merged_theta_sketch,
             SUM(total_count) as total_count
         from `$BQ_PROJECT.$BQ_DATASET`.theta_agg_by_key_set_a
     ),
     union_data_set_b AS (
         SELECT
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_union(theta_sketch,14) as merged_theta_sketch,
+            bqutil.fn.theta_sketch_union(theta_sketch,14) as merged_theta_sketch,
             SUM(total_count) as total_count
         from `$BQ_PROJECT.$BQ_DATASET`.theta_agg_by_key_set_b
     ),
     agg_data_set_a_b AS (
         SELECT
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_intersection(merged_theta_sketch) as intersected_theta_sketch,
+            bqutil.fn.theta_sketch_intersection(merged_theta_sketch) as intersected_theta_sketch,
             sum(total_count) as total_count,
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_union(merged_theta_sketch, 14) as union_theta_sketch
+            bqutil.fn.theta_sketch_union(merged_theta_sketch, 14) as union_theta_sketch
         from (
                  SELECT
                      merged_theta_sketch,
@@ -128,18 +131,18 @@ WITH
     ),
     set_difference AS (
         SELECT
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_a_not_b(a.merged_theta_sketch, b.merged_theta_sketch) as a_not_b_theta_sketch,
-            `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_a_not_b(b.merged_theta_sketch, a.merged_theta_sketch) as b_not_a_theta_sketch,
+            bqutil.fn.theta_sketch_a_not_b(a.merged_theta_sketch, b.merged_theta_sketch) as a_not_b_theta_sketch,
+            bqutil.fn.theta_sketch_a_not_b(b.merged_theta_sketch, a.merged_theta_sketch) as b_not_a_theta_sketch,
             a.total_count as set_a_count,
             b.total_count as set_b_count
         from  union_data_set_a a, union_data_set_b b
     )
 select
     "SetA = [1, 5M] \nSetB = (4M, 7M]" as set_info,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_extract(intersected_theta_sketch) as intersect_uniq_count,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_extract(union_theta_sketch) as union_uniq_count,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_extract(a_not_b_theta_sketch) as a_not_b_uniq_count,
-    `$BQ_PROJECT.$BQ_DATASET`.theta_sketch_extract(b_not_a_theta_sketch) as b_not_a_uniq_count,
+    bqutil.fn.theta_sketch_extract(intersected_theta_sketch) as intersect_uniq_count,
+    bqutil.fn.theta_sketch_extract(union_theta_sketch) as union_uniq_count,
+    bqutil.fn.theta_sketch_extract(a_not_b_theta_sketch) as a_not_b_uniq_count,
+    bqutil.fn.theta_sketch_extract(b_not_a_theta_sketch) as b_not_a_uniq_count,
     set_a_count,
     set_b_count,
     total_count,
@@ -184,7 +187,7 @@ CREATE OR REPLACE TABLE `$BQ_PROJECT.$BQ_DATASET`.agg_sample_data_10B AS
 select
 group_key,
 count(*) as total_count,
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_int64(x,250) as kll_sketch
+bqutil.fn.kll_sketch_int64(x,250) as kll_sketch
 from `$BQ_PROJECT.$BQ_DATASET`.sample_data_10B
 group by group_key;
 ```
@@ -195,16 +198,16 @@ group by group_key;
 WITH
 agg_data AS (
 SELECT
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_merge(kll_sketch,250) as merged_kll_sketch,
+bqutil.fn.kll_sketch_merge(kll_sketch,250) as merged_kll_sketch,
 SUM(total_count) as total_count
 from `$BQ_PROJECT.$BQ_DATASET`.agg_sample_data_10B
 )
 select
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_quantile(merged_kll_sketch, 0.0) as mininum,
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_quantile(merged_kll_sketch, 0.5) as p50,
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_quantile(merged_kll_sketch, 0.75) as p75,
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_quantile(merged_kll_sketch, 0.95) as p95,
-`$BQ_PROJECT.$BQ_DATASET`.kll_sketch_quantile(merged_kll_sketch, 1.0) as maximum,
+bqutil.fn.kll_sketch_quantile(merged_kll_sketch, 0.0) as mininum,
+bqutil.fn.kll_sketch_quantile(merged_kll_sketch, 0.5) as p50,
+bqutil.fn.kll_sketch_quantile(merged_kll_sketch, 0.75) as p75,
+bqutil.fn.kll_sketch_quantile(merged_kll_sketch, 0.95) as p95,
+bqutil.fn.kll_sketch_quantile(merged_kll_sketch, 1.0) as maximum,
 merged_kll_sketch,
 total_count
 FROM agg_data;
@@ -253,7 +256,7 @@ select
     group_key,
     count(distinct user_id) as exact_uniq_users_ct,
     sum(clicks) as exact_clicks_ct,
-    `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_int64(user_id,clicks,14) as tuple_sketch
+    bqutil.fn.tuple_sketch_int64(user_id,clicks,14) as tuple_sketch
 from `$BQ_PROJECT.$BQ_DATASET`.sample_data_100M
 group by group_key;
 ```
@@ -266,7 +269,7 @@ select
     exact_uniq_users_ct,
     exact_clicks_ct,
     FLOOR(exact_clicks_ct/exact_uniq_users_ct) as clicks_avg,
-    `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_extract_summary(tuple_sketch) as tuple_sketch_summary
+    bqutil.fn.tuple_sketch_extract_summary(tuple_sketch) as tuple_sketch_summary
 from `$BQ_PROJECT.$BQ_DATASET`.agg_sample_data_100M
 ```
 
@@ -276,16 +279,16 @@ from `$BQ_PROJECT.$BQ_DATASET`.agg_sample_data_100M
 WITH
 agg_data AS (
     SELECT
-         `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_union(tuple_sketch,14) as merged_tuple_sketch,
+         bqutil.fn.tuple_sketch_union(tuple_sketch,14) as merged_tuple_sketch,
          SUM(exact_uniq_users_ct) as total_uniq_users_ct, 
     from `$BQ_PROJECT.$BQ_DATASET`.agg_sample_data_100M
 )
 Select
     total_uniq_users_ct,
-   `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_extract_summary(merged_tuple_sketch) as summary,
-   `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_extract_count(merged_tuple_sketch) as approx_dist_user_ct,
-   `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_extract_sum(merged_tuple_sketch) as approx_clicks_ct,
-   `$BQ_PROJECT.$BQ_DATASET`.tuple_sketch_extract_avg(merged_tuple_sketch) as approx_clicks_avg,
+   bqutil.fn.tuple_sketch_extract_summary(merged_tuple_sketch) as summary,
+   bqutil.fn.tuple_sketch_extract_count(merged_tuple_sketch) as approx_dist_user_ct,
+   bqutil.fn.tuple_sketch_extract_sum(merged_tuple_sketch) as approx_clicks_ct,
+   bqutil.fn.tuple_sketch_extract_avg(merged_tuple_sketch) as approx_clicks_avg,
    merged_tuple_sketch
 FROM agg_data;
 ```
