@@ -53,8 +53,7 @@ steps:
   args:
     - run-script
     - build-all-libs
- 
- #########################################################################
+  #########################################################################
   # Clone datasketches-cpp github repo as dependency for building WASM libraries
   # Build (via emscripten) all WASM libraries for BigQuery Sketch UD(A)Fs
   #########################################################################
