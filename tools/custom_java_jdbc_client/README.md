@@ -13,7 +13,7 @@ The following files are provided:
   * Main example showing how to authenticate, configure, and execute queries.
 * src/main/java/com/example/OAuthUserConfig.java
   * OAuth user config object and builder.
-* src/main/java/com/example/OAuthUserType.javaa
+* src/main/java/com/example/OAuthUserType.java
   * Enum for available OAuth user types.
 * pom.xml
   * Project configuration and dependencies.
