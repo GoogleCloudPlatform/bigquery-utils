@@ -138,6 +138,10 @@ SELECT bqutil.fn.int(1.684)
 * [json_extract_key_value_pairs](#json_extract_key_value_pairs)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
+* [kll_sketch_float64](#kllsketchfloat64--idcol-float64-k-int64-)
+* [kll_sketch_int64](#kllsketchint64--idcol-int64-k-int64-)
+* [kll_sketch_merge](#kllsketchmerge--sketch-bytes-k-int64-)
+* [kll_sketch_quantile](#kllsketchquantile--sketch-bytes-rank-float64-)
 * [knots_to_mph](#knots_to_mphinput_knots-float64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
@@ -169,6 +173,12 @@ SELECT bqutil.fn.int(1.684)
 * [sure_range](#sure_range)
 * [sure_values](#sure_values)
 * [table_url](#table_urltable_id-string)
+* [theta_sketch_a_not_b](#thetasketchanotb--sketcha-bytes-sketchb-bytes-)
+* [theta_sketch_bytes](#thetasketchbytes--bytescol-bytes-lgk-int64-)
+* [theta_sketch_extract](#thetasketchextract--sketch-bytes-)
+* [theta_sketch_intersection](#thetasketchintersection--sketch-bytes-)
+* [theta_sketch_int64](#thetasketchint64--idcol-int64-lgk-int64-)
+* [theta_sketch_union](#thetasketchunion--sketch-bytes-lgk-int64-)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -178,6 +188,12 @@ SELECT bqutil.fn.int(1.684)
 * [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [t_test](#t_testarrayarray)
+* [tuple_sketch_int64](#tuplesketchint64--idcol-int64-valuecol-int64-lgk-int64--)
+* [tuple_sketch_extract_avg](#tuplesketchextractavg--sketch-bytes-)
+* [tuple_sketch_extract_count](#tuplesketchextractcount--sketch-bytes-)
+* [tuple_sketch_extract_sum](#tuplesketchextractsum--sketch-bytes-)
+* [tuple_sketch_extract_summary](#tuplesketchextractsummary--sketch-bytes-)
+* [tuple_sketch_union](#tuplesketchunion--sketch-bytes-lgk-int64-)
 * [typeof](#typeofinput-any-type)
 * [url_decode](#url_decodetext-string-method-string)
 * [url_encode](#url_encodetext-string-method-string)
@@ -1517,6 +1533,18 @@ SELECT
 object, array, string, number, boolean, boolean, null
 ```
 
+### [kll_sketch_float64(id_col FLOAT64, k INT64)](kll_sketch_float64.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
+### [kll_sketch_int64(id_col INT64, k INT64)](kll_sketch_int64.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details. 
+
+### [kll_sketch_merge(sketch BYTES, k INT64)](kll_sketch_merge.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
+### [kll_sketch_quantile(sketch BYTES, rank FLOAT64)](kll_sketch_quantile.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
 ### [knots_to_mph(input_knots FLOAT64)](knots_to_mph.sqlx)
 Converts knots to miles per hour
 ```sql
@@ -1778,6 +1806,24 @@ SELECT bqutil.fn.table_url("bigquery-public-data.new_york_citibike.citibike_trip
 https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=new_york_citibike&t=citibike_trips&page=table
 ```
 
+### [theta_sketch_a_not_b(sketch_a BYTES, sketch_b BYTES)](theta_sketch_a_not_b.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_bytes(bytes_col BYTES, lg_k INT64)](theta_sketch_bytes.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_extract(sketch BYTES)](theta_sketch_extract.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_intersection(sketch BYTES)](theta_sketch_intersection.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_int64(id_col INT64, lg_k INT64)](theta_sketch_int64.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_union(sketch BYTES, lg_k INT64)](theta_sketch_union.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
 ### [to_binary(x INT64)](to_binary.sqlx)
 Returns a binary representation of a number.
 
@@ -1961,6 +2007,23 @@ SELECT
 |-------------------------|-------------------------|-------------------------|
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
+### [tuple_sketch_extract_avg(sketch BYTES)](tuple_sketch_extract_avg.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_count(sketch BYTES)](tuple_sketch_extract_count.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_sum(sketch BYTES)](tuple_sketch_extract_sum.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_summary(sketch BYTES)](tuple_sketch_extract_summary.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_int64(id_col INT64, value_col INT64, lg_k INT64)](tuple_sketch_int64.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_union(sketch BYTES, lg_k INT64)](tuple_sketch_union.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
 
 ### [typeof(input ANY TYPE)](typeof.sqlx)
 

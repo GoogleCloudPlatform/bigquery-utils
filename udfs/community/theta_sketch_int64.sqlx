@@ -19,7 +19,10 @@ CREATE OR REPLACE AGGREGATE FUNCTION
   ${self()}(x INT64, lg_k INT64 NOT AGGREGATE)
   RETURNS BYTES
   LANGUAGE js
-  OPTIONS (library=["${JS_BUCKET}/theta_sketch.mjs"]) AS '''
+  OPTIONS (
+    library=["${JS_BUCKET}/theta_sketch.mjs"],
+    description = 'Aggregates id_col, log_k args and returns a theta sketch.'
+  ) AS '''
 import ModuleFactory from "${JS_BUCKET}/theta_sketch.mjs";
 
 var Module = await ModuleFactory();

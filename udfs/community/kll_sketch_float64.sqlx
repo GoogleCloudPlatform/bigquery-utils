@@ -19,7 +19,10 @@ CREATE OR REPLACE AGGREGATE FUNCTION
   ${self()}(x FLOAT64, k INT64 NOT AGGREGATE)
   RETURNS BYTES
   LANGUAGE js
-  OPTIONS (library=["${JS_BUCKET}/kll_sketch.mjs"]) AS '''
+  OPTIONS (
+    library=["${JS_BUCKET}/kll_sketch.mjs"],
+    description = 'Aggregates id_col, k args and returns a KLL sketch.'
+  ) AS '''
 import ModuleFactory from "${JS_BUCKET}/kll_sketch.mjs";
 var Module = await ModuleFactory();
 

@@ -19,7 +19,10 @@ CREATE OR REPLACE AGGREGATE FUNCTION
   ${self()}(x BYTES, lg_k INT64 NOT AGGREGATE)
   RETURNS BYTES
   LANGUAGE js
-  OPTIONS (library=["${JS_BUCKET}/theta_sketch.mjs"]) AS '''
+  OPTIONS (
+    library=["${JS_BUCKET}/theta_sketch.mjs"],
+    description='Aggregates bytes_col, log_k args and returns a theta sketch.\nThis function can also be used for initializing theta sketch for string cols. Just CAST( string_col AS BYTES FORMAT \'UTF-8\') and pass to this function'
+  ) AS '''
 import ModuleFactory from "${JS_BUCKET}/theta_sketch.mjs";
 
 var Module = await ModuleFactory();

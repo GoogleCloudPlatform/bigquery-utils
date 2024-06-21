@@ -18,7 +18,10 @@ config { hasOutput: true }
 CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
     RETURNS STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64>
     LANGUAGE js
-    OPTIONS (library=["${JS_BUCKET}/tuple_sketch.js"]) AS '''
+    OPTIONS (
+      library=["${JS_BUCKET}/tuple_sketch.js"],
+      description='Takes in a tuple sketch and returns summary of key and value cols i.e struct<uniq_count, sum, avg>.'
+    ) AS '''
 var sketchBinary = intArrayFromBase64(sketch);
 var ptr = Module._malloc(sketchBinary.length);
 Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);
