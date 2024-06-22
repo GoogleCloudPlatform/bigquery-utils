@@ -15,14 +15,14 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE AGGREGATE FUNCTION
-       ${self()}(x BYTES)
-  RETURNS BYTES
-  LANGUAGE js
-  OPTIONS (
-    library=["${JS_BUCKET}/theta_sketch.mjs"],
-    description = 'Aggregates multiple theta sketches, performs an intersection op and returns a merged theta sketch.'
-  ) AS '''
+CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(x BYTES)
+RETURNS BYTES
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/theta_sketch.mjs"],
+  description = '''Aggregates multiple theta sketches, performs an intersection op and returns a merged theta sketch.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
 import ModuleFactory from "${JS_BUCKET}/theta_sketch.mjs";
 
 var Module = await ModuleFactory();

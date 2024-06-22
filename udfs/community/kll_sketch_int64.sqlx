@@ -15,14 +15,14 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE AGGREGATE FUNCTION
-  ${self()}(x INT64, k INT64 NOT AGGREGATE)
-  RETURNS BYTES
-  LANGUAGE js
-  OPTIONS (
-    library=["${JS_BUCKET}/kll_sketch.mjs"],
-    description = 'Aggregates id_col, k args and returns a KLL sketch.'
-  ) AS '''
+CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(x INT64, k INT64 NOT AGGREGATE)
+RETURNS BYTES
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/kll_sketch.mjs"],
+  description = '''Aggregates id_col, k args and returns a KLL sketch.
+For more details: https://datasketches.apache.org/docs/KLL/KLLSketch.html'''
+) AS '''
 import ModuleFactory from "${JS_BUCKET}/kll_sketch.mjs";
 
 var Module = await ModuleFactory();

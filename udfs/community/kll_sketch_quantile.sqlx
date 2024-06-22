@@ -16,12 +16,13 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES, q_rank FLOAT64)
-    RETURNS FLOAT64
-    LANGUAGE js
-    OPTIONS (
-      library=["${JS_BUCKET}/kll_sketch.js"],
-      description='Takes in KLL sketch and rank value and returns quantile value. eg. a rank of 0.5 will return median, rank = 1 returns max.'
-    ) AS '''
+RETURNS FLOAT64
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/kll_sketch.js"],
+  description='''Takes in KLL sketch and rank value and returns quantile value. eg. a rank of 0.5 will return median, rank = 1 returns max.
+For more details: https://datasketches.apache.org/docs/KLL/KLLSketch.html'''
+) AS '''
 var sketchBinary = intArrayFromBase64(sketch);
 var ptr = Module._malloc(sketchBinary.length);
 Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);

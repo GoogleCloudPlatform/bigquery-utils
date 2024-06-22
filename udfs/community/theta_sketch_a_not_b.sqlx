@@ -16,13 +16,13 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(sketch_A BYTES, sketch_NotB BYTES)
-    RETURNS BYTES
-    LANGUAGE js
-    OPTIONS (
-      library=["${JS_BUCKET}/theta_sketch.js"],
-      description = 'Takes in 2 theta sketches, performs a difference op / a_not_b op (i.e SetA - SetB) and returns a theta_sketch'
-    ) AS
-'''
+RETURNS BYTES
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/theta_sketch.js"],
+  description = '''Takes in 2 theta sketches, performs a difference op / a_not_b op (i.e SetA - SetB) and returns a theta_sketch.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
 var sketchBinary_a = intArrayFromBase64(sketch_A);
 var sketchBinary_b = intArrayFromBase64(sketch_NotB);
 var totalSize = sketchBinary_a.length + sketchBinary_b.length;

@@ -17,12 +17,15 @@ config { hasOutput: true }
 
 
 CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
-    RETURNS INT64
-    LANGUAGE js
-    OPTIONS (
-      library=["${JS_BUCKET}/tuple_sketch.js"],
-      description = 'Takes in a tuple sketch, combines the summary values of the value_col (using sum) from the random sample of id_col stored within the Tuple sketch, calculates an estimate that applies to the entire dataset and returns the avg.'
-    ) AS '''
+RETURNS INT64
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/tuple_sketch.js"],
+  description = '''Takes in a tuple sketch, combines the summary values of
+the value_col (using sum) from the random sample of id_col stored within the 
+Tuple sketch, calculates an estimate that applies to the entire dataset and returns the avg.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
 var sketchBinary = intArrayFromBase64(sketch);
 var ptr = Module._malloc(sketchBinary.length);
 Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);
