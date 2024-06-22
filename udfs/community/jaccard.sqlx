@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 CREATE OR REPLACE FUNCTION ${self()}(a STRING, b STRING)
 RETURNS FLOAT64
-LANGUAGE js AS r"""
+LANGUAGE js 
+OPTIONS (
+    description="Compute Jaccard distance."
+) 
+AS r"""
   let intersectSize = 0;
 
   if(a && b) {
