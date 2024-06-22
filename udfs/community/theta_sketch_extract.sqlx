@@ -16,9 +16,13 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
-    RETURNS FLOAT64
-    LANGUAGE js
-    OPTIONS (library=["${JS_BUCKET}/theta_sketch.js"]) AS '''
+RETURNS FLOAT64
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/theta_sketch.js"],
+  description = '''Takes in a theta sketch, returns approx distinct count of entries of the id_col used to create the theta sketch.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
 // from emscripten
 var sketchBinary = intArrayFromBase64(sketch);
 var ptr = Module._malloc(sketchBinary.length);

@@ -16,9 +16,13 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
-    RETURNS INT64
-    LANGUAGE js
-    OPTIONS (library=["${JS_BUCKET}/tuple_sketch.js"]) AS '''
+RETURNS INT64
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/tuple_sketch.js"],
+  description = '''Takes in a tuple sketch, returns approx distinct count of entries of the id_col used to create the tuple sketch.
+For more details: https://datasketches.apache.org/docs/Tuple/TupleOverview.html'''
+) AS '''
 var sketchBinary = intArrayFromBase64(sketch);
 var ptr = Module._malloc(sketchBinary.length);
 Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);
