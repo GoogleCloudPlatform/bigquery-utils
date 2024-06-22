@@ -21,7 +21,7 @@ LANGUAGE js
 OPTIONS (
   library=["${JS_BUCKET}/tuple_sketch.mjs"],
   description='''Aggregates multiple tuple sketches, performs a union op and returns a merged tuple sketch.
-For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+For more details: https://datasketches.apache.org/docs/Tuple/TupleOverview.html'''
 ) AS '''
 import ModuleFactory from "${JS_BUCKET}/tuple_sketch.mjs";
 var Module = await ModuleFactory();
