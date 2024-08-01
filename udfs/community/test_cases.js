@@ -11,9 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 const { generate_udf_test, generate_udaf_test } = unit_test_utils;
-
 generate_udf_test("int", [
   {
     inputs: [`"-1"`],
@@ -2395,7 +2393,6 @@ generate_udf_test("cw_td_strtok", [
     inputs: [`";foo;;bar;baz"`, `";"`, `2`],
     expected_output: `"bar"`,
   },
-
   {
     inputs: [`";foo;;"`, `";"`, `2`],
     expected_output: `null`,
@@ -2433,7 +2430,6 @@ generate_udf_test("cw_td_strtok", [
     expected_output: `null`,
   },
 ]);
-
 generate_udf_test("cw_regexp_split", [
   {
     inputs: [`"Test#1"`, `"#"`, `"i"`],
@@ -2558,21 +2554,18 @@ generate_udf_test("interval_seconds", [
     expected_output: `CAST(-86400 AS INT64)`,
   },
 ]);
-
 generate_udf_test("interval_millis", [
   {
     inputs: [`INTERVAL -1 DAY`],
     expected_output: `CAST(-86400000 AS INT64)`,
   },
 ]);
-
 generate_udf_test("interval_micros", [
   {
     inputs: [`INTERVAL -1 DAY`],
     expected_output: `CAST(-86400000000 AS INT64)`,
   },
 ]);
-
 generate_udf_test("bignumber_add", [
   {
     inputs: [
@@ -2596,7 +2589,6 @@ generate_udf_test("bignumber_add", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_div", [
   {
     inputs: [
@@ -2648,7 +2640,6 @@ generate_udf_test("bignumber_div", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_mul", [
   {
     inputs: [
@@ -2676,7 +2667,6 @@ generate_udf_test("bignumber_mul", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_sub", [
   {
     inputs: [
@@ -2700,7 +2690,6 @@ generate_udf_test("bignumber_sub", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_sum", [
   {
     inputs: [
@@ -2733,7 +2722,6 @@ generate_udf_test("bignumber_sum", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_avg", [
   {
     inputs: [
@@ -2770,7 +2758,6 @@ generate_udf_test("bignumber_avg", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_eq", [
   {
     inputs: [
@@ -2815,7 +2802,6 @@ generate_udf_test("bignumber_eq", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_gt", [
   {
     inputs: [
@@ -2860,7 +2846,6 @@ generate_udf_test("bignumber_gt", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_gte", [
   {
     inputs: [
@@ -2905,7 +2890,6 @@ generate_udf_test("bignumber_gte", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_lt", [
   {
     inputs: [
@@ -2950,7 +2934,6 @@ generate_udf_test("bignumber_lt", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("bignumber_lte", [
   {
     inputs: [
@@ -2995,7 +2978,6 @@ generate_udf_test("bignumber_lte", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("cw_period_intersection", [
   {
     inputs: [
@@ -3033,7 +3015,6 @@ generate_udf_test("cw_period_intersection", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("cw_period_ldiff", [
   {
     inputs: [
@@ -3064,7 +3045,6 @@ generate_udf_test("cw_period_ldiff", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("cw_period_rdiff", [
   {
     inputs: [
@@ -3155,42 +3135,36 @@ generate_udf_test("sure_nonnull", [
     expected_output: `"string_example"`,
   },
 ]);
-
 generate_udf_test("sure_nonnull", [
   {
     inputs: [`1`],
     expected_output: `1`,
   },
 ]);
-
 generate_udf_test("sure_cond", [
   {
     inputs: [`1`, `TRUE`],
     expected_output: `1`,
   },
 ]);
-
 generate_udf_test("sure_like", [
   {
     inputs: [`"[Testcase]"`, `"[%]"`],
     expected_output: `"[Testcase]"`,
   },
 ]);
-
 generate_udf_test("sure_range", [
   {
     inputs: [`1`, `1`, `10`],
     expected_output: `1`,
   },
 ]);
-
 generate_udf_test("sure_range", [
   {
     inputs: [`"b"`, `"a"`, `"c"`],
     expected_output: `"b"`,
   },
 ]);
-
 generate_udf_test("sure_values", [
   {
     inputs: [`"hoge"`, `["hoge"]`],
@@ -3201,7 +3175,6 @@ generate_udf_test("sure_values", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("job_url", [
   {
     inputs: [`"my_project:us.my_job_id"`],
@@ -3216,7 +3189,6 @@ generate_udf_test("job_url", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("table_url", [
   {
     inputs: [`"my_project.my_dataset.my_table"`],
@@ -3235,7 +3207,6 @@ generate_udf_test("table_url", [
     expected_output: `NULL`,
   },
 ]);
-
 generate_udf_test("cw_overlapping_partition_by_regexp", [
   {
     inputs: [`1`, `"A@1#A@2#B@3#A@4#B@5#"`, `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`],
@@ -3266,7 +3237,6 @@ generate_udf_test("cw_overlapping_partition_by_regexp", [
     expected_output: `CAST([101, 102, 103] AS ARRAY<INT64>)`,
   },
 ]);
-
 generate_udf_test("cw_disjoint_all_partitions_by_regexp", [
   {
     inputs: [`"A@1#A@2#B@3#A@4#B@5#"`, `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`],
@@ -3281,7 +3251,6 @@ generate_udf_test("cw_disjoint_all_partitions_by_regexp", [
     expected_output: `CAST([] AS ARRAY<STRUCT<p INT64, rn INT64>>)`,
   },
 ]);
-
 generate_udf_test("cw_disjoint_partition_by_regexp", [
   {
     inputs: [`1`, `"A@1#A@2#B@3#A@4#B@5#"`, `"(?:A@\\\\d+#)+(?:B@\\\\d+#)"`],
@@ -3312,7 +3281,6 @@ generate_udf_test("cw_disjoint_partition_by_regexp", [
     expected_output: `CAST([104, 105] AS ARRAY<INT64>)`,
   },
 ]);
-
 generate_udaf_test("scaled_average", {
   input_columns: [`dividend`, `divisor`],
   input_rows: `SELECT 1 AS dividend, 2 AS divisor 
@@ -3322,7 +3290,6 @@ generate_udaf_test("scaled_average", {
       SELECT 5, 6`,
   expected_output: `0.69444444444444442`,
 });
-
 generate_udaf_test("scaled_average", {
   input_columns: [`dividend`, `divisor`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3332,7 +3299,6 @@ generate_udaf_test("scaled_average", {
     ])`,
   expected_output: `0.66666666666666663`,
 });
-
 generate_udaf_test("scaled_sum", {
   input_columns: [`dividend`, `4.0 NOT AGGREGATE`],
   input_rows: `SELECT 1 AS dividend
@@ -3342,7 +3308,6 @@ generate_udaf_test("scaled_sum", {
       SELECT 5`,
   expected_output: `2.25`,
 });
-
 generate_udaf_test("scaled_sum", {
   input_columns: [`dividend`, `4.0 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3352,7 +3317,6 @@ generate_udaf_test("scaled_sum", {
     ]) AS dividend`,
   expected_output: `1.75`,
 });
-
 generate_udaf_test("theta_sketch_int64", {
   input_columns: [`id_col`, `14 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3362,7 +3326,6 @@ generate_udaf_test("theta_sketch_int64", {
     ]) AS id_col`,
   expected_output: `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
 });
-
 generate_udaf_test("theta_sketch_union", {
   input_columns: [`sketch`, `14 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3371,7 +3334,6 @@ generate_udaf_test("theta_sketch_union", {
     ]) AS sketch`,
   expected_output: `FROM_BASE64('AgMDAAAazJMFAAAAAAAAABX5fcu9hqEFQN4u4cnbPQi9MnNyRpHMFMOX/BKBcJ0eukCzwdoGaV0=')`,
 });
-
 generate_udaf_test("theta_sketch_bytes", {
   input_columns: [`col`, `14 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3381,26 +3343,23 @@ generate_udaf_test("theta_sketch_bytes", {
       ]) AS col`,
   expected_output: `FROM_BASE64('AgMDAAAazJMDAAAAAAAAACeG5v3dPBRekMZD7DaJq2XxsLkOSE0lfQ==')`,
 });
-
 generate_udf_test("theta_sketch_extract", [
   {
     inputs: [
-      `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`
+      `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
     ],
-    expected_output: `3.0`
-  }
+    expected_output: `3.0`,
+  },
 ]);
-
 generate_udf_test("theta_sketch_a_not_b", [
   {
     inputs: [
       `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
-      `FROM_BASE64('AQMDAAAazJMV+X3LvYahBQ==')`
+      `FROM_BASE64('AQMDAAAazJMV+X3LvYahBQ==')`,
     ],
-    expected_output: `FROM_BASE64('AgMDAAAazJMCAAAAAAAAAMOX/BKBcJ0eukCzwdoGaV0=')`
-  }
+    expected_output: `FROM_BASE64('AgMDAAAazJMCAAAAAAAAAMOX/BKBcJ0eukCzwdoGaV0=')`,
+  },
 ]);
-
 generate_udaf_test("theta_sketch_intersection", {
   input_columns: [`theta_sketch`],
   input_rows: `SELECT FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==') as theta_sketch
@@ -3408,7 +3367,6 @@ generate_udaf_test("theta_sketch_intersection", {
               SELECT FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
   expected_output: `FROM_BASE64('AgMDAAAazJMDAAAAAAAAABX5fcu9hqEFw5f8EoFwnR66QLPB2gZpXQ==')`,
 });
-
 generate_udaf_test("tuple_sketch_int64", {
   input_columns: [`id_col`, `key_col`, `14 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3418,7 +3376,6 @@ generate_udaf_test("tuple_sketch_int64", {
     ])`,
   expected_output: `FROM_BASE64('AgMJAQAazJMCAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgcAAAAAAAAA')`,
 });
-
 generate_udaf_test("tuple_sketch_union", {
   input_columns: [`sketch`, `14 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3427,43 +3384,38 @@ generate_udaf_test("tuple_sketch_union", {
     ]) AS sketch`,
   expected_output: `FROM_BASE64('AgMJAQAazJMCAAAAAAAAABX5fcu9hqEFBAAAAAAAAADDl/wSgXCdHg4AAAAAAAAA')`,
 });
-
 generate_udf_test("tuple_sketch_extract_count", [
   {
     inputs: [
-      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`,
     ],
-    expected_output: `3`
-  }
+    expected_output: `3`,
+  },
 ]);
-
 generate_udf_test("tuple_sketch_extract_sum", [
   {
     inputs: [
-      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`,
     ],
-    expected_output: `6`
-  }
+    expected_output: `6`,
+  },
 ]);
-
 generate_udf_test("tuple_sketch_extract_avg", [
   {
     inputs: [
-      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`,
     ],
-    expected_output: `2`
-  }
+    expected_output: `2`,
+  },
 ]);
-
 generate_udf_test("tuple_sketch_extract_summary", [
   {
     inputs: [
-      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`
+      `FROM_BASE64('AgMJAQAazJMDAAAAAAAAABX5fcu9hqEFAgAAAAAAAADDl/wSgXCdHgIAAAAAAAAAukCzwdoGaV0CAAAAAAAAAA==')`,
     ],
-    expected_output: `STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64>(3,6,2)`
-  }
+    expected_output: `STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64>(3,6,2)`,
+  },
 ]);
-
 generate_udaf_test("kll_sketch_int64", {
   input_columns: [`id_col`, `200 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3473,7 +3425,6 @@ generate_udaf_test("kll_sketch_int64", {
     ]) AS id_col`,
   expected_output: `FROM_BASE64('BQEPAMgACAADAAAAAAAAAMgAAQDFAAAAAACAPwAAQEAAAEBAAAAAQAAAgD8=')`,
 });
-
 generate_udaf_test("kll_sketch_float64", {
   input_columns: [`id_col`, `200 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3483,7 +3434,6 @@ generate_udaf_test("kll_sketch_float64", {
       ]) AS id_col`,
   expected_output: `FROM_BASE64('BQEPAMgACAADAAAAAAAAAMgAAQDFAAAAAACAPwAAQEAAAEBAAAAAQAAAgD8=')`,
 });
-
 generate_udaf_test("kll_sketch_merge", {
   input_columns: [`sketch`, `200 NOT AGGREGATE`],
   input_rows: `SELECT * FROM UNNEST([
@@ -3492,13 +3442,40 @@ generate_udaf_test("kll_sketch_merge", {
       ]) AS sketch`,
   expected_output: `FROM_BASE64('BQEPAMgACAAGAAAAAAAAAMgAAQDCAAAAAACAPwAAgEAAAIA/AAAAQAAAgEAAAIA/AAAAQAAAQEA=')`,
 });
-
 generate_udf_test("kll_sketch_quantile", [
   {
     inputs: [
       `FROM_BASE64('BQEPAPoACAADAAAAAAAAAPoAAQD3AAAAAACAPwAAQEAAAEBAAAAAQAAAgD8=')`,
-      `0.5`
+      `0.5`,
     ],
-    expected_output: `2.0`
-  }
+    expected_output: `2.0`,
+  },
+]);
+generate_udf_test("xml_to_json_fpx", [
+  {
+    inputs: [`'<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'`],
+    expected_output: `JSON '{"xml":{"bar":{"baz":"BAZ"},"@_foo":"FOO"}}'`,
+  },
+  {
+    inputs: [`CAST(NULL AS STRING)`],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [`''`],
+    expected_output: `JSON '{}'`,
+  },
+]);
+generate_udf_test("xml_to_json", [
+  {
+    inputs: [`'<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'`],
+    expected_output: `JSON '{"xml":[{"_attributes":{"foo":"FOO"},"bar":[{"baz":["BAZ"]}]}]}'`,
+  },
+  {
+    inputs: [`CAST(NULL AS STRING)`],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [`''`],
+    expected_output: `JSON '{}'`,
+  },
 ]);

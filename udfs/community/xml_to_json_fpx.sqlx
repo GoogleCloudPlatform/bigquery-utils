@@ -1,0 +1,59 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(xml STRING)
+RETURNS JSON
+DETERMINISTIC
+LANGUAGE js 
+OPTIONS(
+library="${JS_BUCKET}/fast-xml-parser-v4.4.1.min.js",
+description="""Converts XML to JSON using the open source
+fast-xml-parser JavaScript library.
+For the fastest parsing performance, use the xml_to_json UDF which 
+is based on the txml JavaScript library.
+
+NULL input is returned as NULL output.
+Empty string input is returned as empty JSON object.
+
+fast-xml-parser repo:
+https://github.com/NaturalIntelligence/fast-xml-parser
+
+See link below for a list of options you can pass to the XMLParser object:
+https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/docs/v4/2.XMLparseOptions.md
+
+/*
+ * Example Usage:
+ * Run the query below in BigQuery
+ */
+
+SELECT bqutil.fn.xml_to_json_fpx(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+)
+
+/*
+ * The query result will be the following:
+ * {"xml":{"@_foo":"FOO","bar":{"baz":"BAZ"}}}
+ */
+
+""") AS """
+if(xml===null) {
+  return null;
+}
+return JSON.parse(JSON.stringify(new fast_xml_parser.XMLParser({
+  ignoreAttributes : false
+}).parse(xml)));
+""";
