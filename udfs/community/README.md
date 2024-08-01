@@ -202,6 +202,8 @@ SELECT bqutil.fn.int(1.684)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
 * [url_trim_query](#url_trim_queryurl-string-keys_to_trim-array)
 * [week_of_month](#week_of_monthdate_expression-any-type)
+* [xml_to_json](#xml_to_jsonxml-string)
+* [xml_to_json_fpx](#xml_to_json_fpxxml-string)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
@@ -2152,6 +2154,47 @@ SELECT
 
 0 1
 ```
+
+### [xml_to_json(xml STRING)](xml_to_json.sqlx)
+Converts XML to JSON using the open source
+txml JavaScript library which is 2-3 times faster than the fast-xml-parser library. \
+NULL input is returned as NULL output. \
+Empty string input is returned as empty JSON object.
+
+* [txml repo](https://github.com/TobiasNickel/tXml)
+* [Benchmark details of comparison with fast-xml-parser](https://github.com/tobiasnickel/fast-xml-parser#benchmark)
+
+```sql
+SELECT bqutil.fn.xml_to_json(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+) AS output_json
+```
+
+results:
+
+| output_json |
+| ----------- |
+| {"xml":[{"_attributes":{"foo":"FOO"},"bar":[{"baz":["BAZ"]}]}]} |
+
+### [xml_to_json_fpx(xml STRING)](xml_to_json_fpx.sqlx)
+Converts XML to JSON using the open source
+fast-xml-parser JavaScript library. \
+NULL input is returned as NULL output. \
+Empty string input is returned as empty JSON object.
+
+* [fast-xml-parser repo](https://github.com/NaturalIntelligence/fast-xml-parser)
+* [List of options you can pass to the XMLParser object](https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/docs/v4/2.XMLparseOptions.md)
+
+```sql
+SELECT bqutil.fn.xml_to_json_fpx(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+) as output_json
+```
+results:
+
+| output_json |
+| ----------- |
+| {"xml":{"@_foo":"FOO","bar":{"baz":"BAZ"}}} |
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sqlx)
 Convert a STRING formatted as a YYYYMMDD to a DATE

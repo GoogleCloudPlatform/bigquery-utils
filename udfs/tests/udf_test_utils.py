@@ -97,9 +97,10 @@ def generate_js_libs_package_json():
             for version in js_libs_dict.get(lib_name).get('versions')
         },
         "devDependencies": {
-            "webpack": "^5.3.1",
-            "webpack-cli": "^4.1.0",
-            "concurrently": "^5.3.0"
+            "webpack": "^5.93.0",
+            "webpack-cli": "^5.1.4",
+            "concurrently": "^8.2.2",
+            "buffer": "^6.0.3",
         }
     }
     # Update with webpack scripts for building all js packages
