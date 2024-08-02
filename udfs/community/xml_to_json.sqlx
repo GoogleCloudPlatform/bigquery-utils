@@ -52,5 +52,5 @@ SELECT bqutil.fn.xml_to_json(
 if(xml===null) {
   return null;
 }
-return txml.simplifyLostLess(txml.parse(xml));
+return txml.simplify(txml.parse(xml));
 """;
