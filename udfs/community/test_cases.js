@@ -3468,7 +3468,7 @@ generate_udf_test("xml_to_json_fpx", [
 generate_udf_test("xml_to_json", [
   {
     inputs: [`'<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'`],
-    expected_output: `JSON '{"xml":{"_attributes":{"foo":"FOO"},"bar":{"baz":"BAZ"}}}`,
+    expected_output: `JSON '{"xml":{"_attributes":{"foo":"FOO"},"bar":{"baz":"BAZ"}}}'`,
   },
   {
     inputs: [`CAST(NULL AS STRING)`],
