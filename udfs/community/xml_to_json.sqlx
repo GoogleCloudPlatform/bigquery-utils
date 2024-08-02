@@ -51,6 +51,8 @@ SELECT bqutil.fn.xml_to_json(
 """) AS """
 if(xml===null) {
   return null;
+} else if(xml==="") {
+  return {};
 }
 return txml.simplify(txml.parse(xml));
 """;
