@@ -55,7 +55,7 @@ client = get_bq_client()
 
 def main(event, context):
     """
-    request should containa payload like:
+    request should contain a payload like:
     {
         "source_dataset_name":"DATASET_1",
         "target_dataset_name":"SNAPSHOT_DATASET_1",
