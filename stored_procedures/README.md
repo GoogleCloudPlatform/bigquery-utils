@@ -132,3 +132,68 @@ END;
 Output:
 
 `This assertion was successful`
+
+### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
+Run BQML.GENERATE_EMBEDDING function iteratively until all rows in the source table are captured in the destination table. This allows you to address any retryable errors that occur during individual runs of the BQML.GENERATE_EMBEDDING call.
+
+> Function parameters
+
+| Parameter | Description | Required | 
+| ----------- | ----------- | ----------- |
+| `source_table` | The full path of the BigQuery table containing the text data to be embedded. | Yes |
+| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. | Yes |
+| `model` | The full path of the embedding model to be used. | Yes |
+| `content_column` | The name of the column in the `source_table` containing the text to be embedded. | Yes |
+| `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. | Yes | 
+| `options` | A JSON string containing additional options for the embedding generation process. In this case, it sets the `batch_size` to 100. | No |
+
+The options JSON encodes additional optional arguments for the procedure. Each parameter must be set as a key-value pair in the JSON.
+
+| Parameter | Default Value | Description |
+|---|---|---|
+| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. |
+| `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
+| `where_clause` | 'TRUE' | An optional SQL WHERE clause to filter the rows from the source table before processing. |
+| `projection_columns` | ARRAY['*'] | An array of column names to select from the source table into the destination table. Defaults to all columns ('*'). |
+| `ml_options` | 'STRUCT(TRUE AS flatten_json_output)' | A JSON string representing additional options for the ML operation. The default flattens JSON output. |
+
+A sample JSON option string would look like: 
+```
+`{
+  "batch_size": 50000,
+  "termination_time_secs": 43200,  // 12 hours
+  "where_clause": "LENGTH(text) < 1000",
+  "projection_columns": ["type", "text"],
+  "ml_options": "STRUCT(FALSE AS flatten_json_output)"
+}`
+```
+
+> Example 
+
+```sql
+-- a unit test of bqml_generate_embeddings
+BEGIN
+  CREATE OR REPLACE TABLE sample.hacker AS
+  SELECT * FROM `bigquery-public-data.hacker_news.full`
+  WHERE type = 'story'
+  AND text IS NOT NULL
+  LIMIT 1000;
+```
+
+```sql
+CALL `bqutil.procedure.bqml_generate_embeddings`(
+    "sample.hacker",                  --source_table
+    "sample.hacker_results",           -- destination_table (it will be created if it doesn't exist)
+    "sample.embedding_model",         -- model
+    "text",                           -- content column
+    ["id"],                           -- key columns
+    '{}'                              -- optional arguments encoded as a JSON string
+);
+
+ASSERT (SELECT COUNT(*) FROM `saurabh-maurya-test1.bqml_test.hacker_news_1k_proc_results_11`) = 1000
+END;
+```
+
+Output:
+
+`This assertion was successful`
