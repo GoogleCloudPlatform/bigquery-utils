@@ -139,7 +139,7 @@ Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.go
 
 This approach improves the robustness of your embedding generation process by automatically retrying failed batches, ensuring complete data coverage in the destination table.
 
-> Function parameters
+#### Function parameters
 
 | Parameter | Description | Required | 
 | ----------- | ----------- | ----------- |
@@ -171,7 +171,7 @@ A sample fully-filled JSON option string would look like:
 }'
 ```
 
-Example usage
+#### Example usage
 
 ```sql
 BEGIN
