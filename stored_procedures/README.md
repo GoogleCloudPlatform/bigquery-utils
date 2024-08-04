@@ -190,7 +190,7 @@ CALL `bqutil.procedure.bqml_generate_embeddings`(
     '{}'                              -- optional arguments encoded as a JSON string
 );
 
-ASSERT (SELECT COUNT(*) FROM `saurabh-maurya-test1.bqml_test.hacker_news_1k_proc_results_11`) = 1000
+ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000
 END;
 ```
 
