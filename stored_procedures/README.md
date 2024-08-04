@@ -141,20 +141,21 @@ This approach improves the robustness of your embedding generation process by au
 
 #### Function parameters
 
-| Parameter | Description | Required | 
-| ----------- | ----------- | ----------- |
-| `source_table` | The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table" | Yes |
-| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.| Yes |
-| `model` | The full path of the embedding model to be used. | Yes |
-| `content_column` | The name of the column in the `source_table` containing the text to be embedded. | Yes |
-| `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. | Yes | 
-| `options` | A JSON string containing additional options for the embedding generation process. In this case, it sets the `batch_size` to 100. | No |
+| Parameter | Description | 
+| ----------- | ----------- | 
+| `source_table` | The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table" |
+| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.|
+| `model` | The full path of the embedding model to be used. | 
+| `content_column` | The name of the column in the `source_table` containing the text to be embedded. |
+| `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. |
+| `options` | A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters. |
 
 The options JSON encodes additional optional arguments for the procedure. Each parameter must be set as a key-value pair in the JSON.
 
 | Parameter | Default Value | Description |
 |---|---|---|
-| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. |
+| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple
+-- child jobs, but needs to be small enough to complete in a single job run. |
 | `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
 | `where_clause` | 'TRUE' | An optional SQL WHERE clause to filter the rows from the source table before processing. |
 | `projection_columns` | ARRAY['*'] | An array of column names to select from the source table into the destination table. Defaults to all columns ('*'). |
@@ -175,6 +176,8 @@ A sample fully-filled JSON option string would look like:
 
 ```sql
 BEGIN
+  -- Assumes dataset and model are already created
+
   CREATE OR REPLACE TABLE sample.hacker AS
   SELECT * FROM `bigquery-public-data.hacker_news.full`
   WHERE type = 'story'
@@ -190,7 +193,7 @@ BEGIN
       '{}'                              -- optional arguments encoded as a JSON string
   );
 
-  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000
+  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000;
 END;
 ```
 
