@@ -134,7 +134,7 @@ Output:
 `This assertion was successful`
 
 ### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
-Run BQML.GENERATE_EMBEDDING function iteratively until all rows in the source table are captured in the destination table. This allows you to address any retryable errors that occur during individual runs of the BQML.GENERATE_EMBEDDING call.
+Runs [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) functions iteratively until all rows in the source table are captured in the destination table. This allows you to address any retryable errors that occur during individual runs of the BQML.GENERATE_EMBEDDING call.
 
 > Function parameters
 
@@ -157,7 +157,7 @@ The options JSON encodes additional optional arguments for the procedure. Each p
 | `projection_columns` | ARRAY['*'] | An array of column names to select from the source table into the destination table. Defaults to all columns ('*'). |
 | `ml_options` | 'STRUCT(TRUE AS flatten_json_output)' | A JSON string representing additional options for the ML operation. The default flattens JSON output. |
 
-A sample JSON option string would look like: 
+A sample fully-filled JSON option string would look like: 
 ```
 `{
   "batch_size": 50000,
@@ -178,19 +178,17 @@ BEGIN
   WHERE type = 'story'
   AND text IS NOT NULL
   LIMIT 1000;
-```
 
-```sql
-CALL `bqutil.procedure.bqml_generate_embeddings`(
-    "sample.hacker",                  --source_table
-    "sample.hacker_results",           -- destination_table (it will be created if it doesn't exist)
-    "sample.embedding_model",         -- model
-    "text",                           -- content column
-    ["id"],                           -- key columns
-    '{}'                              -- optional arguments encoded as a JSON string
-);
+  CALL `bqutil.procedure.bqml_generate_embeddings`(
+      "sample.hacker",                  --source_table
+      "sample.hacker_results",           -- destination_table (it will be created if it doesn't exist)
+      "sample.embedding_model",         -- model
+      "text",                           -- content column
+      ["id"],                           -- key columns
+      '{}'                              -- optional arguments encoded as a JSON string
+  );
 
-ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000
+  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000
 END;
 ```
 
