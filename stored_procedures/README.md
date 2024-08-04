@@ -134,14 +134,17 @@ Output:
 `This assertion was successful`
 
 ### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
-Runs [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) functions iteratively until all rows in the source table are captured in the destination table. This allows you to address any retryable errors that occur during individual runs of the BQML.GENERATE_EMBEDDING call.
+
+Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+
+This approach improves the robustness of your embedding generation process by automatically retrying failed batches, ensuring complete data coverage in the destination table.
 
 > Function parameters
 
 | Parameter | Description | Required | 
 | ----------- | ----------- | ----------- |
-| `source_table` | The full path of the BigQuery table containing the text data to be embedded. | Yes |
-| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. | Yes |
+| `source_table` | The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table" | Yes |
+| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.| Yes |
 | `model` | The full path of the embedding model to be used. | Yes |
 | `content_column` | The name of the column in the `source_table` containing the text to be embedded. | Yes |
 | `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. | Yes | 
@@ -168,10 +171,9 @@ A sample fully-filled JSON option string would look like:
 }'
 ```
 
-> Example 
+Example usage
 
 ```sql
--- a unit test of bqml_generate_embeddings
 BEGIN
   CREATE OR REPLACE TABLE sample.hacker AS
   SELECT * FROM `bigquery-public-data.hacker_news.full`
@@ -180,8 +182,8 @@ BEGIN
   LIMIT 1000;
 
   CALL `bqutil.procedure.bqml_generate_embeddings`(
-      "sample.hacker",                  --source_table
-      "sample.hacker_results",           -- destination_table (it will be created if it doesn't exist)
+      "sample.hacker",                  -- source_table
+      "sample.hacker_results",          -- destination_table (it will be created if it doesn't exist)
       "sample.embedding_model",         -- model
       "text",                           -- content column
       ["id"],                           -- key columns
