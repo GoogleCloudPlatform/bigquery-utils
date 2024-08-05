@@ -129,6 +129,7 @@ EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid ml_options. It must be a string.';
 END;
 
+-- Indicate the parameters used in this script run
 SELECT source_table, target_table, ml_model, content_column, key_columns, options, batch_size, where_clause, termination_time_secs, projection_columns, ml_options;
 
 -- Create the target table first if it does not exist
@@ -154,7 +155,7 @@ REPEAT
 DROP TABLE IF EXISTS _SESSION.embedding_batch;
 
 -- Identify new rows in the source table to generate embeddings
--- For throughput reasons, Materialize these rows into a temp table before calling GENERATE_EMBEDDING()
+-- For throughput reasons, materialize these rows into a temp table before calling GENERATE_EMBEDDING()
 EXECUTE
   IMMEDIATE
     FORMAT(
