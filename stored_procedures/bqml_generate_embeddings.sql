@@ -1,3 +1,45 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+-- Iteratively executes the BQML.GENERATE_EMBEDDING function to ensure all source table rows are embedded in the destination table, 
+-- handling potential retryable errors gracefully along the way. 
+-- Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+
+-- @param STRING source_table : The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table"
+-- @param STRING target_table : The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.
+-- @param STRING ml_model : The full path of the embedding model to be used.
+-- @param STRING content_column : The name of the column in the `source_table` containing the text to be embedded.
+-- @param ARRAY<STRING> key_columns : An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value.
+-- @param STRING options_string : A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters.
+-- @param STRING options : A JSON string containing optional parameters for the operation.
+-- A sample fully-filled JSON option string would look like:
+-- '{
+--   "batch_size": 50000,
+--   "termination_time_secs": 43200,  // 12 hours
+--   "where_clause": "LENGTH(text) < 1000",
+--   "projection_columns": ["type", "text"],
+--   "ml_options": "STRUCT(FALSE AS flatten_json_output)"
+-- }'
+
+-- The parameters within the options string are documented below as:
+-- @param INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
+-- @param INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
+-- @param STRING where_clause : An optional SQL WHERE clause to filter the rows from the source table before processing. Defaults to 'TRUE'.
+-- @param ARRAY<STRING> projection_columns : An array of column names to select from the source table into the destination table. Defaults to all columns ('*').
+-- @param STRING ml_options : A JSON string representing additional options for the ML operation. Defaults to 'STRUCT(TRUE AS flatten_json_output)' which flattens JSON output.
 CREATE OR REPLACE PROCEDURE `bqutil.procedure.bqml_generate_embeddings`(source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)
 BEGIN
 
