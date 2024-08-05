@@ -157,17 +157,22 @@ export function deserialize(serialized) {
   };
 }
 
+// Possible states:
+// - first (or only) merge, union is absent on left hand side
+// - iterative merge, union is present on left hand side
+//   - union should be absent on the right hand side
+//   - should we defend against this?
+// - merge-after-update, sketch is present on left or right hand side
+// - merge-after-serialize, serialized is present on left or right hand side
 export function merge(state, other_state) {
   if (!state.union) {
     state.union = Module._theta_union_initialize(state.lg_k);
   }
 
-  if (state.sketch || other_state.sketch) {
-    throw new Error("update_sketch not expected during merge()");
-  }
-
-  if (other_state.union) {
-    throw new Error("other_state should not have union during merge()");
+  if (state.sketch) {
+    Module._theta_union_update_sketch(state.union, state.sketch);
+    Module._update_sketch_destroy(state.sketch);
+    state.sketch = 0;
   }
 
   if (state.serialized) {
@@ -176,11 +181,22 @@ export function merge(state, other_state) {
     state.serialized = null;
   }
 
+  if (other_state.union) {
+    throw new Error("other_state should not have union during merge()");
+  }
+  if (!other_state.sketch && !other_state.serialized) {
+    throw new Error("Expected sketch on other_state");
+  }
+
+  if (other_state.sketch) {
+    Module._theta_union_update_sketch(state.union, other_state.sketch);
+    Module._update_sketch_destroy(other_state.sketch);
+    other_state.sketch = 0;
+  }
+
   if (other_state.serialized) {
     updateUnion(state.union, other_state.serialized);
     other_state.serialized = null;
-  } else {
-    throw new Error("Expected serialized sketch on other_state");
   }
 }
 

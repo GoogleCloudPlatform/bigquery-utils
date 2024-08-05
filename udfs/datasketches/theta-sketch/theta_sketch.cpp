@@ -133,7 +133,7 @@ EMSCRIPTEN_KEEPALIVE void theta_union_update_buffer(
 }
 
 EMSCRIPTEN_KEEPALIVE void theta_union_update_sketch(
-    theta_union * theta_union, compact_theta_sketch *sketch) {
+    theta_union *theta_union, update_theta_sketch *sketch) {
   theta_union->update(*sketch);
 }
 

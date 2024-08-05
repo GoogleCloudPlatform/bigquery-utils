@@ -142,14 +142,9 @@ export function deserialize(serialized) {
   };
 }
 
-// Assuming Merge can only be called after deserialize
 export function merge(state, other_state) {
   if (!state.sketch) {
     state.sketch = Module._kll_sketch_initialize(state.k);
-  }
-
-  if (other_state.sketch ) {
-    throw new Error("Did not expect sketch in other state");
   }
 
   if (state.serialized) {
@@ -158,11 +153,15 @@ export function merge(state, other_state) {
     state.serialized = null;
   }
 
+  if (other_state.sketch ) {
+    Module._merge_sketch(state.sketch, other_state.sketch);
+    Module._kll_sketch_destroy(other_state.sketch);
+    other_state.sketch = 0;
+  }
+
   if (other_state.serialized) {
     updateSketch(state.sketch, other_state.serialized);
     other_state.serialized = null;
-  } else {
-    throw new Error("Expected serialized sketch on other_state");
   }
 }
 
