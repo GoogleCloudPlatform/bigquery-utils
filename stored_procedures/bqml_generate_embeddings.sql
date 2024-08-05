@@ -24,7 +24,6 @@
 -- @param STRING content_column : The name of the column in the `source_table` containing the text to be embedded.
 -- @param ARRAY<STRING> key_columns : An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value.
 -- @param STRING options_string : A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters.
--- @param STRING options : A JSON string containing optional parameters for the operation.
 -- A sample fully-filled JSON option string would look like:
 -- '{
 --   "batch_size": 50000,
