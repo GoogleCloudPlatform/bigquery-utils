@@ -34,11 +34,11 @@
 -- }'
 
 -- The parameters within the options string are documented below as:
--- @param INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
--- @param INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
--- @param STRING where_clause : An optional SQL WHERE clause to filter the rows from the source table before processing. Defaults to 'TRUE'.
--- @param ARRAY<STRING> projection_columns : An array of column names to select from the source table into the destination table. Defaults to all columns ('*').
--- @param STRING ml_options : A JSON string representing additional options for the ML operation. Defaults to 'STRUCT(TRUE AS flatten_json_output)' which flattens JSON output.
+-- INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
+-- INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
+-- STRING where_clause : An optional SQL WHERE clause to filter the rows from the source table before processing. Defaults to 'TRUE'.
+-- ARRAY<STRING> projection_columns : An array of column names to select from the source table into the destination table. Defaults to all columns ('*').
+-- STRING ml_options : A JSON string representing additional options for the ML operation. Defaults to 'STRUCT(TRUE AS flatten_json_output)' which flattens JSON output.
 CREATE OR REPLACE PROCEDURE `bqutil.procedure.bqml_generate_embeddings`(source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)
 BEGIN
 
