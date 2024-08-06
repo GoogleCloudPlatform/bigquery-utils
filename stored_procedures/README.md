@@ -170,7 +170,7 @@ A sample fully-filled JSON option string would look like:
   "termination_time_secs": 43200,
   "source_filter": "LENGTH(text) < 1000",
   "projection_columns": ["type", "text"],
-  "ml_options": "STRUCT(TRUE AS flatten_json_output)"
+  "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
 }"""
 ```
 
