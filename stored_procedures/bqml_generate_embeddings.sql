@@ -28,7 +28,7 @@
 -- '{
 --   "batch_size": 50000,
 --   "termination_time_secs": 43200,
---   "where_clause": "LENGTH(text) < 1000",
+--   "source_filter": "LENGTH(text) < 1000",
 --   "projection_columns": ["type", "text"],
 --   "ml_options": "STRUCT(FALSE AS flatten_json_output)"
 -- }'
@@ -36,7 +36,7 @@
 -- The parameters within the options string are documented below as:
 -- INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
 -- INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
--- STRING where_clause : An optional SQL WHERE clause to filter the rows from the source table before processing. Defaults to 'TRUE'.
+-- STRING source_filter : An optional filter applied as a SQL WHERE clause to the source table before processing. Defaults to 'TRUE'.
 -- ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. Defaults to all columns ('*').
 -- STRING ml_options : A JSON string representing additional options for the ML operation. Defaults to 'STRUCT(TRUE AS flatten_json_output)' which flattens JSON output.
 CREATE OR REPLACE PROCEDURE `bqutil.procedure.bqml_generate_embeddings`(source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)
@@ -47,8 +47,8 @@ DECLARE batch_size DEFAULT 80000;
 -- The time to wait before the script terminates
 DECLARE termination_time_secs DEFAULT(23 * 60 * 60);
 
--- An optional where clause to apply to the source table
-DECLARE where_clause DEFAULT 'TRUE';
+-- An optional filter applied as a where clause to apply to the source table
+DECLARE source_filter DEFAULT 'TRUE';
 
 -- The columns to project from the source table to the target table
 DECLARE projection_columns DEFAULT ARRAY['*'];
@@ -65,7 +65,7 @@ DECLARE
         ARRAY_TO_STRING(projection_columns, ','),
         content_column,
         source_table,
-        where_clause);
+        source_filter);
 
 -- The filter condition for accepting the ML result into the target table
 DECLARE
@@ -106,11 +106,11 @@ EXCEPTION WHEN ERROR THEN
 END;
 
 BEGIN
-IF JSON_EXTRACT_SCALAR(options, '$.where_clause') IS NOT NULL THEN
-  SET where_clause = CAST(JSON_EXTRACT_SCALAR(options, '$.where_clause') AS STRING);
+IF JSON_EXTRACT_SCALAR(options, '$.source_filter') IS NOT NULL THEN
+  SET source_filter = CAST(JSON_EXTRACT_SCALAR(options, '$.source_filter') AS STRING);
 END IF;
 EXCEPTION WHEN ERROR THEN
-  RAISE USING MESSAGE = 'Invalid where_clause. It must be a string.';
+  RAISE USING MESSAGE = 'Invalid source_filter. It must be a string.';
 END;
 
 BEGIN
@@ -130,7 +130,7 @@ EXCEPTION WHEN ERROR THEN
 END;
 
 -- Indicate the parameters used in this script run
-SELECT source_table, target_table, ml_model, content_column, key_columns, options, batch_size, where_clause, termination_time_secs, projection_columns, ml_options;
+SELECT source_table, target_table, ml_model, content_column, key_columns, options, batch_size, source_filter, termination_time_secs, projection_columns, ml_options;
 
 -- Create the target table first if it does not exist
 EXECUTE

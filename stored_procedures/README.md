@@ -157,7 +157,7 @@ The options JSON encodes additional optional arguments for the procedure. Each p
 | `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple
 -- child jobs, but needs to be small enough to complete in a single job run. |
 | `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
-| `where_clause` | 'TRUE' | An optional SQL WHERE clause to filter the rows from the source table before processing. |
+| `source_filter` | 'TRUE' | An optional filter applied as a WHERE clause to the source table before processing. |
 | `projection_columns` | ARRAY['*'] | An array of column names to select from the source table into the destination table. Defaults to all columns ('*'). |
 | `ml_options` | 'STRUCT(TRUE AS flatten_json_output)' | A JSON string representing additional options for the ML operation. The default flattens JSON output. |
 
@@ -166,7 +166,7 @@ A sample fully-filled JSON option string would look like:
 '{
   "batch_size": 50000,
   "termination_time_secs": 43200,  // 12 hours
-  "where_clause": "LENGTH(text) < 1000",
+  "source_filter": "LENGTH(text) < 1000",
   "projection_columns": ["type", "text"],
   "ml_options": "STRUCT(FALSE AS flatten_json_output)"
 }'
@@ -180,8 +180,7 @@ BEGIN
 
   CREATE OR REPLACE TABLE sample.hacker AS
   SELECT * FROM `bigquery-public-data.hacker_news.full`
-  WHERE type = 'story'
-  AND text IS NOT NULL
+  WHERE text IS NOT NULL
   LIMIT 1000;
 
   CALL `bqutil.procedure.bqml_generate_embeddings`(
