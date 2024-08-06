@@ -30,7 +30,7 @@
 --   "termination_time_secs": 43200,
 --   "source_filter": "LENGTH(text) < 1000",
 --   "projection_columns": ["type", "text"],
---   "ml_options": "STRUCT(FALSE AS flatten_json_output)"
+--   "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
 -- }'
 
 -- The parameters within the options string are documented below as:
@@ -57,15 +57,7 @@ DECLARE projection_columns DEFAULT ARRAY['*'];
 DECLARE ml_options DEFAULT 'STRUCT(TRUE AS flatten_json_output)';
 
 
-DECLARE
-  ml_query
-    DEFAULT
-      FORMAT(
-        'SELECT %s, %s AS content FROM `%s` WHERE %s',
-        ARRAY_TO_STRING(projection_columns, ','),
-        content_column,
-        source_table,
-        source_filter);
+DECLARE ml_query STRING;
 
 -- The filter condition for accepting the ML result into the target table
 DECLARE
@@ -114,8 +106,12 @@ EXCEPTION WHEN ERROR THEN
 END;
 
 BEGIN
-IF JSON_EXTRACT_SCALAR(options, '$.projection_columns') IS NOT NULL THEN
-  SET ml_options = JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns');
+IF JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns') IS NOT NULL THEN
+  SET projection_columns = JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns');
+  SET projection_columns = (
+    SELECT ARRAY_AGG(DISTINCT val) 
+    FROM UNNEST(ARRAY_CONCAT(key_columns, projection_columns)) AS val
+  );
 END IF;
 EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid projection_columns. It must be an array of strings.';
@@ -129,8 +125,15 @@ EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid ml_options. It must be a string.';
 END;
 
+SET ml_query = FORMAT(
+        'SELECT %s, %s AS content FROM `%s` WHERE %s',
+        ARRAY_TO_STRING(projection_columns, ','),
+        content_column,
+        source_table,
+        source_filter);
+
 -- Indicate the parameters used in this script run
-SELECT source_table, target_table, ml_model, content_column, key_columns, options, batch_size, source_filter, termination_time_secs, projection_columns, ml_options;
+SELECT source_table, target_table, ml_model, content_column, key_columns, options, batch_size, source_filter, termination_time_secs, projection_columns, ml_options, ml_query;
 
 -- Create the target table first if it does not exist
 EXECUTE
