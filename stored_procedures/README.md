@@ -165,13 +165,13 @@ The options JSON encodes additional optional arguments for the procedure. Each p
 
 A sample fully-filled JSON option string would look like: 
 ```
-'{
+"""{
   "batch_size": 50000,
   "termination_time_secs": 43200,
   "source_filter": "LENGTH(text) < 1000",
   "projection_columns": ["type", "text"],
   "ml_options": "STRUCT(TRUE AS flatten_json_output)"
-}'
+}"""
 ```
 
 #### Example usage
