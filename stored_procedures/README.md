@@ -18,6 +18,8 @@ CALL bqutil.procedure.GetNextIds(10, next_ids);
 * [chi_square](#chi_squaretable_name-string-independent_var-string-dependent_var-string-out-result-structx-float64-dof-float64-p-float64)
 * [bh_multiple_tests](#bh_multiple_tests-pvalue_table_name-string-pvalue_column_name-string-n_rows-int64-temp_table_name-string-)
 * [linear_regression](#linear_regression-table_name-string-independent_var-string-dependent_var-string-out-result-structa-float64-b-float64-r-float64-)
+* [bqml_generate_embeddings](#bqml_generate_embeddings-source_table-string-target_table-string-ml_model-string-content_column-string-key_columns-array-options_string-string)
+
 
 ## Documentation
 
