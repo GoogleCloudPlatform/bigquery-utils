@@ -147,7 +147,7 @@ export function merge(state, other_state) {
     state.union = Module._tuple_union_initialize(state.lg_k);
   }
 
-  if (state.sketch)
+  if (state.sketch) {
     Module._tuple_union_update_sketch(state.union, state.sketch);
     Module._update_sketch_destroy(state.sketch);
     state.sketch = 0;
