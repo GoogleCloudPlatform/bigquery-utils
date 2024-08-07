@@ -154,7 +154,7 @@ EMSCRIPTEN_KEEPALIVE void tuple_union_update_buffer(
 }
 
 EMSCRIPTEN_KEEPALIVE void tuple_union_update_sketch(
-    tuple_union * tuple_union, compact_tuple_sketch *sketch) {
+    tuple_union *tuple_union, update_tuple_sketch *sketch) {
   tuple_union->update(*sketch);
 }
 
