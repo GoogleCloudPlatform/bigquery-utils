@@ -51,6 +51,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   }
   included_files = ["udfs/**", "stored_procedures/**"]
   ignored_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**"]
+  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   substitutions = {
     _BQ_LOCATION = "${each.value}"
