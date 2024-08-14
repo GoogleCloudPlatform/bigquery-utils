@@ -50,7 +50,7 @@ EXECUTE IMMEDIATE """
             ON expected_table.independent_var = contingency_table.independent_var
             AND expected_table.dependent_var = contingency_table.dependent_var
     )
-    SELECT STRUCT (x, dof, bqutil.fn${when(dataform.projectConfig.vars.REGION_SUFFIX !== '', `_${dataform.projectConfig.vars.REGION_SUFFIX}`,'')}.pvalue(x, dof) AS p) FROM output
+    SELECT STRUCT (x, dof, bqutil.fn${when(dataform.projectConfig.vars.REGION_SUFFIX !== '', `_${dataform.projectConfig.vars.REGION_SUFFIX}`,'')}.chisquare_cdf(x, dof) AS p) FROM output
 """ INTO result;
 END;
 
