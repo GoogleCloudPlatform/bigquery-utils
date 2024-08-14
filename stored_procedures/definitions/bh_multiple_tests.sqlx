@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -20,7 +21,7 @@
 -- @param STRING pvalue_table_name : the name of the table with the p values that need to be adjusted
 -- @param STRING pvalue_column_name : the name of the column with p values.
 -- @param INT Nrows : Number of tests (equal to number of rows of the input table)
-CREATE OR REPLACE PROCEDURE bqutil.procedure.bh_multiple_tests (pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )
+CREATE OR REPLACE PROCEDURE ${self()}(pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )
 BEGIN
    EXECUTE IMMEDIATE format("""
    CREATE TEMP TABLE %s AS
@@ -57,7 +58,7 @@ BEGIN
       UNION ALL SELECT 0.074
       UNION ALL SELECT 0.205;
 
-   CALL bqutil.procedure.bh_multiple_tests('Pvalues','pval',8, 'bh_multiple_tests_results');
+   CALL ${self()}('Pvalues','pval',8, 'bh_multiple_tests_results');
 
    # Table Output
    # pval   p_adj
@@ -83,9 +84,6 @@ BEGIN
        )
        FROM bh_multiple_tests_results
    ) = 8;
-
-
-
-
+   DROP TABLE Pvalues;
+   DROP TABLE bh_multiple_tests_results;
 END;
-

@@ -34,7 +34,7 @@ steps:
   # Build and deploy
   # (only deploy if triggered by a commit to master branch)
   ###########################################################
-- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+- name: gcr.io/$PROJECT_ID/bq_udf_ci
   entrypoint: bash
   args:
     - release/build.sh
