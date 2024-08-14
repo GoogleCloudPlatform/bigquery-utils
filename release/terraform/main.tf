@@ -49,7 +49,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
       }
     }
   }
-  included_files = ["udfs/**"]
+  included_files = ["udfs/**", "stored_procedures/**"]
   ignored_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**"]
 
   substitutions = {

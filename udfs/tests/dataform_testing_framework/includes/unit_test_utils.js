@@ -60,11 +60,12 @@ function create_dataform_test_view(test_name, udf_name, test_cases) {
     });
     udf_input_aliases = udf_input_aliases.join(',');
     const udf_invocation_str = `${get_udf_project_and_dataset(udf_name)}${udf_name}(${udf_input_aliases})`;
+    publish(`${test_name}_dummy_view`).type("view").query("SELECT 1 as col1");
     publish(test_name)
         .type("view")
         .query(
             (ctx) => `SELECT ${udf_invocation_str} AS udf_output\n` +
-                `FROM ${ctx.resolve("test_inputs")}`
+                `FROM ${ctx.resolve(`${test_name}_dummy_view`)}`
         );
 }
 
@@ -79,11 +80,12 @@ function create_dataform_udaf_test_view(test_name, udf_name, test_case) {
     });
     udf_input_aliases = udf_input_aliases.join(',');
     const udf_invocation_str = `${get_udf_project_and_dataset(udf_name)}${udf_name}(${udf_input_aliases})`;
+    publish(`${test_name}_dummy_view`).type("view").query("SELECT 1 as col1");
     publish(test_name)
         .type("view")
         .query(
             (ctx) => `SELECT ${udf_invocation_str} AS udf_output\n` +
-                `FROM ${ctx.resolve("test_inputs")}`
+                `FROM ${ctx.resolve(`${test_name}_dummy_view`)}`
         );
 }
 
@@ -95,7 +97,7 @@ function run_dataform_test(
     test(test_name)
         .dataset(test_name)
         .input(
-            "test_inputs",
+            `${test_name}_dummy_view`,
             `${test_input_select_statements.join("\n  UNION ALL")}`
         )
         .expect(`${expected_output_select_statements.join("\nUNION ALL\n")}`);

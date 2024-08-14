@@ -1,0 +1,53 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+-- Generates next ids and inserts them into a sample table.
+-- This implementation prevents against race condition.
+--
+-- @param INT64 id_count number of id to increase
+-- @return ARRAY<int64> an array of generated ids
+
+-- a sample id table
+CREATE OR REPLACE TABLE ${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}.Ids (id INT64);
+
+CREATE OR REPLACE PROCEDURE ${self()}(id_count INT64, OUT next_ids ARRAY<INT64>)
+BEGIN
+  DECLARE id_start INT64 DEFAULT (
+    SELECT COUNT(*) 
+    FROM ${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}.Ids
+  );
+  SET next_ids = GENERATE_ARRAY(id_start, id_start + id_count);
+
+  MERGE ${dataform.projectConfig.defaultDatabase}.${dataform.projectConfig.defaultSchema}.Ids
+  USING UNNEST(next_ids) AS new_id
+  ON id = new_id
+  WHEN MATCHED THEN UPDATE SET id = ERROR(FORMAT('Race when adding ID %t', new_id))
+  WHEN NOT MATCHED THEN INSERT VALUES (new_id);
+END;
+
+-- a unit test of GetNextIds
+BEGIN
+  DECLARE i INT64 DEFAULT 1;
+  DECLARE next_ids ARRAY<INT64> DEFAULT [];
+  DECLARE ids ARRAY<INT64> DEFAULT [];
+  WHILE i < 10 DO
+    CALL ${self()}(10, next_ids);
+    SET ids = ARRAY_CONCAT(ids, next_ids);
+    SET i = i + 1;
+  END WHILE;
+  SELECT FORMAT('IDs are: %t', ids);
+END;
