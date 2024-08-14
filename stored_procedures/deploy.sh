@@ -50,7 +50,7 @@ if ! (dataform run . \
     --default-location=${BQ_LOCATION} \
     --default-database=${PROJECT_ID} \
     --default-schema=${DATASET_ID} \
-    --vars=${REGION_SUFFIX} \
+    --vars=REGION_SUFFIX=${REGION_SUFFIX} \
     --timeout=10m); then
   # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
   # If SHORT_SHA is not null, then we know a test dataset was used.
