@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -19,7 +20,7 @@
 -- @param STRING dependent_var name of the column in our table that represents our dependent variable
 -- @return STRUCT <FLOAT64 x, FLOAT64 dof, FLOAT64 p> x is the chi-square statistic, dof is degrees of freedom, p is the pvalue
 
-CREATE OR REPLACE PROCEDURE bqutil.procedure.chi_square (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64> )
+CREATE OR REPLACE PROCEDURE ${self()}(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64> )
 BEGIN
 EXECUTE IMMEDIATE """
     WITH contingency_table AS (
@@ -49,7 +50,7 @@ EXECUTE IMMEDIATE """
             ON expected_table.independent_var = contingency_table.independent_var
             AND expected_table.dependent_var = contingency_table.dependent_var
     )
-    SELECT STRUCT (x, dof, bqutil.fn.pvalue(x, dof) AS p) FROM output
+    SELECT STRUCT (x, dof, bqutil.fn${when(dataform.projectConfig.vars.REGION_SUFFIX !== '', `_${dataform.projectConfig.vars.REGION_SUFFIX}`,'')}.chisquare_cdf(x, dof) AS p) FROM output
 """ INTO result;
 END;
 
@@ -72,10 +73,10 @@ BEGIN
         UNION ALL SELECT 'cat', 'yarn'
         UNION ALL SELECT 'cat', 'yarn';
 
-  CALL bqutil.procedure.chi_square('categorical', 'animal', 'toy', result);
+  CALL ${self()}('categorical', 'animal', 'toy', result);
 
   ASSERT result.x = 3.7452380952380966;
   ASSERT result.dof = 1;
   ASSERT result.p = 0.052958181867438725;
+  DROP TABLE categorical;
 END;
-

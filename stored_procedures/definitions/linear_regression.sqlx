@@ -1,3 +1,4 @@
+config { hasOutput: true }
 /*
  * Copyright 2021 Google LLC
  *
@@ -19,7 +20,7 @@
 -- @param STRING dependent_var name of the column in our table that represents our dependent variable
 -- @return STRUCT<a FLOAT64, b FLOAT64, r FLOAT64>
 
-CREATE OR REPLACE PROCEDURE bqutil.procedure.linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )
+CREATE OR REPLACE PROCEDURE ${self()}(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )
 BEGIN
 EXECUTE IMMEDIATE """
     WITH results AS (
@@ -211,11 +212,11 @@ BEGIN
      UNION ALL SELECT 5.9,3.0,5.1,1.8,'virginica';
 
 
-  CALL bqutil.procedure.linear_regression('iris', 'sepal_width', 'petal_width', result);
+  CALL ${self()}('iris', 'sepal_width', 'petal_width', result);
 
   -- We round to 11 decimals here because there appears to be some inconsistency in the function, likely due to floating point errors and the order of aggregation
   ASSERT ROUND(result.a, 11) = 3.11519268710;
   ASSERT ROUND(result.b, 11) = -0.62754617565;
   ASSERT ROUND(result.r, 11) = -0.35654408961;
+  DROP TABLE iris;
 END;
-

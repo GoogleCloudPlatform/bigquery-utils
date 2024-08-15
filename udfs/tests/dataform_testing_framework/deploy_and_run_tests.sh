@@ -86,6 +86,7 @@ generate_dataform_config_and_creds() {
   local target_dir=$3
   # Generate the dataform.json with the appropriate project_id and dataset_id
   sed "s|\${PROJECT_ID}|${project_id}|g" dataform_template.json \
+    | sed "s|\${BQ_LOCATION}|${BQ_LOCATION}|g" \
     | sed "s|\${DATASET_ID}|${dataset_id}|g" >"${target_dir}"/dataform.json
   # Create an .df-credentials.json file as shown below
   # in order to have Dataform pick up application default credentials
@@ -133,7 +134,7 @@ deploy_udfs() {
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
 
   printf "Deploying UDFs using dataform run command\n"
-  if ! (cd "${udfs_target_dir}" && dataform run .); then
+  if ! (cd "${udfs_target_dir}" && dataform run . --timeout=10m); then
     # If any error occurs, delete BigQuery testing dataset before exiting with status code 1
     # If SHORT_SHA is not null, then we know a test dataset was used.
     if [[ -n "${SHORT_SHA}" ]]; then
