@@ -715,6 +715,18 @@ generate_udf_test("ts_tumble", [
     inputs: [`CAST("2020-01-01 00:17:30" AS TIMESTAMP)`, `CAST(0 AS INT64)`],
     expected_output: `NULL`,
   },
+  {
+    inputs: [`CAST("2020-01-01 00:17:30" AS TIMESTAMP)`, `CAST(316224000000 AS INT64)`],
+    expected_output: `CAST("1970-01-01 00:00:00" AS TIMESTAMP)`,
+  },
+  {
+    inputs: [`CAST("2020-01-01 00:17:30" AS TIMESTAMP)`, `CAST(9223372036854775807 AS INT64)`],
+    expected_output: `CAST("1970-01-01 00:00:00" AS TIMESTAMP)`,
+  },
+  {
+    inputs: [`CAST("1900-01-01 00:17:30" AS TIMESTAMP)`, `CAST(900 AS INT64)`],
+    expected_output: `CAST("1900-01-01 00:15:00" AS TIMESTAMP)`,
+  },
 ]);
 generate_udf_test("ts_gen_keyed_timestamps", [
   {

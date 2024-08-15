@@ -2009,6 +2009,8 @@ SELECT
 |-------------------------|-------------------------|-------------------------|
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
+Consider using the built-in [TIMESTAMP_BUCKET](https://cloud.google.com/bigquery/docs/reference/standard-sql/time-series-functions#timestamp_bucket) function instead.
+
 ### [tuple_sketch_extract_avg(sketch BYTES)](tuple_sketch_extract_avg.sqlx)
 Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
 
