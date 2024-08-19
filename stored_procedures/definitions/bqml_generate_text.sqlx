@@ -112,7 +112,7 @@ IF JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns') IS NOT NULL THEN
 END IF;
 EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid projection_columns. It must be an array of strings.';
-END;c
+END;
 
 SET projection_columns = (
   SELECT ARRAY_AGG(DISTINCT val) 

@@ -213,17 +213,17 @@ This approach improves the robustness of your text generation process by automat
 | Parameter | Description | 
 | ----------- | ----------- | 
 | `source_table` | The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table" |
-| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.|
-| `model` | The full path of the embedding model to be used. | 
+| `destination_table` | The full path of the BigQuery table where the generated text will be stored. This table will be created if it does not exist.|
+| `model` | The full path of the text model to be used. | 
 | `prompt_column` | The name of the column in the `source_table` containing the text prompts. |
 | `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. |
-| `options` | A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters. |
+| `options` | A JSON string containing additional optional parameters for the text generation process. Set to '{}' if you want to use defaults for all options parameters. |
 
 The options JSON encodes additional optional arguments for the procedure. Each parameter must be set as a key-value pair in the JSON.
 
 | Parameter | Default Value | Description |
 |---|---|---|
-| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. A reasonable starting value is the Vertex QPM quota * 500 |
+| `batch_size` | 1000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. A reasonable starting value is the Vertex QPM quota * 100 |
 | `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
 | `source_filter` | 'TRUE' | An optional filter applied as a WHERE clause to the source table before processing. |
 | `projection_columns` | ARRAY[] | An array of column names to select from the source table into the destination table. '*' is not a valid value. |
@@ -232,11 +232,11 @@ The options JSON encodes additional optional arguments for the procedure. Each p
 A sample fully-filled JSON option string would look like: 
 ```
 """{
-  "batch_size": 50000,
+  "batch_size": 50,
   "termination_time_secs": 43200,
   "source_filter": "LENGTH(text) < 1000",
   "projection_columns": ["type", "text"],
-  "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
+  "ml_options": "STRUCT(0.2 as temperature)"
 }"""
 ```
 
@@ -249,7 +249,7 @@ BEGIN
   CREATE OR REPLACE TABLE sample.hacker AS
   SELECT * FROM `bigquery-public-data.hacker_news.full`
   WHERE text IS NOT NULL
-  LIMIT 1000;
+  LIMIT 100;
 
   CALL `bqutil.procedure.bqml_generate_text`(
       "sample.hacker",                  -- source_table
@@ -260,7 +260,7 @@ BEGIN
       '{}'                              -- optional arguments encoded as a JSON string
   );
 
-  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000;
+  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 100;
 END;
 ```
 
