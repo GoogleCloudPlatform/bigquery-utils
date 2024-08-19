@@ -200,3 +200,70 @@ END;
 Output:
 
 `This assertion was successful`
+
+
+### [bqml_generate_text (source_table STRING, target_table STRING, ml_model STRING, prompt_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_text.sql)
+
+Iteratively executes the [BQML.GENERATE_TEXT](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-text) function to ensure all source table prompts have responses in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+
+This approach improves the robustness of your text generation process by automatically retrying failed batches, ensuring complete data coverage in the destination table.
+
+#### Function parameters
+
+| Parameter | Description | 
+| ----------- | ----------- | 
+| `source_table` | The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table" |
+| `destination_table` | The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.|
+| `model` | The full path of the embedding model to be used. | 
+| `prompt_column` | The name of the column in the `source_table` containing the text prompts. |
+| `key_columns` | An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value. |
+| `options` | A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters. |
+
+The options JSON encodes additional optional arguments for the procedure. Each parameter must be set as a key-value pair in the JSON.
+
+| Parameter | Default Value | Description |
+|---|---|---|
+| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. A reasonable starting value is the Vertex QPM quota * 500 |
+| `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
+| `source_filter` | 'TRUE' | An optional filter applied as a WHERE clause to the source table before processing. |
+| `projection_columns` | ARRAY[] | An array of column names to select from the source table into the destination table. '*' is not a valid value. |
+| `ml_options` | 'STRUCT()' | A JSON string representing additional options for the ML operation. Must be of the form 'STRUCT(...) |
+
+A sample fully-filled JSON option string would look like: 
+```
+"""{
+  "batch_size": 50000,
+  "termination_time_secs": 43200,
+  "source_filter": "LENGTH(text) < 1000",
+  "projection_columns": ["type", "text"],
+  "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
+}"""
+```
+
+#### Example usage
+
+```sql
+BEGIN
+  -- Assumes dataset and model are already created
+
+  CREATE OR REPLACE TABLE sample.hacker AS
+  SELECT * FROM `bigquery-public-data.hacker_news.full`
+  WHERE text IS NOT NULL
+  LIMIT 1000;
+
+  CALL `bqutil.procedure.bqml_generate_text`(
+      "sample.hacker",                  -- source_table
+      "sample.hacker_results",          -- destination_table (it will be created if it doesn't exist)
+      "sample.text_model",              -- model
+      "text",                           -- content column
+      ["id"],                           -- key columns
+      '{}'                              -- optional arguments encoded as a JSON string
+  );
+
+  ASSERT (SELECT COUNT(*) FROM `sample.hacker_results`) = 1000;
+END;
+```
+
+Output:
+
+`This assertion was successful`
