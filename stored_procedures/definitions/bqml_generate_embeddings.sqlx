@@ -52,7 +52,7 @@ DECLARE termination_time_secs DEFAULT(23 * 60 * 60);
 DECLARE source_filter DEFAULT 'TRUE';
 
 -- The columns to project from the source table to the target table
-DECLARE projection_columns DEFAULT ARRAY[];
+DECLARE projection_columns ARRAY<STRING> DEFAULT ARRAY[];
 
 -- The ML options to use for the ML operation
 DECLARE ml_options DEFAULT 'STRUCT(TRUE AS flatten_json_output)';
