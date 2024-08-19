@@ -11,6 +11,30 @@ you can reference it like the following:
 DECLARE next_ids ARRAY<INT64> DEFAULT [];
 CALL bqutil.procedure.GetNextIds(10, next_ids);
 ```
+## Using the stored procedures
+
+All stored procedures within this repository are available under the `bqutil` project on
+publicly shared datasets. Queries can then reference the shared procedures in the US multi-region via
+`bqutil.<dataset>.<procedure>()`.
+
+Procedures within this repository are also deployed publicly into every other region that [BigQuery supports](https://cloud.google.com/bigquery/docs/locations). 
+In order to use a UDF in your desired location outside of the US multi-region, you can reference it via a dataset with a regional suffix:
+
+`bqutil.<dataset>_<region>.<procedure>()`.
+
+For example, `GetNextIds` can be referenced in various locations:
+
+```
+CALL bqutil.procedure_eu.GetNextIds()            ## eu multi-region
+
+CALL bqutil.procedure_europe_west1.GetNextIds()  ## europe-west1 region
+
+CALL bqutil.procedure_asia_south1.GetNextIds()   ## asia-south1 region
+
+```
+
+Note: Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
+
 
 ## Stored Procedures
 
