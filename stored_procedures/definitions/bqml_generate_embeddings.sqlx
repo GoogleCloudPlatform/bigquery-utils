@@ -109,14 +109,15 @@ END;
 BEGIN
 IF JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns') IS NOT NULL THEN
   SET projection_columns = JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns');
-  SET projection_columns = (
-    SELECT ARRAY_AGG(DISTINCT val) 
-    FROM UNNEST(ARRAY_CONCAT(key_columns, projection_columns)) AS val
-  );
 END IF;
 EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid projection_columns. It must be an array of strings.';
 END;
+
+SET projection_columns = (
+  SELECT ARRAY_AGG(DISTINCT val) 
+  FROM UNNEST(ARRAY_CONCAT(key_columns, projection_columns)) AS val
+);
 
 BEGIN
 IF JSON_EXTRACT_SCALAR(options, '$.ml_options') IS NOT NULL THEN
