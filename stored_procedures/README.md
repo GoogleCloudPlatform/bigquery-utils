@@ -23,7 +23,7 @@ CALL bqutil.procedure.GetNextIds(10, next_ids);
 
 ## Documentation
 
-### [GetNextIds(id_count INT64, OUT next_ids ARRAY<INT64>)](get_next_id.sql)
+### [GetNextIds(id_count INT64, OUT next_ids ARRAY<INT64>)](definitions/get_next_id.sqlx)
 Generates next ids and inserts them into a sample table. This implementation prevents against race condition.
 ```sql
 BEGIN
@@ -35,7 +35,7 @@ END;
 IDs are: [99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 ```
 
-### [chi_square(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>)](chi_square.sql)
+### [chi_square(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>)](definitions/chi_square.sqlx)
 Performs a chi-square statistical test from an input table. It generates a structure containg the chi-square statistics, the degrees of freedom, and the pvalue of the test.
 ```sql
  BEGIN
@@ -65,7 +65,7 @@ Output:
 |---|---|---|
 | 3.7452380952380966 | 1.0  |  0.052958181867438725 |
 
-### [bh_multiple_tests( pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )](bh_multiple_tests.sql)
+### [bh_multiple_tests( pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )](definitions/bh_multiple_tests.sqlx)
 Adjust p values using the Benjamini-Hochberg multipletests method, additional details in doi:10.1098/rsta.2009.0127
 
 ```sql
@@ -95,7 +95,7 @@ Output:
 | 0.074 | 0.08457142857142856 |
 | 0.205 | 0.205 |
    
-### [linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )](linear_regression.sql)
+### [linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )](definitions/linear_regression.sqlx)
 Run a standard linear regression on table data. Expects a table and two columns: the independent variable and the dependent variable. The output is a STRUCT with the slope (`a`), the intercept (`b`) and the correlation value (`r`).
 
 > Input data
@@ -135,9 +135,9 @@ Output:
 
 `This assertion was successful`
 
-### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
+### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](definitions/bqml_generate_embeddings.sqlx)
 
-Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
 
 This approach improves the robustness of your embedding generation process by automatically retrying failed batches, ensuring complete data coverage in the destination table.
 
