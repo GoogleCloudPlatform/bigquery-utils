@@ -11,6 +11,30 @@ you can reference it like the following:
 DECLARE next_ids ARRAY<INT64> DEFAULT [];
 CALL bqutil.procedure.get_next_ids(10, next_ids);
 ```
+## Using the stored procedures
+
+All stored procedures within this repository are available under the `bqutil` project on
+publicly shared datasets. Queries can then reference the shared procedures in the US multi-region via
+`bqutil.procedure.<procedure_name>()`.
+
+Procedures within this repository are also deployed publicly into every other region that [BigQuery supports](https://cloud.google.com/bigquery/docs/locations). 
+In order to use a procedure in your desired location outside of the US multi-region, you can reference it via a dataset with a regional suffix:
+
+`bqutil.procedure_<region>.<procedure_name>()`.
+
+For example, `GetNextIds` can be referenced in various locations:
+
+```
+CALL bqutil.procedure_eu.GetNextIds()            ## eu multi-region
+
+CALL bqutil.procedure_europe_west1.GetNextIds()  ## europe-west1 region
+
+CALL bqutil.procedure_asia_south1.GetNextIds()   ## asia-south1 region
+
+```
+
+Note: Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
+
 
 ## Stored Procedures
 
@@ -24,7 +48,7 @@ CALL bqutil.procedure.get_next_ids(10, next_ids);
 
 ## Documentation
 
-### [get_next_ids(id_count INT64, OUT next_ids ARRAY<INT64>)](get_next_id.sql)
+### [get_next_ids(id_count INT64, OUT next_ids ARRAY<INT64>)](definitions/get_next_id.sqlx)
 Generates next ids and inserts them into a sample table. This implementation prevents against race condition.
 ```sql
 BEGIN
@@ -36,7 +60,7 @@ END;
 IDs are: [99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 ```
 
-### [chi_square(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>)](chi_square.sql)
+### [chi_square(table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<x FLOAT64, dof FLOAT64, p FLOAT64>)](definitions/chi_square.sqlx)
 Performs a chi-square statistical test from an input table. It generates a structure containg the chi-square statistics, the degrees of freedom, and the pvalue of the test.
 ```sql
  BEGIN
@@ -66,7 +90,7 @@ Output:
 |---|---|---|
 | 3.7452380952380966 | 1.0  |  0.052958181867438725 |
 
-### [bh_multiple_tests( pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )](bh_multiple_tests.sql)
+### [bh_multiple_tests( pvalue_table_name STRING, pvalue_column_name STRING, n_rows INT64, temp_table_name STRING )](definitions/bh_multiple_tests.sqlx)
 Adjust p values using the Benjamini-Hochberg multipletests method, additional details in doi:10.1098/rsta.2009.0127
 
 ```sql
@@ -96,7 +120,7 @@ Output:
 | 0.074 | 0.08457142857142856 |
 | 0.205 | 0.205 |
    
-### [linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )](linear_regression.sql)
+### [linear_regression (table_name STRING, independent_var STRING, dependent_var STRING, OUT result STRUCT<a FLOAT64, b FLOAT64, r FLOAT64> )](definitions/linear_regression.sqlx)
 Run a standard linear regression on table data. Expects a table and two columns: the independent variable and the dependent variable. The output is a STRUCT with the slope (`a`), the intercept (`b`) and the correlation value (`r`).
 
 > Input data
@@ -136,7 +160,7 @@ Output:
 
 `This assertion was successful`
 
-### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
+### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](definitions/bqml_generate_embeddings.sqlx)
 
 Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
 
