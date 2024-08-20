@@ -15,12 +15,12 @@ CALL bqutil.procedure.GetNextIds(10, next_ids);
 
 All stored procedures within this repository are available under the `bqutil` project on
 publicly shared datasets. Queries can then reference the shared procedures in the US multi-region via
-`bqutil.<dataset>.<procedure>()`.
+`bqutil.procedure.<procedure_name>()`.
 
 Procedures within this repository are also deployed publicly into every other region that [BigQuery supports](https://cloud.google.com/bigquery/docs/locations). 
 In order to use a procedure in your desired location outside of the US multi-region, you can reference it via a dataset with a regional suffix:
 
-`bqutil.<dataset>_<region>.<procedure>()`.
+`bqutil.procedure_<region>.<procedure_name>()`.
 
 For example, `GetNextIds` can be referenced in various locations:
 
