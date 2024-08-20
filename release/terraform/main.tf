@@ -67,7 +67,7 @@ resource "google_project_iam_member" "bigquery_connection_grant_vertex_ai_user_r
 }
 
 resource "google_bigquery_connection" "connection" {
-  for_each      = toset(var.regions)
+  for_each      = toset(var.bq_regions)
   connection_id = "procedure"
   location      = each.value
   project       = var.project
