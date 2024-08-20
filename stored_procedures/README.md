@@ -202,7 +202,7 @@ Output:
 `This assertion was successful`
 
 
-### [bqml_generate_text (source_table STRING, target_table STRING, ml_model STRING, prompt_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_text.sql)
+### [bqml_generate_text (source_table STRING, target_table STRING, ml_model STRING, prompt_column STRING, key_columns ARRAY<STRING>, options_string STRING)](definitions/bqml_generate_text.sqlx)
 
 *This procedure is still in draft mode and is subject to changes*
 
