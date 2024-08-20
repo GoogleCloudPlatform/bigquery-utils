@@ -204,7 +204,7 @@ Output:
 
 ### [bqml_generate_text (source_table STRING, target_table STRING, ml_model STRING, prompt_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_text.sql)
 
-* This procedure is still in draft mode and is subject to changes *
+*This procedure is still in draft mode and is subject to changes*
 
 Iteratively executes the [BQML.GENERATE_TEXT](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-text) function to ensure all source table prompts have responses in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
 
