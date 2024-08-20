@@ -59,3 +59,17 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   }
 }
 
+resource "google_project_iam_member" "project_iam" {
+  project  = var.project
+  role     = "roles/aiplatform.user"
+  for_each = { for k, v in google_bigquery_connection.connection : k => v.cloud_resource[0].service_account_id }
+  member   = "serviceAccount:${each.value}"
+}
+
+resource "google_bigquery_connection" "connection" {
+  for_each      = toset(var.regions)
+  connection_id = "procedure"
+  location      = each.value
+  project       = var.project
+  cloud_resource {}
+}
