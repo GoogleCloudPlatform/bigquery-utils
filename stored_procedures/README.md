@@ -137,7 +137,7 @@ Output:
 
 ### [bqml_generate_embeddings (source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)](bqml_generate_embeddings.sql)
 
-Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.devsite.corp.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+Iteratively executes the [BQML.GENERATE_EMBEDDING](https://cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-generate-embedding) function to ensure all source table rows are embedded in the destination table, handling potential retryable errors gracefully along the way. Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
 
 This approach improves the robustness of your embedding generation process by automatically retrying failed batches, ensuring complete data coverage in the destination table.
 
@@ -156,12 +156,11 @@ The options JSON encodes additional optional arguments for the procedure. Each p
 
 | Parameter | Default Value | Description |
 |---|---|---|
-| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple
--- child jobs, but needs to be small enough to complete in a single job run. |
+| `batch_size` | 80000 | The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. A reasonable starting value is the Vertex QPM quota * 500 |
 | `termination_time_secs` | 82800 (23 hours) | The maximum time (in seconds) the script should run before terminating. |
 | `source_filter` | 'TRUE' | An optional filter applied as a WHERE clause to the source table before processing. |
-| `projection_columns` | ARRAY['*'] | An array of column names to select from the source table into the destination table. Defaults to all columns ('*'). |
-| `ml_options` | 'STRUCT(TRUE AS flatten_json_output)' | A JSON string representing additional options for the ML operation. The default flattens JSON output. |
+| `projection_columns` | ARRAY[] | An array of column names to select from the source table into the destination table. '*' is not a valid value. |
+| `ml_options` | 'STRUCT()' | A JSON string representing additional options for the ML operation. Must be of the form 'STRUCT(...) |
 
 A sample fully-filled JSON option string would look like: 
 ```
