@@ -59,7 +59,7 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   }
 }
 
-resource "google_project_iam_member" "project_iam" {
+resource "google_project_iam_member" "bigquery_connection_grant_vertex_ai_user_role" {
   project  = var.project
   role     = "roles/aiplatform.user"
   for_each = { for k, v in google_bigquery_connection.connection : k => v.cloud_resource[0].service_account_id }
