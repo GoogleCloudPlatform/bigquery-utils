@@ -38,8 +38,8 @@ config { hasOutput: true }
 -- INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
 -- INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
 -- STRING source_filter : An optional filter applied as a SQL WHERE clause to the source table before processing. Defaults to 'TRUE'.
--- ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. Defaults to all columns ('*').
--- STRING ml_options : A JSON string representing additional options for the ML operation. Defaults to 'STRUCT(TRUE AS flatten_json_output)' which flattens JSON output.
+-- ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. '*' is not a valid value.
+-- STRING ml_options : A JSON string representing additional struct options defined in ML.GENERATE_EMBEDDING. Must be of the form 'STRUCT(...)' 
 CREATE OR REPLACE PROCEDURE ${self()}(source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)
 BEGIN
 
@@ -52,7 +52,7 @@ DECLARE termination_time_secs DEFAULT(23 * 60 * 60);
 DECLARE source_filter DEFAULT 'TRUE';
 
 -- The columns to project from the source table to the target table
-DECLARE projection_columns DEFAULT ARRAY['*'];
+DECLARE projection_columns ARRAY<STRING> DEFAULT ARRAY[];
 
 -- The ML options to use for the ML operation
 DECLARE ml_options DEFAULT 'STRUCT(TRUE AS flatten_json_output)';
@@ -109,14 +109,15 @@ END;
 BEGIN
 IF JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns') IS NOT NULL THEN
   SET projection_columns = JSON_EXTRACT_STRING_ARRAY(options, '$.projection_columns');
-  SET projection_columns = (
-    SELECT ARRAY_AGG(DISTINCT val) 
-    FROM UNNEST(ARRAY_CONCAT(key_columns, projection_columns)) AS val
-  );
 END IF;
 EXCEPTION WHEN ERROR THEN
   RAISE USING MESSAGE = 'Invalid projection_columns. It must be an array of strings.';
 END;
+
+SET projection_columns = (
+  SELECT ARRAY_AGG(DISTINCT val) 
+  FROM UNNEST(ARRAY_CONCAT(key_columns, projection_columns)) AS val
+);
 
 BEGIN
 IF JSON_EXTRACT_SCALAR(options, '$.ml_options') IS NOT NULL THEN
