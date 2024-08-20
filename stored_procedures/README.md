@@ -48,7 +48,7 @@ Note: Region suffixes added to dataset names replace `-` with `_` in order to co
 
 ## Documentation
 
-### [get_next_ids(id_count INT64, OUT next_ids ARRAY<INT64>)](definitions/get_next_id.sqlx)
+### [get_next_ids(id_count INT64, OUT next_ids ARRAY<INT64>)](definitions/get_next_ids.sqlx)
 Generates next ids and inserts them into a sample table. This implementation prevents against race condition.
 ```sql
 BEGIN
