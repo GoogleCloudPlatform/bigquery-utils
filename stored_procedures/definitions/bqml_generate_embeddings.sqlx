@@ -15,32 +15,35 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
--- Iteratively executes the BQML.GENERATE_EMBEDDING function to ensure all source table rows are embedded in the destination table, 
--- handling potential retryable errors gracefully along the way. 
--- Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
-
--- @param STRING source_table : The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table"
--- @param STRING target_table : The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.
--- @param STRING ml_model : The full path of the embedding model to be used.
--- @param STRING content_column : The name of the column in the `source_table` containing the text to be embedded.
--- @param ARRAY<STRING> key_columns : An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value.
--- @param STRING options_string : A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters.
--- A sample fully-filled JSON option string would look like:
--- '{
---   "batch_size": 50000,
---   "termination_time_secs": 43200,
---   "source_filter": "LENGTH(text) < 1000",
---   "projection_columns": ["type", "text"],
---   "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
--- }'
-
--- The parameters within the options string are documented below as:
--- INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
--- INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
--- STRING source_filter : An optional filter applied as a SQL WHERE clause to the source table before processing. Defaults to 'TRUE'.
--- ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. '*' is not a valid value.
--- STRING ml_options : A JSON string representing additional struct options defined in ML.GENERATE_EMBEDDING. Must be of the form 'STRUCT(...)' 
 CREATE OR REPLACE PROCEDURE ${self()}(source_table STRING, target_table STRING, ml_model STRING, content_column STRING, key_columns ARRAY<STRING>, options_string STRING)
+OPTIONS (
+description='''Iteratively executes the BQML.GENERATE_EMBEDDING function to ensure all source table rows are embedded in the destination table, 
+handling potential retryable errors gracefully along the way. 
+Any rows already present in the destination table are ignored, so this procedure is safe to call multiple times.
+
+@param STRING source_table : The full path of the BigQuery table containing the text data to be embedded. Path format - "project.dataset.table" or "dataset.table"
+@param STRING target_table : The full path of the BigQuery table where the generated embeddings will be stored. This table will be created if it does not exist.
+@param STRING ml_model : The full path of the embedding model to be used.
+@param STRING content_column : The name of the column in the `source_table` containing the text to be embedded.
+@param ARRAY<STRING> key_columns : An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value.
+@param STRING options_string : A JSON string containing additional optional parameters for the embedding generation process. Set to '{}' if you want to use defaults for all options parameters.
+
+A sample fully-filled JSON option string would look like:
+'{
+  "batch_size": 50000,
+  "termination_time_secs": 43200,
+  "source_filter": "LENGTH(text) < 1000",
+  "projection_columns": ["type", "text"],
+  "ml_options": "STRUCT('RETRIEVAL_DOCUMENT' as task_type)"
+}'
+
+The parameters within the options string are documented below as:
+INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
+INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
+STRING source_filter : An optional filter applied as a SQL WHERE clause to the source table before processing. Defaults to 'TRUE'.
+ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. '*' is not a valid value.
+STRING ml_options : A JSON string representing additional struct options defined in ML.GENERATE_EMBEDDING. Must be of the form 'STRUCT(...)'
+''')
 BEGIN
 
 DECLARE batch_size DEFAULT 80000;

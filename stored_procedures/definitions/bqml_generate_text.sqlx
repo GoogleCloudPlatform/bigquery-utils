@@ -27,6 +27,7 @@ Any rows already present in the destination table are ignored, so this procedure
 @param STRING prompt_column : The name of the column in the `source_table` containing the text promt.
 @param ARRAY<STRING> key_columns : An array of column names in the `source_table` that uniquely identify each row. '*' is not a valid value.
 @param STRING options_string : A JSON string containing additional optional parameters for the text generation process. Set to '{}' if you want to use defaults for all options parameters.
+
 A sample fully-filled JSON option string would look like:
 '{
   "batch_size": 500,
