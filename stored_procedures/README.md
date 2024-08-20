@@ -5,30 +5,31 @@ examples which mimic the behavior of features in a traditional database. Each st
 directory will be automatically synchronized to the `bqutil` project within the
 `procedure` dataset for reference in queries.
 
-For example, if you'd like to reference the `GetNextIds` function within your query,
+For example, if you'd like to reference the `get_next_ids` function within your query,
 you can reference it like the following:
 ```sql
 DECLARE next_ids ARRAY<INT64> DEFAULT [];
-CALL bqutil.procedure.GetNextIds(10, next_ids);
+CALL bqutil.procedure.get_next_ids(10, next_ids);
 ```
 
 ## Stored Procedures
 
-* [GetNextIds](#getnextidsid_count-int64-out-next_ids-array)
-* [chi_square](#chi_squaretable_name-string-independent_var-string-dependent_var-string-out-result-structx-float64-dof-float64-p-float64)
 * [bh_multiple_tests](#bh_multiple_tests-pvalue_table_name-string-pvalue_column_name-string-n_rows-int64-temp_table_name-string-)
-* [linear_regression](#linear_regression-table_name-string-independent_var-string-dependent_var-string-out-result-structa-float64-b-float64-r-float64-)
 * [bqml_generate_embeddings](#bqml_generate_embeddings-source_table-string-target_table-string-ml_model-string-content_column-string-key_columns-array-options_string-string)
+* [bqml_generate_text](#bqml_generate_text-source_table-string-target_table-string-ml_model-string-prompt_column-string-key_columns-array-options_string-string)
+* [chi_square](#chi_squaretable_name-string-independent_var-string-dependent_var-string-out-result-structx-float64-dof-float64-p-float64)
+* [get_next_ids](#get_next_idsid_count-int64-out-next_ids-array)
+* [linear_regression](#linear_regression-table_name-string-independent_var-string-dependent_var-string-out-result-structa-float64-b-float64-r-float64-)
 
 
 ## Documentation
 
-### [GetNextIds(id_count INT64, OUT next_ids ARRAY<INT64>)](get_next_id.sql)
+### [get_next_ids(id_count INT64, OUT next_ids ARRAY<INT64>)](get_next_id.sql)
 Generates next ids and inserts them into a sample table. This implementation prevents against race condition.
 ```sql
 BEGIN
   DECLARE next_ids ARRAY<INT64> DEFAULT [];
-  CALL bqutil.procedure.GetNextIds(10, next_ids);
+  CALL bqutil.procedure.get_next_ids(10, next_ids);
   SELECT FORMAT('IDs are: %t', next_ids);
 END;
 
