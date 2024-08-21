@@ -81,3 +81,59 @@ resource "google_bigquery_dataset_iam_member" "procedure_public_viewers" {
   role       = "roles/bigquery.dataViewer"
   member     = "allAuthenticatedUsers"
 }
+
+resource "google_bigquery_dataset_iam_member" "nz_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "nz_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "or_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "or_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "rs_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "rs_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "sf_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "sf_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "td_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "td_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "ve_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "ve_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "fn_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "fn_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
