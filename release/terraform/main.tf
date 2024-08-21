@@ -73,3 +73,11 @@ resource "google_bigquery_connection" "connection" {
   project       = var.project
   cloud_resource {}
 }
+
+resource "google_bigquery_dataset_iam_member" "procedure_public_viewers" {
+  project    = var.project
+  for_each   = toset(var.bq_regions)
+  dataset_id = "procedure_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
