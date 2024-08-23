@@ -46,5 +46,5 @@ variable "bq_regions" {
         "me-central1",
         "me-west1",
         "africa-south1"
-        ]
+    ]
 }
