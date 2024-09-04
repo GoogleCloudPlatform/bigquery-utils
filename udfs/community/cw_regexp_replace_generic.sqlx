@@ -22,7 +22,7 @@ LANGUAGE js AS """
   replacement = replacement.replace('\\\\', '$');
   let regExp = new RegExp(regexp, mode);
   if (occurrence == 0)
-      return haystack.replace(regExp, replacement);
+      return haystack.substr(offset).replace(regExp, replacement);
   const start = offset - 1;
   const index = occurrence - 1;
   let relevantString = haystack.substring(start);
