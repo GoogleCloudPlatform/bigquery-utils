@@ -33,7 +33,7 @@ SELECT
   EXTRACT(DATE FROM creation_time) AS creation_date,
   creation_time,
   end_time,
-  TIMESTAMP_DIFF(end_time, start_time, SECOND) AS job_duration_seconds,
+  TIMESTAMP_DIFF(COALESCE(end_time, CURRENT_TIMESTAMP()), start_time, SECOND) AS job_duration_seconds,
   job_type,
   user_email,
   state,
