@@ -1,0 +1,62 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(xml STRING)
+RETURNS JSON
+DETERMINISTIC
+LANGUAGE js 
+OPTIONS(
+library="${JS_BUCKET}/txml-v5.1.1.min.js",
+description="""Converts XML to JSON using the open source
+txml JavaScript library which is 2-3 times faster than the fast-xml-parser library.
+
+NULL input is returned as NULL output.
+Empty string input is returned as empty JSON object.
+
+txml repo:
+https://github.com/TobiasNickel/tXml
+
+Benchmark details of comparison with fast-xml-parser:
+https://github.com/tobiasnickel/fast-xml-parser#benchmark
+
+
+/*
+ * Example Usage:
+ * Run the query below in BigQuery
+ */
+
+SELECT bqutil.fn.xml_to_json(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+)
+
+/*
+ * The query result will be the following:
+ * {"xml":[{"_attributes":{"foo":"FOO"},"bar":[{"baz":["BAZ"]}]}]}
+ */
+
+""") AS """
+if(xml===null) {
+  return null;
+} else if(xml==="") {
+  return {};
+}
+return txml.parse(xml, {
+  // For more parsing options see: 
+  // https://github.com/TobiasNickel/tXml#txmlparse-xmlstring-options
+  simplify: true
+});
+""";

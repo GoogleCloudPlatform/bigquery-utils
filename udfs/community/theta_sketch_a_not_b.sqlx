@@ -1,0 +1,42 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(sketch_A BYTES, sketch_NotB BYTES)
+RETURNS BYTES
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/theta_sketch.js"],
+  description = '''Takes in 2 theta sketches, performs a difference op / a_not_b op (i.e SetA - SetB) and returns a theta_sketch.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
+var sketchBinary_a = intArrayFromBase64(sketch_A);
+var sketchBinary_b = intArrayFromBase64(sketch_NotB);
+var totalSize = sketchBinary_a.length + sketchBinary_b.length;
+var ptrA = Module._malloc(totalSize);
+var ptrB = ptrA + sketchBinary_a.length;
+
+Module.HEAPU8.subarray(ptrA, ptrA + sketchBinary_a.length).set(sketchBinary_a);
+Module.HEAPU8.subarray(ptrB, ptrB + sketchBinary_b.length).set(sketchBinary_b);
+
+var len = Module._theta_sketch_a_not_b(ptrA, sketchBinary_a.length, ptrB, sketchBinary_b.length);
+try {
+  // converting uint8 byte array to base64 string ( to be returned as "Bytes" in BQ
+  return bytesToBase64(Module.HEAPU8.slice(ptrA, ptrA + len));
+} finally {
+  Module._free(ptrA);
+}
+''';

@@ -1,0 +1,155 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(x BYTES)
+RETURNS BYTES
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/theta_sketch.mjs"],
+  description = '''Aggregates multiple theta sketches, performs an intersection op and returns a merged theta sketch.
+For more details: https://datasketches.apache.org/docs/Theta/ThetaSketchFramework.html'''
+) AS '''
+import ModuleFactory from "${JS_BUCKET}/theta_sketch.mjs";
+
+var Module = await ModuleFactory();
+
+// Helper definitions
+
+// shared buffer for serialization and deserialization
+var BUFFER = {
+  ptr: 0,
+  size: 0,
+};
+
+function maxSize(lg_k) {
+  // see https://datasketches.apache.org/docs/Theta/ThetaSize.html
+  return 8 + 24 + 16 * (1 << lg_k);
+}
+
+function requireBuffer(size) {
+  if (BUFFER.size < size) {
+    releaseBuffer();
+    BUFFER.ptr = Module._malloc(size);
+    BUFFER.size = size;
+  }
+  return BUFFER;
+}
+
+function releaseBuffer() {
+  if (BUFFER.ptr) {
+    Module._free(BUFFER.ptr);
+  }
+  BUFFER.ptr = 0;
+  BUFFER.size = 0;
+}
+
+
+function requireIntersection(state) {
+  if (!state.intersection) {
+    state.intersection = Module._theta_intersection_initialize();
+  }
+  if (state.compact) {
+    Module._theta_intersection_update_sketch(state.intersection, state.compact);
+    Module._compact_sketch_destroy(state.compact);
+    state.compact = 0;
+  }
+  return state.intersection;
+}
+
+export function initialState() {
+  return {
+    intersection: Module._theta_intersection_initialize(),
+    compact: 0,
+    count: 0,
+    maxSize: 0,
+  };
+}
+
+export function aggregate(state, arg) {
+  var intersection = requireIntersection(state);
+
+  // the aggregated sketch may be *bigger* than the maxSize of union
+  // so we need to take the arg length as leading
+  var buffer = requireBuffer(arg.length);
+  Module.HEAPU8.subarray(buffer.ptr, buffer.ptr + buffer.size).set(arg);
+
+  Module._theta_intersection_update_buffer(
+      intersection, buffer.ptr, arg.length);
+  state.maxSize = Math.max(state.maxSize, arg.length);
+  state.count++;
+}
+
+export function serialize(state) {
+  try {
+    var intersection = requireIntersection(state);
+    var buffer = requireBuffer(state.maxSize);
+    var len = Module._theta_intersection_serialize_sketch(
+        intersection, buffer.ptr, buffer.size);
+
+    return {
+      count: state.count,
+      bytes: Module.HEAPU8.slice(buffer.ptr, buffer.ptr + len),
+    };
+  } finally {
+    // clean up intersection
+    Module._theta_intersection_destroy(state.intersection);
+    state.intersection = 0;
+  }
+}
+
+export function deserialize(serialized) {
+
+  var buffer = requireBuffer(serialized.bytes.length);
+  Module.HEAPU8
+      .subarray(buffer.ptr, buffer.ptr + serialized.bytes.length)
+      .set(serialized.bytes);
+  var compact = Module._compact_sketch_deserialize(
+      buffer.ptr, serialized.bytes.length);
+  return {
+    intersection: 0,
+    compact: compact,
+    count: serialized.count,
+    maxSize: serialized.bytes.length,
+  };
+}
+
+export function merge(state, other_state) {
+  var intersection = requireIntersection(state);
+
+  if (other_state.intersection) {
+    throw new Error("Did not expect intersection in other state");
+  }
+
+  if (other_state.compact) {
+    if (other_state.count) {
+      Module._theta_intersection_update_sketch(
+          intersection, other_state.compact);
+    }
+    state.maxSize = Math.max(state.maxSize, other_state.maxSize);
+    state.count += other_state.count;
+
+    Module._compact_sketch_destroy(other_state.compact);
+    other_state.compact = 0;
+
+  } else {
+    throw new Error("Expected compact sketch in other_state");
+  }
+}
+export function finalize(state) {
+  return serialize(state).bytes;
+}
+''';

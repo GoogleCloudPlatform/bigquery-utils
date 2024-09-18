@@ -1,6 +1,6 @@
 steps:
   ############################################################
-  # Lint the Dockefile.ci file
+  # Lint the Dockerfile.ci file
   ############################################################
 - name: hadolint/hadolint
   id: lint-ci-docker-image

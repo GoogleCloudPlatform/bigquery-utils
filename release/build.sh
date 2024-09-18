@@ -13,12 +13,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+set -eo pipefail
+
 
 # Directory of the UDFs
 UDF_DIR=udfs
 # Directory of the Stored Procedures
 SP_DIR=stored_procedures
 
+export TERM=xterm-256color
 # Set colors if terminal supports it
 ncolors=$(tput colors)
 if [[ "${ncolors}" -gt 7 ]]; then
@@ -75,31 +78,6 @@ function execute_query() {
 function build_udf_testing_image() {
   gcloud builds submit "${UDF_DIR}"/tests/ \
     --config="${UDF_DIR}"/tests/cloudbuild_udf_test_image.yaml
-}
-
-#######################################
-# Replaces all ${JS_BUCKET} placeholders
-# in javascript UDFs with bigquery-utils
-# public hosting bucket.
-# Globals:
-#   UDF_DIR
-#   _JS_BUCKET
-# Arguments:
-#   None
-# Returns:
-#   None
-#######################################
-function replace_js_udf_bucket_placeholder() {
-  # Replace all variable placeholders "${JS_BUCKET}" in Javascript UDFs
-  # with the bucket that will host all javascript libraries
-  local sql_files
-  sql_files=$(find ${UDF_DIR} -type f -name "*.sql")
-  local num_files
-  num_files=$(echo "${sql_files}" | wc -l)
-  printf "Replacing UDF bucket placeholder \${JS_BUCKET} with %s\n" "${_JS_BUCKET}"
-  while read -r file; do
-    sed -i "s|\${JS_BUCKET}|${_JS_BUCKET}|g" "${file}"
-  done <<<"${sql_files}"
 }
 
 # Remove the ${_JS_BUCKET} directory
@@ -212,8 +190,13 @@ function build() {
   # udfs/ directory have been changed
   if echo "${files_changed}" | grep -q "${UDF_DIR}"/; then
     printf "Building BigQuery UDFs since the following files have changed:\n%s\n" "${files_changed}"
-    replace_js_udf_bucket_placeholder
     build_udfs
+  fi
+  # Only build the BigQuery Stored Procedures if any files in the
+  # stored_procedures/ directory have been changed
+  if echo "${files_changed}" | grep -q "${SP_DIR}"/; then
+    printf "Building BigQuery stored procedures since the following files have changed:\n%s\n" "${files_changed}"
+    cd "${SP_DIR}" && ./deploy.sh
   fi
 }
 
@@ -235,7 +218,6 @@ function deploy_udfs() {
   local num_files
   num_files=$(echo "${sql_files}" | wc -l)
 
-  replace_js_udf_bucket_placeholder
   # For prod deploys, do not set SHORT_SHA so that BQ dataset
   # names do not get the SHORT_SHA value added as a suffix.
   gcloud builds submit "${UDF_DIR}"/ \
@@ -244,28 +226,6 @@ function deploy_udfs() {
     --polling-interval="10" \
     --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
     --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
-}
-
-##############################################
-# Deploys Stored Procedures to the
-# US multi-region "procedure" bqutil dataset.
-# Globals:
-#   _BQ_LOCATION
-# Arguments:
-#   None
-# Returns:
-#   None
-##############################################
-function deploy_stored_procs() {
-  if [[ "${_BQ_LOCATION^^}" == "US" ]]; then
-    local sql_files=$(find $SP_DIR -type f -name "*.sql")
-    local num_files=$(echo "$sql_files" | wc -l)
-
-    printf "Creating or updating $num_files stored procedures...\n"
-    while read -r file; do
-      execute_query $file false "procedure"
-    done <<< "$sql_files"
-  fi
 }
 
 #######################################
@@ -284,8 +244,12 @@ function main() {
   # and this is now building a commit on master branch.
   if [[ "${BRANCH_NAME}" == "master" && -z "${_PR_NUMBER}" ]]; then
     deploy_udfs
-    deploy_stored_procs
+    # For prod deploys of stored procedures, do not set SHORT_SHA so that BQ dataset
+    # names do not get the SHORT_SHA value added as a suffix.
+    cd "${SP_DIR}" && export SHORT_SHA="" && ./deploy.sh
   else
+    # Add SHORTSHA to JS_BUCKET to prevent collisions between concurrent builds
+    export _JS_BUCKET="${_JS_BUCKET}/${SHORT_SHA}"
     build
     dry_run_all_sql
   fi

@@ -1,0 +1,38 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
+RETURNS INT64
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/tuple_sketch.js"],
+  description = '''Takes in a tuple sketch, combines the summary values of the value_col (using sum) from the random sample of id_col stored within the Tuple sketch, calculates an estimate that applies to the entire dataset and returns the sum.
+For more details: https://datasketches.apache.org/docs/Tuple/TupleOverview.html'''
+) AS '''
+var sketchBinary = intArrayFromBase64(sketch);
+var ptr = Module._malloc(sketchBinary.length);
+Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);
+
+var compact_sketch =
+    Module._compact_sketch_deserialize(ptr, sketchBinary.length);
+try {
+  return Module._compact_sketch_get_estimate_sum(compact_sketch);
+} finally {
+  Module._compact_sketch_destroy(compact_sketch);
+  Module._free(ptr);
+}
+''';

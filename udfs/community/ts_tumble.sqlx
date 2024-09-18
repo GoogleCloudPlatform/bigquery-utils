@@ -25,7 +25,11 @@ RETURNS TIMESTAMP
 AS (
   IF (
     tumble_seconds > 0, 
-    TIMESTAMP_SECONDS(DIV(UNIX_SECONDS(input_ts), tumble_seconds) * tumble_seconds), 
+    IF (
+      tumble_seconds > 316224000000,  -- allow > 11,000 years worth of seconds
+      TIMESTAMP_SECONDS(0),
+      TIMESTAMP_BUCKET(input_ts, INTERVAL tumble_seconds SECOND, TIMESTAMP_SECONDS(0))
+    ),
     NULL
   )
 );

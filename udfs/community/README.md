@@ -40,6 +40,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_comparable_format_varchar_t](#cw_comparable_format_varchar_tpart-string)
 * [cw_convert_base](#cw_convert_basenumber-string-from_base-int64-to_base-int64)
 * [cw_csvld](#cw_csvldtext-string-comma-string-quote-string-len-int64)
+* [cw_disjoint_all_partitions_by_regexp](#cw_disjoint_all_partitions_by_regexphaystack-string-regex-string)
 * [cw_disjoint_partition_by_regexp](#cw_disjoint_partition_by_regexpfirstrn-int64-haystack-string-regex-string)
 * [cw_editdistance](#cw_editdistancea-string-b-string)
 * [cw_error_number](cw_error_numbererrmsg-string)
@@ -48,6 +49,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_find_in_list](#cw_find_in_listneedle-string-list-string)
 * [cw_from_base](#cw_from_basenumber-string-base-int64)
 * [cw_getbit](#cw_getbitbits-int64-index-int64)
+* [cw_getbit_binary](#cw_getbit_binarybits-bytes-index-int64)
 * [cw_initcap](#cw_initcaps-string)
 * [cw_instr4](#cw_instr4source-string-search-string-position-int64-ocurrence-int64)
 * [cw_json_array_contains_bool](#cw_json_array_contains_booljson-string-needle-bool)
@@ -136,6 +138,10 @@ SELECT bqutil.fn.int(1.684)
 * [json_extract_key_value_pairs](#json_extract_key_value_pairs)
 * [json_extract_values](#json_extract_values)
 * [json_typeof](#json_typeofjson-string)
+* [kll_sketch_float64](#kll_sketch_float64id_col-float64-k-int64)
+* [kll_sketch_int64](#kll_sketch_float64id_col-float64-k-int64)
+* [kll_sketch_merge](#kll_sketch_mergesketch-bytes-k-int64)
+* [kll_sketch_quantile](#kll_sketch_quantilesketch-bytes-rank-float64)
 * [knots_to_mph](#knots_to_mphinput_knots-float64)
 * [kruskal_wallis](#kruskal_wallisarraystructfactor-string-val-float64)
 * [last_day](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions#last_day)
@@ -160,12 +166,19 @@ SELECT bqutil.fn.int(1.684)
 * [random_int](#random_intmin-any-type-max-any-type)
 * [random_string](#random_stringlength-int64)
 * [random_value](#random_valuearr-any-type)
-* [sure_cond](#sure_cond)
-* [sure_like](#sure_like)
-* [sure_nonnull](#sure_nonnull)
-* [sure_range](#sure_range)
-* [sure_values](#sure_values)
+* [studentt_cdf](#studentt_cdfx-float64-dof-float64)
+* [sure_cond](#sure_condvalue-string-cond-bool)
+* [sure_like](#sure_likevalue-string-like_pattern-string)
+* [sure_nonnull](#sure_nonnullvalue-any-type)
+* [sure_range](#sure_rangevalue-any-type)
+* [sure_values](#sure_valuesvalue-any-type-acceptable_value_array-any-type)
 * [table_url](#table_urltable_id-string)
+* [theta_sketch_a_not_b](#theta_sketch_a_not_bsketch_a-bytes-sketch_b-bytes)
+* [theta_sketch_bytes](#theta_sketch_bytesbytes_col-bytes-lg_k-int64)
+* [theta_sketch_extract](#theta_sketch_extractsketch-bytes)
+* [theta_sketch_intersection](#theta_sketch_intersectionsketch-bytes)
+* [theta_sketch_int64](#theta_sketch_int64id_col-int64-lg_k-int64)
+* [theta_sketch_union](#theta_sketch_unionsketch-bytes-lg_k-int64)
 * [to_binary](#to_binaryx-int64)
 * [to_hex](#to_hexx-int64)
 * [translate](#translateexpression-string-characters_to_replace-string-characters_to_substitute-string)
@@ -175,6 +188,12 @@ SELECT bqutil.fn.int(1.684)
 * [ts_slide](#ts_slidets-timestamp-period-int64-duration-int64)
 * [ts_tumble](#ts_tumbleinput_ts-timestamp-tumble_seconds-int64)
 * [t_test](#t_testarrayarray)
+* [tuple_sketch_int64](#tuple_sketch_int64id_col-int64-value_col-int64-lg_k-int64)
+* [tuple_sketch_extract_avg](#tuple_sketch_extract_avgsketch-bytes)
+* [tuple_sketch_extract_count](#tuple_sketch_extract_countsketch-bytes)
+* [tuple_sketch_extract_sum](#tuple_sketch_extract_sumsketch-bytes)
+* [tuple_sketch_extract_summary](#tuple_sketch_extract_summarysketch-bytes)
+* [tuple_sketch_union](#tuple_sketch_unionsketch-bytes-lg_k-int64)
 * [typeof](#typeofinput-any-type)
 * [url_decode](#url_decodetext-string-method-string)
 * [url_encode](#url_encodetext-string-method-string)
@@ -183,6 +202,8 @@ SELECT bqutil.fn.int(1.684)
 * [url_parse](#url_parseurlstring-string-parttoextract-string)
 * [url_trim_query](#url_trim_queryurl-string-keys_to_trim-array)
 * [week_of_month](#week_of_monthdate_expression-any-type)
+* [xml_to_json](#xml_to_jsonxml-string)
+* [xml_to_json_fpx](#xml_to_json_fpxxml-string)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
 
@@ -448,8 +469,20 @@ SELECT bqutil.fn.cw_csvld('Test#123', '#', '"', 2);
 ["Test", "123"]
 ```
 
+### [cw_disjoint_all_partitions_by_regexp(haystack STRING, regex STRING)](cw_disjoint_all_partitions_by_regexp.sqlx)
+Partitions rows into disjoint segments and returns all the partitions by matching row-sequence with the provided regex pattern.
+```sql
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'A@1#B@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+SELECT bqutil.fn.cw_disjoint_all_partitions_by_regexp(1, 'B@1#B@2#B@3#B@4#A@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
+
+[(0, 1), (0, 2), (0, 3), (1, 4), (1, 5)]
+[(0, 1), (0, 2), (1, 4), (1, 5)]
+[]
+```
+
 ### [cw_disjoint_partition_by_regexp(firstRn INT64, haystack STRING, regex STRING)](cw_disjoint_partition_by_regexp.sqlx)
-Partitions rows into disjoint segments by matching their sequence with the provided regex pattern.
+Partitions rows into disjoint segments and returns a partition associated with the given row-number by matching row-sequence with the provided regex pattern.
 ```sql
 SELECT bqutil.fn.cw_disjoint_partition_by_regexp(1, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
 SELECT bqutil.fn.cw_disjoint_partition_by_regexp(2, 'A@1#A@2#B@3#A@4#B@5#', '(?:A@\\d+#)+(?:B@\\d+#)')
@@ -517,10 +550,20 @@ SELECT bqutil.fn.cw_from_base('A', 16);
 ```
 
 ### [cw_getbit(bits INT64, index INT64)](cw_getbit.sqlx)
-Get bit on given inex.
+Return bit of INT64 input at given index, starting from 0 for the least significant bit.
 ```sql
 SELECT bqutil.fn.cw_getbit(11, 100);
 SELECT bqutil.fn.cw_getbit(11, 3);
+
+0
+1
+```
+
+### [cw_getbit_binary(bits BYTES, index INT64)](cw_getbit_binary.sqlx)
+Return bit of BYTES input at given index, starting from 0 for the least significant bit.
+```sql
+SELECT bqutil.fn.cw_getbit_binary(b'\x0B', 100);
+SELECT bqutil.fn.cw_getbit_binary(b'\x0B', 3);
 
 0
 1
@@ -1492,6 +1535,18 @@ SELECT
 object, array, string, number, boolean, boolean, null
 ```
 
+### [kll_sketch_float64(id_col FLOAT64, k INT64)](kll_sketch_float64.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
+### [kll_sketch_int64(id_col INT64, k INT64)](kll_sketch_int64.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details. 
+
+### [kll_sketch_merge(sketch BYTES, k INT64)](kll_sketch_merge.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
+### [kll_sketch_quantile(sketch BYTES, rank FLOAT64)](kll_sketch_quantile.sqlx)
+Refer to [datasketches/kll-sketch](../datasketches/README.md#kll-sketch) for more details.
+
 ### [knots_to_mph(input_knots FLOAT64)](knots_to_mph.sqlx)
 Converts knots to miles per hour
 ```sql
@@ -1753,6 +1808,24 @@ SELECT bqutil.fn.table_url("bigquery-public-data.new_york_citibike.citibike_trip
 https://console.cloud.google.com/bigquery?p=bigquery-public-data&d=new_york_citibike&t=citibike_trips&page=table
 ```
 
+### [theta_sketch_a_not_b(sketch_a BYTES, sketch_b BYTES)](theta_sketch_a_not_b.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_bytes(bytes_col BYTES, lg_k INT64)](theta_sketch_bytes.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_extract(sketch BYTES)](theta_sketch_extract.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_intersection(sketch BYTES)](theta_sketch_intersection.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_int64(id_col INT64, lg_k INT64)](theta_sketch_int64.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
+### [theta_sketch_union(sketch BYTES, lg_k INT64)](theta_sketch_union.sqlx)
+Refer to [datasketches/theta-sketch](../datasketches/README.md#theta-sketch) for more details.
+
 ### [to_binary(x INT64)](to_binary.sqlx)
 Returns a binary representation of a number.
 
@@ -1936,6 +2009,25 @@ SELECT
 |-------------------------|-------------------------|-------------------------|
 | 2020-01-01 00:15:00 UTC | 2020-01-01 00:10:00 UTC | 2020-01-01 00:17:00 UTC |
 
+Consider using the built-in [TIMESTAMP_BUCKET](https://cloud.google.com/bigquery/docs/reference/standard-sql/time-series-functions#timestamp_bucket) function instead.
+
+### [tuple_sketch_extract_avg(sketch BYTES)](tuple_sketch_extract_avg.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_count(sketch BYTES)](tuple_sketch_extract_count.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_sum(sketch BYTES)](tuple_sketch_extract_sum.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_extract_summary(sketch BYTES)](tuple_sketch_extract_summary.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_int64(id_col INT64, value_col INT64, lg_k INT64)](tuple_sketch_int64.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
+
+### [tuple_sketch_union(sketch BYTES, lg_k INT64)](tuple_sketch_union.sqlx)
+Refer to [datasketches/tuple-sketch](../datasketches/README.md#tuple-sketch) for more details.
 
 ### [typeof(input ANY TYPE)](typeof.sqlx)
 
@@ -2064,6 +2156,47 @@ SELECT
 
 0 1
 ```
+
+### [xml_to_json(xml STRING)](xml_to_json.sqlx)
+Converts XML to JSON using the open source
+txml JavaScript library which is 2-3 times faster than the fast-xml-parser library. \
+NULL input is returned as NULL output. \
+Empty string input is returned as empty JSON object.
+
+* [txml repo](https://github.com/TobiasNickel/tXml)
+* [Benchmark details of comparison with fast-xml-parser](https://github.com/tobiasnickel/fast-xml-parser#benchmark)
+
+```sql
+SELECT bqutil.fn.xml_to_json(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+) AS output_json
+```
+
+results:
+
+| output_json |
+| ----------- |
+| {"xml":[{"_attributes":{"foo":"FOO"},"bar":[{"baz":["BAZ"]}]}]} |
+
+### [xml_to_json_fpx(xml STRING)](xml_to_json_fpx.sqlx)
+Converts XML to JSON using the open source
+fast-xml-parser JavaScript library. \
+NULL input is returned as NULL output. \
+Empty string input is returned as empty JSON object.
+
+* [fast-xml-parser repo](https://github.com/NaturalIntelligence/fast-xml-parser)
+* [List of options you can pass to the XMLParser object](https://github.com/NaturalIntelligence/fast-xml-parser/blob/master/docs/v4/2.XMLparseOptions.md)
+
+```sql
+SELECT bqutil.fn.xml_to_json_fpx(
+  '<xml foo="FOO"><bar><baz>BAZ</baz></bar></xml>'
+) as output_json
+```
+results:
+
+| output_json |
+| ----------- |
+| {"xml":{"@_foo":"FOO","bar":{"baz":"BAZ"}}} |
 
 ### [y4md_to_date(y4md STRING)](y4md_to_date.sqlx)
 Convert a STRING formatted as a YYYYMMDD to a DATE
@@ -2332,3 +2465,21 @@ Results:
 | Row	| normal_cdf |
 |-----|-------------------|
 | 1	| 0.3820885778110474 |
+
+---
+
+### [studentt_cdf(x FLOAT64, dof FLOAT64)](studentt_cdf.sqlx)
+
+Returns the value of x in the cdf of the Student's T distribution with dof degrees of freedom.
+
+Sample Query:
+
+```SQL
+SELECT `bqutils.fn.studentt_cdf`(1.0, 2.0) as studentt_cdf;
+```
+
+Results:
+
+| Row | studentt_cdf      |
+| --- | ----------------- |
+| 1   | 0.788675134594813 |

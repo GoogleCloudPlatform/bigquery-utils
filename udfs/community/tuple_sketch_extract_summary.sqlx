@@ -1,0 +1,42 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(sketch BYTES)
+RETURNS STRUCT<key_distinct_count INT64, value_sum INT64, value_avg INT64>
+LANGUAGE js
+OPTIONS (
+  library=["${JS_BUCKET}/tuple_sketch.js"],
+  description='''Takes in a tuple sketch and returns summary of key and value cols i.e struct<uniq_count, sum, avg>.
+For more details: https://datasketches.apache.org/docs/Tuple/TupleOverview.html'''
+) AS '''
+var sketchBinary = intArrayFromBase64(sketch);
+var ptr = Module._malloc(sketchBinary.length);
+Module.HEAPU8.subarray(ptr, ptr + sketchBinary.length).set(sketchBinary);
+
+var compact_sketch =
+    Module._compact_sketch_deserialize(ptr, sketchBinary.length);
+try {
+  return {
+    "key_distinct_count" : Module._compact_sketch_get_estimate_count(compact_sketch),
+    "value_sum" : Module._compact_sketch_get_estimate_sum(compact_sketch),
+    "value_avg" : Module._compact_sketch_get_estimate_avg(compact_sketch)
+    }
+} finally {
+  Module._compact_sketch_destroy(compact_sketch);
+  Module._free(ptr);
+}
+''';
