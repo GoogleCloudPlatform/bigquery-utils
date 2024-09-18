@@ -13,12 +13,13 @@
 // limitations under the License.
 
 function generate_test(test_name, test_cases, data_quality_function){
+    publish(`${test_name}_dummy_view`).type("view").query("SELECT 1 as col1");
     publish(test_name)
         .type("view")
         .query(ctx => `
             SELECT
               ${data_quality_function("test_input")} AS is_valid
-            FROM ${ctx.resolve("test_inputs")}
+            FROM ${ctx.resolve(`${test_name}_dummy_view`)}
         `);
 
     let expected_output_select_statements = [];
@@ -30,10 +31,10 @@ function generate_test(test_name, test_cases, data_quality_function){
 
     test(test_name)
         .dataset(test_name)
-        .input("test_inputs", `${test_input_select_statements.join(' UNION ALL\n')}`)
+        .input(`${test_name}_dummy_view`, `${test_input_select_statements.join(' UNION ALL\n')}`)
         .expect(`${expected_output_select_statements.join(' UNION ALL\n')}`);
 }
 
 module.exports = {
-    generate_test,
+    generate_test
 }

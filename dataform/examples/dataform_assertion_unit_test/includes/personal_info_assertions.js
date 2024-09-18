@@ -91,7 +91,7 @@ function test_same_character_not_more_than_n_times(colName, n_times){
 /*
     This assertions combines custom assertions for names
  */
-function test_name(colName, n_times){
+function test_name(colName){
     var result_query = `${test_name_validity(colName)} AND ${test_same_character_not_more_than_n_times(colName, 3)}`
     return result_query
 }
