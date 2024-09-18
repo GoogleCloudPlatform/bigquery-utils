@@ -25,8 +25,8 @@ LANGUAGE js AS r"""
     const sa = [...new Set(String(a).split(''))]
     const sb = [...new Set(String(b).split(''))]
 
-    const la = (sa.length > sb.length) ? sa.length : sb.length
-    const lb = (sa.length > sb.length) ? sb.length : sa.length
+    const la = sa.length;
+    const lb = sb.length;
 
     for(let i = 0; i < la; i++) {
       for(let j = 0; j < lb; j++) {
