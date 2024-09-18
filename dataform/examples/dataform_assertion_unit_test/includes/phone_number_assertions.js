@@ -33,12 +33,12 @@
 
     (URL for National dialing plan : https://sns.ift.org.mx:8081/sns-frontend/planes-numeracion/descarga-publica.xhtm)
 */
-function test_phone_number_validity(colName){
-    var remSplCharsLeadingZeros =
-        `${test_remove_leading_zeros(
-            test_remove_special_chars(colName))}`;
+function test_phone_number_validity(colName) {
+  var remSplCharsLeadingZeros = `${test_remove_leading_zeros(
+    test_remove_special_chars(colName)
+  )}`;
 
-    return `${test_phone_number_contain_digit(remSplCharsLeadingZeros)}
+  return `${test_phone_number_contain_digit(remSplCharsLeadingZeros)}
            AND ${test_repeated_phone_number(remSplCharsLeadingZeros)}`;
 }
 
@@ -46,40 +46,40 @@ function test_phone_number_validity(colName){
     Remove special characters
     . : , ; ! " # $ % & / ( ) = ' +
 */
-function test_remove_special_chars(colName){
-    var no_whitespace        = `REPLACE(${colName}, ' ', '')`;
-    var no_dot               = `REPLACE(${no_whitespace}, '.', '')`;
-    var no_colon             = `REPLACE(${no_dot}, ':', '')`;
-    var no_comma             = `REPLACE(${no_colon}, ',', '')`;
-    var no_semicolon         = `REPLACE(${no_comma}, ';', '')`;
-    var no_exclamation       = `REPLACE(${no_semicolon}, '!', '')`;
-    var no_double_quote      = `REPLACE(${no_exclamation}, '"', '')`;
-    var no_hash              = `REPLACE(${no_double_quote}, '#', '')`;
-    var no_dollar            = `REPLACE(${no_hash}, '$', '')`;
-    var no_percentage        = `REPLACE(${no_dollar}, '%', '')`;
-    var no_ampersand         = `REPLACE(${no_percentage}, '&', '')`;
-    var no_forward_slash     = `REPLACE(${no_ampersand}, '/', '')`;
-    var no_left_parenthesis  = `REPLACE(${no_forward_slash}, '(', '')`;
-    var no_right_parenthesis = `REPLACE(${no_left_parenthesis}, ')', '')`;
-    var no_equal             = `REPLACE(${no_right_parenthesis}, '=', '')`;
-    var no_single_quote      = `REPLACE(${no_equal}, '\\'', '')`;
-    var no_plus              = `REPLACE(${no_single_quote}, '+', '')`;
-    return no_plus;
+function test_remove_special_chars(colName) {
+  var no_whitespace = `REPLACE(${colName}, ' ', '')`;
+  var no_dot = `REPLACE(${no_whitespace}, '.', '')`;
+  var no_colon = `REPLACE(${no_dot}, ':', '')`;
+  var no_comma = `REPLACE(${no_colon}, ',', '')`;
+  var no_semicolon = `REPLACE(${no_comma}, ';', '')`;
+  var no_exclamation = `REPLACE(${no_semicolon}, '!', '')`;
+  var no_double_quote = `REPLACE(${no_exclamation}, '"', '')`;
+  var no_hash = `REPLACE(${no_double_quote}, '#', '')`;
+  var no_dollar = `REPLACE(${no_hash}, '$', '')`;
+  var no_percentage = `REPLACE(${no_dollar}, '%', '')`;
+  var no_ampersand = `REPLACE(${no_percentage}, '&', '')`;
+  var no_forward_slash = `REPLACE(${no_ampersand}, '/', '')`;
+  var no_left_parenthesis = `REPLACE(${no_forward_slash}, '(', '')`;
+  var no_right_parenthesis = `REPLACE(${no_left_parenthesis}, ')', '')`;
+  var no_equal = `REPLACE(${no_right_parenthesis}, '=', '')`;
+  var no_single_quote = `REPLACE(${no_equal}, '\\'', '')`;
+  var no_plus = `REPLACE(${no_single_quote}, '+', '')`;
+  return no_plus;
 }
 
 /*
     Precondition leading zero removal
     If starts with "00055", delete the "000"
 */
-function test_remove_leading_zeros(colName){
-    return `LTRIM(${colName}, '0')`;
+function test_remove_leading_zeros(colName) {
+  return `LTRIM(${colName}, '0')`;
 }
 
 /*
     This assertion checks that the input telephone number does not contain more than 3 repeated digits
 */
-function test_repeated_phone_number(colName){
-    return `TRIM( ${colName}, "0") != "" AND
+function test_repeated_phone_number(colName) {
+  return `TRIM( ${colName}, "0") != "" AND
             TRIM( ${colName}, "1") != "" AND
             TRIM( ${colName}, "2") != "" AND
             TRIM( ${colName}, "3") != "" AND
@@ -94,19 +94,21 @@ function test_repeated_phone_number(colName){
 /*
     This assertion checks that the telephone number only contains digits & length not greater than 10
 */
-function test_phone_number_contain_digit(colName){
-    return `REGEXP_CONTAINS(${colName}, r'^[1-9]{1}\\d{9}$')`;
+function test_phone_number_contain_digit(colName) {
+  return `REGEXP_CONTAINS(${colName}, r'^[1-9]{1}\\d{9}$')`;
 }
 
-function test_phone_number(colName){
-    return `${test_phone_number_validity(colName)}` +
-      `AND ${test_phone_number_contain_digit(colName)}` +
+function test_phone_number(colName) {
+  return (
+    `${test_phone_number_validity(colName)}` +
+    `AND ${test_phone_number_contain_digit(colName)}` +
     //   `AND ${test_remove_special_chars(colName)}` +
     //   `AND ${test_remove_leading_zeros(colName)}` +
-      `AND ${test_repeated_phone_number(colName)}` +
-      `AND ${test_phone_number_contain_digit(colName)}`;
+    `AND ${test_repeated_phone_number(colName)}` +
+    `AND ${test_phone_number_contain_digit(colName)}`
+  );
 }
 
 module.exports = {
-    test_phone_number
-}
+  test_phone_number,
+};
