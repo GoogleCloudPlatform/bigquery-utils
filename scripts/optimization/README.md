@@ -308,7 +308,7 @@ contains views with JOINs where the JOIN condition is potentially non-optimal.
 
 <details><summary><b>&#128269; Storage Billing Model Savings DDL </b></summary>
 
-## Queries with performance insights
+## Storage Billing Model Savings DDL
 
 The [storage_billing_model_savings_ddl.sql](storage_billing_model_savings_ddl.sql) script
 creates a table named, `storage_billing_model_savings_ddl` which forecasts which datasets will benefit from
