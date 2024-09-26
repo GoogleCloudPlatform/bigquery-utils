@@ -306,6 +306,30 @@ contains views with JOINs where the JOIN condition is potentially non-optimal.
 
 </details>
 
+<details><summary><b>&#128269; Storage Billing Model Savings DDL </b></summary>
+
+## Queries with performance insights
+
+The [storage_billing_model_savings_ddl.sql](storage_billing_model_savings_ddl.sql) script
+creates a table named, `storage_billing_model_savings_ddl` which forecasts which datasets will benefit from
+either the physical or logical storage billing model, and provides the DDL to adjust them across your organization.
+
+Instructions: Search for marker 'REMEMBER' to tune the queries at your will. You must adjust the region that you're interested in
+and the pricing for each region found [here](https://cloud.google.com/bigquery/pricing#storage).
+
+### Examples of querying script results
+
+* Top 10 datasets with their respective recommended storage billing model, ordered by forecasted savings
+
+  ```sql
+  SELECT project_name, dataset_name, currently_on, better_on, monthly_savings, ddl
+  FROM optimization_workshop.storage_billing_model_savings_ddl
+  ORDER BY monthly_savings DESC
+  LIMIT 10
+  ```
+
+</details>
+
 # Query Analysis
 
 <details><summary><b>&#128269; Queries grouped by hash</b></summary>
