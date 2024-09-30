@@ -14,14 +14,14 @@ steps:
   id: build-ci-image-from-kaniko-cache
   args:
     - --dockerfile=Dockerfile.ci
-    - --destination=gcr.io/$PROJECT_ID/bq_udf_ci
+    - --destination=gcr.io/$PROJECT_ID/bq_udf_ci:infrastructure-public-image-bqutil
     - --cache=true
   waitFor:
     - lint-ci-docker-image
   ############################################################
   # Run yapf linter/formatter on all python assets
   ############################################################
-- name: gcr.io/$PROJECT_ID/bq_udf_ci
+- name: gcr.io/$PROJECT_ID/bq_udf_ci:infrastructure-public-image-bqutil
   id: yapf
   entrypoint: yapf
   args:
