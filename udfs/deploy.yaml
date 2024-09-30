@@ -13,7 +13,7 @@ steps:
 ###########################################################
 # Deploy UDFs and run unit tests
 ###########################################################
-- name: gcr.io/bqutil/bq_udf_ci
+- name: gcr.io/bqutil/bq_udf_ci:infrastructure-public-image-bqutil
   id: deploy_and_test_udfs
   dir: ${_WORKING_DIR}
   entrypoint: bash
