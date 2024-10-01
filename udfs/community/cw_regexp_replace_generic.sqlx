@@ -23,7 +23,7 @@ LANGUAGE js AS """
   let regExp = new RegExp(regexp, mode);
   const start = offset - 1;
   if (occurrence == 0)
-      return haystack.substr(start).replace(regExp, replacement);
+      return haystack.substr(0, start) + haystack.substr(start).replace(regExp, replacement);
   const index = occurrence - 1;
   let relevantString = haystack.substring(start);
   let a, count = 0;
