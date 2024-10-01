@@ -38,7 +38,7 @@ A sample fully-filled JSON option string would look like:
 }'
 
 The parameters within the options string are documented below as:
-INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 80000.
+INT64 batch_size : The number of rows to process in each child job during the procedure. A larger value will reduce the overhead of multiple child jobs, but needs to be small enough to complete in a single job run. Defaults to 4500000.
 INT64 termination_time_secs : The maximum time (in seconds) the script should run before terminating. Defaults to 82800 (23 hours).
 STRING source_filter : An optional filter applied as a SQL WHERE clause to the source table before processing. Defaults to 'TRUE'.
 ARRAY<STRING> projection_columns : An array of column to copy from the source table into the destination table. '*' is not a valid value.
@@ -46,7 +46,7 @@ STRING ml_options : A JSON string representing additional struct options defined
 ''')
 BEGIN
 
-DECLARE batch_size DEFAULT 80000;
+DECLARE batch_size DEFAULT 4500000;
 
 -- The time to wait before the script terminates
 DECLARE termination_time_secs DEFAULT(23 * 60 * 60);
