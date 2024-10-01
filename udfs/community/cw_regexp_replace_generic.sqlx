@@ -21,9 +21,9 @@ LANGUAGE js AS """
   if (haystack == null || regexp == null || replacement == null || offset == null || occurrence == null || mode == null) return null;
   replacement = replacement.replace('\\\\', '$');
   let regExp = new RegExp(regexp, mode);
-  if (occurrence == 0)
-      return haystack.replace(regExp, replacement);
   const start = offset - 1;
+  if (occurrence == 0)
+      return haystack.substr(0, start) + haystack.substr(start).replace(regExp, replacement);
   const index = occurrence - 1;
   let relevantString = haystack.substring(start);
   let a, count = 0;

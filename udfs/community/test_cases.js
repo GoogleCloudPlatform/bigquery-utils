@@ -1453,6 +1453,24 @@ generate_udf_test("cw_regexp_replace_4", [
     expected_output: `"TestCad$123456"`,
   },
 ]);
+generate_udf_test("cw_regexp_replace_4", [
+  {
+    inputs: [`"TestStr123456Str"`, `"Str"`, `"Cad$"`, `CAST(1 AS INT64)`],
+    expected_output: `"TestCad$123456Cad$"`,
+  },
+]);
+generate_udf_test("cw_regexp_replace_4", [
+  {
+    inputs: [`"abaa"`, `"a"`, `"A"`, `CAST(1 AS INT64)`],
+    expected_output: `"AbAA"`,
+  },
+]);
+generate_udf_test("cw_regexp_replace_4", [
+  {
+    inputs: [`"abaa"`, `"a"`, `"A"`, `CAST(2 AS INT64)`],
+    expected_output: `"abAA"`,
+  },
+]);
 generate_udf_test("cw_regexp_replace_5", [
   {
     inputs: [
