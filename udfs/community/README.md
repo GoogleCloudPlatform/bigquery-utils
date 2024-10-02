@@ -863,7 +863,7 @@ SELECT bqutil.fn.cw_regexp_instr_4('TestStr123456Str', 'Str', 1, 3);
 ```
 
 ### [cw_regexp_instr_5(haystack STRING, regexp STRING, p INT64, o INT64, returnopt INT64)](cw_regexp_instr_5.sqlx)
-Takes input haystack string, needle string, starting positin from where search will start, number of occurance and returnopt number. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
+Takes input haystack string, needle string, starting position from where search will start, the 1-based number of match occurence which , and returnopt number. Returns end index +1 of last needle. Mode can be g for global search, i for case insensetive search and m for multiline search.
 ```sql
 SELECT bqutil.fn.cw_regexp_instr_5('TestStr123456', '123', 1, 1, 1);
 
@@ -887,7 +887,7 @@ SELECT bqutil.fn.cw_regexp_instr_generic('TestStr123456', 'Str', 1, 1, 1, 'g');
 ```
 
 ### [cw_regexp_replace_4(haystack STRING, regexp STRING, replacement STRING, offset INT64)](cw_regexp_replace_4.sqlx)
-Takes input haystack string, regular expression, replacement string and starting offset. It returns new string with replacement string matches accordingly regular expression.
+Takes input haystack string, regular expression, replacement string and 1-based starting offset. It returns new string with replacement string matches accordingly regular expression.
 ```sql
 SELECT bqutil.fn.cw_regexp_replace_4('TestStr123456', 'Str', 'Cad$', 1);
 
@@ -895,7 +895,7 @@ TestCad$123456
 ```
 
 ### [cw_regexp_replace_5(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64)](cw_regexp_replace_5.sqlx)
-Takes input haystack string, regular expression, replacement string, starting offset and number of occurence which we want to replace. It returns new string with replacement string matches accordingly regular expression.
+Takes input haystack string, regular expression, replacement string, 1-based starting offset, 1-based number of the occurence which we want to replace. It returns new string with replacement string matches accordingly regular expression.
 ```sql
 SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456', 'Str', 'Cad$', 1, 1);
 SELECT bqutil.fn.cw_regexp_replace_5('TestStr123456Str', 'Str', 'Cad$', 1, 2);
@@ -907,7 +907,7 @@ TestCad$123456Str
 ```
 
 ### [cw_regexp_replace_6(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING)](cw_regexp_replace_6.sqlx)
-Takes input haystack string, regular expression, replacement string, starting offset, number of occurence which we want to replace and mode. It returns new string with replacement string matches accordingly regular expression. Mode can be g for global search, i for case insensetive search and m for multiline search.
+Takes input haystack string, regular expression, replacement string, 1-based starting offset, 1-based number of the occurence which we want to replace, and the mode. It returns new string with replacement string matches accordingly regular expression. Mode can be g for global search, i for case insensetive search and m for multiline search.
 ```sql
 SELECT bqutil.fn.cw_regexp_replace_6('TestStr123456', 'Str', '$:#>', 1, 1, 'i');
 
