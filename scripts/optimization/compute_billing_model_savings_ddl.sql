@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-DECLARE num_days_to_scan INT64 DEFAULT 30;
+-- US pricing for reference: https://cloud.google.com/bigquery/pricing#storage
+-- standard_baseline_rate FLOAT64 DEFAULT .04;
+-- enterprise_baseline_1yr_rate FLOAT64 DEFAULT .048;
+-- enterprise_baseline_3yr_rate FLOAT64 DEFAULT .036;
+-- enterprise_plus_baseline_1yr_rate FLOAT64 DEFAULT .08;
+-- enterprise_plus_baseline_3yr_rate FLOAT64 DEFAULT .06;
+-- standard_payg_rate FLOAT64 DEFAULT .04;
+-- enterprise_payg_rate FLOAT64 DEFAULT .06;
+-- enterprise_plus_payg_rate FLOAT64 DEFAULT .1;
 
--- REMEMBER: Put here the prices of the region of interest, current values are for the US
--- See https://cloud.google.com/bigquery/pricing#storage
+DECLARE num_days_to_scan INT64 DEFAULT 30;
 DECLARE on_demand_rate FLOAT64 DEFAULT 6.25;
-DECLARE standard_payg_rate FLOAT64 DEFAULT .04;
--- DECLARE standard_payg_rate FLOAT64 DEFAULT .06;
--- DECLARE ee_payg_rate FLOAT64 DEFAULT .1;
+-- REMEMBER: Replace with the values of your current or target baseline slot price.
+DECLARE baseline_rate FLOAT64 DEFAULT .04;
+-- REMEMBER: Replace with the values of your current or target autoscaling slot price.
+DECLARE autoscaling_rate DEFAULT .04;
 
 -- REMEMBER: (optional) Change this to filter based on savings absolute value or percentage
 DECLARE threshold_percent FLOAT64 DEFAULT 10.0;  -- 10% difference
@@ -62,7 +70,8 @@ cost_analysis AS (
        sum(total_slot_hours) as total_slot_hours,
        sum(tb_billed) as tb_billed,
        sum(tb_billed)*on_demand_rate as cost_on_demand,
-       sum(total_slot_hours)*standard_payg_rate as cost_reservation
+       sum(total_slot_hours)*autoscaling_rate as worst_case_cost_reservation, -- Worst case is that only autoscaling slots are used.
+       sum(total_slot_hours)*baseline_rate as best_case_cost_reservation -- Best case is that only baseline slots are used.
    FROM job_data
    GROUP BY 1, 2
 )
@@ -71,12 +80,12 @@ SELECT
    -- Generate DDL templates with threshold logic and parameters
    CASE
        WHEN usage_type = 'on_demand' AND cost_on_demand > 0 AND (
-               (cost_on_demand - cost_reservation) / cost_on_demand * 100 >= threshold_percent OR
-               cost_on_demand - cost_reservation >= absolute_threshold
+               (cost_on_demand - worst_case_cost_reservation) / cost_on_demand * 100 >= threshold_percent OR
+               cost_on_demand - worst_case_cost_reservation >= absolute_threshold
            ) THEN CONCAT('CREATE ASSIGNMENT `', admin_project_id, '.', 'region-', location, '.', reservation_name, '.ASSIGNMENT_ID` OPTIONS ( assignee="projects/', project_id, '", job_type="QUERY");')   
        WHEN usage_type = 'reservation' AND cost_on_demand > 0 AND (
-               (cost_reservation - cost_on_demand) / cost_on_demand * 100 >= threshold_percent OR
-               cost_reservation - cost_on_demand >= absolute_threshold
+               (best_case_cost_reservation - cost_on_demand) / cost_on_demand * 100 >= threshold_percent OR
+               best_case_cost_reservation - cost_on_demand >= absolute_threshold
            ) THEN CONCAT('CREATE ASSIGNMENT `', admin_project_id, '.', 'region-', location, '.', 'none', '.ASSIGNMENT_ID` OPTIONS ( assignee="projects/', project_id, '", job_type="QUERY");')
        ELSE NULL  -- No DDL if threshold not met or cost_on_demand is zero
    END AS ddl
