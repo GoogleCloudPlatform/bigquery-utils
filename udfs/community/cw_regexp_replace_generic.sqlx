@@ -15,27 +15,36 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
- /* Generic regexp_replace, which is the 6-args version with regexp_mode already decoded */
+ /* Generic regexp_replace, which is the 6-args version with regexp_mode already decoded
+  *
+  * haystack = the string to search
+  * regexp = the regular expression
+  * replacement = the string to replace the match with
+  * offset = the 1-based offset where the search will begin
+  * occurrence = the 1-based occurrence of the match to replace - overrides
+  *   the 'g' flag
+  * mode = the javascript regular expression mode flags
+  */
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING) RETURNS STRING
 LANGUAGE js AS """
   if (haystack == null || regexp == null || replacement == null || offset == null || occurrence == null || mode == null) return null;
   replacement = replacement.replace('\\\\', '$');
+  if (mode.indexOf('g') == -1) {
+    mode = mode + 'g';
+  }
   let regExp = new RegExp(regexp, mode);
-  const start = offset - 1;
-  if (occurrence == 0)
-      return haystack.substr(0, start) + haystack.substr(start).replace(regExp, replacement);
-  const index = occurrence - 1;
-  let relevantString = haystack.substring(start);
-  let a, count = 0;
-  while ((a = regExp.exec(relevantString)) !== null && count++ < index) {
-      relevantString = relevantString.substr(regExp.lastIndex);
-      regExp.lastIndex = 0;
-  }
-  if (a == null) return haystack;
+  const relevantString = haystack.substring(offset - 1);
   const prefix = haystack.substr(0, haystack.length - relevantString.length);
-  if (mode.indexOf('g') >= 0) {
-      mode = mode.replace('g', '');
-      regExp = new RegExp(regexp, mode);
+  if (occurrence == 0) {
+    return prefix + relevantString.replace(regExp, replacement);
   }
-  return prefix + relevantString.replace(regExp, replacement);
+  for (let count = 0; count < occurrence - 1; count++) {
+    if (regExp.exec(relevantString) === null) {
+      break;
+    }
+  }
+  const skipped = prefix + relevantString.substring(0, regExp.lastIndex);
+  const remaining = relevantString.substring(regExp.lastIndex);
+  regExp = new RegExp(regexp, mode.replace('g', ''));
+  return skipped + remaining.replace(regExp, replacement);
 """;

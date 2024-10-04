@@ -1446,6 +1446,50 @@ generate_udf_test("cw_regexp_replace_generic", [
     ],
     expected_output: `"TestGbp123456"`,
   },
+  {
+    inputs: [
+      `"Abcabc"`,
+      `"a"`,
+      `"x"`,
+      `CAST(1 AS INT64)`,
+      `CAST(0 AS INT64)`,
+      `"i"`
+    ],
+    expected_output: `"xbcxbc"`,
+  },
+  {
+    inputs: [
+      `"Abcabc"`,
+      `"a"`,
+      `"x"`,
+      `CAST(2 AS INT64)`,
+      `CAST(0 AS INT64)`,
+      `"i"`
+    ],
+    expected_output: `"Abcxbc"`,
+  },
+  {
+    inputs: [
+      `"Abcabca"`,
+      `"a"`,
+      `"x"`,
+      `CAST(2 AS INT64)`,
+      `CAST(1 AS INT64)`,
+      `"i"`
+    ],
+    expected_output: `"Abcxbca"`,
+  },
+  {
+    inputs: [
+      `"all vowels replaced"`,
+      `"a|e|i|o|u"`,
+      `"X"`,
+      `CAST(1 AS INT64)`,
+      `CAST(0 AS INT64)`,
+      `"i"`
+    ],
+    expected_output: `"Xll vXwXls rXplXcXd"`
+  }
 ]);
 generate_udf_test("cw_regexp_replace_4", [
   {
