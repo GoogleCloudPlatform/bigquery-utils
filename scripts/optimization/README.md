@@ -534,3 +534,30 @@ of that hour's slots each grouping of labels consumed.
   ``` 
 
 </details>
+<details><summary><b>&#128269; Compute Billing Model Savings DDL</b></summary>
+
+## Compute Billing Model Savings DDL
+
+The [compute_billing_model_savings_ddl](compute_billing_model_savings_ddl.sql)
+script creates a table named, `compute_billing_model_savings_ddl`. 
+
+It can be more cost efficient to use either the on-demand or the reservation compute billing model depending on query patterns. This script aims to identify projects that obviously save cost by switching billing models and to provide template DDL to adjust accordingly. 
+
+In order to safely identify projects that would benefit in one model or the other, the script assumes that any slots used in reservations are autoscaling slots.
+
+Instructions: Search for marker 'REMEMBER' to tune the queries at your will. You must adjust the region that you're interested in
+and the pricing for each region found [here](https://cloud.google.com/bigquery/pricing#storage).
+
+### Examples of querying script results
+
+* Top 10 projects that are forecasted to benefit from a compute billing model change, ordered by forecasted cost difference.
+
+  ```sql
+  SELECT project_id, usage_type as current_model, cost_on_demand, cost_reservation, ABS(cost_reservation-cost_on_demand) as cost_diff, ddl 
+  FROM `optimization_workshop.compute_billing_model_savings_ddl` 
+  WHERE ddl is not null
+  ORDER BY cost_diff desc
+  LIMIT 10
+  ``` 
+
+</details>
