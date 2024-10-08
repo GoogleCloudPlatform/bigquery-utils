@@ -17,5 +17,5 @@ config { hasOutput: true }
 
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
 (
-   ${ref("cw_regexp_replace_generic")}(haystack, regexp, replacement, p, o, ${ref("cw_regex_mode")}(''))
+   ${ref("cw_regexp_replace_generic")}(haystack, regexp, replacement, p, o, ${ref("cw_regex_mode")}(mode))
 );
