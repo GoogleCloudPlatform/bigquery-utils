@@ -3557,3 +3557,137 @@ generate_udf_test("xml_to_json", [
     expected_output: `JSON '{}'`,
   },
 ]);
+generate_udaf_test("cw_mode_int64",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    10 AS v
+  UNION ALL
+  SELECT
+    10
+  UNION ALL
+  SELECT
+    10
+  UNION ALL
+  SELECT
+    30
+  UNION ALL
+  SELECT
+    20
+  UNION ALL
+  SELECT
+    21
+  UNION ALL
+  SELECT
+    20
+  UNION ALL
+  SELECT
+    20
+  UNION ALL
+  SELECT
+    25
+  UNION ALL
+  SELECT
+    10`,
+    expected_output: `10`
+  },
+);
+generate_udaf_test("cw_mode_boolean",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    true AS v
+  UNION ALL
+  SELECT
+    false
+  UNION ALL
+  SELECT
+    true`,
+    expected_output: `true`
+  },
+);
+generate_udaf_test("cw_mode_date",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    DATE "2024-10-09" AS v
+  UNION ALL
+  SELECT
+    DATE "2024-10-08"
+  UNION ALL
+  SELECT
+    DATE "2024-10-09"`,
+    expected_output: `DATE "2024-10-09"`
+  }
+);
+generate_udaf_test("cw_mode_float64",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    1.0 AS v
+  UNION ALL
+  SELECT
+    2.0
+  UNION ALL
+  SELECT
+    1.0`,
+    expected_output: `1.0`
+  }
+);
+generate_udaf_test("cw_mode_json",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    JSON '{"a": 1}' AS v
+  UNION ALL
+  SELECT
+    JSON '{"a": 3}'
+  UNION ALL
+  SELECT
+    JSON '{"a": 1}'`,
+    expected_output: `JSON '{"a": 1}'`
+  }
+);
+generate_udaf_test("cw_mode_numeric",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    CAST(1 as NUMERIC) AS v
+  UNION ALL
+  SELECT
+    CAST(2 as NUMERIC)
+  UNION ALL
+  SELECT
+    CAST(1 as NUMERIC)`,
+    expected_output: `CAST(1 as NUMERIC)`
+  }
+);
+generate_udaf_test("cw_mode_string",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    "a" AS v
+  UNION ALL
+  SELECT
+    "b"
+  UNION ALL
+  SELECT
+    "a"`,
+    expected_output: `"a"`
+  }
+);
+generate_udaf_test("cw_mode_timestamp",
+  {
+    input_columns: [`v`],
+    input_rows: `SELECT
+    TIMESTAMP "2024-10-9T12:34:56.999" AS v
+  UNION ALL
+  SELECT
+    TIMESTAMP "2024-10-9T12:34:56.789"
+  UNION ALL
+  SELECT
+    TIMESTAMP "2024-10-9T12:34:56.789"`,
+    expected_output: `TIMESTAMP "2024-10-9T12:34:56.789"`
+  }
+);
+
