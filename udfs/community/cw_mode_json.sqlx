@@ -15,10 +15,13 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/** Returns the most frequently occurring argument */
 CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(j JSON)
 RETURNS JSON
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+  description="Returns the most frequently occurring argument"
+)
+AS """
   export function initialState() {
     return {frequencyMap: new Map()};
   }
