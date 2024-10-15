@@ -1,0 +1,57 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE AGGREGATE FUNCTION ${self()}(n FLOAT64)
+RETURNS FLOAT64
+LANGUAGE js 
+OPTIONS (
+  description="Returns the most frequently occurring argument"
+)
+AS """
+  export function initialState() {
+    return {frequencyMap: new Map()};
+  }
+  export function aggregate(state, value) {
+    var frequencyMap  = state.frequencyMap;
+    if (frequencyMap.has(value)) {
+      frequencyMap.set(value, frequencyMap.get(value) + 1);
+    } else {
+      frequencyMap.set(value, 1);
+    }
+  }
+  export function merge(state, partial_state) {
+    var frequencyMap  = state.frequencyMap;
+    for (let [key, count] of partial_state.frequencyMap) {
+      if (frequencyMap.has(key)) {
+        frequencyMap.set(key, frequencyMap.get(key) + count);
+      } else {
+        frequencyMap.set(key, count);
+      }
+    }
+  }
+  export function finalize(state) {
+    var maxCount = 0;
+    var maxKey = null;
+    for (let [key, count] of state.frequencyMap) {
+      if (count > maxCount) {
+        maxKey = key;
+        maxCount = count;
+      }
+    }
+    return maxKey;
+  }
+""";
