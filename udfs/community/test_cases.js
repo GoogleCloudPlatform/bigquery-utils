@@ -1559,6 +1559,17 @@ generate_udf_test("cw_regexp_replace_6", [
     ],
     expected_output: `"Test$:#>123456"`,
   },
+  {
+    inputs: [
+      `"aBcb"`,
+      `"b"`,
+      `"x"`,
+      `CAST(1 AS INT64)`,
+      `CAST(0 AS INT64)`,
+      `"i"`,
+    ],
+    expected_output: `"axcx"`,
+  }
 ]);
 generate_udf_test("cw_regexp_instr_5", [
   {
