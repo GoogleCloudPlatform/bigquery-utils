@@ -1,0 +1,70 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(d datetime, style int64)
+  RETURNS STRING
+  OPTIONS (
+    description="Converts a timestamp to a string with a format specified by the given style"
+  )
+  AS (
+    CASE style
+      WHEN NULL THEN NULL
+      WHEN 1 THEN CAST(d AS STRING FORMAT 'mm/dd/yy')
+      WHEN 101 THEN CAST(d AS STRING FORMAT 'mm/dd/yyyy')
+      WHEN 2 THEN CAST(d AS STRING FORMAT 'mm.dd.yy')
+      WHEN 102 THEN CAST(d AS STRING FORMAT 'mm.dd.yyyy')
+      WHEN 3 THEN CAST(d AS STRING FORMAT 'dd/mm/yy')
+      WHEN 103 THEN CAST(d AS STRING FORMAT 'dd/mm/yyyy')
+      WHEN 4 THEN CAST(d AS STRING FORMAT 'dd.mm.yy')
+      WHEN 104 THEN CAST(d AS STRING FORMAT 'dd.mm.yyyy')
+      WHEN 5 THEN CAST(d AS STRING FORMAT 'dd-mm-yy')
+      WHEN 105 THEN CAST(d AS STRING FORMAT 'dd-mm-yyyy')
+      WHEN 6 THEN CAST(d AS STRING FORMAT 'dd Mon yy')
+      WHEN 106 THEN CAST(d AS STRING FORMAT 'dd Mon yyyy')
+      WHEN 7 THEN CAST(d AS STRING FORMAT 'Mon dd yy')
+      WHEN 107 THEN CAST(d AS STRING FORMAT 'Mon dd yyyy')
+      WHEN 8 THEN CAST(d AS STRING FORMAT 'hh:mi:ss')
+      -- 9 and 109 are identical
+      WHEN 9 THEN CAST(d AS STRING FORMAT 'Mon dd yyyy hh:mi:ssAM')
+      WHEN 109 THEN CAST(d AS STRING FORMAT 'Mon dd yyyy hh:mi:ssAM')
+      WHEN 10 THEN CAST(d AS STRING FORMAT 'mm-dd-yy')
+      WHEN 110 THEN CAST(d AS STRING FORMAT 'mm-dd-yyyy')
+      WHEN 11 THEN CAST(d AS STRING FORMAT 'yy/mm/dd')
+      WHEN 111 THEN CAST(d AS STRING FORMAT 'yyyy/mm/dd')
+      WHEN 12 THEN CAST(d AS STRING FORMAT 'yymmdd')
+      WHEN 112 THEN CAST(d AS STRING FORMAT 'yyyymmdd')
+      -- 13 and 113 are identical
+      WHEN 13 THEN CAST(d AS STRING FORMAT 'dd Mon yyyy hh:mi:ss:mmm')
+      WHEN 113 THEN CAST(d AS STRING FORMAT 'dd Mon yyyy hh:mi:ss:mmm')
+      WHEN 14 THEN CAST(d AS STRING FORMAT 'hh:mi:ss:mmm')
+      WHEN 114 THEN CAST(d AS STRING FORMAT 'hh:mi:ss:mmm')
+      -- 20 and 120 are identical
+      WHEN 20 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd hh24:mi:ss')
+      WHEN 120 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd hh24:mi:ss')
+      -- 21, 25, and 121 are identical
+      WHEN 21 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd hh24:mi:ss.ff7')
+      WHEN 25 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd hh24:mi:ss.ff7')
+      WHEN 121 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd hh24:mi:ss.ff7')
+      WHEN 22 THEN CAST(d AS STRING FORMAT 'mm/dd/yy hh:mi:ss AM')
+      WHEN 23 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd')
+      WHEN 126 THEN CAST(d AS STRING FORMAT 'yyyy-mm-dd"T"hh24:mi:ss.ff7')
+      -- 127 not supported because it requires a time zone
+      WHEN 130 THEN CAST(d AS STRING FORMAT 'dd Mon yyyy hh:mi:ss:ff7AM')
+      WHEN 131 THEN CAST(d AS STRING FORMAT 'dd/mm/yyyy hh:mi:ss:ff7AM')
+      ELSE CAST(d AS STRING FORMAT 'Mon dd yyyy hh:miAM')
+    END
+  );
