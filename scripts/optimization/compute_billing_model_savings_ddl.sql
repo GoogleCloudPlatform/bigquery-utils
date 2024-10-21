@@ -46,7 +46,6 @@ CREATE OR REPLACE TABLE optimization_workshop.compute_billing_model_savings_ddl 
 WITH job_data AS (
    SELECT
        project_id,
-       TIMESTAMP_TRUNC(end_time, HOUR) AS time_window,
        SUM(total_slot_ms) as total_slot_ms,
        SUM((total_slot_ms/1000/60/60)) as total_slot_hours,
        SUM(total_bytes_billed/ POW(1024, 4)) as tb_billed,
@@ -59,9 +58,9 @@ WITH job_data AS (
    WHERE
        job_type = 'QUERY'
        AND statement_type != 'SCRIPT'
-       AND DATE(jbo.creation_time, "US/Central") >= CURRENT_DATE - 30
+       AND DATE(jbo.creation_time, "US/Central") >= CURRENT_DATE - num_days_to_scan
    GROUP BY
-       project_id, time_window, usage_type
+       project_id, usage_type
 ),
 cost_analysis AS (
    SELECT

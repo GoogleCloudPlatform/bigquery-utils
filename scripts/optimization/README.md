@@ -543,8 +543,6 @@ script creates a table named, `compute_billing_model_savings_ddl`.
 
 It can be more cost efficient to use either the on-demand or the reservation compute billing model depending on query patterns. This script aims to identify projects that obviously save cost by switching billing models and to provide template DDL to adjust accordingly. 
 
-In order to safely identify projects that would benefit in one model or the other, the script assumes that any slots used in reservations are autoscaling slots.
-
 Instructions: Search for marker 'REMEMBER' to tune the queries at your will. You must adjust the region that you're interested in
 and the pricing for each region found [here](https://cloud.google.com/bigquery/pricing#storage).
 
