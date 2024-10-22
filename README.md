@@ -34,6 +34,7 @@ This repository is broken up into:
         *   [snowflake](/udfs/migration/snowflake)
         *   [teradata](/udfs/migration/teradata)
         *   [vertica](/udfs/migration/vertica)
+        *   [sqlserver](/udfs/migration/sqlserver)
 *   [Views](/views) - Views over system tables such as audit logs or the
     `INFORMATION_SCHEMA`
     *   [query_audit](/views/audit/query_audit.sql) - View to simplify querying
