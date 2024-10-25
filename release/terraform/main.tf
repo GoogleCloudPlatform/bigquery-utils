@@ -118,6 +118,14 @@ resource "google_bigquery_dataset_iam_member" "sf_public_viewers" {
   member     = "allAuthenticatedUsers"
 }
 
+resource "google_bigquery_dataset_iam_member" "ss_public_viewers" {
+  project    = var.project
+  for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
+  dataset_id = "ss_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
 resource "google_bigquery_dataset_iam_member" "td_public_viewers" {
   project    = var.project
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
