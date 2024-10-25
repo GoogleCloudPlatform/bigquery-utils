@@ -5,3 +5,4 @@ snowflake: sf
 teradata: td
 vertica: ve
 community: fn
+sqlserver: ss

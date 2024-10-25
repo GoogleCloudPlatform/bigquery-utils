@@ -12,7 +12,7 @@ value.
 The [community](/udfs/community) folder contains community-contributed functions
 that perform some actions in BigQuery. The [migration](/udfs/migration) folder
 contains sub-folders such as [teradata](/udfs/migration/teradata),
-[redshift](/udfs/migration/redshift), and [oracle](/udfs/migration/oracle) which
+[redshift](/udfs/migration/redshift), [sqlserver](/udfs/migration/sqlserver) and [oracle](/udfs/migration/oracle) which
 contain community-contributed functions that replicate the behavior of
 proprietary functions in other data warehouses. These functions can help you
 achieve feature parity in a migration from another data warehouse to BigQuery.
