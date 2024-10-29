@@ -7,4 +7,9 @@ directory will be automatically synchronized to the `bqutil` project within the
 
 ## UDFs
 
-Nothing here yet, check back soon...
+* [round_datetime](#round_datetimedt-datetime-format-string)
+
+## Documentation
+
+### [round_datetime(d DATETIME, format STRING)](round_datetime.sqlx)
+Emulates the `ROUND(DATE, VARCHAR)` function from Oracle as [documented here](https://docs.oracle.com/cd/B14117_01/server.101/b10759/functions121.htm).

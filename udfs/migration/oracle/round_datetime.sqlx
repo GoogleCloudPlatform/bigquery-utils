@@ -1,0 +1,76 @@
+config { hasOutput: true }
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(d DATETIME, format STRING)
+  RETURNS DATETIME
+  OPTIONS (
+    description="Emulates the behavior of Oracle's ROUND function for dates"
+  )
+  AS (
+    CASE
+      WHEN format = "YEAR" OR format = "SYYYY" OR format = "YYYY" OR format = "SYEAR" OR format = "YYY" OR format = "YY" OR format = "Y" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 6 MONTH), YEAR)
+      WHEN format = "IYYY" OR format = "IYY" OR format = "IY" OR format = "I" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 6 MONTH), YEAR)
+      WHEN format = "Q" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 3 MONTH), QUARTER)
+      WHEN format = "MON" OR format = "MM" OR format = "RM" OR format = "MONTH" THEN
+        IF(EXTRACT(DAY FROM d) >= 16, DATETIME_ADD(DATETIME_TRUNC(d, MONTH), INTERVAL 1 MONTH), DATETIME_TRUNC(d, MONTH))
+      WHEN format = "WW" THEN
+        (
+          WITH t AS (
+            SELECT
+                DATE_DIFF(d, DATE_TRUNC(d, YEAR), HOUR) AS h,
+                CAST(24 * 7 AS int64) AS hw 
+          )
+          SELECT
+              DATETIME_TRUNC(DATETIME_ADD(DATE_TRUNC(d, YEAR), INTERVAL CAST((DIV(h, hw) + IF (MOD(h, hw) < hw / 2, 0, 1)) * hw AS int64) hour), DAY)
+            FROM t 
+        )
+      WHEN format = "IW" THEN
+        (
+          WITH t AS (
+            SELECT
+              DATE_DIFF(d, DATE_TRUNC(d, ISOYEAR), HOUR) AS h,
+              CAST(24 * 7 AS int64) AS hw
+          )
+          SELECT
+              DATETIME_TRUNC(DATETIME_ADD(DATE_TRUNC(d, ISOYEAR), INTERVAL CAST((DIV(h, hw) + IF(MOD(h, hw) < hw / 2, 0, 1)) * hw AS int64) hour), DAY)
+            FROM t
+        )
+      WHEN format = "W" THEN
+        (
+          WITH t AS (
+            SELECT
+                DATE_DIFF(d, DATE_TRUNC(d, MONTH), HOUR) AS h,
+                CAST(24 * 7 AS int64) AS hw
+          )
+          SELECT
+              DATETIME_TRUNC(DATETIME_ADD(DATE_TRUNC(d, MONTH), INTERVAL CAST((DIV(h, hw) + IF (MOD(h, hw) < hw / 2, 0, 1)) * hw AS int64) hour), DAY)
+            FROM t
+        )
+      WHEN format = "DDD" OR format = "DD" OR format = "J" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 12 HOUR), DAY)
+      WHEN format = "DY" OR format = "D" OR format = "DAY" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 84 HOUR), WEEK)
+      WHEN format = "HH24" OR format = "HH12" OR format = "HH" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 30 MINUTE), HOUR)
+      WHEN format = "MI" THEN
+        DATETIME_TRUNC(DATETIME_ADD(d, INTERVAL 30 SECOND), MINUTE)
+      ELSE NULL
+    END
+  );
