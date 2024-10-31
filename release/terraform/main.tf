@@ -92,7 +92,6 @@ resource "google_bigquery_dataset_iam_member" "nz_public_viewers" {
 }
 */
 
-/* Uncomment below whenever the first contribution to oracle dataset occurs 
 resource "google_bigquery_dataset_iam_member" "or_public_viewers" {
   project    = var.project
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
@@ -100,7 +99,6 @@ resource "google_bigquery_dataset_iam_member" "or_public_viewers" {
   role       = "roles/bigquery.dataViewer"
   member     = "allAuthenticatedUsers"
 }
-*/
 
 resource "google_bigquery_dataset_iam_member" "rs_public_viewers" {
   project    = var.project
