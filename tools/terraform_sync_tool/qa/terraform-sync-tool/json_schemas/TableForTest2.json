@@ -1,0 +1,26 @@
+[
+  {
+    "description": "Col1",
+    "mode": "NULLABLE",
+    "name": "Col1",
+    "type": "STRING"
+  },
+  {
+    "description": "Col2",
+    "mode": "NULLABLE",
+    "name": "Col2",
+    "type": "STRING"
+  },
+  {
+    "description": "Col3",
+    "mode": "NULLABLE",
+    "name": "Col3",
+    "type": "STRING"
+  },
+  {
+    "description": "Col4",
+    "mode": "NULLABLE",
+    "name": "Col4",
+    "type": "STRING"
+  }
+]
