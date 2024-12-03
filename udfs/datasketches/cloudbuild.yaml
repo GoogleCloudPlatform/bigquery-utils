@@ -1,0 +1,32 @@
+steps:
+###########################################################
+# Deploy UDFs and run unit tests
+###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci:infrastructure-public-image-bqutil
+  id: deploy_datasketches_udfs
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    set -eu
+    git clone https://github.com/emscripten-core/emsdk.git
+    cd emsdk
+    ./emsdk install latest
+    ./emsdk activate latest
+    source ./emsdk_env.sh
+    cd ..
+    LATEST_TAG=$(curl -L https://api.github.com/repos/apache/datasketches-bigquery/releases/latest \
+      | jq -r '.tag_name')
+    printf "Latest tag: %s\n" "${LATEST_TAG}" 
+    git clone --recursive --single-branch --branch "${LATEST_TAG}" https://github.com/apache/datasketches-bigquery.git
+    cd datasketches-bigquery
+    make
+    make install
+    make test
+  env:
+  - BQ_PROJECT=${PROJECT_ID} # PROJECT_ID is derived from Cloud Build project
+  - BQ_DATASET=datasketches
+  - BQ_LOCATION=${_BQ_LOCATION}
+  - JS_BUCKET=${_JS_BUCKET}
+
+timeout: 1800s # 30 minutes
