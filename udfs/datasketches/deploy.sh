@@ -55,7 +55,7 @@ function deploy_udfs_and_run_unit_tests() {
 
   gcloud builds submit . \
     --project=$PROJECT_ID \
-    --region="us-central1d" \
+    --region="us-central1" \
     --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
     --polling-interval="10" \
     --substitutions=_BQ_LOCATION=$_BQ_LOCATION,_BQ_DATASET=$_BQ_DATASET,_JS_BUCKET=$_JS_BUCKET
