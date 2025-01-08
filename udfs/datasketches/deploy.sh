@@ -90,6 +90,7 @@ function main() {
       remove_testing_assets
       exit 1
     fi
+    remove_testing_assets
   fi
 }
 
