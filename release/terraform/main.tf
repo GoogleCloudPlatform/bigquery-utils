@@ -90,7 +90,7 @@ resource "google_cloudbuild_trigger" "datasketches_regional_trigger" {
 
   substitutions = {
     _BQ_LOCATION = "${each.value}"
-    _JS_BUCKET   = "gs://${var.project}-datasketches-${each.value}"
+    _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
   }
 }
 
