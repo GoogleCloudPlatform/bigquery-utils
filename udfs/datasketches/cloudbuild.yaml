@@ -10,7 +10,10 @@ steps:
   - deploy.sh
   env:
   - PROJECT_ID=${PROJECT_ID}
+  - BRANCH_NAME=${BRANCH_NAME}
+  - SHORT_SHA=${SHORT_SHA}
   - _JS_BUCKET=${_JS_BUCKET}
+  - _PR_NUMBER=${_PR_NUMBER}
   - _BQ_LOCATION=${_BQ_LOCATION}
 
 timeout: 1800s # 30 minutes
