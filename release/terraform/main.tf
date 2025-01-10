@@ -50,7 +50,42 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
     }
   }
   included_files = ["udfs/**", "stored_procedures/**"]
-  ignored_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**"]
+  ignored_files = ["cloudbuild.yaml", ".*\\.md", "images/*", "tools/**", "udfs/datasketches/**"]
+  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
+
+  substitutions = {
+    _BQ_LOCATION = "${each.value}"
+    _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
+  }
+}
+
+resource "google_cloudbuild_trigger" "datasketches_regional_trigger" {
+  depends_on = [
+    google_storage_bucket.regional_bucket
+  ]
+  for_each = toset(var.bq_regions)
+  name     = "datasketches-udf-regional-trigger-${each.value}"
+  filename = "udfs/datasketches/cloudbuild.yaml"
+
+  github {
+    owner = "GoogleCloudPlatform"
+    name  = "bigquery-utils"
+    dynamic "pull_request" {
+      for_each = var.project == "bqutil-test" ? [1] : []
+      content {
+        branch = "^master$"
+        comment_control = "COMMENTS_ENABLED"
+      }
+    }
+    dynamic "push" {
+      for_each = var.project == "bqutil" ? [1] : []
+      content {
+        branch = "^master$"
+      }
+    }
+  }
+  included_files = ["udfs/datasketches/**"]
+  ignored_files = [".*\\.md"]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   substitutions = {
@@ -144,6 +179,14 @@ resource "google_bigquery_dataset_iam_member" "fn_public_viewers" {
   project    = var.project
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "fn_${replace(each.value, "-", "_")}"
+  role       = "roles/bigquery.dataViewer"
+  member     = "allAuthenticatedUsers"
+}
+
+resource "google_bigquery_dataset_iam_member" "datasketches_public_viewers" {
+  project    = var.project
+  for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
+  dataset_id = "datasketches_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
   member     = "allAuthenticatedUsers"
 }

@@ -1,0 +1,20 @@
+steps:
+###########################################################
+# Deploy datasketches UDFs and run unit tests
+###########################################################
+- name: gcr.io/$PROJECT_ID/bq_udf_ci:infrastructure-public-image-bqutil
+  id: deploy_datasketches_udfs
+  dir: udfs/datasketches
+  entrypoint: bash
+  args:
+  - deploy.sh
+  env:
+  - PROJECT_ID=${PROJECT_ID}
+  - BRANCH_NAME=${BRANCH_NAME}
+  - SHORT_SHA=${SHORT_SHA}
+  - _BQ_DATASET=datasketches
+  - _JS_BUCKET=${_JS_BUCKET}
+  - _PR_NUMBER=${_PR_NUMBER}
+  - _BQ_LOCATION=${_BQ_LOCATION}
+
+timeout: 1800s # 30 minutes
