@@ -13,7 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -eo pipefail
 
 # Remove testing assets
 # Globals:
@@ -44,6 +43,7 @@ function remove_testing_assets(){
 #   None
 ##############################################
 function deploy_udfs_and_run_unit_tests() {
+  set -eo pipefail
   git clone --recursive --single-branch --branch $(cat VERSION.txt) https://github.com/apache/datasketches-bigquery.git
   cd datasketches-bigquery
 
