@@ -2344,7 +2344,7 @@ The [Linear Regression](https://en.wikipedia.org/wiki/Linear_regression), is a l
 ```sql
 DECLARE data ARRAY<STRUCT<X STRING, Y FLOAT64>>;
 set data = [ (5.1,2.5), (5.0,2.0), (5.7,2.6), (6.0,2.2), (5.8,2.6), (5.5,2.3), (6.1,2.8), (5.5,2.5), (6.4,3.2), (5.6,3.0)];
-SELECT `bqutils.fn.linear_regression`(data) AS results;
+SELECT `bqutil.fn.linear_regression`(data) AS results;
 ```
 
 results:
@@ -2364,7 +2364,7 @@ The [chisquare_cdf](https://jstat.github.io/distributions.html#jStat.chisquare.c
 * Output: p FLOAT64
 
 ```sql
-SELECT `bqutils.fn.chisquare_cdf`(.3,2) AS results;
+SELECT `bqutil.fn.chisquare_cdf`(.3,2) AS results;
 ```
 
 results:
@@ -2391,7 +2391,7 @@ SELECT
     50.0  as d
 )
 SELECT
-    `bqutils.fn.p_fisherexact`(a,b,c,d) as pvalue
+    `bqutil.fn.p_fisherexact`(a,b,c,d) as pvalue
 FROM
    mydata
 ```
@@ -2415,7 +2415,7 @@ WITH mydata AS (
     [2, 4, 6, 2, 3, 7, 5, 1.] AS x,
     [8, 10, 11, 14, 20, 18, 19, 9. ] AS y
 )
-SELECT `bqutils.fn.mannwhitneyu`(y, x, 'two-sided') AS test
+SELECT `bqutil.fn.mannwhitneyu`(y, x, 'two-sided') AS test
 FROM mydata
 ```
 
@@ -2438,7 +2438,7 @@ DECLARE pop2 ARRAY<FLOAT64>;
 SET pop1 = [13.3,6.0,20.0,8.0,14.0,19.0,18.0,25.0,16.0,24.0,15.0,1.0,15.0];
 SET pop2 = [22.0,16.0,21.7,21.0,30.0,26.0,12.0,23.2,28.0,23.0] ;
 
-SELECT `bqutils.fn.t_test`(pop1, pop2) AS actual_result_rows;
+SELECT `bqutil.fn.t_test`(pop1, pop2) AS actual_result_rows;
 
 ```
 
@@ -2457,7 +2457,7 @@ Returns the value of x in the cdf of the Normal distribution with parameters mea
 Sample Query:
 
 ```SQL
-SELECT `bqutils.fn.normal_cdf`(1.1, 1.7, 2.0) as normal_cdf;
+SELECT `bqutil.fn.normal_cdf`(1.1, 1.7, 2.0) as normal_cdf;
 ```
 
 Results:
@@ -2475,7 +2475,7 @@ Returns the value of x in the cdf of the Student's T distribution with dof degre
 Sample Query:
 
 ```SQL
-SELECT `bqutils.fn.studentt_cdf`(1.0, 2.0) as studentt_cdf;
+SELECT `bqutil.fn.studentt_cdf`(1.0, 2.0) as studentt_cdf;
 ```
 
 Results:
