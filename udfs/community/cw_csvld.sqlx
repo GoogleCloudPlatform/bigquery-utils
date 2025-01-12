@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 CREATE OR REPLACE FUNCTION ${self()}(text string, comma string, quote string,len INT64)
 RETURNS array<string>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Determine if value exists in json (a string containing a JSON array)."
+)
+AS """
 
     var ret = []
     var index = 0;
