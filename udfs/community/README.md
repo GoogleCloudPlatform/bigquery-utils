@@ -75,6 +75,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_regex_mode](#cw_regex_modemode-string)
 * [cw_regexp_extract](#cw_regexp_extractstr-string-regexp-string)
 * [cw_regexp_extract_all](#cw_regexp_extract_allstr-string-regexp-string)
+* [cw_regexp_extract_all_start_pos](#cw_regexp_extract_all_start_posstr-string-regexp-string-position-int64)
 * [cw_regexp_extract_all_n](#cw_regexp_extract_all_nstr-string-regexp-string-groupn-int64)
 * [cw_regexp_extract_n](#cw_regexp_extract_nstr-string-regexp-string-groupn-int64)
 * [cw_regexp_instr_2](#cw_regexp_instr_2haystack-string-needle-string)
@@ -804,6 +805,16 @@ Finds all occurrences of the regular expression regexp in str and returns the ca
 SELECT bqutil.fn.cw_regexp_extract_all_n('TestStr123456Str789', 'Str.*', 0);
 
 Str123456Str789
+```
+
+### [cw_regexp_extract_all_start_pos(str STRING, regexp STRING, position INT64)](cw_regexp_extract_all_start_pos.sqlx)
+Finds all occurrences of the regular expression regexp in str starting from position. Returns null if either str or regexp is null.
+```sql
+SELECT bqutil.fn.cw_regexp_extract_all_start_pos('TestStr123456Str789', 'Str.*', 2);
+SELECT bqutil.fn.cw_regexp_extract_all_start_pos('TestStr123456Str789', 'Str.*', 12);
+
+Str123456Str789
+Str789
 ```
 
 ### [cw_regexp_extract_n(str STRING, regexp STRING, groupn INT64)](cw_regexp_extract_n.sqlx)
