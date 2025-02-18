@@ -171,7 +171,7 @@ EXECUTE
       CREATE TEMP TABLE _SESSION.text_batch AS
       (SELECT *
           FROM (%s) AS S
-          WHERE NOT EXISTS (SELECT * FROM %s AS T WHERE %s) LIMIT %d)
+          WHERE NOT EXISTS (SELECT * FROM `%s` AS T WHERE %s) LIMIT %d)
     ''',
       ml_query,
       target_table,
