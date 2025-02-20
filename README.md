@@ -12,7 +12,7 @@ BigQuery.
 This repository is broken up into:
 
 *   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
-    *   [Geospatial](/geospatial) - Colab notebook for Geospatial Analytics.
+    *   [Geospatial](/geospatial) - Colab notebooks for Geospatial Analytics.
 *   [Performance Testing](/performance_testing) - Examples for doing performance testing
     *   [JMeter](/performance_testing/jmeter) - Examples for using JMeter to test BigQuery performance
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
