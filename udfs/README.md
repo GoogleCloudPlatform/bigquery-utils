@@ -9,7 +9,8 @@ value.
 
 ## Repo Folder to BigQuery Dataset Mappings
 
-> Note: The UDF datasets listed below reside in US multi-region, but are also available in all other supported BigQuery locations as described in [Using the UDFs](#using-the-udfs) section.
+> ![IMPORTANT] 
+> The UDF datasets listed below reside in US multi-region, but are also available in all other supported BigQuery locations as described in [Using the UDFs](#using-the-udfs) section.
 
 | Repo Folder                                         | BigQuery UDF Dataset                                                                                       | Description                                                                                                                                                                                                                                                                                                                            |
 |-----------------------------------------------------|------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
