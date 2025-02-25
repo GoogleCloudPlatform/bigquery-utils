@@ -62,12 +62,12 @@ In order to use a UDF in your desired location outside of the US multi-region, y
 
 For example, the Teradata `nullifzero` can be referenced in various locations:
 
-```
-bqutil.td_eu.nullifzero()            ## eu multi-region
+```sql
+bqutil.td_eu.nullifzero()            -- eu multi-region
 
-bqutil.td_europe_west1.nullifzero()  ## europe-west1 region
+bqutil.td_europe_west1.nullifzero()  -- europe-west1 region
 
-bqutil.td_asia_south1.nullifzero()   ## asia-south1 region
+bqutil.td_asia_south1.nullifzero()   -- asia-south1 region
 
 ```
 
