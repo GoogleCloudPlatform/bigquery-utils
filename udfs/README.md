@@ -7,7 +7,7 @@ function using another SQL expression or JavaScript. These functions accept
 columns of input and perform actions, returning the result of those actions as a
 value.
 
-## Repo Folder to UDF Dataset Mappings
+## Repo Folder to BigQuery Dataset Mappings
 
 ### [community/](/udfs/community) -> [bqutil.fn](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn)
 
