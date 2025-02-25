@@ -44,7 +44,7 @@ UDFs are available in the [bqutil.or](https://console.cloud.google.com/bigquery?
 Contains community-contributed functions that replicate the behavior of Vertica functions to achieve feature parity in a migration from Vertica to BigQuery. 
 UDFs are available in the [bqutil.ve](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
 
-### [datasketches](/udfs/datasketches/) -> [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches)
+### [datasketches/](/udfs/datasketches/) -> [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches)
 
 Contains open source, high-performance library of stochastic streaming algorithms commonly called "sketches" in the data sciences. Sketches are small, stateful programs that process massive data as a stream and can provide approximate answers, with mathematical guarantees, to computationally difficult queries orders-of-magnitude faster than traditional, exact methods. The source for these UDFs are maintained in the [apache/datasketches-bigquery](https://github.com/apache/datasketches-bigquery)
 repo, but are available in the [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
