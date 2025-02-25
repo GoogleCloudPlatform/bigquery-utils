@@ -63,7 +63,7 @@ The following sections cover a few methods of deploying the UDFs.
 
 ### Deploy with Cloud Build (Recommended)
 
-<details><summary><b>U+1F5D2 Click to expan step-by-step instructions</b></summary>
+<details><summary><b>&#1F5D2 Click to expan step-by-step instructions</b></summary>
 
 1. Authenticate using the Cloud SDK and set the BigQuery project in which you'll
    deploy your UDF(s):
@@ -102,7 +102,7 @@ The following sections cover a few methods of deploying the UDFs.
 
 ### Deploy with your own machine
 
-<details><summary><b>U+1F5D2 Click to expan step-by-step instructions</b></summary>
+<details><summary><b>&#1F5D2 Click to expan step-by-step instructions</b></summary>
 
 Run the following in your machine's terminal to deploy all UDFs in your own
 BigQuery project.
@@ -139,7 +139,7 @@ BigQuery project.
 
 ### Deploy with bq command-line tool or BigQuery Console
 
-<details><summary><b>U+1F5D2 Click to expan step-by-step instructions</b></summary>
+<details><summary><b>&#1F5D2 Click to expan step-by-step instructions</b></summary>
 
 If you want to create the UDFs from this repository using the bq command-line
 tool, then you must make a few modifications to the SQLX files as shown below:
@@ -159,7 +159,7 @@ tool, then you must make a few modifications to the SQLX files as shown below:
 
 ### Using JavaScript UDFs
 
-<details><summary><b>U+1F5D2 Click to expan step-by-step instructions</b></summary>
+<details><summary><b>&#1F5D2 Click to expan step-by-step instructions</b></summary>
 
 When
 creating [JavaScript UDFs](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#javascript-udf-structure)
