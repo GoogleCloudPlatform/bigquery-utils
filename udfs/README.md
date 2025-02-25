@@ -92,11 +92,12 @@ The following sections cover a few methods of deploying the UDFs.
    # Deploy to US
    gcloud builds submit . --config=deploy.yaml --substitutions _PROJECT_ID=YOUR_PROJECT_ID,_BQ_LOCATION=US
    ```
-   > [!NOTE]
-   > Deploy to a different location by setting `_BQ_LOCATION` to your own
-   > desired value.\
-   > [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
-   > for a list of supported locations.
+
+> [!NOTE]
+> Deploy to a different location by setting `_BQ_LOCATION` to your own
+> desired value.\
+> [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
+> for a list of supported locations.
 
 ### Deploy with your own machine
 
@@ -124,6 +125,7 @@ BigQuery project.
    # Deploy to US
    export BQ_LOCATION=US && bash deploy.sh
    ```
+
    > [!NOTE]
    > Deploy to a different location by setting `BQ_LOCATION` to your own
    > desired value.\
