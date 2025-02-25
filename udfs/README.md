@@ -9,45 +9,18 @@ value.
 
 ## Repo Folder to BigQuery Dataset Mappings
 
-### [community/](/udfs/community) -> [bqutil.fn](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn)
+> Note: The UDF datasets listed below reside in US multi-region, but are also available in all other supported BigQuery locations as described in [Using the UDFs](#using-the-udfs) section.
 
-Contains an assortment of community-contributed functions available in the [bqutil.fn](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-
-### [migration/teradata/](/udfs/migration/teradata/) -> [bqutil.td](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std)
-
-Contains community-contributed functions that replicate the behavior of Teradata
-functions to achieve feature parity in a migration from Teradata to BigQuery.
-UDFs are available in the [bqutil.td](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-
-### [migration/redshift/](/udfs/migration/redshift) -> [bqutil.rs](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs)
-
-Contains community-contributed functions that replicate the behavior of Redshift functions to achieve feature parity in a migration from Redshift to BigQuery. 
-UDFs are available in the [bqutil.rs](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-  
-### [migration/snowflake/](/udfs/migration/snowflake) -> [bqutil.sf](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf)
-
-Contains community-contributed functions that replicate the behavior of Snowflake functions to achieve feature parity in a migration from Snowflake to BigQuery. 
-UDFs are available in the [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-
-### [migration/sqlserver/](/udfs/migration/sqlserver) -> [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss)
-
-Contains community-contributed functions that replicate the behavior of SQL Server functions to achieve feature parity in a migration from SQL Server to BigQuery. 
-UDFs are available in the [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-  
-### [migration/oracle/](/udfs/migration/oracle) -> [bqutil.or](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor)
-
-Contains community-contributed functions that replicate the behavior of Oracle functions to achieve feature parity in a migration from Oracle to BigQuery. 
-UDFs are available in the [bqutil.or](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-
-### [migration/vertica/](/udfs/migration/vertica) -> [bqutil.ve](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve)
-
-Contains community-contributed functions that replicate the behavior of Vertica functions to achieve feature parity in a migration from Vertica to BigQuery. 
-UDFs are available in the [bqutil.ve](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
-
-### [datasketches/](/udfs/datasketches/) -> [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches)
-
-Contains open source, high-performance library of stochastic streaming algorithms commonly called "sketches" in the data sciences. Sketches are small, stateful programs that process massive data as a stream and can provide approximate answers, with mathematical guarantees, to computationally difficult queries orders-of-magnitude faster than traditional, exact methods. The source for these UDFs are maintained in the [apache/datasketches-bigquery](https://github.com/apache/datasketches-bigquery)
-repo, but are available in the [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+| Repo Folder                                         | BigQuery UDF Dataset                                                                                       | Description                                                                                                                                                                                                                                                                                                                            |
+|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`community/`](/udfs/community)                     | [`bqutil.fn`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn)                     | Contains an assortment of community-contributed functions.                                                                                                                                                                                                                                                                             |
+| [`migration/teradata/`](/udfs/migration/teradata/)  | [`bqutil.td`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std)                     | Contains community-contributed functions that replicate the behavior of Teradata functions.                                                                                                                                                                                                                                            |
+| [`migration/redshift/`](/udfs/migration/redshift)   | [`bqutil.rs`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs)                     | Contains community-contributed functions that replicate the behavior of Redshift functions.                                                                                                                                                                                                                                            |
+| [`migration/snowflake/`](/udfs/migration/snowflake) | [`bqutil.sf`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf)                     | Contains community-contributed functions that replicate the behavior of Snowflake functions.                                                                                                                                                                                                                                           |
+| [`migration/sqlserver/`](/udfs/migration/sqlserver) | [`bqutil.ss`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss)                     | Contains community-contributed functions that replicate the behavior of SQL Server functions.                                                                                                                                                                                                                                          |
+| [`migration/oracle/`](/udfs/migration/oracle)       | [`bqutil.or`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor)                     | Contains community-contributed functions that replicate the behavior of Oracle functions.                                                                                                                                                                                                                                              |
+| [`migration/vertica/`](/udfs/migration/vertica)     | [`bqutil.ve`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve)                     | Contains community-contributed functions that replicate the behavior of Vertica functions.                                                                                                                                                                                                                                             |
+| [`datasketches/`](/udfs/datasketches/)              | [`bqutil.datasketches`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) | Contains an open source, high-performance library of stochastic streaming algorithms commonly called "sketches". The source for these UDFs are maintained in the apache/datasketches-bigquery repo, but are available in the bqutil.datasketches US multi-region dataset and all other regions as described in Using the UDFs section. |
 
 ## Using the UDFs
 
@@ -68,7 +41,6 @@ bqutil.td_eu.nullifzero()            -- eu multi-region
 bqutil.td_europe_west1.nullifzero()  -- europe-west1 region
 
 bqutil.td_asia_south1.nullifzero()   -- asia-south1 region
-
 ```
 
 Note: Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
@@ -185,7 +157,7 @@ UDF function, that uses the `js-levenshtein-v1.1.6.js` library.
 
 1. Copy the compiled library to your bucket:
    `gsutil cp gs://bqutil-lib/bq_js_libs/js-levenshtein-v1.1.6.js gs://your-bucket`
-2. Give permissions to the library. First, if you don't
+1. Give permissions to the library. First, if you don't
    have [uniform bucket-level access](https://cloud.google.com/storage/docs/using-uniform-bucket-level-access)
    in your bucket, enable
    it: `gsutil uniformbucketlevelaccess set on gs://your-bucket`. Once done give
@@ -195,10 +167,10 @@ UDF function, that uses the `js-levenshtein-v1.1.6.js` library.
    or [project](https://cloud.google.com/sdk/gcloud/reference/projects/add-iam-policy-binding)
    level to a user or
    group: `gsutil iam ch [user|group]:[user|group]@domain.com:roles/storage.objectViewer gs://your_bucket`
-3. Edit the [levenshtein.sql](community/levenshtein.sql) SQL file and replace
+1. Edit the [levenshtein.sql](community/levenshtein.sql) SQL file and replace
    the library path `library="${JS_BUCKET}/js-levenshtein-v1.1.6.js"` with your
    own path `library="gs://your-bucket/js-levenshtein-v1.1.6.js`
-4. Create the SQL UDF passing the previously modified SQL file:
+1. Create the SQL UDF passing the previously modified SQL file:
    `bq query --project_id YOUR_PROJECT_ID --dataset_id YOUR_DATASET_ID --nouse_legacy_sql < levenshtein.sql`
 
 ## Contributing UDFs
