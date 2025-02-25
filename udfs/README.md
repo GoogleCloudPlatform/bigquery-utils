@@ -7,15 +7,47 @@ function using another SQL expression or JavaScript. These functions accept
 columns of input and perform actions, returning the result of those actions as a
 value.
 
-## Community and Migration Functions
+## Repo Folder to UDF Dataset Mappings
 
-The [community](/udfs/community) folder contains community-contributed functions
-that perform some actions in BigQuery. The [migration](/udfs/migration) folder
-contains sub-folders such as [teradata](/udfs/migration/teradata),
-[redshift](/udfs/migration/redshift), [sqlserver](/udfs/migration/sqlserver) and [oracle](/udfs/migration/oracle) which
-contain community-contributed functions that replicate the behavior of
-proprietary functions in other data warehouses. These functions can help you
-achieve feature parity in a migration from another data warehouse to BigQuery.
+### [community/](/udfs/community) -> [bqutil.fn](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn)
+
+Contains an assortment of community-contributed functions available in the [bqutil.fn](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+
+### [migration/teradata/](/udfs/migration/teradata/) -> [bqutil.td](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std)
+
+Contains community-contributed functions that replicate the behavior of Teradata
+functions to achieve feature parity in a migration from Teradata to BigQuery.
+UDFs are available in the [bqutil.td](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+
+### [migration/redshift/](/udfs/migration/redshift) -> [bqutil.rs](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs)
+
+Contains community-contributed functions that replicate the behavior of Redshift functions to achieve feature parity in a migration from Redshift to BigQuery. 
+UDFs are available in the [bqutil.rs](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+  
+### [migration/snowflake/](/udfs/migration/snowflake) -> [bqutil.sf](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf)
+
+Contains community-contributed functions that replicate the behavior of Snowflake functions to achieve feature parity in a migration from Snowflake to BigQuery. 
+UDFs are available in the [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+
+### [migration/sqlserver/](/udfs/migration/sqlserver) -> [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss)
+
+Contains community-contributed functions that replicate the behavior of SQL Server functions to achieve feature parity in a migration from SQL Server to BigQuery. 
+UDFs are available in the [bqutil.ss](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+  
+### [migration/oracle/](/udfs/migration/oracle) -> [bqutil.or](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor)
+
+Contains community-contributed functions that replicate the behavior of Oracle functions to achieve feature parity in a migration from Oracle to BigQuery. 
+UDFs are available in the [bqutil.or](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+
+### [migration/vertica/](/udfs/migration/vertica) -> [bqutil.ve](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve)
+
+Contains community-contributed functions that replicate the behavior of Vertica functions to achieve feature parity in a migration from Vertica to BigQuery. 
+UDFs are available in the [bqutil.ve](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
+
+### [datasketches](/udfs/datasketches/) -> [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches)
+
+Contains open source, high-performance library of stochastic streaming algorithms commonly called "sketches" in the data sciences. Sketches are small, stateful programs that process massive data as a stream and can provide approximate answers, with mathematical guarantees, to computationally difficult queries orders-of-magnitude faster than traditional, exact methods. The source for these UDFs are maintained in the [apache/datasketches-bigquery](https://github.com/apache/datasketches-bigquery)
+repo, but are available in the [bqutil.datasketches](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) US multi-region dataset and all other regions as described in [Using the UDFs](#using-the-udfs) section.
 
 ## Using the UDFs
 
