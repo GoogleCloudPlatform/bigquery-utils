@@ -10,18 +10,18 @@ value.
 ## Repo Folder to BigQuery Dataset Mappings
 
 > [!IMPORTANT]
-> The UDF datasets listed below reside in US multi-region, but are also available in all other supported BigQuery locations as described in [Using the UDFs](#using-the-udfs) section.
+> The UDF datasets listed below reside in US multi-region, but are also available in all other supported BigQuery locations as described in the [Using the UDFs](#using-the-udfs) section.
 
 | Repo Folder                                         | BigQuery UDF Dataset                                                                                       | Description                                                                                                                                                                                                                                                                                                                            |
 |-----------------------------------------------------|------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [`community/`](/udfs/community)                     | [`bqutil.fn`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sfn)                     | Contains an assortment of community-contributed functions.                                                                                                                                                                                                                                                                             |
-| [`migration/teradata/`](/udfs/migration/teradata/)  | [`bqutil.td`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std)                     | Contains community-contributed functions that replicate the behavior of Teradata functions.                                                                                                                                                                                                                                            |
+| [`datasketches/`](/udfs/datasketches/)              | [`bqutil.datasketches`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) | Contains an open source, high-performance library of stochastic streaming algorithms commonly called "sketches". The source for these UDFs are maintained in the apache/datasketches-bigquery repo, but are available in the bqutil.datasketches US multi-region dataset and all other regions as described in Using the UDFs section. |
+| [`migration/oracle/`](/udfs/migration/oracle)       | [`bqutil.or`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor)                     | Contains community-contributed functions that replicate the behavior of Oracle functions.                                                                                                                                                                                                                                              |
 | [`migration/redshift/`](/udfs/migration/redshift)   | [`bqutil.rs`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2srs)                     | Contains community-contributed functions that replicate the behavior of Redshift functions.                                                                                                                                                                                                                                            |
 | [`migration/snowflake/`](/udfs/migration/snowflake) | [`bqutil.sf`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2ssf)                     | Contains community-contributed functions that replicate the behavior of Snowflake functions.                                                                                                                                                                                                                                           |
 | [`migration/sqlserver/`](/udfs/migration/sqlserver) | [`bqutil.ss`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sss)                     | Contains community-contributed functions that replicate the behavior of SQL Server functions.                                                                                                                                                                                                                                          |
-| [`migration/oracle/`](/udfs/migration/oracle)       | [`bqutil.or`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sor)                     | Contains community-contributed functions that replicate the behavior of Oracle functions.                                                                                                                                                                                                                                              |
+| [`migration/teradata/`](/udfs/migration/teradata/)  | [`bqutil.td`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2std)                     | Contains community-contributed functions that replicate the behavior of Teradata functions.                                                                                                                                                                                                                                            |
 | [`migration/vertica/`](/udfs/migration/vertica)     | [`bqutil.ve`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sve)                     | Contains community-contributed functions that replicate the behavior of Vertica functions.                                                                                                                                                                                                                                             |
-| [`datasketches/`](/udfs/datasketches/)              | [`bqutil.datasketches`](https://console.cloud.google.com/bigquery?ws=!1m4!1m3!3m2!1sbqutil!2sdatasketches) | Contains an open source, high-performance library of stochastic streaming algorithms commonly called "sketches". The source for these UDFs are maintained in the apache/datasketches-bigquery repo, but are available in the bqutil.datasketches US multi-region dataset and all other regions as described in Using the UDFs section. |
 
 ## Using the UDFs
 
@@ -47,9 +47,6 @@ bqutil.td_asia_south1.nullifzero()   -- asia-south1 region
 > [!NOTE]  
 > Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
 
-
-![Alt text](/images/public_udf_architecture.png?raw=true "Public UDFs")
-
 ## Deploying the UDFs
 
 All UDFs within this repository are maintained in SQLX format. This format is
@@ -64,7 +61,7 @@ The Dataform CLI is a useful tool for deploying the UDFs because it:
 
 The following sections cover a few methods of deploying the UDFs. 
 
-### Deploy with Cloud Build (Recommended)
+<details><summary><b>&#128269; Deploy with Cloud Build (Recommended)</b></summary>
 
 1. Authenticate using the Cloud SDK and set the BigQuery project in which you'll
    deploy your UDF(s):
@@ -98,6 +95,8 @@ The following sections cover a few methods of deploying the UDFs.
 > desired value.\
 > [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
 > for a list of supported locations.
+
+</details>
 
 ### Deploy with your own machine
 
@@ -180,6 +179,8 @@ UDF function, that uses the `js-levenshtein-v1.1.6.js` library.
    `bq query --project_id YOUR_PROJECT_ID --dataset_id YOUR_DATASET_ID --nouse_legacy_sql < levenshtein.sql`
 
 ## Contributing UDFs
+
+![Alt text](/images/public_udf_architecture.png?raw=true "Public UDFs")
 
 If you are interested in contributing UDFs to this repository, please see the
 [instructions](/udfs/CONTRIBUTING.md) to get started.
