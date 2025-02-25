@@ -61,7 +61,9 @@ The Dataform CLI is a useful tool for deploying the UDFs because it:
 
 The following sections cover a few methods of deploying the UDFs. 
 
-<details><summary><b>&#128269; Deploy with Cloud Build (Recommended)</b></summary>
+### Deploy with Cloud Build (Recommended)
+
+<details><summary><b> Click to expand step-by-step instructions</b></summary>
 
 1. Authenticate using the Cloud SDK and set the BigQuery project in which you'll
    deploy your UDF(s):
@@ -100,6 +102,8 @@ The following sections cover a few methods of deploying the UDFs.
 
 ### Deploy with your own machine
 
+<details><summary><b> Click to expand step-by-step instructions</b></summary>
+
 Run the following in your machine's terminal to deploy all UDFs in your own
 BigQuery project.
 
@@ -131,7 +135,11 @@ BigQuery project.
 > [Click here](https://cloud.google.com/bigquery/docs/locations#supported_regions)
 > for a list of supported locations.
 
+</details>
+
 ### Deploy with bq command-line tool or BigQuery Console
+
+<details><summary><b> Click to expand step-by-step instructions</b></summary>
 
 If you want to create the UDFs from this repository using the bq command-line
 tool, then you must make a few modifications to the SQLX files as shown below:
@@ -147,7 +155,11 @@ tool, then you must make a few modifications to the SQLX files as shown below:
       ```
     * BigQuery Console: Just paste the SQL UDF body in the console and execute.
 
+</details>
+
 ### Using JavaScript UDFs
+
+<details><summary><b> Click to expand step-by-step instructions</b></summary>
 
 When
 creating [JavaScript UDFs](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions#javascript-udf-structure)
@@ -177,6 +189,8 @@ UDF function, that uses the `js-levenshtein-v1.1.6.js` library.
    own path `library="gs://your-bucket/js-levenshtein-v1.1.6.js`
 1. Create the SQL UDF passing the previously modified SQL file:
    `bq query --project_id YOUR_PROJECT_ID --dataset_id YOUR_DATASET_ID --nouse_legacy_sql < levenshtein.sql`
+
+</details>
 
 ## Contributing UDFs
 
