@@ -128,7 +128,9 @@ BigQuery project.
    # Deploy to US
    export BQ_LOCATION=US && bash deploy.sh
    ```
-
+<div class="alert alert-important">
+<p>Hello does this work</p>
+</div>
 > [!IMPORTANT]
 > Deploy to a different location by setting `BQ_LOCATION` to your own
 > desired value.\
