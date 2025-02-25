@@ -32,7 +32,7 @@ publicly shared datasets. Queries can then reference the shared UDFs in the US m
 UDFs within this repository are also deployed publicly into every other region that [BigQuery supports](https://cloud.google.com/bigquery/docs/locations). 
 In order to use a UDF in your desired location outside of the US multi-region, you can reference it via a dataset with a regional suffix:
 
-`bqutil.<dataset>_<region>.<function>()`.
+`bqutil.<dataset>_<region>.<function>()`
 
 For example, the Teradata `nullifzero` can be referenced in various locations:
 
@@ -44,7 +44,8 @@ bqutil.td_europe_west1.nullifzero()  -- europe-west1 region
 bqutil.td_asia_south1.nullifzero()   -- asia-south1 region
 ```
 
-Note: Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
+> [!NOTE]  
+> Region suffixes added to dataset names replace `-` with `_` in order to comply with BigQuery dataset naming rules.
 
 
 ![Alt text](/images/public_udf_architecture.png?raw=true "Public UDFs")
