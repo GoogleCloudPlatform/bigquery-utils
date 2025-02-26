@@ -85,7 +85,7 @@ resource "google_cloudbuild_trigger" "datasketches_regional_trigger" {
     }
   }
   included_files = ["udfs/datasketches/**"]
-  ignored_files = [".*\\.md"]
+  ignored_files = ["**/*.md"]
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   substitutions = {
