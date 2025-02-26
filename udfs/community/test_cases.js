@@ -3558,4 +3558,158 @@ generate_udaf_test("cw_mode_timestamp",
     expected_output: `TIMESTAMP "2024-10-9T12:34:56.789"`
   }
 );
+generate_udf_test("cw_regexp_extract_all_start_pos", [
+  {
+    inputs: [`"abcdefg"`, `"c"`, `CAST(1 as INT64)`],
+    expected_output: `[ "c" ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"c"`, `CAST(2 as INT64)`],
+    expected_output: `[ "c" ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"c"`, `CAST(3 as INT64)`],
+    expected_output: `[ "c" ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"c"`, `CAST(4 as INT64)`],
+    expected_output: '[ ]'
+  },
+  {
+    inputs: [`"abababab"`, `"ab"`, `CAST(1 as INT64)`],
+    expected_output: `[ "ab", "ab", "ab", "ab" ]`
+  },
+  {
+    inputs: [`"abababab"`, `"ab"`, `CAST(2 as INT64)`],
+    expected_output: `[ "ab", "ab", "ab" ]`
+  },
+  {
+    inputs: [`"abababab"`, `"ab"`, `CAST(3 as INT64)`],
+    expected_output: `[ "ab", "ab", "ab" ]`
+  },
+  {
+    inputs: [`"abababab"`, `"ab"`, `CAST(4 as INT64)`],
+    expected_output: `[ "ab", "ab" ]`
+  },
+  {
+    inputs: [`"abababab"`, `"ab"`, `CAST(50 as INT64)`],
+    expected_output: `[ ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"g"`, `CAST(7 as INT64)`],
+    expected_output: `[ "g" ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"g"`, `CAST(6 as INT64)`],
+    expected_output: `[ "g" ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"g"`, `CAST(8 as INT64)`],
+    expected_output: `[ ]`
+  },
+  {
+    inputs: [`"abcdefg"`, `"z"`, `CAST(8 as INT64)`],
+    expected_output: `[ ]`
+  },
+  {
+    inputs: [`"aaaaaa"`, `"aa"`, `CAST(1 as INT64)`],
+    expected_output: `[ "aa", "aa", "aa" ]`
+  },
+  {
+    inputs: [`"aaaaaa"`, `"aa"`, `CAST(2 as INT64)`],
+    expected_output: `[ "aa", "aa" ]`
+  },
+  {
+    inputs: [`"aaaaaa"`, `"aa"`, `CAST(3 as INT64)`],
+    expected_output: `[ "aa", "aa" ]`
+  },
+  {
+    inputs: [`"aaaaaa"`, `"aa"`, `CAST(40 as INT64)`],
+    expected_output: `[ ]`
+  },
+  {
+    inputs: [`"abbcccdddde"`, `"c+"`, `CAST(1 as INT64)`],
+    expected_output: `[ "ccc" ]`
+  },
+  {
+    inputs: [`"abbcccdddde"`, `"c+"`, `CAST(4 as INT64)`],
+    expected_output: `[ "ccc" ]`
+  },
+  {
+    inputs: [`"abbcccdddde"`, `"d+"`, `CAST(1 as INT64)`],
+    expected_output: `[ "dddd" ]`
+  },
+  {
+    inputs: [`"abbcccdddde"`, `"d+"`, `CAST(7 as INT64)`],
+    expected_output: `[ "dddd" ]`
+  },
+  {
+    inputs: [`"abbcccdddde"`, `"d+"`, `CAST(80 as INT64)`],
+    expected_output: `[ ]`
+  },
+  {
+    inputs: [`"abc123def456"`, `"[0-9]+"`, `CAST(1 as INT64)`],
+    expected_output: `[ "123", "456" ]`
+  },
+  {
+    inputs: [`"abc123def456"`, `"[0-9]+"`, `CAST(4 as INT64)`],
+    expected_output: `[ "123", "456" ]`
+  },
+  {
+    inputs: [`"abc123def456"`, `"[0-9]+"`, `CAST(7 as INT64)`],
+    expected_output: `[ "456" ]`
+  },
+  {
+    inputs: [`NULL`, `"a"`, `CAST(1 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`NULL`, `"[0-9]+"`, `CAST(5 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`NULL`, `"abc"`, `CAST(10 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"abc"`, `NULL`, `CAST(1 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"12345"`, `NULL`, `CAST(3 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"xyz"`, `NULL`, `CAST(7 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"abc"`, `"a"`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"123"`, `""`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"test"`, `"t"`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`NULL`, `NULL`, `CAST(1 as INT64)`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`NULL`, `"a"`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`"abc"`, `NULL`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+  {
+    inputs: [`NULL`, `NULL`, `NULL`],
+    expected_output: `CAST(NULL AS ARRAY<STRING>)`
+  },
+]);
 
