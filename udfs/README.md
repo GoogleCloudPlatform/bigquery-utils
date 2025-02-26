@@ -61,7 +61,7 @@ The Dataform CLI is a useful tool for deploying the UDFs because it:
 
 The following sections cover a few methods of deploying the UDFs. 
 
-### Deploy with BigQuery SQL (Recommended)
+### Deploy with BigQuery SQL (Fastest)
 
 <details><summary><b>&#128466; Click to expand step-by-step instructions</b></summary>
 
@@ -139,7 +139,7 @@ END FOR;
 
 </details>
 
-### Deploy with Cloud Build (Recommended)
+### Deploy with Cloud Build
 
 <details><summary><b>&#128466; Click to expand step-by-step instructions</b></summary>
 
