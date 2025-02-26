@@ -215,26 +215,6 @@ BigQuery project.
 
 </details>
 
-### Deploy with bq command-line tool or BigQuery Console
-
-<details><summary><b>&#128466; Click to expand step-by-step instructions</b></summary>
-
-If you want to create the UDFs from this repository using the bq command-line
-tool, then you must make a few modifications to the SQLX files as shown below:
-
-1. Remove the first line `config { hasOutput: true }` in each SQLX file.
-1. Replace any instance of `${self()}` with the fully qualified UDF name.
-1. Replace any instance of `${ref(SOME_UDF_NAME)}` with the fully qualified UDF
-   name of `SOME_UDF_NAME`.
-1. Deploy the UDF using either of the following:
-    * bq command-line tool:
-      ```bash
-      bq query --nouse_legacy_sql < UDF_SQL_FILE_NAME.sqlx`
-      ```
-    * BigQuery Console: Just paste the SQL UDF body in the console and execute.
-
-</details>
-
 ### Using JavaScript UDFs
 
 <details><summary><b>&#128466; Click to expand step-by-step instructions</b></summary>
