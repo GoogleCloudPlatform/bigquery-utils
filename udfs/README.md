@@ -86,7 +86,7 @@ SET @@location="us-east4";
 DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
 DECLARE YOUR_REGION STRING DEFAULT(@@location);
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE fn_udf_ddls ARRAY<STRING>;
@@ -116,7 +116,7 @@ SET @@location="us-east4";
 DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
 DECLARE YOUR_REGION STRING DEFAULT(@@location);
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE cw_udf_ddls ARRAY<STRING>;
