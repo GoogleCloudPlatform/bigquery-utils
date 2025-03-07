@@ -14,6 +14,7 @@ This repository is broken up into:
 *   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
     *   [Geospatial](/dashboards/geospatial) - Colab notebooks for Geospatial Analytics.
     *   [System Tables](/dashboards/system_tables) - Looker Studio Dashboards built on BigQuery's INFORMATION_SCHEMA metadata views to understand organization's slot and reservation utilization, job execution, and job errors.
+*   [Notebooks](/notebooks) - Colab notebooks for various BigQuery related use cases.
 *   [Performance Testing](/performance_testing) - Examples for doing performance testing
     *   [JMeter](/performance_testing/jmeter) - Examples for using JMeter to test BigQuery performance
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
