@@ -1136,7 +1136,7 @@ generate_udf_test("azimuth_to_geog_point", [
       `CAST(312.9 AS FLOAT64)`,
       `CAST(1066.6 AS FLOAT64)`,
     ],
-    expected_output: `ST_GEOGPOINT(81.4417483906444, 39.9606210457152)`,
+    expected_output: `ST_GEOGPOINT(81.4424537666577, 39.9606895127128)`,
   },
   {
     inputs: [

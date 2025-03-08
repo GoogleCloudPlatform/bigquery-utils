@@ -15,8 +15,19 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64 ) AS (
-  ST_GeogPOINT(57.2958*(input_lon*(3.14159/180)+(atan2(sin(azimuth * (3.14159/180)) * sin(distance * 1.61/6378.1) * cos(input_lat* (3.14159/180)),cos(distance * 1.61/6378.1)-sin(input_lat * (3.14159/180)) * sin(57.2958*(asin(sin(input_lat * (3.14159/180)) * cos(distance * 1.61/6378.1) + cos(input_lat * (3.14159/180)) * sin(distance * 1.61/6378.1) * cos(azimuth*(3.14159/180)))))))), 
-
-57.2958*(asin(sin(input_lat * (3.14159/180)) * cos(distance * 1.61/6378.1) + cos(input_lat * (3.14159/180)) * sin(distance * 1.61/6378.1) * cos(azimuth*(3.14159/180)))))
-);
+-- Forms BigQuery GEOGRAPHY point (latitude and longitude) from input latitude, longitude, azimuth, and distance (in miles)
+CREATE OR REPLACE FUNCTION ${self()}(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)
+RETURNS GEOGRAPHY
+OPTIONS (
+  description="Forms BigQuery GEOGRAPHY point (latitude and longitude) from input latitude, longitude, azimuth, and distance (in miles)"
+)
+AS ((
+  with variables as (
+    select acos(-1) as pi, 180/acos(-1) as rad2deg, acos(-1)/180 as deg2rag, 6378.1 as earth_radius_km, 1.61 as miles_in_km
+  )
+  select ST_GeogPOINT(
+    rad2deg*(input_lon * deg2rag + (atan2(sin(azimuth * deg2rag) * sin(distance * miles_in_km/earth_radius_km) * cos(input_lat * deg2rag), cos(distance * miles_in_km/earth_radius_km) - sin(input_lat * deg2rag) * sin(rad2deg * (asin(sin(input_lat * deg2rag) * cos(distance * miles_in_km/earth_radius_km) + cos(input_lat * deg2rag) * sin(distance * miles_in_km/earth_radius_km) * cos(azimuth * deg2rag))))))), 
+    rad2deg*(asin(sin(input_lat * deg2rag) * cos(distance * miles_in_km/earth_radius_km) + cos(input_lat * deg2rag) * sin(distance * miles_in_km/earth_radius_km) * cos(azimuth * deg2rag)))
+  )
+  from variables
+));
