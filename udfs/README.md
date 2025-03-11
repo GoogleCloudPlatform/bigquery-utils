@@ -7,6 +7,12 @@ function using another SQL expression or JavaScript. These functions accept
 columns of input and perform actions, returning the result of those actions as a
 value.
 
+> [!CAUTION]
+> UDFs in this repo are hosted in `bqutil` datasets to help you easily test and
+> demo their functionality. Do not directly reference any `bqutil` UDFs in your
+> production environment as updates to this repo may result in breaking changes.
+> Only the latest version of each UDF is deployed to the `bqutil` datasets. 
+
 ## Repo Folder to BigQuery Dataset Mappings
 
 > [!IMPORTANT]
