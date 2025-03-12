@@ -8,10 +8,14 @@ columns of input and perform actions, returning the result of those actions as a
 value.
 
 > [!CAUTION]
+> Do not directly reference any `bqutil` UDFs in your production environment.
+> You should instead [deploy these UDFs](#deploying-the-udfs) into your 
+> production environment. 
+> 
 > UDFs in this repo are hosted in `bqutil` datasets to help you easily test and
-> demo their functionality. Do not directly reference any `bqutil` UDFs in your
-> production environment as updates to this repo may result in breaking changes.
-> Only the latest version of each UDF is deployed to the `bqutil` datasets. 
+> demo their functionality. Any updates to UDFs in this repo may result in 
+> breaking changes since only the latest version of each UDF is deployed to the
+> `bqutil` datasets. 
 
 ## Repo Folder to BigQuery Dataset Mappings
 
