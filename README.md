@@ -28,6 +28,7 @@ This repository is broken up into:
 *   [UDFs](/udfs) - User-defined functions for common usage as well as migration
     *   [community](/udfs/community) - Community contributed user-defined
         functions
+    *   [datasketches](/udfs/datasketches) - UDFs deployed from the latest release of [Apache Datasketches for BigQuery](https://github.com/apache/datasketches-bigquery)
     *   [migration](/udfs/migration) - UDFs which mimic the behavior of
         proprietary functions in the following databases:
         *   [netezza](/udfs/migration/netezza)
