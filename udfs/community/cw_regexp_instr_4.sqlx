@@ -16,7 +16,10 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, p INT64, o INT64) RETURNS INT64
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="""Implements regexp_instr/4 (haystack, regexp, p, o)."""
+) AS """
   if (haystack == null || regexp == null || o == null) return null;
   p = p -1;
   o = o -1;
