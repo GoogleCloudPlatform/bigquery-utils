@@ -109,10 +109,10 @@ EXECUTE IMMEDIATE
       )
    INTO fn_udf_ddls;
 -- Creates the fn dataset within your project
-EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
+EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS `" || YOUR_PROJECT_ID || "`.fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR fn_udf_ddl IN (SELECT * FROM UNNEST(fn_udf_ddls) ddl)
-DO EXECUTE IMMEDIATE REPLACE(REPLACE(fn_udf_ddl.ddl, "bqutil", YOUR_PROJECT_ID), "CREATE ", "CREATE OR REPLACE ");
+DO EXECUTE IMMEDIATE REPLACE(REPLACE(fn_udf_ddl.ddl, "bqutil", "`" || YOUR_PROJECT_ID || "`"), "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
@@ -140,10 +140,10 @@ EXECUTE IMMEDIATE
       )
    INTO cw_udf_ddls;
 -- Creates the fn dataset within your project
-EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
+EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS `" || YOUR_PROJECT_ID || "`.fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR cw_udf_ddl IN (SELECT * FROM UNNEST(cw_udf_ddls) ddl)
-DO EXECUTE IMMEDIATE REPLACE(REPLACE(cw_udf_ddl.ddl, "bqutil", YOUR_PROJECT_ID), "CREATE ", "CREATE OR REPLACE ");
+DO EXECUTE IMMEDIATE REPLACE(REPLACE(cw_udf_ddl.ddl, "bqutil", "`" || YOUR_PROJECT_ID || "`"), "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
