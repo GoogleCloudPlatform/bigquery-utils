@@ -119,7 +119,7 @@ DO EXECUTE IMMEDIATE
     REPLACE(
       REPLACE(
         fn_udf_ddl.ddl,
-        "gs://bqutil-lib"|| IF(@@location <> "US", "-" || @@location, ""), YOUR_JS_BUCKET),
+        "gs://bqutil-lib"|| IF(@@location <> "US", "-" || @@location, "/bq_js_libs"), YOUR_JS_BUCKET),
       "FUNCTION bqutil.", "FUNCTION `"||YOUR_PROJECT_ID||"`."),
     "CREATE ", "CREATE OR REPLACE ");
 END FOR;
