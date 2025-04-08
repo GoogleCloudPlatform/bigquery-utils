@@ -160,10 +160,10 @@ EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || 
 FOR cw_udf_ddl IN (SELECT * FROM UNNEST(cw_udf_ddls) ddl)
 DO EXECUTE IMMEDIATE 
   REPLACE(
-   REPLACE(
+    REPLACE(
       cw_udf_ddl.ddl,
       "FUNCTION bqutil.", "FUNCTION " || YOUR_PROJECT_ID || "."),
-   "CREATE ", "CREATE OR REPLACE ");
+    "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
