@@ -104,7 +104,7 @@ DECLARE YOUR_JS_BUCKET STRING DEFAULT("gs://YOUR_BUCKET");
 DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
 DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE fn_udf_ddls ARRAY<STRING>;
@@ -125,7 +125,7 @@ DO EXECUTE IMMEDIATE
     REPLACE(
       REPLACE(
         fn_udf_ddl.ddl,
-        "gs://bqutil-lib"|| IF(@@location <> "US", "-" || @@location, "/bq_js_libs"), YOUR_JS_BUCKET),
+        "gs://bqutil-lib"|| IF(YOUR_REGION <> "us", "-" || @@location, "/bq_js_libs"), YOUR_JS_BUCKET),
       "FUNCTION bqutil.", "FUNCTION `"||YOUR_PROJECT_ID||"`."),
     "CREATE ", "CREATE OR REPLACE ");
 END FOR;
@@ -139,9 +139,9 @@ SET @@location="us-east4";
  * DO NOT EDIT SQL BELOW THIS LINE
  **********************************/
 DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
-DECLARE YOUR_REGION STRING DEFAULT(@@location);
+DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE cw_udf_ddls ARRAY<STRING>;
