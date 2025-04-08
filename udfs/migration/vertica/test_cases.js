@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const {generate_udf_test} = unit_test_utils;
+const {generate_udf_test} = require("bigquery_udf_unit_testing/includes/unit_test_utils");
 
 generate_udf_test("lowerb", [
     {
