@@ -101,7 +101,7 @@ DECLARE YOUR_JS_BUCKET STRING DEFAULT("gs://YOUR_BUCKET");
 /**********************************
  * DO NOT EDIT SQL BELOW THIS LINE
  **********************************/
-DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
+DECLARE YOUR_PROJECT_ID STRING DEFAULT("`"||@@project_id||"`");
 DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
   IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
@@ -117,7 +117,7 @@ EXECUTE IMMEDIATE
       )
    INTO fn_udf_ddls;
 -- Creates the fn dataset within your project
-EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS `" || YOUR_PROJECT_ID || "`.fn" || region_suffix;
+EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR fn_udf_ddl IN (SELECT * FROM UNNEST(fn_udf_ddls) ddl)
 DO EXECUTE IMMEDIATE 
@@ -126,7 +126,7 @@ DO EXECUTE IMMEDIATE
       REPLACE(
         fn_udf_ddl.ddl,
         "gs://bqutil-lib"|| IF(YOUR_REGION <> "us", "-" || @@location, "/bq_js_libs"), YOUR_JS_BUCKET),
-      "FUNCTION bqutil.", "FUNCTION `"||YOUR_PROJECT_ID||"`."),
+      "FUNCTION bqutil.", "FUNCTION " || YOUR_PROJECT_ID || "."),
     "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
@@ -138,7 +138,7 @@ SET @@location="us-east4";
 /**********************************
  * DO NOT EDIT SQL BELOW THIS LINE
  **********************************/
-DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
+DECLARE YOUR_PROJECT_ID STRING DEFAULT("`"||@@project_id||"`");
 DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
   IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
@@ -155,10 +155,15 @@ EXECUTE IMMEDIATE
       )
    INTO cw_udf_ddls;
 -- Creates the fn dataset within your project
-EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS `" || YOUR_PROJECT_ID || "`.fn" || region_suffix;
+EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR cw_udf_ddl IN (SELECT * FROM UNNEST(cw_udf_ddls) ddl)
-DO EXECUTE IMMEDIATE REPLACE(REPLACE(cw_udf_ddl.ddl, "bqutil", "`" || YOUR_PROJECT_ID || "`"), "CREATE ", "CREATE OR REPLACE ");
+DO EXECUTE IMMEDIATE 
+  REPLACE(
+   REPLACE(
+      cw_udf_ddl.ddl,
+      "FUNCTION bqutil.", "FUNCTION " || YOUR_PROJECT_ID || "."),
+   "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
