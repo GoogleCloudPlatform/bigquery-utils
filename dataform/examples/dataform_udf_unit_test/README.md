@@ -21,7 +21,7 @@
     ```
 1. Generate the Dataform credentials file by running the following:
    ```bash
-   dataform init-creds bigquery
+   dataform init-creds
    ```
 1. Execute the unit tests by running the following:
     ```bash
@@ -45,7 +45,7 @@
    ```bash
    cp includes/unit_test_utils.js $DATAFORM_DIR/includes/
    cd $DATAFORM_DIR
-   dataform init-creds bigquery
+   dataform init-creds
    ```
 1. Create a new test_cases.js file:
    ```bash
