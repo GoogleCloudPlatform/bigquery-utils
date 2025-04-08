@@ -81,7 +81,13 @@ Run the following `gcloud` command to copy the JavaScript files hosted in the
 `bqutil` project's Cloud Storage bucket to your own bucket:
 
 ```bash
-gcloud storage cp gs://bqutil-lib/bq_js_libs/* gs://YOUR_BUCKET/bq_js_libs
+# For US multi-region us the following command
+gcloud storage cp gs://bqutil-lib/bq_js_libs/* gs://YOUR_BUCKET/
+# For other regions, modify the command to use the appropriate bucket.
+# Examples shown below:
+#
+# gcloud storage cp gs://bqutil-lib-eu/* gs://YOUR_BUCKET/
+# gcloud storage cp gs://bqutil-lib-asia-east2/* gs://YOUR_BUCKET/
 ```
 
 Run the following SQL script in your BigQuery console to copy all `bqutil.fn` UDFs into
