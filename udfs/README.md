@@ -81,7 +81,13 @@ Run the following `gcloud` command to copy the JavaScript files hosted in the
 `bqutil` project's Cloud Storage bucket to your own bucket:
 
 ```bash
-gcloud storage cp gs://bqutil-lib/bq_js_libs/* gs://YOUR_BUCKET/bq_js_libs
+# For US multi-region us the following command
+gcloud storage cp gs://bqutil-lib/bq_js_libs/* gs://YOUR_BUCKET/
+# For other regions, modify the command to use the appropriate bucket.
+# Examples shown below:
+#
+# gcloud storage cp gs://bqutil-lib-eu/* gs://YOUR_BUCKET/
+# gcloud storage cp gs://bqutil-lib-asia-east2/* gs://YOUR_BUCKET/
 ```
 
 Run the following SQL script in your BigQuery console to copy all `bqutil.fn` UDFs into
@@ -90,13 +96,15 @@ your own project:
 ```sql
 -- SET YOUR DESIRED BQ REGION BELOW
 SET @@location="us-east4";
+-- SET YOUR CLOUD STORAGE BUCKET BELOW
+DECLARE YOUR_JS_BUCKET STRING DEFAULT("gs://YOUR_BUCKET");
 /**********************************
  * DO NOT EDIT SQL BELOW THIS LINE
  **********************************/
-DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
-DECLARE YOUR_REGION STRING DEFAULT(@@location);
+DECLARE YOUR_PROJECT_ID STRING DEFAULT("`"||@@project_id||"`");
+DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE fn_udf_ddls ARRAY<STRING>;
@@ -112,7 +120,14 @@ EXECUTE IMMEDIATE
 EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR fn_udf_ddl IN (SELECT * FROM UNNEST(fn_udf_ddls) ddl)
-DO EXECUTE IMMEDIATE REPLACE(REPLACE(fn_udf_ddl.ddl, "bqutil", YOUR_PROJECT_ID), "CREATE ", "CREATE OR REPLACE ");
+DO EXECUTE IMMEDIATE 
+  REPLACE(
+    REPLACE(
+      REPLACE(
+        fn_udf_ddl.ddl,
+        "gs://bqutil-lib"|| IF(YOUR_REGION <> "us", "-" || @@location, "/bq_js_libs"), YOUR_JS_BUCKET),
+      "FUNCTION bqutil.", "FUNCTION " || YOUR_PROJECT_ID || "."),
+    "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
@@ -123,10 +138,10 @@ SET @@location="us-east4";
 /**********************************
  * DO NOT EDIT SQL BELOW THIS LINE
  **********************************/
-DECLARE YOUR_PROJECT_ID STRING DEFAULT(@@project_id);
-DECLARE YOUR_REGION STRING DEFAULT(@@location);
+DECLARE YOUR_PROJECT_ID STRING DEFAULT("`"||@@project_id||"`");
+DECLARE YOUR_REGION STRING DEFAULT(LOWER(@@location));
 DECLARE region_suffix STRING DEFAULT(
-  IF(YOUR_REGION="US", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
+  IF(YOUR_REGION="us", "", "_" || REPLACE(YOUR_REGION, "-", "_"))
 );
 -- Get regional UDFs
 DECLARE cw_udf_ddls ARRAY<STRING>;
@@ -143,7 +158,12 @@ EXECUTE IMMEDIATE
 EXECUTE IMMEDIATE "CREATE SCHEMA IF NOT EXISTS " || YOUR_PROJECT_ID || ".fn" || region_suffix;
 -- Creates all cw_* UDFs within your new fn dataset
 FOR cw_udf_ddl IN (SELECT * FROM UNNEST(cw_udf_ddls) ddl)
-DO EXECUTE IMMEDIATE REPLACE(REPLACE(cw_udf_ddl.ddl, "bqutil", YOUR_PROJECT_ID), "CREATE ", "CREATE OR REPLACE ");
+DO EXECUTE IMMEDIATE 
+  REPLACE(
+    REPLACE(
+      cw_udf_ddl.ddl,
+      "FUNCTION bqutil.", "FUNCTION " || YOUR_PROJECT_ID || "."),
+    "CREATE ", "CREATE OR REPLACE ");
 END FOR;
 ```
 
