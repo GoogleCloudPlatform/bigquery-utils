@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const { generate_udf_test, generate_udaf_test } = unit_test_utils;
+const { generate_udf_test, generate_udaf_test } = require("bigquery_udf_unit_testing/includes/unit_test_utils");
 generate_udf_test("int", [
   {
     inputs: [`"-1"`],
