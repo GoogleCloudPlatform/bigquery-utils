@@ -10,8 +10,13 @@
 
 
 -- Permissions needed
--- * To run this query https://cloud.google.com/bigquery/docs/information-schema-table-storage-by-organization#required_permissions
--- * To run the ALTER SCHEMA DDL https://cloud.google.com/bigquery/docs/updating-datasets#required_permissions
+-- * To run this query
+--  * Permissions to run queries in the current project
+--  * Permissions to create a table and write on it in the configured work dataset
+--  * https://cloud.google.com/bigquery/docs/information-schema-table-storage-by-organization#required_permissions
+--  * https://cloud.google.com/bigquery/docs/information-schema-datasets-schemata-options#before_you_begin
+-- * To run the ALTER SCHEMA DDL
+--  * https://cloud.google.com/bigquery/docs/updating-datasets#required_permissions
 
 
 -- REMEMBER: Put here the prices of the region of interest, current values are for the US
@@ -46,7 +51,7 @@ FOR record IN (
     SELECT
       catalog_name AS project_name,
       schema_name AS dataset_name,
-    FROM `''' || record.project_id || '''.region-us.INFORMATION_SCHEMA.SCHEMATA_OPTIONS`
+    FROM `''' || record.project_id || '''.region-us.INFORMATION_SCHEMA.SCHEMATA_OPTIONS` -- REMEMBER: Change here to the region of interest
     WHERE 
       option_name = "storage_billing_model" 
       AND option_value = 'PHYSICAL'
