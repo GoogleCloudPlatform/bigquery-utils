@@ -15,7 +15,6 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Converts a value to valid escaped XML string */
 CREATE OR REPLACE FUNCTION ${self()}(xml STRING, xpath STRING) RETURNS STRING
 LANGUAGE python
 OPTIONS (

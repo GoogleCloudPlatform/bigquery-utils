@@ -15,13 +15,10 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/*
- Converts a value to valid escaped XML string.
- Uses simple rule to escape `&,<,>,',",\t,\n,\r` special characters.
-*/
 CREATE OR REPLACE FUNCTION ${self()}(v ANY TYPE) RETURNS STRING
 OPTIONS (
-    description="Converts a value to valid escaped XML string."
+    description="""Converts a value to valid escaped XML string.
+Uses simple rule to escape `&,<,>,',",\t,\n,\r` special characters."""
 )
 AS (
   REPLACE(

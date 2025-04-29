@@ -15,16 +15,13 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/*
- Returns XML element with given tag name and data.
- For example, cw_xml_element('v', array['x', '&amp;', 'y']) will be converted to
- "<v>x&amp;y</v>".
-
- All the string values in data must be XML escaped.
- */
 CREATE OR REPLACE FUNCTION ${self()}(name STRING, data ARRAY<STRING>) RETURNS STRING
 OPTIONS (
-    description="Returns XML element with given tag name and data."
+    description="""Returns XML element with given tag name and data.
+For example, cw_xml_element('v', array['x', '&amp;', 'y']) will be converted to
+"<v>x&amp;y</v>".
+
+All the string values in data must be XML escaped."""
 )
 AS (
   (

@@ -15,18 +15,15 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/*
- Returns string representation of XML element with given tag name, attributes and data.
- For example, cw_xml_element('v', array[struct('a', 42)], array['x', '&amp;', 'y'])
- will be converted to '<v a="42">x&amp;y</v>'.
-
- If a particular attribute name is null then entire (name,value) pair is not serialized.
-
- All the string values in data must be XML escaped.
- */
 CREATE OR REPLACE FUNCTION ${self()}(name STRING, attributes ARRAY<STRUCT<name STRING, value STRING>>, data ARRAY<STRING>) RETURNS STRING
 OPTIONS (
-    description="Returns string representation of XML element with given tag name, attributes and data."
+    description="""Returns string representation of XML element with given tag name, attributes and data.
+For example, cw_xml_element('v', array[struct('a', 42)], array['x', '&amp;', 'y'])
+will be converted to '<v a="42">x&amp;y</v>'.
+
+If a particular attribute name is null then entire (name,value) pair is not serialized.
+
+All the string values in data must be XML escaped."""
 )
 AS (
   (
