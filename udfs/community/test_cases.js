@@ -3728,7 +3728,7 @@ generate_udf_test("cw_xml_element", [
     expected_output: `"<x>a&amp;b</x>"`,
   },
 ]);
-generate_udf_test("cw_xml_element_with_attribute", [
+generate_udf_test("cw_xml_element_with_attributes", [
   {
     inputs: [`"x"`, `[STRUCT("a" AS name, "42" AS value)]`, `["a", "&amp;", "b"]`],
     expected_output: `'<x a="42" >a&amp;b</x>'`,
