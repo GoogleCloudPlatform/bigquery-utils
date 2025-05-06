@@ -1,0 +1,31 @@
+config { hasOutput: true }
+/*
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(name STRING, data ARRAY<STRING>) RETURNS STRING
+OPTIONS (
+    description="""Returns XML element with given tag name and data.
+For example, cw_xml_element('v', array['x', '&amp;', 'y']) will be converted to
+"<v>x&amp;y</v>".
+
+All the string values in data must be XML escaped."""
+)
+AS (
+  (
+    SELECT '<' || name || '>' || STRING_AGG(COALESCE(v, ''), '') || '</' || name || '>'
+    FROM UNNEST(data) v
+  )
+);
