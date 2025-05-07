@@ -15,7 +15,10 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, needle STRING, start INT64) RETURNS INT64 AS (
+CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, needle STRING, start INT64) RETURNS INT64 
+OPTIONS (
+    description="""Implements regexp_instr/3 (haystack, needle, start)."""
+) AS (
   CASE WHEN REGEXP_CONTAINS(substr(haystack, GREATEST(start, 1)), needle) THEN
     LENGTH(REGEXP_REPLACE(substr(haystack, GREATEST(start, 1)), CONCAT('(.*?)', needle, '(.*)'), '\\1')) + GREATEST(start, 1)
   WHEN needle IS NULL OR haystack IS NULL or start IS NULL THEN
