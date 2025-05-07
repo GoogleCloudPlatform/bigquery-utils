@@ -44,7 +44,6 @@ replace_js_udf_bucket_placeholder() {
 # Create symbolic links to the following dataform dependencies
 # to save time and not duplicate resources:
 #   - package.json file
-#   - includes/ dir
 #   - node_modules/ dir
 #
 # Arguments:
@@ -56,7 +55,6 @@ add_symbolic_dataform_dependencies() {
   local target_dir=$1
   ln -sf "$(pwd)"/package.json "${target_dir}"/package.json
   ln -sfn "$(pwd)"/node_modules/ "${target_dir}"/node_modules
-  ln -sfn "$(pwd)"/includes/ "${target_dir}"/includes
 }
 
 #######################################
