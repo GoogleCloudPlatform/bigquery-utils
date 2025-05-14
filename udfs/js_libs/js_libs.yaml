@@ -17,3 +17,9 @@ fast-xml-parser:
 txml:
   versions:
     - 5.1.1
+base64-js:
+  versions:
+    - 1.5.1
+pako:
+  versions:
+    - 2.1.0
