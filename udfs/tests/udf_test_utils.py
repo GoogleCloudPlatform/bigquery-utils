@@ -143,6 +143,10 @@ def generate_webpack_configs():
             elif len(js_dependency_files) == 1:
                 js_main_entrypoint_path = npm_package_config_path.parent / Path(
                     js_dependency_files[0])
+            else:
+                # If main is not set, it defaults to index.js in the package's root folder.
+                # https://docs.npmjs.com/cli/v11/configuring-npm/package-json#main
+                js_main_entrypoint_path = npm_package_config_path.parent / Path('index.js')
         webpack_config_file_path = Path(
             f'{npm_package_config_path.parent.name}-webpack.config.js')
         minimize_js = True if js_lib_name not in NO_MINIFY_JS_LIBS else False

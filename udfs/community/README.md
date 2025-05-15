@@ -132,6 +132,7 @@ SELECT bqutil.fn.int(1.684)
 * [get_array_value](#get_array_valuek-string-arr-any-type)
 * [getbit](#getbittarget_arg-int64-target_bit_arg-int64)
 * [get_value](#get_valuek-string-arr-any-type)
+* [gunzip](#gunzipgzipped-bytes)
 * [int](#intv-any-type)
 * [jaccard](#jaccard)
 * [job_url](#job_urljob_id-string)
@@ -1426,6 +1427,19 @@ results:
 |-----|-----|-----|
 | bbb | aaa | ccc |
 
+
+### [gunzip(gzipped BYTES)](gunzip.sqlx)
+Given compressed BYTES using the `DEFLATE` (a.k.a. `gzip`) algorithm, this method will return the decompressed value as BYTES.
+
+```sql
+SELECT CAST(bqutil.fn.gunzip(FROM_BASE64("H4sIAOL4JWgAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==")) AS STRING)
+```
+
+results:
+
+| f0_ |
+|-----|
+| hello world |
 
 
 ### [int(v ANY TYPE)](int.sqlx)
