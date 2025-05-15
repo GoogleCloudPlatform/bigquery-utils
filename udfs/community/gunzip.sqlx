@@ -30,14 +30,14 @@ description="""Decompress BYTES using the DEFLATE (a.k.a. gzip) algorithm.
 
 SELECT CAST(
   bqutil.fn.gunzip(
-    FROM_BASE64("H4sIACYJJWgAA8tIzcnJVyjPL8pJ4QIALTsIrwwAAAA=")
+    FROM_BASE64("H4sIAOL4JWgAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==")
   )
   AS STRING
 )
 
 /*
  * The query result will be the following:
- * "hello world\n"
+ * "hello world"
  */
 
 """) AS """
