@@ -1432,7 +1432,7 @@ results:
 Given compressed BYTES using the `DEFLATE` (a.k.a. `gzip`) algorithm, this method will return the decompressed value as BYTES.
 
 ```sql
-SELECT CAST(bqutil.fn.gunzip(FROM_BASE64("H4sIAF4OJWgAA8tIzcnJVyjPL8pJ4QIALTsIrwwAAAA=")) AS STRING)
+SELECT CAST(bqutil.fn.gunzip(FROM_BASE64("H4sIAOL4JWgAA8tIzcnJVyjPL8pJAQCFEUoNCwAAAA==")) AS STRING)
 ```
 
 results:
