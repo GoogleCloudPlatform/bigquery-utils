@@ -1,6 +1,6 @@
 config { hasOutput: true }
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ if (gzipped == null) {
   return null;
 }
 
-const bytes = Base64.toUint8Array(gzipped);
+const bytes = base64_js.toUint8Array(gzipped);
 const decompressed = pako.ungzip(bytes);
-return Base64.fromUint8Array(decompressed);
+return base64_js.fromUint8Array(decompressed);
 """;
