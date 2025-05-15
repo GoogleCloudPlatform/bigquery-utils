@@ -3756,7 +3756,7 @@ generate_udf_test("cw_xml_extract", [
 generate_udf_test("gunzip", [
   {
     inputs: [`FROM_BASE64("H4sIACYJJWgAA8tIzcnJVyjPL8pJ4QIALTsIrwwAAAA=")`],
-    expected_output: `FROM_BASE64("aGVsbG8gd29ybGQK")`,
+    expected_output: `CAST("hello world" AS BYTES)||FROM_BASE64("Cg==")`,
   },
   {
     inputs: [`CAST(NULL AS BYTES)`],
