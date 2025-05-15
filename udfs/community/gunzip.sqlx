@@ -37,7 +37,7 @@ SELECT CAST(
 
 /*
  * The query result will be the following:
- * "hello world"
+ * "hello world\n"
  */
 
 """) AS """
