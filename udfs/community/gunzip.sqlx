@@ -45,7 +45,7 @@ if (gzipped == null) {
   return null;
 }
 
-const bytes = base64_js.toUint8Array(gzipped);
+const bytes = base64_js.toByteArray(gzipped);
 const decompressed = pako.ungzip(bytes);
-return base64_js.fromUint8Array(decompressed);
+return base64_js.fromByteArray(decompressed);
 """;
