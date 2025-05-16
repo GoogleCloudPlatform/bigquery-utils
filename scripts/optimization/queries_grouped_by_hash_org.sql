@@ -15,8 +15,8 @@
  */
 
 /*
- * This script creates a table named, top_bytes_scanning_queries_by_hash, 
- * which contains the top 200 most expensive queries by total bytes scanned
+ * This script creates a table named, queries_grouped_by_hash_org, 
+ * which contains the top 200 most expensive queries by total slot hours
  * within the past 30 days.
  * 30 days is the default timeframe, but you can change this by setting the
  * num_days_to_scan variable to a different value.
