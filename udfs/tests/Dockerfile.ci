@@ -1,4 +1,4 @@
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:stable
 WORKDIR /ci
 COPY requirements.txt ./
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -12,7 +12,7 @@ RUN python3 -m venv venv
 
 RUN . venv/bin/activate \
     && pip install --no-cache-dir -r requirements.txt \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update && apt-get install --no-install-recommends -y nodejs \
     && npm i -g @dataform/cli@3.0.21 \
     && apt-get clean \
