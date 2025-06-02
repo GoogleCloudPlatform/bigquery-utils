@@ -44,7 +44,7 @@ function remove_testing_assets(){
 ##############################################
 function deploy_udfs_and_run_unit_tests() {
   set -eo pipefail
-  git clone --recursive --single-branch --branch $(cat VERSION.txt) https://github.com/apache/datasketches-bigquery.git
+  git clone --single-branch --branch $(cat VERSION.txt) https://github.com/apache/datasketches-bigquery.git
   cd datasketches-bigquery
 
   if [[ "${_BQ_LOCATION^^}" != "US" ]]; then
