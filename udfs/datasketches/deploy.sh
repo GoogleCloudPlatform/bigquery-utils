@@ -53,6 +53,10 @@ function deploy_udfs_and_run_unit_tests() {
     printf "BigQuery regional dataset name: %s\n" "${_BQ_DATASET}"
   fi
 
+  # TODO: Remove this temporary workaround that has been put in place only to allow
+  # deploying datasketches v1.1.1
+  sed -i 's|git clone https://github.com/emscripten-core/emsdk.git|git clone --branch 4.0.7 --single-branch https://github.com/emscripten-core/emsdk.git|g' cloudbuild.yaml
+
   gcloud builds submit . \
     --project=$PROJECT_ID \
     --region="us-central1" \
