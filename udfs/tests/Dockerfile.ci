@@ -1,8 +1,21 @@
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:latest
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
 WORKDIR /ci
 COPY requirements.txt ./
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN pip3 install --no-cache-dir -r requirements.txt \
- && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
- && apt-get install --no-install-recommends -y nodejs \
- && npm i -g @dataform/cli@3.0.2
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y python3-venv curl wget unzip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python3 -m venv venv
+
+RUN . venv/bin/activate \
+    && pip install --no-cache-dir -r requirements.txt \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get update && apt-get install --no-install-recommends -y nodejs \
+    && npm i -g @dataform/cli@3.0.21 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/ci/venv/bin:$PATH"
