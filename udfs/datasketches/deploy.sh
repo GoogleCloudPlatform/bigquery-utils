@@ -44,7 +44,7 @@ function remove_testing_assets(){
 ##############################################
 function deploy_udfs_and_run_unit_tests() {
   set -eo pipefail
-  git clone --recursive --single-branch --branch $(cat VERSION.txt) https://github.com/apache/datasketches-bigquery.git
+  git clone --single-branch --branch $(cat VERSION.txt) https://github.com/apache/datasketches-bigquery.git
   cd datasketches-bigquery
 
   if [[ "${_BQ_LOCATION^^}" != "US" ]]; then
@@ -52,6 +52,9 @@ function deploy_udfs_and_run_unit_tests() {
     export _BQ_DATASET="${_BQ_DATASET}_$(echo $_BQ_LOCATION | tr '[:upper:]' '[:lower:]' | tr '-' '_')"
     printf "BigQuery regional dataset name: %s\n" "${_BQ_DATASET}"
   fi
+
+  # TODO: Remove this temporary workaround once datasketches repo releases this fix --> https://github.com/apache/datasketches-bigquery/pull/156 
+  sed -i 's|git clone https://github.com/emscripten-core/emsdk.git|git clone --branch 4.0.7 --single-branch https://github.com/emscripten-core/emsdk.git|g' cloudbuild.yaml
 
   gcloud builds submit . \
     --project=$PROJECT_ID \
