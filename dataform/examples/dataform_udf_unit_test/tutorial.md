@@ -24,7 +24,7 @@ npm i -g @dataform/cli && dataform install
 ### 2. Generate the Dataform credentials file by running the following:
 
 ```bash
-dataform init-creds bigquery
+dataform init-creds
 ```
 
 > Note: You will be prompted to select the following:

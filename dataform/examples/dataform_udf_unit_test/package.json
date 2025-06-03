@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@dataform/core": "1.20.0"
+    "@dataform/core": "3.0.19",
+    "bigquery_udf_unit_testing": "https://github.com/danieldeleo/bigquery_udf_unit_testing/archive/refs/tags/latest.tar.gz"
   }
 }
