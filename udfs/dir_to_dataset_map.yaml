@@ -6,3 +6,4 @@ teradata: td
 vertica: ve
 community: fn
 sqlserver: ss
+multimodal: mm

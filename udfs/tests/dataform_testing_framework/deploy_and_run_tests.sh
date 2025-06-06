@@ -263,8 +263,9 @@ main() {
 
       # SHORT_SHA environment variable below comes from
       # cloud build when the trigger originates from a github commit.
-      if [[ $udf_dir == 'community' ]]; then
-        # Deploy all UDFs in the community folder
+      # if [[ $udf_dir == 'community' || $udf_dir == 'multimodal' ]]; then
+      if [[ $udf_dir == 'multimodal' ]]; then
+        # Deploy all UDFs in the community/multimodal folder
         deploy_udfs \
           "${PROJECT_ID}" \
           "${JS_BUCKET}" \
@@ -276,22 +277,22 @@ main() {
         test_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../community \
+          "$(pwd)"/../../"${udf_dir}$" \
           "${udf_dir}"_test
-      else # Deploy all UDFs in the migration folder
-        deploy_udfs \
-          "${PROJECT_ID}" \
-          "${JS_BUCKET}" \
-          "${udf_dir}" \
-          "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../migration/"${udf_dir}" \
-          "${udf_dir}"_deploy
-        # Run unit tests for all UDFs in migration folder
-        test_udfs \
-          "${PROJECT_ID}" \
-          "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../migration/"${udf_dir}" \
-          "${udf_dir}"_test
+      # else # Deploy all UDFs in the migration folder
+      #   deploy_udfs \
+      #     "${PROJECT_ID}" \
+      #     "${JS_BUCKET}" \
+      #     "${udf_dir}" \
+      #     "${dataset_id}${SHORT_SHA}" \
+      #     "$(pwd)"/../../migration/"${udf_dir}" \
+      #     "${udf_dir}"_deploy
+      #   # Run unit tests for all UDFs in migration folder
+      #   test_udfs \
+      #     "${PROJECT_ID}" \
+      #     "${dataset_id}${SHORT_SHA}" \
+      #     "$(pwd)"/../../migration/"${udf_dir}" \
+      #     "${udf_dir}"_test
       fi
 
       printf "Finished testing UDFs in BigQuery dataset: %s%s\n" "${dataset_id}" "${SHORT_SHA}"
