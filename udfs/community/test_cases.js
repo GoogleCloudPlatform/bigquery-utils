@@ -3782,7 +3782,11 @@ generate_udf_test("parse_timestamp", [
     expected_output: `TIMESTAMP '2024-03-20 14:30:00'`,
   },
   {
-    inputs: [`'%Y-%m-%d %H:%M:%S'`, `'invalid_date'`],
+    inputs: [`'%Y-%m-%d %H:%M:%S'`, `'2024-03-20 25:30:00'`],
     expected_output: `NULL`,
+  },
+  {
+    inputs: [`'%Y%m%d %H%M%S.%f'`, `'20240320 143000.123'`],
+    expected_output: `TIMESTAMP '2024-03-20 14:30:00.123'`,
   }
 ]);
