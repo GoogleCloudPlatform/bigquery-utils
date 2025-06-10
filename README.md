@@ -12,9 +12,12 @@ BigQuery.
 This repository is broken up into:
 
 *   [Dashboards](/dashboards) - Pre-built dashboards for common use cases
-    *   [Geospatial](/dashboards/geospatial) - Colab notebooks for Geospatial Analytics.
     *   [System Tables](/dashboards/system_tables) - Looker Studio Dashboards built on BigQuery's INFORMATION_SCHEMA metadata views to understand organization's slot and reservation utilization, job execution, and job errors.
 *   [Notebooks](/notebooks) - Colab notebooks for various BigQuery related use cases.
+    *   [BigQuery Frequent Items Sketches Demo](/notebooks/bigquery_frequent_items_sketches_demo.ipynb) - Calculating TopN file extensions in Git repos from public Github Dataset.
+    *   [BigQuery KLL Sketches Demo](/notebooks/bigquery_kll_sketches_demo.ipynb) - Calculating Quantiles over user defined time-windows.
+    *   [BigQuery Theta Sketches Demo](/notebooks/bigquery_theta_sketches_demo.ipynb) - Calculating Distinct User Logins over different months.
+    *   [Geospatial](/dashboards/geospatial) - Colab notebooks for Geospatial Analytics.
 *   [Performance Testing](/performance_testing) - Examples for doing performance testing
     *   [JMeter](/performance_testing/jmeter) - Examples for using JMeter to test BigQuery performance
 *   [Scripts](/scripts) - Python, Shell, & SQL scripts
