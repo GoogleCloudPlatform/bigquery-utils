@@ -20,7 +20,9 @@ CREATE OR REPLACE FUNCTION ${self()}(f STRING, s STRING)
 RETURNS TIMESTAMP LANGUAGE python
 OPTIONS (entry_point='do_parse_timestamp', runtime_version='python-3.11')
 AS r"""
-  from datetime import datetime
-  def do_parse_timestamp(f, s):
+from datetime import datetime
+
+
+def do_parse_timestamp(f, s):
     return datetime.strptime(s, f)
 """;
