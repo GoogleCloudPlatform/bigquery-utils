@@ -3763,3 +3763,26 @@ generate_udf_test("gunzip", [
     expected_output: `CAST(NULL AS BYTES)`,
   },
 ]);
+
+generate_udf_test("parse_timestamp", [
+  {
+    inputs: [`'%Y-%m-%d %H:%M:%S'`, `'2024-03-20 14:30:00'`],
+    expected_output: `TIMESTAMP '2024-03-20 14:30:00'`,
+  },
+  {
+    inputs: [`'%Y-%m-%d'`, `'2024-03-20'`],
+    expected_output: `TIMESTAMP '2024-03-20 00:00:00'`,
+  },
+  {
+    inputs: [`'%m/%d/%Y'`, `'03/20/2024'`],
+    expected_output: `TIMESTAMP '2024-03-20 00:00:00'`,
+  },
+  {
+    inputs: [`'%Y-%m-%dT%H:%M:%S'`, `'2024-03-20T14:30:00'`],
+    expected_output: `TIMESTAMP '2024-03-20 14:30:00'`,
+  },
+  {
+    inputs: [`'%Y-%m-%d %H:%M:%S'`, `'invalid_date'`],
+    expected_output: `NULL`,
+  }
+]);

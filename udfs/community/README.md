@@ -192,6 +192,7 @@ SELECT bqutil.fn.int(1.684)
 * [xml_to_json_fpx](#xml_to_json_fpxxml-string)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
+* [parse_timestamp](#parse_timestampf-string-s-string)
 
 ## Documentation
 ### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
@@ -2198,6 +2199,25 @@ returns:
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
 
+
+### [parse_timestamp(f STRING, s STRING)](parse_timestamp.sqlx)
+Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value.
+
+```sql
+SELECT bqutil.fn.parse_timestamp('%Y-%m-%d %H:%M:%S', '2024-03-20 14:30:00');
+
+2024-03-20 14:30:00 UTC
+```
+
+The function uses Python's datetime.strptime() to parse the timestamp string according to the format string. Common format codes include:
+- %Y: Year with century (2024)
+- %m: Month as zero-padded number (01-12)
+- %d: Day as zero-padded number (01-31)
+- %H: Hour (24-hour clock) as zero-padded number (00-23)
+- %M: Minute as zero-padded number (00-59)
+- %S: Second as zero-padded number (00-59)
+
+Returns NULL if the input string cannot be parsed according to the format string.
 
 <br/>
 <br/>
