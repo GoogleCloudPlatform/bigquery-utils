@@ -41,6 +41,34 @@ replace_js_udf_bucket_placeholder() {
 }
 
 #######################################
+# Replaces all ${JS_BUCKET} placeholders
+# in javascript UDFs with user-provided
+# public hosting bucket.
+# Arguments:
+#   udf_dir
+#   js_bucket
+# Returns:
+#   None
+#######################################
+replace_placeholder() {
+  # Replace all variable placeholders "${JS_BUCKET}" in Javascript UDFs
+  # with the bucket that will host all javascript libraries
+  local udf_dir=$1
+  local placeholder=$2
+  local replace_value=$3
+  local file_name_fmt=$4
+  printf "Replacing UDF bucket placeholder '${placeholder}' with %s\n" "${replace_value}"
+  while read -r file; do
+    if [[ -n $file ]]; then
+      printf "Replacing variables in file %s\n" "$file"
+      sed -i "s|${placeholder}|${replace_value}|g" "${file}"
+    else
+      printf "No ${file_name_fmt} files found in %s\n" "${udf_dir}"
+    fi
+  done <<< "$(find "${udf_dir}" -type f -name "${file_name_fmt}")"
+}
+
+#######################################
 # Create symbolic links to the following dataform dependencies
 # to save time and not duplicate resources:
 #   - package.json file
@@ -116,11 +144,12 @@ generate_dataform_config_and_creds() {
 #######################################
 deploy_udfs() {
   local project_id=$1
-  local js_bucket=$2
-  local udf_dir=$3
-  local dataset_id=$4
-  local udfs_source_dir=$5
-  local udfs_target_dir=$6
+  local bq_location=$2
+  local js_bucket=$3
+  local udf_dir=$4
+  local dataset_id=$5
+  local udfs_source_dir=$6
+  local udfs_target_dir=$7
   mkdir -p "${udfs_target_dir}"/definitions
   # Copy all UDF sources into the target dir to avoid modifying the source itself.
   # Option -L is used to copy actual files to which symlinks point.
@@ -129,7 +158,8 @@ deploy_udfs() {
   # Remove test_cases.js avoid deploying this file
   rm -f "${udfs_target_dir}"/definitions/"${udf_dir}"/test_cases.js
 
-  replace_js_udf_bucket_placeholder "${udfs_target_dir}"/definitions/"${udf_dir}" "${js_bucket}"
+  replace_placeholder "${udfs_target_dir}"/definitions/"${udf_dir}" "\${BQ_LOCATION}" "${bq_location}" "*.sqlx"
+  replace_placeholder "${udfs_target_dir}"/definitions/"${udf_dir}" "\${JS_BUCKET}" "${js_bucket}" "*.sqlx"
   generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
   add_symbolic_dataform_dependencies "${udfs_target_dir}"
 
@@ -161,13 +191,19 @@ deploy_udfs() {
 #######################################
 test_udfs() {
   local project_id=$1
-  local dataset_id=$2
-  local udfs_source_dir=$3
-  local udfs_target_dir=$4
+  local bq_location=$2
+  local js_bucket=$3  
+  local dataset_id=$4
+  local udfs_source_dir=$5
+  local udfs_target_dir=$6
   mkdir -p "${udfs_target_dir}"/definitions
   # Only run Dataform tests if a test_cases.js exists
   if [[ -f "${udfs_source_dir}"/test_cases.js ]]; then
     cp "${udfs_source_dir}"/test_cases.js "${udfs_target_dir}"/definitions/test_cases.js
+
+    replace_placeholder "${udfs_target_dir}"/definitions "\${BQ_LOCATION}" "${bq_location}" "test_cases.js"
+    replace_placeholder "${udfs_target_dir}"/definitions "\${JS_BUCKET}" "${js_bucket}" "test_cases.js"
+
     generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${udfs_target_dir}"
     add_symbolic_dataform_dependencies "${udfs_target_dir}"
     
@@ -229,6 +265,7 @@ main() {
       # Deploy all UDFs in the community folder
       deploy_udfs \
         "${PROJECT_ID}" \
+        "${BQ_LOCATION}" \
         "${JS_BUCKET}" \
         "community" \
         "${public_dataset_id}" \
@@ -237,6 +274,8 @@ main() {
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${PROJECT_ID}" \
+        "${BQ_LOCATION}" \
+        "${JS_BUCKET}" \
         "${public_dataset_id}" \
         "$(pwd)"/../../community \
         "community_test"
@@ -268,6 +307,7 @@ main() {
         # Deploy all UDFs in the community/multimodal folder
         deploy_udfs \
           "${PROJECT_ID}" \
+          "${BQ_LOCATION}" \
           "${JS_BUCKET}" \
           "${udf_dir}" \
           "${dataset_id}${SHORT_SHA}" \
@@ -276,8 +316,10 @@ main() {
         # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
+          "${BQ_LOCATION}" \
+          "${JS_BUCKET}" \
           "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../"${udf_dir}$" \
+          "$(pwd)"/../../"${udf_dir}" \
           "${udf_dir}"_test
       # else # Deploy all UDFs in the migration folder
       #   deploy_udfs \
@@ -290,6 +332,8 @@ main() {
       #   # Run unit tests for all UDFs in migration folder
       #   test_udfs \
       #     "${PROJECT_ID}" \
+          # "${BQ_LOCATION}" \
+          # "${JS_BUCKET}" \
       #     "${dataset_id}${SHORT_SHA}" \
       #     "$(pwd)"/../../migration/"${udf_dir}" \
       #     "${udf_dir}"_test
