@@ -15,44 +15,18 @@
 # limitations under the License.
 
 #######################################
-# Replaces all ${JS_BUCKET} placeholders
-# in javascript UDFs with user-provided
-# public hosting bucket.
+# Replaces all placeholders of files
+# with names follow file_name_fmt
+# in udf_dir with replace_value.
 # Arguments:
-#   udf_dir
-#   js_bucket
-# Returns:
-#   None
-#######################################
-replace_js_udf_bucket_placeholder() {
-  # Replace all variable placeholders "${JS_BUCKET}" in Javascript UDFs
-  # with the bucket that will host all javascript libraries
-  local udf_dir=$1
-  local js_bucket=$2
-  printf "Replacing UDF bucket placeholder \${JS_BUCKET} with %s\n" "${js_bucket}"
-  while read -r file; do
-    if [[ -n $file ]]; then
-      printf "Replacing variables in file %s\n" "$file"
-      sed -i "s|\${JS_BUCKET}|${js_bucket}|g" "${file}"
-    else
-      printf "No SQLX files found in %s\n" "${udf_dir}"
-    fi
-  done <<< "$(find "${udf_dir}" -type f -name "*.sqlx")"
-}
-
-#######################################
-# Replaces all ${JS_BUCKET} placeholders
-# in javascript UDFs with user-provided
-# public hosting bucket.
-# Arguments:
-#   udf_dir
-#   js_bucket
+#   udf_dir - Dir to apply the replace ment
+#   placeholder - Placehoolder in the files, e.g. \${JS_BUCKET}
+#   replace_value - The replaced value.
+#   file_name_fmt - File name format filter. Only the files with names follow the format will apply the replacement.
 # Returns:
 #   None
 #######################################
 replace_placeholder() {
-  # Replace all variable placeholders "${JS_BUCKET}" in Javascript UDFs
-  # with the bucket that will host all javascript libraries
   local udf_dir=$1
   local placeholder=$2
   local replace_value=$3
@@ -129,6 +103,7 @@ generate_dataform_config_and_creds() {
 # The following steps are taken:
 #   - UDFs are copied into a new directory.
 #   - test_cases.js file is temporarily renamed so that Dataform doesn't try to run it.
+#   - BQ_LOCATION variable placeholder in all .sqlx files is replaced with the env variable value
 #   - JS_BUCKET variable placeholder in all .sqlx files is replaced with the env variable value
 #   - Dataform config/creds files (dataform.json and .df-credentials.json) are created
 #   - Symbolic links to Dataform dependencies are created
@@ -136,7 +111,8 @@ generate_dataform_config_and_creds() {
 #   - test_cases.js file is restored to its original name
 # Arguments:
 #   project_id - BQ project in which dataform assets will be created
-#   js_bucket - GCS bucket which holds JavaScript UDF libraries
+#   bq_location - BQ location in which dataform assets will be created
+#   js_bucket - GCS bucket which holds JavaScript UDF libraries and multimodal test data
 #   dataset_id - Name of dataset directory which holds .sqlx UDFs to be deployed
 #   short_dataset_id - BQ dataset in which dataform assets will be deployed
 #   udfs_source_dir - Directory which holds UDFs to be deployed
@@ -179,12 +155,16 @@ deploy_udfs() {
 # Execute all unit tests provided in a test_cases.js file.
 # The following steps are taken:
 #   - test_cases.js file is copied from the specified udfs_source_dir into udfs_target_dir
+#   - BQ_LOCATION variable placeholder in all test_cases.js file is replaced with the env variable value
+#   - JS_BUCKET variable placeholder in all test_cases.js file is replaced with the env variable value
 #   - Dataform config/creds files (dataform.json and .df-credentials.json) are created
 #   - Symbolic links to Dataform dependencies are created
 #   - "dataform test" command is executed to test all UDFs
 #   - Any error in testing will terminate with the deletion of the BigQuery testing dataset
 # Arguments:
 #   project_id - BQ project in which UDFs to be unit tested exist
+#   bq_location - BQ location in which UDFs to be unit tested exist
+#   js_bucket - GCS bucket which holds JavaScript UDF libraries and multimodal test data
 #   dataset_id - BQ dataset in which UDFs to be unit tested exist
 #   udfs_source_dir - Directory which holds the test_cases.js file to be run
 #   udfs_target_dir - Temp directory in which test_cases.js will be copied and then run
@@ -302,8 +282,7 @@ main() {
 
       # SHORT_SHA environment variable below comes from
       # cloud build when the trigger originates from a github commit.
-      # if [[ $udf_dir == 'community' || $udf_dir == 'multimodal' ]]; then
-      if [[ $udf_dir == 'multimodal' ]]; then
+      if [[ $udf_dir == 'community' || $udf_dir == 'multimodal' ]]; then
         # Deploy all UDFs in the community/multimodal folder
         deploy_udfs \
           "${PROJECT_ID}" \
@@ -313,7 +292,7 @@ main() {
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../"${udf_dir}" \
           "${udf_dir}"_deploy
-        # Run unit tests for all UDFs in community folder
+        # Run unit tests for all UDFs in community/multimodal folder
         test_udfs \
           "${PROJECT_ID}" \
           "${BQ_LOCATION}" \
@@ -321,22 +300,23 @@ main() {
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../"${udf_dir}" \
           "${udf_dir}"_test
-      # else # Deploy all UDFs in the migration folder
-      #   deploy_udfs \
-      #     "${PROJECT_ID}" \
-      #     "${JS_BUCKET}" \
-      #     "${udf_dir}" \
-      #     "${dataset_id}${SHORT_SHA}" \
-      #     "$(pwd)"/../../migration/"${udf_dir}" \
-      #     "${udf_dir}"_deploy
-      #   # Run unit tests for all UDFs in migration folder
-      #   test_udfs \
-      #     "${PROJECT_ID}" \
-          # "${BQ_LOCATION}" \
-          # "${JS_BUCKET}" \
-      #     "${dataset_id}${SHORT_SHA}" \
-      #     "$(pwd)"/../../migration/"${udf_dir}" \
-      #     "${udf_dir}"_test
+      else # Deploy all UDFs in the migration folder
+        deploy_udfs \
+          "${PROJECT_ID}" \
+          "${BQ_LOCATION}" \
+          "${JS_BUCKET}" \
+          "${udf_dir}" \
+          "${dataset_id}${SHORT_SHA}" \
+          "$(pwd)"/../../migration/"${udf_dir}" \
+          "${udf_dir}"_deploy
+        # Run unit tests for all UDFs in migration folder
+        test_udfs \
+          "${PROJECT_ID}" \
+          "${BQ_LOCATION}" \
+          "${JS_BUCKET}" \
+          "${dataset_id}${SHORT_SHA}" \
+          "$(pwd)"/../../migration/"${udf_dir}" \
+          "${udf_dir}"_test
       fi
 
       printf "Finished testing UDFs in BigQuery dataset: %s%s\n" "${dataset_id}" "${SHORT_SHA}"
