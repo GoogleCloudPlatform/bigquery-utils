@@ -22,7 +22,7 @@ WITH CONNECTION `${BQ_LOCATION}.multimodal-udf-connection`
 OPTIONS (
     entry_point='exif', 
     runtime_version='python-3.11', 
-    packages=["pillow", "requests"])
+    packages=["pillow==11.2.1", "requests==2.32.4"])
 
 AS r'''
 
