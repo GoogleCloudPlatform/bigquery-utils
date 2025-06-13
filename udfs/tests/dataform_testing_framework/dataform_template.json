@@ -2,5 +2,8 @@
     "warehouse": "bigquery",
     "defaultSchema": "${DATASET_ID}",
     "defaultDatabase": "${PROJECT_ID}",
-    "defaultLocation": "${BQ_LOCATION}"
+    "defaultLocation": "${BQ_LOCATION}",
+    "vars": {
+        "gcsBucket": "${GCS_BUCKET}"
+    }
 }

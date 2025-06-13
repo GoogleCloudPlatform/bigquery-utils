@@ -34,5 +34,5 @@ if ( abs_r < 1.0 ) {
    return NaN 
 }
 """
-OPTIONS (library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]);
+OPTIONS (library=["${dataform.projectConfig.vars.gcsBucket}/jstat-v1.9.4.min.js"]);
 

@@ -21,7 +21,7 @@ RETURNS BOOL
 LANGUAGE js
   OPTIONS (
     description="Safely allows greater than comparison on numbers of any magnitude.",
-    library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
+    library=["${dataform.projectConfig.vars.gcsBucket}/bn.js-v5.2.1.min.js"])
 AS r"""
   if (first === null || second === null || first === "" || second === "") {
       return null;
