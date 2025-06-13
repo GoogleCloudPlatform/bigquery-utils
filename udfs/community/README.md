@@ -155,6 +155,7 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [normal_cdf](#normal_cdfx-float64-mean-float64-stdev-float64)
+* [parse_timestamp_python](#parse_timestamp_python-f-string-s-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [pi](#pi)
@@ -192,7 +193,6 @@ SELECT bqutil.fn.int(1.684)
 * [xml_to_json_fpx](#xml_to_json_fpxxml-string)
 * [y4md_to_date](#y4md_to_datey4md-string)
 * [zeronorm](#zeronormx-any-type-meanx-float64-stddevx-float64)
-* [parse_timestamp](#parse_timestampf-string-s-string)
 
 ## Documentation
 ### [azimuth_to_geog_point(input_lat FLOAT64, input_lon FLOAT64, azimuth FLOAT64, distance FLOAT64)](azimuth_to_geog_point.sqlx)
@@ -2199,30 +2199,6 @@ returns:
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
 
-
-### [parse_timestamp(f STRING, s STRING)](parse_timestamp.sqlx)
-Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value.
-
-```sql
-SELECT bqutil.fn.parse_timestamp('%Y-%m-%d %H:%M:%S', '2024-03-20 14:30:00');
-
-2024-03-20 14:30:00 UTC
-```
-
-The function uses Python's datetime.strptime() to parse the timestamp string according to the format string. Common format codes include:
-- %Y: Year with century (2024)
-- %m: Month as zero-padded number (01-12)
-- %d: Day as zero-padded number (01-31)
-- %H: Hour (24-hour clock) as zero-padded number (00-23)
-- %M: Minute as zero-padded number (00-59)
-- %S: Second as zero-padded number (00-59)
-
-Returns NULL if the input string cannot be parsed according to the format string.
-
-<br/>
-<br/>
-<br/>
-
 # StatsLib: Statistical UDFs
 
 This section details the subset of community contributed [user-defined functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/user-defined-functions)
@@ -2335,6 +2311,27 @@ results:
 |---------------------|--------------------|-------------------|
 | -0.4353361094588436 | 0.5300416418798544 | 0.632366563565354 |
 -----
+
+
+### [parse_timestamp_python(f STRING, s STRING)](parse_timestamp.sqlx)
+Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value.
+
+```sql
+SELECT bqutil.fn.parse_timestamp_python('%Y-%m-%d %H:%M:%S', '2024-03-20 14:30:00');
+
+2024-03-20 14:30:00 UTC
+```
+
+The function uses Python's datetime.strptime() to parse the timestamp string according to the format string. Common format codes include:
+- %Y: Year with century (2024)
+- %m: Month as zero-padded number (01-12)
+- %d: Day as zero-padded number (01-31)
+- %H: Hour (24-hour clock) as zero-padded number (00-23)
+- %M: Minute as zero-padded number (00-59)
+- %S: Second as zero-padded number (00-59)
+- %F: Fractional seconds with microsecond precision (000000-999999)
+
+Returns NULL if the input string cannot be parsed according to the format string.
 
 ### [pvalue(H FLOAT64, dof FLOAT64)](pvalue.sqlx)
 Takes _H_ and _dof_ and returns _p_ probability value.

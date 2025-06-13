@@ -1,6 +1,6 @@
 config { hasOutput: true }
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
--- Safely allows greater than comparison on numbers of any magnitude
-CREATE OR REPLACE FUNCTION ${self()}(f STRING, s STRING)
+-- Parses a string into a TIMESTAMP using the specified format string
+CREATE OR REPLACE FUNCTION ${self()}_python(f STRING, s STRING)
 RETURNS TIMESTAMP LANGUAGE python
-OPTIONS (entry_point='do_parse_timestamp', runtime_version='python-3.11')
+OPTIONS (entry_point='do_parse_timestamp', runtime_version='python-3.11', description='Parses a string into a TIMESTAMP using the specified format string')
 AS r"""
 from datetime import datetime
 
 
 def do_parse_timestamp(f, s):
     try:
-        return datetime.strptime(s, f)
+    return datetime.strptime(s, f)
     except ValueError:
         return None
 """;

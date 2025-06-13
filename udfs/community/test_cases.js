@@ -3764,7 +3764,7 @@ generate_udf_test("gunzip", [
   },
 ]);
 
-generate_udf_test("parse_timestamp", [
+generate_udf_test("parse_timestamp_python", [
   {
     inputs: [`'%Y-%m-%d %H:%M:%S'`, `'2024-03-20 14:30:00'`],
     expected_output: `TIMESTAMP '2024-03-20 14:30:00'`,
