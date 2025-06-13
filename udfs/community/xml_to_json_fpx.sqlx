@@ -20,7 +20,7 @@ RETURNS JSON
 DETERMINISTIC
 LANGUAGE js 
 OPTIONS(
-library="${JS_BUCKET}/fast-xml-parser-v4.4.1.min.js",
+library="${dataform.projectConfig.vars.gcsBucket}/fast-xml-parser-v4.4.1.min.js",
 description="""Converts XML to JSON using the open source
 fast-xml-parser JavaScript library.
 For the fastest parsing performance, use the xml_to_json UDF which 

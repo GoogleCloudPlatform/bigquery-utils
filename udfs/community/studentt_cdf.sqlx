@@ -23,6 +23,6 @@ LANGUAGE js AS """
   return jstat['jStat']['studentt']['cdf']( x, dof )
 """
 OPTIONS (
-	    library=["${JS_BUCKET}/jstat-v1.9.4.min.js"]
+	    library=["${dataform.projectConfig.vars.gcsBucket}/jstat-v1.9.4.min.js"]
 );
 
