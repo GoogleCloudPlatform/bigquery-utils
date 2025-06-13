@@ -206,7 +206,7 @@ main() {
 
       # SHORT_SHA environment variable below comes from
       # cloud build when the trigger originates from a github commit.
-      if [[ $udf_dir == 'community' ]]; then
+      if [[ $udf_dir == 'community' || $udf_dir == 'multimodal' ]]; then
         # Deploy all UDFs in the community folder
         deploy_udfs \
           "${PROJECT_ID}" \
