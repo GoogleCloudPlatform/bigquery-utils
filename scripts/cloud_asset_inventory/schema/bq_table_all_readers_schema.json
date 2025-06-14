@@ -1,0 +1,33 @@
+[
+    {
+        "name": "table_name",
+        "type": "STRING",
+        "mode": "NULLABLE",
+        "description": "Name of BigQuery Table"
+    },
+    {
+        "name": "inherited_readers",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+            {
+                "name": "parent_name",
+                "type": "STRING",
+                "mode": "NULLABLE",
+                "description": "The name of dataset, project, folder or org which is ancestor of the Table"
+            },
+            {
+                "name": "role",
+                "type": "STRING",
+                "mode": "NULLABLE",
+                "description": "The BigQuery predefined role applied on the parent_name resource"
+            },
+            {
+                "name": "members",
+                "type": "STRING",
+                "mode": "REPEATED",
+                "description": "IAM Principals assigned with the role on the parent_name resource"
+            }
+        ]
+    }
+]
