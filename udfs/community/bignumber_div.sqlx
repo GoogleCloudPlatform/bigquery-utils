@@ -21,7 +21,7 @@ RETURNS STRING
 LANGUAGE js
   OPTIONS (
     description="Safely allows mathematical division on numbers of any magnitude.",
-    library=["${JS_BUCKET}/bn.js-v5.2.1.min.js"])
+    library=["${dataform.projectConfig.vars.gcsBucket}/bn.js-v5.2.1.min.js"])
 AS r"""
     if (first === null || first === "" || second === "0" || second === null || second === "") {
         return null;

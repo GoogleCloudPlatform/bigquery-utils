@@ -20,7 +20,7 @@ RETURNS BYTES
 DETERMINISTIC
 LANGUAGE js 
 OPTIONS(
-library=["${JS_BUCKET}/base64-js-v1.5.1.min.js", "${JS_BUCKET}/pako-v2.1.0.min.js"],
+library=["${dataform.projectConfig.vars.gcsBucket}/base64-js-v1.5.1.min.js", "${dataform.projectConfig.vars.gcsBucket}/pako-v2.1.0.min.js"],
 description="""Decompress BYTES using the DEFLATE (a.k.a. gzip) algorithm.
 
 /*

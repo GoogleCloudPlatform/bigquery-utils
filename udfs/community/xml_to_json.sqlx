@@ -20,7 +20,7 @@ RETURNS JSON
 DETERMINISTIC
 LANGUAGE js 
 OPTIONS(
-library="${JS_BUCKET}/txml-v5.1.1.min.js",
+library="${dataform.projectConfig.vars.gcsBucket}/txml-v5.1.1.min.js",
 description="""Converts XML to JSON using the open source
 txml JavaScript library which is 2-3 times faster than the fast-xml-parser library.
 
