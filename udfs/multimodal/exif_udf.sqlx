@@ -18,7 +18,7 @@ config { hasOutput: true }
 CREATE OR REPLACE FUNCTION ${self()}(src_obj_ref_rt STRING)
 RETURNS STRING
 LANGUAGE python
-WITH CONNECTION `${BQ_LOCATION}.multimodal-udf-connection`
+WITH CONNECTION `${dataform.projectConfig.defaultLocation}.multimodal-udf-connection`
 OPTIONS (
     entry_point='exif', 
     runtime_version='python-3.11', 
