@@ -155,7 +155,7 @@ SELECT bqutil.fn.int(1.684)
 * [nlp_compromise_number](#nlp_compromise_numberstr-string)
 * [nlp_compromise_people](#nlp_compromise_peoplestr-string)
 * [normal_cdf](#normal_cdfx-float64-mean-float64-stdev-float64)
-* [parse_timestamp_python](#parse_timestamp_python-f-string-s-string)
+* [parse_timestamp](#parse_timestamp-f-string-s-string)
 * [percentage_change](#percentage_changeval1-float64-val2-float64)
 * [percentage_difference](#percentage_differenceval1-float64-val2-float64)
 * [pi](#pi)
@@ -2313,11 +2313,11 @@ results:
 -----
 
 
-### [parse_timestamp_python(f STRING, s STRING)](parse_timestamp.sqlx)
+### [parse_timestamp(f STRING, s STRING)](parse_timestamp.sqlx)
 Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value.
 
 ```sql
-SELECT bqutil.fn.parse_timestamp_python('%Y-%m-%d %H:%M:%S', '2024-03-20 14:30:00');
+SELECT bqutil.fn.parse_timestamp('%Y-%m-%d %H:%M:%S', '2024-03-20 14:30:00');
 
 2024-03-20 14:30:00 UTC
 ```

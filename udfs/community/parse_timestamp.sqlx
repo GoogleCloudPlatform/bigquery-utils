@@ -15,10 +15,11 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
+-- This UDF is added because BigQuery's parse_timestamp does not support the %F format code for fractional seconds, while this UDF does.
 -- Parses a string into a TIMESTAMP using the specified format string
 CREATE OR REPLACE FUNCTION ${self()}(f STRING, s STRING)
 RETURNS TIMESTAMP LANGUAGE python
-OPTIONS (entry_point='do_parse_timestamp', runtime_version='python-3.11', description='Parses a timestamp string according to a specified format string using Python\'s datetime.strptime(). Returns a TIMESTAMP value or NULL if parsing fails. Supports common format codes such as %Y, %m, %d, %H, %M, %S, and %F for fractional seconds.')
+OPTIONS (entry_point='do_parse_timestamp', runtime_version='python-3.11', description='Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value or NULL if parsing fails. Supports common format codes such as %Y, %m, %d, %H, %M, %S, and %F for fractional seconds. BigQuery\'s parse_timestamp does not support %F.')
 AS r"""
 from datetime import datetime
 
