@@ -45,7 +45,7 @@ else
 fi
 
 if [[ -n "${JS_BUCKET}" ]]; then
-  gcloud storage cp -r multimodal/test_data/* ${JS_BUCKET}/test_data/
+  gcloud storage cp -r tests/test_data/* ${JS_BUCKET}/test_data/
   gcloud builds submit . \
     --project="${PROJECT_ID}" \
     --substitutions _BQ_LOCATION="${BQ_LOCATION}",SHORT_SHA=_test_env,_JS_BUCKET="${JS_BUCKET}"

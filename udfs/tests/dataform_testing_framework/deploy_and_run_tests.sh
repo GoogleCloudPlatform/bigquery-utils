@@ -206,14 +206,16 @@ main() {
 
       # SHORT_SHA environment variable below comes from
       # cloud build when the trigger originates from a github commit.
-      if [[ $udf_dir == 'community' || $udf_dir == 'multimodal' ]]; then
-        # Deploy all UDFs in the community/multimodal folder
+      if [[ $udf_dir == 'community' ]]; then
+        # Deploy all UDFs in the community folder
         deploy_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../"${udf_dir}" \
           "${JS_BUCKET}"
-        # Run unit tests for all UDFs in community/multimodal folder
+        # Copy test_data used by some unit tests
+        gcloud storage cp -r "$(pwd)"/../test_data/* ${JS_BUCKET}/test_data/
+        # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
