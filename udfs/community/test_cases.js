@@ -3771,7 +3771,6 @@ generate_udf_test("exif_udf", [
   }
 ]);
 
-
 generate_udf_test("exif", [
   {
     inputs: [`OBJ.MAKE_REF("${dataform.projectConfig.vars.gcsBucket}/test_data/images_exif/test_image_exif.jpg", "${dataform.projectConfig.defaultLocation}.bigframes-default-connection")`],

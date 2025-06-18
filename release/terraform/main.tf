@@ -109,6 +109,14 @@ resource "google_bigquery_connection" "connection" {
   cloud_resource {}
 }
 
+resource "google_bigquery_connection" "connection" {
+  for_each      = toset(var.bq_regions)
+  connection_id = "multimodal-udf-connection"
+  location      = each.value
+  project       = var.project
+  cloud_resource {}
+}
+
 resource "google_bigquery_dataset_iam_member" "procedure_public_viewers" {
   project    = var.project
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
