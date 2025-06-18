@@ -3766,14 +3766,14 @@ generate_udf_test("gunzip", [
 
 generate_udf_test("exif_udf", [
   {
-    inputs: [`TO_JSON_STRING(OBJ.GET_ACCESS_URL(OBJ.MAKE_REF("${dataform.projectConfig.vars.gcsBucket}/test_data/images_exif/test_image_exif.jpg", "${dataform.projectConfig.defaultLocation}.bigframes-default-connection"), "R"))`],
+    inputs: [`TO_JSON_STRING(OBJ.GET_ACCESS_URL(OBJ.MAKE_REF("${dataform.projectConfig.vars.gcsBucket}/test_data/images_exif/test_image_exif.jpg", "${dataform.projectConfig.defaultLocation}.multimodal-udf-connection"), "R"))`],
     expected_output: `'{"ExifOffset": 47, "Make": "MyCamera"}'`
   }
 ]);
 
 generate_udf_test("exif", [
   {
-    inputs: [`OBJ.MAKE_REF("${dataform.projectConfig.vars.gcsBucket}/test_data/images_exif/test_image_exif.jpg", "${dataform.projectConfig.defaultLocation}.bigframes-default-connection")`],
+    inputs: [`OBJ.MAKE_REF("${dataform.projectConfig.vars.gcsBucket}/test_data/images_exif/test_image_exif.jpg", "${dataform.projectConfig.defaultLocation}.multimodal-udf-connection")`],
     expected_output: `JSON '{"ExifOffset": 47, "Make": "MyCamera"}'`
   }
 ]);
