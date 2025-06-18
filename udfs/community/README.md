@@ -125,6 +125,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_width_bucket](#cw_width_bucketvalue_expression-float64-lower_bound-float64-upper_bound-float64-partition_count-int64)
 * [day_occurrence_of_month](#day_occurrence_of_monthdate_expression-any-type)
 * [degrees](#degreesx-any-type)
+* [exif](#exifsrc_obj_ref-structuri-string-version-string-authorizer-string-details-json)
 * [find_in_set](#find_in_setstr-string-strlist-string)
 * [freq_table](#freq_tablearr-any-type)
 * [from_binary](#from_binaryvalue-string)
@@ -1274,6 +1275,21 @@ SELECT bqutil.fn.degrees(3.141592653589793) is_this_pi
 
 180.0
 ```
+
+### [exif(src_obj_ref STRUCT<uri STRING, version STRING, authorizer STRING, details JSON>)](exif.sqlx)
+Extract EXIF data as JSON from the ObjectRef of GCS files. Now only support image types.
+
+```sql
+SELECT bqutil.mm.exif(
+  OBJ.MAKE_REF("gs://<PATH>/<TO>/<YOUR_IMAGE_FILE>", "<BQ_LOCATION>.<YOUR_CONNECTION_ID>")
+) AS output_json
+```
+
+results:
+
+| output_json |
+| ----------- |
+| {"ExifOffset": 47, "Make": "MyCamera"} |
 
 
 ### [find_in_set(str STRING, strList STRING)](find_in_set.sqlx)

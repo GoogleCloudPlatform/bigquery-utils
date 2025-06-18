@@ -213,11 +213,13 @@ main() {
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../"${udf_dir}" \
           "${JS_BUCKET}"
+        # Copy test_data used by some unit tests
+        gcloud storage cp -r "$(pwd)"/../test_data/* ${JS_BUCKET}/test_data/
         # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../community
+          "$(pwd)"/../../"${udf_dir}"
       else # Deploy all UDFs in the migration folder
         deploy_udfs \
           "${PROJECT_ID}" \
