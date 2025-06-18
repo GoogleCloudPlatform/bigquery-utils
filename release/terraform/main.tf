@@ -109,7 +109,7 @@ resource "google_bigquery_connection" "connection" {
   cloud_resource {}
 }
 
-resource "google_bigquery_connection" "connection" {
+resource "google_bigquery_connection" "multimodal-udf-connection" {
   for_each      = toset(var.bq_regions)
   connection_id = "multimodal-udf-connection"
   location      = each.value
