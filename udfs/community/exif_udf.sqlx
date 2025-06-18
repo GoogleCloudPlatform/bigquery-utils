@@ -20,11 +20,17 @@ RETURNS STRING
 LANGUAGE python
 WITH CONNECTION `${dataform.projectConfig.defaultLocation}.multimodal-udf-connection`
 OPTIONS (
-    entry_point='exif', 
-    runtime_version='python-3.11', 
-    packages=["pillow==11.2.1", "requests==2.32.4"])
+    entry_point="exif", 
+    runtime_version="python-3.11", 
+    packages=["pillow==11.2.1", "requests==2.32.4"],
+    description="""Extracts EXIF data as JSON from the ObjectRef of GCS files.
+Currently only supports image types.
 
-AS r'''
+To directly call this UDF, provide the input argument "src_obj_ref_rt" using the following:
+
+    TO_JSON_STRING(OBJ.GET_ACCESS_URL("gs://<PATH>/<TO>/<YOUR_IMAGE_FILE>", "R"))
+"""
+) AS r'''
 
 def exif(src_obj_ref_rt):
     import io

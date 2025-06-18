@@ -16,6 +16,12 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(src_obj_ref STRUCT<uri STRING, version STRING, authorizer STRING, details JSON>)
-RETURNS JSON AS (
+RETURNS JSON 
+OPTIONS(
+    description="""Extracts EXIF data as JSON from the ObjectRef of GCS files.
+Currently only supports image types.
+This UDF calls another helper UDF: ${ref("exif_udf")}
+"""
+) AS (
     PARSE_JSON(${ref("exif_udf")}(TO_JSON_STRING(OBJ.GET_ACCESS_URL(src_obj_ref, "R"))))
 );
