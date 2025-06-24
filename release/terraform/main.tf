@@ -75,8 +75,9 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   substitutions = {
-    _BQ_LOCATION = "${each.value}"
-    _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
+    _BQ_LOCATION            = "${each.value}"
+    _JS_BUCKET              = "gs://${var.project}-lib-${each.value}"
+    _TEST_DATA_GCS_BUCKET   = "gs://${var.project}-test-data-${each.value}"
   }
 }
 

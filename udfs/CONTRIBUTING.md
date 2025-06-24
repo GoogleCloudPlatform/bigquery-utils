@@ -77,7 +77,7 @@ that your UDFs behave as expected.
      --role=roles/bigquery.dataEditor
    ```
 
-1. Create a Google Cloud Storage Bucket to store JS libraries in your project and run the UDF unit tests in Cloud Build by running the following:
+1. Create a Google Cloud Storage Bucket to store JS libraries and test data in your project and run the UDF unit tests in Cloud Build by running the following:
 
    ```bash
    export JS_BUCKET=gs://YOUR_BUCKET/PATH/TO/STORE/JS_LIBS

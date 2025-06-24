@@ -189,6 +189,8 @@ main() {
         "$(pwd)"/../../community \
         "${JS_BUCKET}" \
         "${TEST_DATA_GCS_BUCKET}"
+      # Copy test_data used by some unit tests
+      gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/test_data/"
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${PROJECT_ID}" \
@@ -226,7 +228,7 @@ main() {
           "${JS_BUCKET}" \
           "${TEST_DATA_GCS_BUCKET}"
         # Copy test_data used by some unit tests
-        gcloud storage cp -r "$(pwd)"/../test_data/* ${JS_BUCKET}/test_data/
+        gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/${SHORT_SHA}/test_data/"
         # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
@@ -251,6 +253,8 @@ main() {
       if [[ -n "${SHORT_SHA}" ]]; then
         printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${dataset_id}${SHORT_SHA}" "${SHORT_SHA}"
         bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}${SHORT_SHA}"
+        printf "Deleting test data from gcs bucket %s becasue setting env var SHORT_SHA=%s means this is a test build\n" "${TEST_DATA_GCS_BUCKET}" "${SHORT_SHA}"
+
       fi
     done
   fi

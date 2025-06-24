@@ -93,6 +93,19 @@ function remove_gcs_js_directory(){
   gcloud storage rm -r "${_JS_BUCKET}/**"
 }
 
+# Remove test data from ${_TEST_DATA_GCS_BUCKET}
+# Globals:
+#   _TEST_DATA_GCS_BUCKET
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function remove_gcs_test_data(){
+  printf "Deleting Cloud Storage directory: %s\n" "${_TEST_DATA_GCS_BUCKET}"
+  gcloud storage rm -r "${_TEST_DATA_GCS_BUCKET}/**"
+}
+
 #######################################
 # Builds all BigQuery UDFs within the repository.
 # Globals:
@@ -115,7 +128,7 @@ function build_udfs() {
       --config="${UDF_DIR}"/cloudbuild.yaml \
       --polling-interval="10" \
       --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
-      --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION}" ; then
+      --substitutions _JS_BUCKET="${_JS_BUCKET}",SHORT_SHA="${SHORT_SHA}",_BQ_LOCATION="${_BQ_LOCATION},_TEST_DATA_GCS_BUCKET=${_TEST_DATA_GCS_BUCKET}" ; then
       # Delete BigQuery UDF test datasets and cloud storage directory if above cloud build process fails
       printf "FAILURE: Build process for BigQuery UDFs failed, running cleanup steps:\n"
       local datasets
@@ -129,9 +142,11 @@ function build_udfs() {
         bq --headless --synchronous_mode rm -r -f "${dataset}${SHORT_SHA}"
       done
       remove_gcs_js_directory
+      remove_gcs_test_data
       exit 1
     fi
     remove_gcs_js_directory
+    remove_gcs_test_data
   fi
 }
 
@@ -248,8 +263,10 @@ function main() {
     # names do not get the SHORT_SHA value added as a suffix.
     cd "${SP_DIR}" && export SHORT_SHA="" && ./deploy.sh
   else
-    # Add SHORTSHA to JS_BUCKET to prevent collisions between concurrent builds
+    # Add SHORTSHA to _JS_BUCKET and _TEST_DATA_GCS_BUCKET env variables 
+    # to prevent collisions between concurrent builds
     export _JS_BUCKET="${_JS_BUCKET}/${SHORT_SHA}"
+    export _TEST_DATA_GCS_BUCKET="${_TEST_DATA_GCS_BUCKET}/${SHORT_SHA}"
     build
     dry_run_all_sql
   fi
