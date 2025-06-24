@@ -35,9 +35,9 @@ resource "google_storage_bucket_iam_member" "member" {
 
 resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket-writer" {
   for_each = {
-    for connection in google_bigquery_connection.bigframes-default-connection : connection.id => {
-      location           = connection.location
-      service_account_id = connection.cloud_resource[0].service_account_id
+    for k, v in google_bigquery_connection.bigframes-default-connection : k => {
+      location           = v.location
+      service_account_id = v.cloud_resource[0].service_account_id
     }
   }
   bucket   = "${var.project}-test-data-${each.value.location}"
