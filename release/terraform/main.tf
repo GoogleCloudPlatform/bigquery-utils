@@ -37,7 +37,7 @@ resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket
   for_each = { for connection in google_bigquery_connection.bigframes-default-connection : connection.id => connection }
   bucket   = "${var.project}-test-data-${each.value.location}"
   role     = "roles/storage.objectWriter"
-  member   = "serviceAccount:${each.value.cloud_resource[0].service_account_id}
+  member   = "serviceAccount:${each.value.cloud_resource[0].service_account_id}"
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
