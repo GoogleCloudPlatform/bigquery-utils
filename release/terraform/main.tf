@@ -41,7 +41,7 @@ resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket
     }
   }
   bucket   = "${var.project}-test-data-${each.value.location}"
-  role     = "roles/storage.objectWriter"
+  role     = "roles/storage.objectUser"
   member   = "serviceAccount:${each.value.service_account_id}"
 }
 
