@@ -167,7 +167,8 @@ main() {
   fi
   if [[ -z "${TEST_DATA_GCS_BUCKET}" ]]; then
     printf "No value set for environment variable TEST_DATA_GCS_BUCKET.\n"
-    export TEST_DATA_GCS_BUCKET="gs://${PROJECT_ID}-test-data-${BQ_LOCATION}"
+    local lowercase_bq_location=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]')
+    export TEST_DATA_GCS_BUCKET="gs://${PROJECT_ID}-test-data-${lowercase_bq_location}"
     printf "Defaulting TEST_DATA_GCS_BUCKET to %s\n" "${TEST_DATA_GCS_BUCKET}"
   fi
 
