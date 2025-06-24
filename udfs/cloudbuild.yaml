@@ -78,5 +78,6 @@ steps:
     - BQ_LOCATION=${_BQ_LOCATION}
     - SHORT_SHA=${SHORT_SHA}
     - JS_BUCKET=${_JS_BUCKET}
+    - TEST_DATA_GCS_BUCKET=${_TEST_DATA_GCS_BUCKET}
 
 timeout: 1800s # 30 minutes
