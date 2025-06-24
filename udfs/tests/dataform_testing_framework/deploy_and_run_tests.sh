@@ -167,9 +167,8 @@ main() {
   fi
   if [[ -z "${TEST_DATA_GCS_BUCKET}" ]]; then
     printf "No value set for environment variable TEST_DATA_GCS_BUCKET.\n"
-    local lowercase_bq_location=$(echo "$BQ_LOCATION" | tr '[:upper:]' '[:lower:]')
-    export TEST_DATA_GCS_BUCKET="gs://${PROJECT_ID}-test-data-${lowercase_bq_location}"
-    printf "Defaulting TEST_DATA_GCS_BUCKET to %s\n" "${TEST_DATA_GCS_BUCKET}"
+    export TEST_DATA_GCS_BUCKET="${JS_BUCKET}"
+    printf "Defaulting TEST_DATA_GCS_BUCKET to %s\n" "${JS_BUCKET}"
   fi
 
   # Create an empty dataform.json file because Dataform requires
@@ -253,8 +252,6 @@ main() {
       if [[ -n "${SHORT_SHA}" ]]; then
         printf "Deleting BigQuery dataset %s because setting env var SHORT_SHA=%s means this is a test build\n" "${dataset_id}${SHORT_SHA}" "${SHORT_SHA}"
         bq --project_id "${PROJECT_ID}" rm -r -f --dataset "${dataset_id}${SHORT_SHA}"
-        printf "Deleting test data from gcs bucket %s becasue setting env var SHORT_SHA=%s means this is a test build\n" "${TEST_DATA_GCS_BUCKET}" "${SHORT_SHA}"
-
       fi
     done
   fi
