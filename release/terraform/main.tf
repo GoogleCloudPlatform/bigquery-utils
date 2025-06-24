@@ -17,11 +17,27 @@ resource "google_storage_bucket" "regional_bucket" {
   force_destroy               = false
 }
 
+resource "google_storage_bucket" "regional_test_data_bucket" {
+  for_each                    = toset(var.bq_regions)
+  name                        = "${var.project}-test-data-${each.value}"
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  location                    = each.key
+  force_destroy               = false
+}
+
 resource "google_storage_bucket_iam_member" "member" {
   for_each = var.project == "bqutil" ? toset(var.bq_regions) : []
-  bucket = "${var.project}-lib-${each.value}"
-  role = "roles/storage.objectViewer"
-  member = "allAuthenticatedUsers"
+  bucket   = "${var.project}-lib-${each.value}"
+  role     = "roles/storage.objectViewer"
+  member   = "allAuthenticatedUsers"
+}
+
+resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket-writer" {
+  for_each = { for connection in google_bigquery_connection.bigframes-default-connection : connection.id => connection }
+  bucket   = "${var.project}-test-data-${each.value.location}"
+  role     = "roles/storage.objectWriter"
+  member   = "serviceAccount:${each.value.cloud_resource[0].service_account_id}
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
@@ -112,6 +128,14 @@ resource "google_bigquery_connection" "connection" {
 resource "google_bigquery_connection" "multimodal-udf-connection" {
   for_each      = toset(var.bq_regions)
   connection_id = "multimodal-udf-connection"
+  location      = each.value
+  project       = var.project
+  cloud_resource {}
+}
+
+resource "google_bigquery_connection" "bigframes-default-connection" {
+  for_each      = toset(var.bq_regions)
+  connection_id = "bigframes-default-connection"
   location      = each.value
   project       = var.project
   cloud_resource {}
