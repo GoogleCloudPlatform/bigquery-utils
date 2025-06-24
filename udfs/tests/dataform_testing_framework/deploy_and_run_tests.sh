@@ -228,7 +228,7 @@ main() {
           "${JS_BUCKET}" \
           "${TEST_DATA_GCS_BUCKET}"
         # Copy test_data used by some unit tests
-        gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/${SHORT_SHA}/test_data/"
+        gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/test_data/"
         # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
