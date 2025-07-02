@@ -32,6 +32,7 @@
 #   project_id - BQ project in which dataform assets will be created
 #   dataset_id - BQ dataset in which dataform assets will be created
 #   gcs_bucket - GCS bucket which holds JavaScript UDF libraries or other assets
+#   test_data_gcs_bucket - GCS bucket used for reading/writing test data during unit testing 
 # Returns:
 #   None
 #######################################
@@ -39,11 +40,13 @@ generate_dataform_config_and_creds() {
   local project_id=$1
   local dataset_id=$2
   local gcs_bucket=$3
+  local test_data_gcs_bucket=$4
   # Generate the dataform.json with the appropriate project_id and dataset_id
   sed "s|\${PROJECT_ID}|${project_id}|g" dataform_template.json \
     | sed "s|\${BQ_LOCATION}|${BQ_LOCATION}|g" \
     | sed "s|\${DATASET_ID}|${dataset_id}|g" \
     | sed "s|\${GCS_BUCKET}|${gcs_bucket}|g" \
+    | sed "s|\${TEST_DATA_GCS_BUCKET}|${test_data_gcs_bucket}|g" \
     >dataform.json
   # Create an .df-credentials.json file as shown below
   # in order to have Dataform pick up application default credentials
@@ -70,6 +73,7 @@ deploy_udfs() {
   local dataset_id=$2
   local udfs_source_dir=$3
   local js_bucket=$4
+  local test_data_gcs_bucket=$5
   # Clear the definitions directory if it exists from a previous run
   rm -rf definitions
   # Create the Dataform definitions/ directory for the SQLX UDFs to be deployed
@@ -79,7 +83,7 @@ deploy_udfs() {
   # Remove test_cases.js file if it exists in the definitions directory
   # because this file is only used for testing UDFs
   rm -f definitions/test_cases.js
-  generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${js_bucket}"
+  generate_dataform_config_and_creds "${project_id}" "${dataset_id}" "${js_bucket}" "${test_data_gcs_bucket}"
 
   ls -la
   ls -la definitions
@@ -161,6 +165,11 @@ main() {
     export JS_BUCKET=gs://bqutil-lib/bq_js_libs # bucket used by bqutil project
     printf "Defaulting JS_BUCKET to %s\n" "${JS_BUCKET}"
   fi
+  if [[ -z "${TEST_DATA_GCS_BUCKET}" ]]; then
+    printf "No value set for environment variable TEST_DATA_GCS_BUCKET.\n"
+    export TEST_DATA_GCS_BUCKET="${JS_BUCKET}"
+    printf "Defaulting TEST_DATA_GCS_BUCKET to %s\n" "${JS_BUCKET}"
+  fi
 
   # Create an empty dataform.json file because Dataform requires
   # this file's existence when installing dependencies.
@@ -177,7 +186,10 @@ main() {
         "${PROJECT_ID}" \
         "${public_dataset_id}" \
         "$(pwd)"/../../community \
-        "${JS_BUCKET}"
+        "${JS_BUCKET}" \
+        "${TEST_DATA_GCS_BUCKET}"
+      # Copy test_data used by some unit tests
+      gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/test_data/"
       # Run unit tests for all UDFs in community folder
       test_udfs \
         "${PROJECT_ID}" \
@@ -212,18 +224,22 @@ main() {
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../"${udf_dir}" \
-          "${JS_BUCKET}"
+          "${JS_BUCKET}" \
+          "${TEST_DATA_GCS_BUCKET}"
+        # Copy test_data used by some unit tests
+        gcloud storage cp -r "$(pwd)"/../test_data/* "${TEST_DATA_GCS_BUCKET}/test_data/"
         # Run unit tests for all UDFs in community folder
         test_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
-          "$(pwd)"/../../community
+          "$(pwd)"/../../"${udf_dir}"
       else # Deploy all UDFs in the migration folder
         deploy_udfs \
           "${PROJECT_ID}" \
           "${dataset_id}${SHORT_SHA}" \
           "$(pwd)"/../../migration/"${udf_dir}" \
-          "${JS_BUCKET}"
+          "${JS_BUCKET}" \
+          "${TEST_DATA_GCS_BUCKET}"
         # Run unit tests for all UDFs in migration folder
         test_udfs \
           "${PROJECT_ID}" \

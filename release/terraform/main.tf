@@ -17,11 +17,32 @@ resource "google_storage_bucket" "regional_bucket" {
   force_destroy               = false
 }
 
+resource "google_storage_bucket" "regional_test_data_bucket" {
+  for_each                    = toset(var.bq_regions)
+  name                        = "${var.project}-test-data-${each.value}"
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+  location                    = each.key
+  force_destroy               = false
+}
+
 resource "google_storage_bucket_iam_member" "member" {
   for_each = var.project == "bqutil" ? toset(var.bq_regions) : []
-  bucket = "${var.project}-lib-${each.value}"
-  role = "roles/storage.objectViewer"
-  member = "allAuthenticatedUsers"
+  bucket   = "${var.project}-lib-${each.value}"
+  role     = "roles/storage.objectViewer"
+  member   = "allAuthenticatedUsers"
+}
+
+resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket-writer" {
+  for_each = {
+    for k, v in google_bigquery_connection.bigframes-default-connection : k => {
+      location           = v.location
+      service_account_id = v.cloud_resource[0].service_account_id
+    }
+  }
+  bucket   = "${var.project}-test-data-${each.value.location}"
+  role     = "roles/storage.objectUser"
+  member   = "serviceAccount:${each.value.service_account_id}"
 }
 
 resource "google_cloudbuild_trigger" "regional_trigger" {
@@ -54,8 +75,9 @@ resource "google_cloudbuild_trigger" "regional_trigger" {
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   substitutions = {
-    _BQ_LOCATION = "${each.value}"
-    _JS_BUCKET   = "gs://${var.project}-lib-${each.value}"
+    _BQ_LOCATION            = "${each.value}"
+    _JS_BUCKET              = "gs://${var.project}-lib-${each.value}"
+    _TEST_DATA_GCS_BUCKET   = "gs://${var.project}-test-data-${each.value}"
   }
 }
 
@@ -104,6 +126,22 @@ resource "google_project_iam_member" "bigquery_connection_grant_vertex_ai_user_r
 resource "google_bigquery_connection" "connection" {
   for_each      = toset(var.bq_regions)
   connection_id = "procedure"
+  location      = each.value
+  project       = var.project
+  cloud_resource {}
+}
+
+resource "google_bigquery_connection" "multimodal-udf-connection" {
+  for_each      = toset(var.bq_regions)
+  connection_id = "multimodal-udf-connection"
+  location      = each.value
+  project       = var.project
+  cloud_resource {}
+}
+
+resource "google_bigquery_connection" "bigframes-default-connection" {
+  for_each      = toset(var.bq_regions)
+  connection_id = "bigframes-default-connection"
   location      = each.value
   project       = var.project
   cloud_resource {}
