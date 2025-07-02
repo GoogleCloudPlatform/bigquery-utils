@@ -240,7 +240,7 @@ function deploy_udfs() {
     --config="${UDF_DIR}"/cloudbuild.yaml \
     --polling-interval="10" \
     --worker-pool="projects/${PROJECT_ID}/locations/us-central1/workerPools/udf-unit-testing" \
-    --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION}"
+    --substitutions SHORT_SHA=,_JS_BUCKET="${_JS_BUCKET}",_BQ_LOCATION="${_BQ_LOCATION},"_TEST_DATA_GCS_BUCKET="${_TEST_DATA_GCS_BUCKET}"
 }
 
 #######################################
@@ -254,6 +254,9 @@ function deploy_udfs() {
 #   None
 #######################################
 function main() {
+  # Add SHORTSHA to _TEST_DATA_GCS_BUCKET env variable
+  # to prevent collisions between concurrent builds
+  export _TEST_DATA_GCS_BUCKET="${_TEST_DATA_GCS_BUCKET}/${SHORT_SHA}"
   # Only deploy UDFs when building master branch and there is
   # no associated pull request, meaning the PR was approved
   # and this is now building a commit on master branch.
@@ -263,10 +266,9 @@ function main() {
     # names do not get the SHORT_SHA value added as a suffix.
     cd "${SP_DIR}" && export SHORT_SHA="" && ./deploy.sh
   else
-    # Add SHORTSHA to _JS_BUCKET and _TEST_DATA_GCS_BUCKET env variables 
+    # Add SHORTSHA to _JS_BUCKET env variable 
     # to prevent collisions between concurrent builds
     export _JS_BUCKET="${_JS_BUCKET}/${SHORT_SHA}"
-    export _TEST_DATA_GCS_BUCKET="${_TEST_DATA_GCS_BUCKET}/${SHORT_SHA}"
     build
     dry_run_all_sql
   fi
