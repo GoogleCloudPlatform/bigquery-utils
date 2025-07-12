@@ -26,7 +26,11 @@ config { hasOutput: true }
   * mode = the javascript regular expression mode flags
   */
 CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, offset INT64, occurrence INT64, mode STRING) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js
+OPTIONS (
+    description="""Generic regexp_replace, which is the 6-args version with regexp_mode already decoded"""
+)
+AS """
   if (haystack == null || regexp == null || replacement == null || offset == null || occurrence == null || mode == null) return null;
   replacement = replacement.replace('\\\\', '$');
   if (mode.indexOf('g') == -1) {
