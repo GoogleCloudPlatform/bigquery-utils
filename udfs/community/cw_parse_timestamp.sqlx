@@ -1,6 +1,6 @@
 config { hasOutput: true }
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-/* Emulates Oracle's TO_TIMESTAMP function. */ 
 
-CREATE OR REPLACE FUNCTION cw_udf.cw_parse_timestamp(
-  timeString STRING, formatString STRING)
-RETURNS TIMESTAMP
-LANGUAGE js OPTIONS (library=["${dataform.projectConfig.vars.gcsBucket}/moment-v2.30.1.min.js"], description = "Emulates Oracle's to_timestamp function.")
-AS """
-  // Create a moment object by parsing the timeString with the given formatString
-  const momentObject = moment(timeString, formatString);
+CREATE OR REPLACE FUNCTION ${self()}(timeString STRING, formatString STRING)
+  RETURNS TIMESTAMP
+  LANGUAGE js OPTIONS (
+    library=["${dataform.projectConfig.vars.gcsBucket}/moment-v2.30.1.min.js"],
+    description="Emulates Oracle's TO_TIMESTAMP function.") AS
+"""
+// Create a moment object by parsing the timeString with the given formatString
+const momentObject = moment(timeString, formatString);
 
-  // Return the datetime object as Java Script timestamp.
-  return momentObject.format('MMMM Do YYYY, h:mm:ss.SSSSSSSSS a');
+// Return the datetime object as Java Script timestamp.
+return momentObject.format('MMMM Do YYYY, h:mm:ss.SSSSSSSSS a');
 """;
