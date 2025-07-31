@@ -3067,7 +3067,7 @@ generate_udf_test("bignumber_lte", [
     expected_output: `NULL`,
   },
 ]);
-generate_udf_test("cw_period_intersection", [
+generate_udf_test("cw_parse_timestamp", [
   {
     inputs: [`"10-Sep-02 14:10:10.123000"`, `DD-MMM-YY HH:mm:ss.SSSSSS`,],
     expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
@@ -3077,7 +3077,6 @@ generate_udf_test("cw_period_intersection", [
     expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
   },
 ]);
-
 generate_udf_test("cw_period_intersection", [
   {
     inputs: [
