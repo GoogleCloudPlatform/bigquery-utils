@@ -3069,11 +3069,11 @@ generate_udf_test("bignumber_lte", [
 ]);
 generate_udf_test("cw_parse_timestamp", [
   {
-    inputs: [`"10-Sep-02 14:10:10.123000"`, `DD-MMM-YY HH:mm:ss.SSSSSS`,],
+    inputs: [`"10-Sep-02 14:10:10.123000"`, `"DD-MMM-YY HH:mm:ss.SSSSSS"`,],
     expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
   },
   {
-    inputs: [`"10-Sep-02 14:10:10123000"`, `DD-MMM-YY HH:mm:ssSSSSSS`,],
+    inputs: [`"10-Sep-02 14:10:10123000"`, `"DD-MMM-YY HH:mm:ssSSSSSS"`,],
     expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
   },
 ]);
