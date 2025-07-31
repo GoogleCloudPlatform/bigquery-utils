@@ -23,3 +23,6 @@ base64-js:
 pako:
   versions:
     - 2.1.0
+moment:
+  versions:
+    - 2.30.1

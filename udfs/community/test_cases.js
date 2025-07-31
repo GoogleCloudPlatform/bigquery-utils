@@ -3069,12 +3069,23 @@ generate_udf_test("bignumber_lte", [
 ]);
 generate_udf_test("cw_period_intersection", [
   {
+    inputs: [`"10-Sep-02 14:10:10.123000"`, `DD-MMM-YY HH:mm:ss.SSSSSS`,],
+    expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
+  },
+  {
+    inputs: [`"10-Sep-02 14:10:10123000"`, `DD-MMM-YY HH:mm:ssSSSSSS`,],
+    expected_output: `"September 10th 2002, 2:10:10.123000000 pm"`,
+  },
+]);
+
+generate_udf_test("cw_period_intersection", [
+  {
     inputs: [
       `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
       `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
     ],
     expected_output: `STRUCT(TIMESTAMP '2001-11-13 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
-  },
+  }, 
   {
     inputs: [
       `STRUCT(TIMESTAMP '2001-11-22 00:00:00' AS lower, TIMESTAMP '2001-11-26 00:00:00' AS upper)`,
