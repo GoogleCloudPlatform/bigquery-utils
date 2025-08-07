@@ -14,7 +14,7 @@
 
 const {generate_test} = unit_test_utils;
 const {test_gender_status} = personal_info_assertions;
-const test_name = "test_gemder_assertions";
+const test_name = "test_gender_assertions";
 const test_cases = {
     /*
         Provide your own testing data following the structure
