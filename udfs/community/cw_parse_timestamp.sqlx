@@ -23,5 +23,11 @@ CREATE OR REPLACE FUNCTION ${self()}(timeString STRING, formatString STRING)
     description="Emulates Oracle's TO_TIMESTAMP function.") AS
 """
 // Return timeString with the given formatString in BigQuery canonical ISO format
-return moment(timeString, formatString).toDate();
+const momentObject = moment(dateString, correctFormat);
+
+if(momentObject.isValid()) {
+  return moment(timeString, formatString).toDate();
+}
+
+return null;
 """;
