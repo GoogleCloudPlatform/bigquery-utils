@@ -69,6 +69,7 @@ SELECT bqutil.fn.int(1.684)
 * [cw_nvp2json4](#cw_nvp2json4nvp-string-name_delim-string-val_delim-string-ignore_char-string)
 * [cw_otranslate](#cw_otranslates-string-key-string-value-string)
 * [cw_overlapping_partition_by_regexp](#cw_overlapping_partition_by_regexpfirstrn-int64-haystack-string-regex-string)
+* [cw_parse_timestamp](#cw_parse_timestamptimeString-string-formatString-string)
 * [cw_period_intersection](#cw_period_intersectionp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_period_ldiff](#cw_period_ldiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_period_rdiff](#cw_period_rdiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
@@ -732,6 +733,37 @@ SELECT bqutil.fn.cw_disjoint_partition_by_regexp(5, 'B@5#', '(?:A@\\d+#)+(?:B@\\
 [4, 5]
 []
 ```
+
+### [cw_parse_timestamp(timeString STRING, formatString STRING)](cw_parse_timestamp.sqlx)
+Parses a timestamp string according to a specified format string. Returns a TIMESTAMP value.
+
+```sql
+SELECT bqutil.fn.cw_parse_timestamp('Y-m-d H:M:s', '2024-03-20 14:30:00');
+
+2024-03-20 14:30:00 UTC
+```
+
+The function uses JavaScript library Moment to parse the timestamp string according to the format string. format string is Joda time format. Returns NULL if the input string cannot be parsed according to the format string.
+
+Input	                  Example	           Description
+YYYY	                  2014	             4 or 2 digit year. Note: Only 4 digit can be parsed on strict mode
+YY	                    14	               2 digit year
+Y	                      -25	               Year with any number of digits and sign
+Q	                      1..4	             Quarter of year. Sets month to first month in quarter.
+M MM	                  1..12	             Month number
+MMM MMMM	              Jan..December	     Month name in locale set by moment.locale()
+D DD	                  1..31	             Day of month
+DDD DDDD	              1..365	           Day of year
+X	                      1410715640.579	   Unix timestamp
+H HH	                  0..23	             Hours (24 hour time)
+h hh	                  1..12	             Hours (12 hour time used with a A.)
+k kk	                  1..24	             Hours (24 hour time from 1 to 24)
+a A	                    am pm	             Post or ante meridiem (Note the one character a p are also considered valid)
+m mm	                  0..59	             Minutes
+s ss	                  0..59	             Seconds
+S SS SSS ... SSSSSSSSS	0..999999999	     Fractional seconds
+Z ZZ	                  +12:00	           Offset from UTC as +-HH:mm, +-HHmm, or Z
+
 
 
 ### [cw_period_intersection(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_intersection.sqlx)
@@ -2213,6 +2245,7 @@ returns:
 | 3	| 30 | 0.0 |
 | 4	| 40 | 6.324555320336759 |
 | 5	| 50 | 12.649110640673518 |
+
 
 
 <br/>
