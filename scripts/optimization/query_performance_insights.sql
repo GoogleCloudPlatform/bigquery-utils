@@ -41,7 +41,13 @@ WHERE
     FROM UNNEST(
       query_info.performance_insights.stage_performance_standalone_insights
     )
-    WHERE slot_contention OR insufficient_shuffle_quota 
+    WHERE
+      slot_contention
+      OR insufficient_shuffle_quota
+      -- The following fields are arrays or complex types, so we check for non-null values
+      OR bi_engine_reasons IS NOT NULL
+      OR high_cardinality_joins IS NOT NULL
+      OR partition_skew IS NOT NULL
     UNION ALL
     SELECT 1
     FROM UNNEST(
