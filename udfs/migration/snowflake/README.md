@@ -40,3 +40,19 @@ SEQ|KEY|PATH|INDEX|VALUE|THIS
 2|null|b[1]|1|88|[77,88]
 3|c|c|null|{"d":"X"}|{"a":1,"b":[77,88],"c":{"d":"X"}}
 1|d|c.d|null|"X"|{"d":"X"}
+
+### [json_ilike(input JSON, pattern STRING)](json_ilike.sqlx)
+Helps to emulate the `SELECT {* ILIKE '%pattern%'}` syntax. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/data-types-semistructured#object-constants)
+```sql
+select
+    bqutil.sf.json_ilike(to_json((select as struct subselect.*)), '%ra%') as j
+  from
+  (
+    select 1 as xray, 2 as frame, 3 as id
+  ) as subselect;
+```
+
+Row|j
+---|-
+1|{"frame":2,"xray":1}	
+
