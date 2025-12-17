@@ -93,3 +93,18 @@ generate_udf_test("flatten", [
     },
 ]);
 
+generate_udf_test("json_ilike", [
+    {
+        inputs: [`json_object('abc', 1, 'def', 2)`, `'_b_'`],
+        expected_output: `JSON '{"abc": 1}'`
+    },
+    {
+        inputs: [`json_object('abc', 1, 'cba', 2)`, `'%c%'`],
+        expected_output: `JSON '{"abc": 1, "cba": 2}'`
+    },
+    {
+        inputs: [`json_object('abc', 1, 'cba', 2)`, `'c%'`],
+        expected_output: `JSON '{"cba": 2}'`
+    }
+]);
+
