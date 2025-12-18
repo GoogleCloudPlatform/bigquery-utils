@@ -22,7 +22,7 @@ import sys
 def parse_args():
     parser = argparse.ArgumentParser(description="Export BigQuery table schemas and DDLs to local files.")
     parser.add_argument("--project_id", required=True, help="GCP Project ID")
-    parser.add_argument("--region", default="us-central1", help="BigQuery Region (default: us-central1)")
+    parser.add_argument("--region", default="us", help="BigQuery Region (default: us-central1)")
     parser.add_argument("--output_dir", default="bq_schemas", help="Output directory for exported schemas (default: bq_schemas)")
     return parser.parse_args()
 
