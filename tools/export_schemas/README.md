@@ -17,8 +17,8 @@ This tool exports the DDL (Data Definition Language) for all tables in a BigQuer
 - Google Cloud SDK: The bq command-line tool must be installed and authenticated.
 - Python 3.x: Installed on your local machine or Cloud Shell.
 - IAM Permissions:
-    - bigquery.jobs.create (to run the export query).
-    - bigquery.tables.get and access to INFORMATION_SCHEMA views.
+    - roles/bigquery.jobUser (To execute the query job)
+    - roles/bigquery.metadataViewer (To access the INFORMATION_SCHEMA.TABLES view)
 
 ## Usage
 
@@ -29,7 +29,7 @@ python3 export_schemas.py --project_id <YOUR_PROJECT_ID> [--region <REGION>] [--
 ### Arguments
 
 - `--project_id`: (Required) The Google Cloud Project ID.
-- `--region`: (Optional) The BigQuery region to query. Defaults to `us-central1`.
+- `--region`: (Optional) The BigQuery region to query. Defaults to `us`.
 - `--output_dir`: (Optional) The directory to save the exported schemas. Defaults to `bq_schemas`.
 
 ### Example
