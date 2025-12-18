@@ -82,7 +82,7 @@ def main():
         print("No tables found. Check your project ID and region.")
         return
 
-    print(f"Found {len(tables)} tables. Writing .sql files...")
+    print(f"Found {len(tables)} tables. Writing {len(tables)}.sql files...")
 
     # 3. Write files
     for row in tables:
