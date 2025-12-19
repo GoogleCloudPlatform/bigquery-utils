@@ -12,19 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
-import json
 import os
 import shutil
 import argparse
 import sys
+import threading
+import queue
+from google.cloud import bigquery
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Export BigQuery table schemas and DDLs to local files.")
     parser.add_argument("--project_id", required=True, help="GCP Project ID")
-    parser.add_argument("--region", default="us", help="BigQuery Region (default: us-central1)")
+    parser.add_argument("--region", default="us", help="BigQuery Region (default: us")
     parser.add_argument("--output_dir", default="bq_schemas", help="Output directory for exported schemas (default: bq_schemas)")
+    parser.add_argument("--threads", type=int, default=10, help="Number of threads for parallel file writing (default: 10)")
     return parser.parse_args()
+
+
+
+def write_ddl(table_metadata, output_dir):
+    dataset = table_metadata['table_schema']
+    table = table_metadata['table_name']
+    ddl = table_metadata['ddl']
+
+    # Create dataset folder if it doesn't exist
+    ds_path = os.path.join(output_dir, dataset)
+    os.makedirs(ds_path, exist_ok=True)
+
+    # Write the DDL
+    with open(os.path.join(ds_path, f"{table}.sql"), "w") as sql_file:
+        sql_file.write(ddl)
+
+def worker(task_queue, output_dir):
+    while True:
+        table_metadata = task_queue.get()
+        if table_metadata is None:
+            break
+        write_ddl(table_metadata, output_dir)
+        task_queue.task_done()
 
 def main():
     args = parse_args()
@@ -32,6 +57,7 @@ def main():
     project_id = args.project_id
     region = args.region
     output_dir = args.output_dir
+    threads = args.threads
     
     # Construct region scope for INFORMATION_SCHEMA
     if region.lower().startswith("region-"):
@@ -47,7 +73,7 @@ def main():
 
     print(f"--- Starting Bulk Export for {project_id} ({region_scope}) ---")
 
-    # 2. Run the query using BQ CLI and get JSON output (Safe for DDL parsing)
+    # 2. Run the query using BigQuery Client Library
     query = f"""
     SELECT table_schema, table_name, ddl
     FROM `{project_id}.{region_scope}.INFORMATION_SCHEMA.TABLES`
@@ -56,47 +82,48 @@ def main():
     
     print("Querying BigQuery metadata...")
     
-    cmd = [
-        "bq", "query", 
-        "--use_legacy_sql=false", 
-        "--format=json", 
-        "--max_rows=10000", 
-        f"--project_id={project_id}",
-        query
-    ]
-
     try:
-        # Run command and capture output
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        tables = json.loads(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("\nError running BigQuery command:")
-        print(e.stderr)
+        client = bigquery.Client(project=project_id, location=region)
+        query_job = client.query(query)
+        tables = [dict(table_metadata) for table_metadata in query_job]
+    except ImportError:
+        print("\nError: google-cloud-bigquery module not found.")
+        print("Please install using: pip install google-cloud-bigquery or requirements.txt")
         return
-    except json.JSONDecodeError:
-        print("\nError: Query returned no data or invalid JSON.")
-        print("Check if your region is correct or if you have permissions.")
+    except Exception as query_error:
+        print("\nError running BigQuery query:")
+        print(query_error)
         return
 
     if not tables:
         print("No tables found. Check your project ID and region.")
         return
 
-    print(f"Found {len(tables)} tables. Writing {len(tables)}.sql files...")
+    print(f"Found {len(tables)} tables. Writing {len(tables)} .sql files...")
 
-    # 3. Write files
-    for row in tables:
-        dataset = row['table_schema']
-        table = row['table_name']
-        ddl = row['ddl']
+    # 3. Write files in parallel
+    task_queue = queue.Queue()
+    thread_pool = []
+    
+    # Start worker threads
+    for _ in range(threads):
+        worker_thread = threading.Thread(target=worker, args=(task_queue, output_dir))
+        worker_thread.start()
+        thread_pool.append(worker_thread)
 
-        # Create dataset folder if it doesn't exist
-        ds_path = os.path.join(output_dir, dataset)
-        os.makedirs(ds_path, exist_ok=True)
+    # Put all tasks in the queue
+    for table_metadata in tables:
+        task_queue.put(table_metadata)
 
-        # Write the DDL
-        with open(os.path.join(ds_path, f"{table}.sql"), "w") as f:
-            f.write(ddl)
+    # Block until all tasks are done
+    task_queue.join()
+
+    # Stop workers
+    for _ in range(threads):
+        task_queue.put(None)
+    
+    for worker_thread in thread_pool:
+        worker_thread.join()
 
     # 4. Create Zip
     print("Zipping files...")
