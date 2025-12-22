@@ -75,6 +75,12 @@ SELECT
       || '.' || ref_table.table_id
     FROM UNNEST(referenced_tables) ref_table
   ))                                                                       AS referenced_tables,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(50)] AS median_time_ms,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(75)] AS p75_time_ms,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(80)] AS p80_time_ms,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(90)] AS p90_time_ms,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(95)] AS p95_time_ms,
+  APPROX_QUANTILES(TIMESTAMP_DIFF(end_time, creation_time, MILLISECOND), 100)[OFFSET(99)] AS p99_time_ms
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 WHERE 
   DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
