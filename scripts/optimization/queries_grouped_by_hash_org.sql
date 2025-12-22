@@ -63,7 +63,6 @@ SELECT
   SUM(total_slot_ms) / (1000 * 60 * 60)                                    AS total_slot_hours,
   AVG(total_slot_ms) / (1000 * 60 * 60)                                    AS avg_total_slot_hours_per_active_day,
   AVG(TIMESTAMP_DIFF(end_time, start_time, SECOND) )                       AS avg_job_duration_seconds,
-
   ARRAY_AGG(DISTINCT FORMAT("%T",labels))                                  AS labels,
   SUM(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS total_slots,
   AVG(total_slot_ms / TIMESTAMP_DIFF(end_time, start_time, MILLISECOND))   AS avg_total_slots,
