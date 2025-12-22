@@ -354,11 +354,10 @@ in execution than the `queries_grouped_by_hash.sql` script because it has to
 loop over all projects and for each
 project query the `INFORMATION_SCHEMA.JOBS_BY_PROJECT` view.
 
-The [queries_grouped_by_hash_project_duration.sql](queries_grouped_by_hash_project_duration.sql)
-script creates a table named,
-`queries_grouped_by_hash_project_duration`. This table is also similar to
-the `queries_grouped_by_hash` table, but it
-focuses on the duration percentiles taken by each query hash.
+Both the `queries_grouped_by_hash` (Org and Project level) tables include duration percentiles (`median_time_ms`, `p75_time_ms`, `p90_time_ms`, etc.) calculated from `creation_time`. These metrics help identify query performance stability:
+- **Median**: If median is high, it indicates that the query is taking a long time to complete. Prioritize optimizing queries with high median duration. (filter earlier, check joins).
+- **Median vs p99**: A large gap indicates unstable performance (e.g., occasional slot contention or data skew).
+- **p95/p99**: Useful for tracking SLA violations and "worst-case" user experience.
 
 For example, the following queries would be grouped together because the date
 literal filters are ignored:
