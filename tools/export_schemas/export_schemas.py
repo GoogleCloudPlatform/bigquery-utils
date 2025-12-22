@@ -16,8 +16,7 @@ import os
 import shutil
 import argparse
 import sys
-import threading
-import queue
+import concurrent.futures
 from google.cloud import bigquery
 
 def parse_args():
@@ -25,7 +24,6 @@ def parse_args():
     parser.add_argument("--project_id", required=True, help="GCP Project ID")
     parser.add_argument("--region", default="us", help="BigQuery Region (default: us")
     parser.add_argument("--output_dir", default="bq_schemas", help="Output directory for exported schemas (default: bq_schemas)")
-    parser.add_argument("--threads", type=int, default=10, help="Number of threads for parallel file writing (default: 10)")
     return parser.parse_args()
 
 
@@ -43,21 +41,12 @@ def write_ddl(table_metadata, output_dir):
     with open(os.path.join(ds_path, f"{table}.sql"), "w") as sql_file:
         sql_file.write(ddl)
 
-def worker(task_queue, output_dir):
-    while True:
-        table_metadata = task_queue.get()
-        if table_metadata is None:
-            break
-        write_ddl(table_metadata, output_dir)
-        task_queue.task_done()
-
 def main():
     args = parse_args()
     
     project_id = args.project_id
     region = args.region
     output_dir = args.output_dir
-    threads = args.threads
     
     # Construct region scope for INFORMATION_SCHEMA
     if region.lower().startswith("region-"):
@@ -102,28 +91,17 @@ def main():
     print(f"Found {len(tables)} tables. Writing {len(tables)} .sql files...")
 
     # 3. Write files in parallel
-    task_queue = queue.Queue()
-    thread_pool = []
-    
-    # Start worker threads
-    for _ in range(threads):
-        worker_thread = threading.Thread(target=worker, args=(task_queue, output_dir))
-        worker_thread.start()
-        thread_pool.append(worker_thread)
-
-    # Put all tasks in the queue
-    for table_metadata in tables:
-        task_queue.put(table_metadata)
-
-    # Block until all tasks are done
-    task_queue.join()
-
-    # Stop workers
-    for _ in range(threads):
-        task_queue.put(None)
-    
-    for worker_thread in thread_pool:
-        worker_thread.join()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future_to_table = {
+            executor.submit(write_ddl, table_metadata, output_dir): table_metadata 
+            for table_metadata in tables
+        }
+        for future in concurrent.futures.as_completed(future_to_table):
+            table_metadata = future_to_table[future]
+            try:
+                future.result()
+            except Exception as exc:
+                print(f"Table {table_metadata.get('table_name')} generated an exception: {exc}")
 
     # 4. Create Zip
     print("Zipping files...")
