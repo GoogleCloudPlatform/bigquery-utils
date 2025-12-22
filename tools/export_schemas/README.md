@@ -24,7 +24,7 @@ This tool exports the DDL (Data Definition Language) for all tables in a BigQuer
 ## Usage
 
 ```bash
-python3 export_schemas.py --project_id <YOUR_PROJECT_ID> [--region <REGION>] [--output_dir <OUTPUT_DIR>] [--threads <THREADS>]
+python3 export_schemas.py --project_id <YOUR_PROJECT_ID> [--region <REGION>] [--output_dir <OUTPUT_DIR>]
 ```
 
 ### Arguments
@@ -32,7 +32,6 @@ python3 export_schemas.py --project_id <YOUR_PROJECT_ID> [--region <REGION>] [--
 - `--project_id`: (Required) The Google Cloud Project ID.
 - `--region`: (Optional) The BigQuery region to query. Defaults to `us`.
 - `--output_dir`: (Optional) The directory to save the exported schemas. Defaults to `bq_schemas`.
-- `--threads`: (Optional) Number of threads for parallel export. Defaults to `10`.
 
 ### Example
 
