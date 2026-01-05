@@ -538,7 +538,7 @@ TOPIC_ID=test-gcs-ocn
 PUBSUB_TOPIC=projects/${PROJECT_ID/topics/${TOPIC_ID}
 
 # Create Pub/Sub Object Change Notifications
-gsutil notification create -f json -t ${PUBSUB_TOPIC} -e OBJECT_FINALIZE gs://${INGESTION_BUCKET}
+gcloud storage buckets notifications create --payload-format=json --topic=${PUBSUB_TOPIC} --event-types=OBJECT_FINALIZE gs://${INGESTION_BUCKET}
 
 # Deploy Cloud Function
 gcloud functions deploy test-gcs-bq-ingest \
