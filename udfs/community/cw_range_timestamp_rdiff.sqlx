@@ -1,0 +1,26 @@
+config { hasOutput: true }
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(p1 RANGE<TIMESTAMP>, p2 RANGE<TIMESTAMP>) RETURNS RANGE<TIMESTAMP>
+OPTIONS(description="Emulates Teradata's RDIFF operator with RANGE<TIMESTAMP> inputs.")
+AS (
+  CASE
+    WHEN RANGE_OVERLAPS(p1, p2) AND RANGE_END(p1) > RANGE_END(p2) THEN
+      RANGE(RANGE_END(p2), RANGE_END(p1))
+    ELSE NULL
+  END
+);
