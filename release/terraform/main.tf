@@ -30,7 +30,7 @@ resource "google_storage_bucket_iam_member" "member" {
   for_each = var.project == "bqutil" ? toset(var.bq_regions) : []
   bucket   = "${var.project}-lib-${each.value}"
   role     = "roles/storage.objectViewer"
-  member   = "allAuthenticatedUsers"
+  member   = "allUsers"
 }
 
 resource "google_storage_bucket_iam_member" "bigframes-default-connection-bucket-writer" {
@@ -152,7 +152,7 @@ resource "google_bigquery_dataset_iam_member" "procedure_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "procedure_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 /* Uncomment below whenever the first contribution to netezza dataset occurs 
@@ -161,7 +161,7 @@ resource "google_bigquery_dataset_iam_member" "nz_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "nz_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 */
 
@@ -170,7 +170,7 @@ resource "google_bigquery_dataset_iam_member" "or_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "or_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "rs_public_viewers" {
@@ -178,7 +178,7 @@ resource "google_bigquery_dataset_iam_member" "rs_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "rs_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "sf_public_viewers" {
@@ -186,7 +186,7 @@ resource "google_bigquery_dataset_iam_member" "sf_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "sf_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "ss_public_viewers" {
@@ -194,7 +194,7 @@ resource "google_bigquery_dataset_iam_member" "ss_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "ss_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "td_public_viewers" {
@@ -202,7 +202,7 @@ resource "google_bigquery_dataset_iam_member" "td_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "td_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "ve_public_viewers" {
@@ -210,7 +210,7 @@ resource "google_bigquery_dataset_iam_member" "ve_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "ve_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "fn_public_viewers" {
@@ -218,7 +218,7 @@ resource "google_bigquery_dataset_iam_member" "fn_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "fn_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
 
 resource "google_bigquery_dataset_iam_member" "datasketches_public_viewers" {
@@ -226,5 +226,5 @@ resource "google_bigquery_dataset_iam_member" "datasketches_public_viewers" {
   for_each   = var.project == "bqutil" ? toset(var.bq_regions) : []
   dataset_id = "datasketches_${replace(each.value, "-", "_")}"
   role       = "roles/bigquery.dataViewer"
-  member     = "allAuthenticatedUsers"
+  member     = "allUsers"
 }
