@@ -3148,6 +3148,96 @@ generate_udf_test("cw_period_ldiff", [
     expected_output: `NULL`,
   },
 ]);
+generate_udf_test("cw_range_date_ldiff", [
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-12, 2001-11-14)'`,
+      `RANGE<DATE> '[2001-11-13, 2001-11-15)'`,
+    ],
+    expected_output: `RANGE<DATE> '[2001-11-12, 2001-11-13)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-22, 2001-11-26)'`,
+      `RANGE<DATE> '[2001-11-23, 2001-11-25)'`,
+    ],
+    expected_output: `RANGE<DATE> '[2001-11-22, 2001-11-23)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-13, 2001-11-14)'`,
+      `RANGE<DATE> '[2001-11-15, 2001-11-16)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-12, 2001-11-14)'`,
+      `RANGE<DATE> '[2001-11-14, 2001-11-15)'`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
+generate_udf_test("cw_range_datetime_ldiff", [
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-13 00:00:00, 2001-11-15 00:00:00)'`,
+    ],
+    expected_output: `RANGE<DATETIME> '[2001-11-12 00:00:00, 2001-11-13 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-22 00:00:00, 2001-11-26 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-23 00:00:00, 2001-11-25 00:00:00)'`,
+    ],
+    expected_output: `RANGE<DATETIME> '[2001-11-22 00:00:00, 2001-11-23 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-13 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-15 00:00:00, 2001-11-16 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
+generate_udf_test("cw_range_timestamp_ldiff", [
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-13 00:00:00, 2001-11-15 00:00:00)'`,
+    ],
+    expected_output: `RANGE<TIMESTAMP> '[2001-11-12 00:00:00, 2001-11-13 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-22 00:00:00, 2001-11-26 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-23 00:00:00, 2001-11-25 00:00:00)'`,
+    ],
+    expected_output: `RANGE<TIMESTAMP> '[2001-11-22 00:00:00, 2001-11-23 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-13 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-15 00:00:00, 2001-11-16 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
 generate_udf_test("cw_period_rdiff", [
   {
     inputs: [
@@ -3174,6 +3264,96 @@ generate_udf_test("cw_period_rdiff", [
     inputs: [
       `STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)`,
       `STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper)`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
+generate_udf_test("cw_range_date_rdiff", [
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-13, 2001-11-15)'`,
+      `RANGE<DATE> '[2001-11-12, 2001-11-14)'`,
+    ],
+    expected_output: `RANGE<DATE> '[2001-11-14, 2001-11-15)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-22, 2001-11-26)'`,
+      `RANGE<DATE> '[2001-11-23, 2001-11-25)'`,
+    ],
+    expected_output: `RANGE<DATE> '[2001-11-25, 2001-11-26)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-15, 2001-11-16)'`,
+      `RANGE<DATE> '[2001-11-13, 2001-11-14)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<DATE> '[2001-11-14, 2001-11-15)'`,
+      `RANGE<DATE> '[2001-11-12, 2001-11-14)'`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
+generate_udf_test("cw_range_datetime_rdiff", [
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-13 00:00:00, 2001-11-15 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+    ],
+    expected_output: `RANGE<DATETIME> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-22 00:00:00, 2001-11-26 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-23 00:00:00, 2001-11-25 00:00:00)'`,
+    ],
+    expected_output: `RANGE<DATETIME> '[2001-11-25 00:00:00, 2001-11-26 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-15 00:00:00, 2001-11-16 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-13 00:00:00, 2001-11-14 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<DATETIME> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+      `RANGE<DATETIME> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+]);
+generate_udf_test("cw_range_timestamp_rdiff", [
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-13 00:00:00, 2001-11-15 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
+    ],
+    expected_output: `RANGE<TIMESTAMP> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-22 00:00:00, 2001-11-26 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-23 00:00:00, 2001-11-25 00:00:00)'`,
+    ],
+    expected_output: `RANGE<TIMESTAMP> '[2001-11-25 00:00:00, 2001-11-26 00:00:00)'`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-15 00:00:00, 2001-11-16 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-13 00:00:00, 2001-11-14 00:00:00)'`,
+    ],
+    expected_output: `NULL`,
+  },
+  {
+    inputs: [
+      `RANGE<TIMESTAMP> '[2001-11-14 00:00:00, 2001-11-15 00:00:00)'`,
+      `RANGE<TIMESTAMP> '[2001-11-12 00:00:00, 2001-11-14 00:00:00)'`,
     ],
     expected_output: `NULL`,
   },

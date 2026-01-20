@@ -72,7 +72,13 @@ SELECT bqutil.fn.int(1.684)
 * [cw_parse_timestamp](#cw_parse_timestamptimeString-string-formatString-string)
 * [cw_period_intersection](#cw_period_intersectionp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
 * [cw_period_ldiff](#cw_period_ldiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_range_date_ldiff](#cw_range_date_ldiffp1-range-p2-range)
+* [cw_range_datetime_ldiff](#cw_range_datetime_ldiffp1-range-p2-range)
+* [cw_range_timestamp_ldiff](#cw_range_timestamp_ldiffp1-range-p2-range)
 * [cw_period_rdiff](#cw_period_rdiffp1-structlower-timestamp-upper-timestamp-p2-structlower-timestamp-upper-timestamp)
+* [cw_range_date_rdiff](#cw_range_date_rdiffp1-range-p2-range)
+* [cw_range_datetime_rdiff](#cw_range_datetime_rdiffp1-range-p2-range)
+* [cw_range_timestamp_rdiff](#cw_range_timestamp_rdiffp1-range-p2-range)
 * [cw_regex_mode](#cw_regex_modemode-string)
 * [cw_regexp_extract](#cw_regexp_extractstr-string-regexp-string)
 * [cw_regexp_extract_all](#cw_regexp_extract_allstr-string-regexp-string)
@@ -784,6 +790,33 @@ SELECT bqutil.fn.cw_period_ldiff(
 STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-13 00:00:00' AS upper)
 ```
 
+### [cw_range_date_ldiff(p1 RANGE<DATE>, p2 RANGE<DATE>)](cw_range_date_ldiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_date_ldiff(
+  RANGE(DATE '2001-11-12', DATE '2001-11-14'),
+  RANGE(DATE '2001-11-13', DATE '2001-11-15'))
+
+RANGE(DATE '2001-11-12', DATE '2001-11-13')
+```
+
+### [cw_range_datetime_ldiff(p1 RANGE<DATETIME>, p2 RANGE<DATETIME>)](cw_range_datetime_ldiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_datetime_ldiff(
+  RANGE(DATETIME '2001-11-12 00:00:00', DATETIME '2001-11-14 00:00:00'),
+  RANGE(DATETIME '2001-11-13 00:00:00', DATETIME '2001-11-15 00:00:00'))
+
+RANGE(DATETIME '2001-11-12 00:00:00', DATETIME '2001-11-13 00:00:00')
+```
+
+### [cw_range_timestamp_ldiff(p1 RANGE<TIMESTAMP>, p2 RANGE<TIMESTAMP>)](cw_range_timestamp_ldiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_timestamp_ldiff(
+  RANGE(TIMESTAMP '2001-11-12 00:00:00', TIMESTAMP '2001-11-14 00:00:00'),
+  RANGE(TIMESTAMP '2001-11-13 00:00:00', TIMESTAMP '2001-11-15 00:00:00'))
+
+RANGE(TIMESTAMP '2001-11-12 00:00:00', TIMESTAMP '2001-11-13 00:00:00')
+```
+
 ### [cw_period_rdiff(p1 STRUCT<lower TIMESTAMP, upper TIMESTAMP>, p2 STRUCT<lower TIMESTAMP, upper TIMESTAMP>)](cw_period_rdiff.sqlx)
 ```sql
 SELECT bqutil.fn.cw_period_rdiff(
@@ -791,6 +824,34 @@ SELECT bqutil.fn.cw_period_rdiff(
   STRUCT(TIMESTAMP '2001-11-12 00:00:00' AS lower, TIMESTAMP '2001-11-14 00:00:00' AS upper))
 
 STRUCT(TIMESTAMP '2001-11-14 00:00:00' AS lower, TIMESTAMP '2001-11-15 00:00:00' AS upper)
+```
+
+### [cw_range_date_rdiff(p1 RANGE<DATE>, p2 RANGE<DATE>)](cw_range_date_rdiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_date_rdiff(
+  RANGE(DATE '2001-11-13', DATE '2001-11-15'),
+  RANGE(DATE '2001-11-12', DATE '2001-11-14'))
+
+RANGE(DATE '2001-11-14', DATE '2001-11-15')
+```
+
+### [cw_range_datetime_rdiff(p1 RANGE<DATETIME>, p2 RANGE<DATETIME>)](cw_range_datetime_rdiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_datetime_rdiff(
+  RANGE(DATETIME '2001-11-13 00:00:00', DATETIME '2001-11-15 00:00:00'),
+  RANGE(DATETIME '2001-11-12 00:00:00', DATETIME '2001-11-14 00:00:00'))
+
+RANGE(DATETIME '2001-11-14 00:00:00', DATETIME '2001-11-15 00:00:00')
+```
+
+
+### [cw_range_timestamp_rdiff(p1 RANGE<TIMESTAMP>, p2 RANGE<TIMESTAMP>)](cw_range_timestamp_rdiff.sqlx)
+```sql
+SELECT cw_udf.cw_range_timestamp_rdiff(
+  RANGE(TIMESTAMP '2001-11-13 00:00:00', TIMESTAMP '2001-11-15 00:00:00'),
+  RANGE(TIMESTAMP '2001-11-12 00:00:00', TIMESTAMP '2001-11-14 00:00:00'))
+
+RANGE(TIMESTAMP '2001-11-14 00:00:00', TIMESTAMP '2001-11-15 00:00:00')
 ```
 
 ### [cw_regex_mode(mode STRING)](cw_regex_mode.sqlx)
