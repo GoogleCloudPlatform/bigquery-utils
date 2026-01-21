@@ -15,6 +15,9 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(input_meters FLOAT64) AS (
+CREATE OR REPLACE FUNCTION ${self()}(input_meters FLOAT64) 
+OPTIONS (
+    description="Convert meters to miles."
+) AS (
   input_meters / 1609.344
 );
