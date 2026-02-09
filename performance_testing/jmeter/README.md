@@ -9,7 +9,7 @@ provided JMeter test plans
   [Java 8+ Oracle JDK](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)
   from Oracle page
 * Download the
-  [Simba BigQuery JDBC Driver](https://cloud.google.com/bigquery/providers/simba-drivers)
+  [Simba BigQuery JDBC Driver](https://docs.cloud.google.com/bigquery/docs/reference/odbc-jdbc-drivers#current_jdbc_driver)
 * Download the latest
   [JMeter Binary](https://jmeter.apache.org/download_jmeter.cgi)
 
