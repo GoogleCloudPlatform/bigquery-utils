@@ -336,14 +336,13 @@ and the pricing for each region found [here](https://cloud.google.com/bigquery/p
 
 ## Queries grouped by hash
 
-The [queries_grouped_by_hash.sql](queries_grouped_by_hash.sql) script creates a
+The [queries_grouped_by_hash_project.sql](queries_grouped_by_hash_project.sql) script creates a
 table named,
-`queries_grouped_by_hash`. This table groups queries by their normalized query
+`queries_grouped_by_hash_project`. This table groups queries by their normalized query
 pattern, which ignores
 comments, parameter values, UDFs, and literals in the query text.
 This allows us to group queries that are logically the same, but
-have different literals. The `queries_grouped_by_hash` table does not expose the
-raw SQL text of the queries.
+have different literals.
 
 The [viewable_queries_grouped_by_hash.sql](viewable_queries_grouped_by_hash.sql)
 script creates a table named,
@@ -354,6 +353,12 @@ The `viewable_queries_grouped_by_hash.sql` script runs much slower
 in execution than the `queries_grouped_by_hash.sql` script because it has to
 loop over all projects and for each
 project query the `INFORMATION_SCHEMA.JOBS_BY_PROJECT` view.
+
+The [queries_grouped_by_hash_project_duration.sql](queries_grouped_by_hash_project_duration.sql)
+script creates a table named,
+`queries_grouped_by_hash_project_duration`. This table is also similar to
+the `queries_grouped_by_hash` table, but it
+focuses on the duration percentiles taken by each query hash.
 
 For example, the following queries would be grouped together because the date
 literal filters are ignored:
@@ -532,5 +537,24 @@ of that hour's slots each grouping of labels consumed.
   ORDER BY period_total_slot_hours DESC
   LIMIT 10
   ``` 
+
+</details>
+
+<details><summary><b>&#128269; BI Engine Mode Duration </b></summary>
+
+## BI Engine Mode Duration 
+
+The [bi_engine_mode_duration](bi_engine_mode_duration.sql)
+script creates a table named, `bi_engine_mode_duration`. This table
+groups queries by their BI Engine mode and then shows for every day timeslice how long queries took for each mode.
+
+</details>
+
+<details><summary><b>&#128269; BI Engine Disabled Reasons</b></summary>
+
+## BI Engine Disabled Reasons
+
+The [bi_engine_disabled_reasons](bi_engine_disabled_reasons.sql)
+script creates a table named, `bi_engine_disabled_reasons`. This table groups queries by their BI Engine Disabled reason and counts them by reason.
 
 </details>

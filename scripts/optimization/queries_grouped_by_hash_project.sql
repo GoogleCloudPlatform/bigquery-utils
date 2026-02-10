@@ -15,8 +15,8 @@
  */
 
 /*
- * This script creates a table named, top_bytes_scanning_queries_by_hash, 
- * which contains the top 200 most expensive queries by total bytes scanned
+ * This script creates a table named queries_grouped_by_hash_project, 
+ * which contains the top 200 most expensive queries by total slot hours
  * within the past 30 days.
  * 30 days is the default timeframe, but you can change this by setting the
  * num_days_to_scan variable to a different value.
@@ -75,11 +75,13 @@ SELECT
       || '.' || ref_table.table_id
     FROM UNNEST(referenced_tables) ref_table
   ))                                                                       AS referenced_tables,
-FROM `region-us`.INFORMATION_SCHEMA.JOBS
+FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_ORGANIZATION
 WHERE 
   DATE(creation_time) >= CURRENT_DATE - num_days_to_scan
   AND state = 'DONE'
   AND error_result IS NULL
   AND job_type = 'QUERY'
   AND statement_type != 'SCRIPT' 
-GROUP BY statement_type, query_hash;
+GROUP BY statement_type, query_hash
+ORDER BY total_slot_hours DESC
+LIMIT 200;
