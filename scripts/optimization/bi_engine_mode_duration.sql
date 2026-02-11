@@ -60,4 +60,3 @@ FROM
 GROUP BY
  1,
  2
- ORDER BY day, bi_engine_mode ASC;

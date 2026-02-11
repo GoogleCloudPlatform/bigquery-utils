@@ -547,6 +547,16 @@ The [bi_engine_mode_duration](bi_engine_mode_duration.sql)
 script creates a table named, `bi_engine_mode_duration`. This table
 groups queries by their BI Engine mode and then shows for every day timeslice how long queries took for each mode.
 
+### Examples of querying script results
+
+* Order by day and BI Engine mode
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.bi_engine_mode_duration
+    ORDER BY day, bi_engine_mode ASC
+    ```
+
 </details>
 
 <details><summary><b>&#128269; BI Engine Disabled Reasons</b></summary>
