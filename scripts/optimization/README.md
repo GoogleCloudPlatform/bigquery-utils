@@ -376,16 +376,25 @@ Running the `run_anti_pattern_tool.sh` bash script will build and run the Anti-P
 
   ```sql
   SELECT *
-  FROM optimization_workshop.queries_grouped_by_hash
+  FROM optimization_workshop.queries_grouped_by_hash_org
   ORDER BY total_gigabytes_processed DESC
   LIMIT 100
+  ```
+
+* Top 200 queries with the highest total slot hours
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_hash_project
+  ORDER BY total_slot_hours DESC
+  LIMIT 200
   ```
 
 * Top 100 recurring queries with the highest slot hours consumed
 
   ```sql
   SELECT *
-  FROM optimization_workshop.queries_grouped_by_hash
+  FROM optimization_workshop.queries_grouped_by_hash_org
   ORDER BY total_slot_hours * days_active * job_count DESC 
   LIMIT 100
   ```

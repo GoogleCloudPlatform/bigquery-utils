@@ -89,5 +89,4 @@ WHERE
   AND job_type = 'QUERY'
   AND statement_type != 'SCRIPT' 
 GROUP BY statement_type, query_hash
-ORDER BY total_slot_hours DESC
-LIMIT 200;
+
