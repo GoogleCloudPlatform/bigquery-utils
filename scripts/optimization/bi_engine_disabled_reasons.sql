@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
+/*
+ * This script creates a table named, bi_engine_disabled_reasons,
+ * which groups queries by their BI Engine Disabled reason and counts them by reason.
+ * This table helps identify the most common reasons why BI Engine is disabled
+ * for your queries so that you can tune your queries to be BI Engine friendly.
+ * 
+ * 30 days is the default timeframe, but you can change this by setting the
+ * num_days_to_scan variable to a different value.
+ */
+
+
 DECLARE num_days_to_scan INT64 DEFAULT 30;
 
 CREATE SCHEMA IF NOT EXISTS optimization_workshop;
