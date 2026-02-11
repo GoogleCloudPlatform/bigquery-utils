@@ -500,6 +500,45 @@ generated for them in the past 30 days.
 
 </details>
 
+<details><summary><b>&#128269; BI Engine Mode Duration </b></summary>
+
+## BI Engine Mode Duration 
+
+The [bi_engine_mode_duration](bi_engine_mode_duration.sql)
+script creates a table named, `bi_engine_mode_duration`. This table
+groups queries by their BI Engine mode and then shows for every day timeslice how long queries took for each mode.
+
+### Examples of querying script results
+
+* Order by day and BI Engine mode
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.bi_engine_mode_duration
+    ORDER BY day, bi_engine_mode ASC
+    ```
+
+</details>
+
+<details><summary><b>&#128269; BI Engine Disabled Reasons</b></summary>
+
+## BI Engine Disabled Reasons
+
+The [bi_engine_disabled_reasons](bi_engine_disabled_reasons.sql)
+script creates a table named, `bi_engine_disabled_reasons`. This table groups queries by their BI Engine Disabled reason and counts them by reason.
+
+### Examples of querying script results
+
+* Order by reasons count descending
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.bi_engine_disabled_reasons
+    ORDER BY count DESC
+    ```
+
+</details>
+
 # Workload Analysis
 
 <details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
@@ -548,31 +587,4 @@ of that hour's slots each grouping of labels consumed.
 
 </details>
 
-<details><summary><b>&#128269; BI Engine Mode Duration </b></summary>
 
-## BI Engine Mode Duration 
-
-The [bi_engine_mode_duration](bi_engine_mode_duration.sql)
-script creates a table named, `bi_engine_mode_duration`. This table
-groups queries by their BI Engine mode and then shows for every day timeslice how long queries took for each mode.
-
-### Examples of querying script results
-
-* Order by day and BI Engine mode
-
-    ```sql
-    SELECT *
-    FROM optimization_workshop.bi_engine_mode_duration
-    ORDER BY day, bi_engine_mode ASC
-    ```
-
-</details>
-
-<details><summary><b>&#128269; BI Engine Disabled Reasons</b></summary>
-
-## BI Engine Disabled Reasons
-
-The [bi_engine_disabled_reasons](bi_engine_disabled_reasons.sql)
-script creates a table named, `bi_engine_disabled_reasons`. This table groups queries by their BI Engine Disabled reason and counts them by reason.
-
-</details>
