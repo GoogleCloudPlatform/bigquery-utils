@@ -336,14 +336,13 @@ and the pricing for each region found [here](https://cloud.google.com/bigquery/p
 
 ## Queries grouped by hash
 
-The [queries_grouped_by_hash.sql](queries_grouped_by_hash.sql) script creates a
+The [queries_grouped_by_hash_project.sql](queries_grouped_by_hash_project.sql) script creates a
 table named,
-`queries_grouped_by_hash`. This table groups queries by their normalized query
+`queries_grouped_by_hash_project`. This table groups queries by their normalized query
 pattern, which ignores
 comments, parameter values, UDFs, and literals in the query text.
 This allows us to group queries that are logically the same, but
-have different literals. The `queries_grouped_by_hash` table does not expose the
-raw SQL text of the queries.
+have different literals.
 
 The [viewable_queries_grouped_by_hash.sql](viewable_queries_grouped_by_hash.sql)
 script creates a table named,
@@ -354,6 +353,11 @@ The `viewable_queries_grouped_by_hash.sql` script runs much slower
 in execution than the `queries_grouped_by_hash.sql` script because it has to
 loop over all projects and for each
 project query the `INFORMATION_SCHEMA.JOBS_BY_PROJECT` view.
+
+Both the `queries_grouped_by_hash` (Org and Project level) tables include duration percentiles (`median_time_ms`, `p75_time_ms`, `p90_time_ms`, etc.) calculated from `creation_time`. These metrics help identify query performance stability:
+- **Median**: If median is high, it indicates that the query is taking a long time to complete. Prioritize optimizing queries with high median duration. (filter earlier, check joins).
+- **Median vs p99**: A large gap indicates unstable performance (e.g., occasional slot contention or data skew).
+- **p95/p99**: Useful for tracking SLA violations and "worst-case" user experience.
 
 For example, the following queries would be grouped together because the date
 literal filters are ignored:
@@ -372,16 +376,25 @@ Running the `run_anti_pattern_tool.sh` bash script will build and run the Anti-P
 
   ```sql
   SELECT *
-  FROM optimization_workshop.queries_grouped_by_hash
+  FROM optimization_workshop.queries_grouped_by_hash_org
   ORDER BY total_gigabytes_processed DESC
   LIMIT 100
+  ```
+
+* Top 200 queries with the highest total slot hours
+
+  ```sql
+  SELECT *
+  FROM optimization_workshop.queries_grouped_by_hash_project
+  ORDER BY total_slot_hours DESC
+  LIMIT 200
   ```
 
 * Top 100 recurring queries with the highest slot hours consumed
 
   ```sql
   SELECT *
-  FROM optimization_workshop.queries_grouped_by_hash
+  FROM optimization_workshop.queries_grouped_by_hash_org
   ORDER BY total_slot_hours * days_active * job_count DESC 
   LIMIT 100
   ```
@@ -487,6 +500,45 @@ generated for them in the past 30 days.
 
 </details>
 
+<details><summary><b>&#128269; BI Engine Mode Duration </b></summary>
+
+## BI Engine Mode Duration 
+
+The [bi_engine_mode_duration](bi_engine_mode_duration.sql)
+script creates a table named, `bi_engine_mode_duration`. This table
+groups queries by their BI Engine mode and then shows for every day timeslice how long queries took for each mode.
+
+### Examples of querying script results
+
+* Order by day and BI Engine mode
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.bi_engine_mode_duration
+    ORDER BY day, bi_engine_mode ASC
+    ```
+
+</details>
+
+<details><summary><b>&#128269; BI Engine Disabled Reasons</b></summary>
+
+## BI Engine Disabled Reasons
+
+The [bi_engine_disabled_reasons](bi_engine_disabled_reasons.sql)
+script creates a table named, `bi_engine_disabled_reasons`. This table groups queries by their BI Engine Disabled reason and counts them by reason.
+
+### Examples of querying script results
+
+* Order by reasons count descending
+
+    ```sql
+    SELECT *
+    FROM optimization_workshop.bi_engine_disabled_reasons
+    ORDER BY count DESC
+    ```
+
+</details>
+
 # Workload Analysis
 
 <details><summary><b>&#128269; Hourly slot consumption by query hash</b></summary>
@@ -534,3 +586,5 @@ of that hour's slots each grouping of labels consumed.
   ``` 
 
 </details>
+
+
