@@ -14,7 +14,7 @@
 
 r"""This script facilitates the migration of BigQuery Policy Tags and associated Data Policies between regions, designed to assist with scenarios like replicating a dataset and ensuring governance consistency.
 
-*** GOOGLE CONFIDENTIAL - PROVIDED FOR CVS HEALTH USE ONLY ***
+*** GOOGLE CONFIDENTIAL ***
 *** AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED ***
 *** NOT AN OFFICIALLY SUPPORTED GOOGLE PRODUCT ***
 
@@ -32,7 +32,7 @@ This causes queries on tagged columns in the secondary region to fail with
 This script automates the process of recreating the governance artifacts
 (Taxonomies, Policy Tag IAM Policies, Data Policies) in the destination region
 and re-linking the table columns to the correct, newly replicated policy tags.
-This script is provided to assist CVS Health with specific migration
+This script is provided to assist customers with specific migration
 challenges. This script is designed to operate on one dataset at a time to
 minimize risk during migration.
 
@@ -181,7 +181,7 @@ Examples:
 
   # Run Step 1 for a single dataset
   python migrate_policy_tags.py --project_id policy-tags-migration-test \
-    --source_region us --dataset cvs_test_us --step1 \
+    --source_region us --dataset test_dataset_us --step1 \
     --table_schema_backup_dir ./schema_backups
 
   # Run Step 1 for all datasets
@@ -204,11 +204,11 @@ Examples:
 
   # Run Step 5 only
   python migrate_policy_tags.py --project_id policy-tags-migration-test \
-    --source_region us --destination_region us-east4 --dataset cvs_test_us --step5
+    --source_region us --destination_region us-east4 --dataset test_dataset_us --step5
 
   # Run Step 6 only
   python migrate_policy_tags.py --project_id policy-tags-migration-test \
-    --source_region us --destination_region us-east4 --dataset cvs_test_us \
+    --source_region us --destination_region us-east4 --dataset test_dataset_us \
     --policy_tag_bindings_snapshot_timestamp <TIMESTAMP> --step6
 
   # Run Step 6 for all datasets in snapshot
@@ -218,7 +218,7 @@ Examples:
 
   # Log to a specific file and set log level to DEBUG
   python migrate_policy_tags.py --project_id policy-tags-migration-test \
-    --source_region us --dataset cvs_test_us --step1 --log_file ./migration_run.log --log_level DEBUG
+    --source_region us --dataset test_dataset_us --step1 --log_file ./migration_run.log --log_level DEBUG
 """
 
 # This is a customer-facing script provided as-is, and is not subject to
