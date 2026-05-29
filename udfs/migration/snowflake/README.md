@@ -56,3 +56,32 @@ Row|j
 ---|-
 1|{"frame":2,"xray":1}	
 
+### [object_agg(key STRING, value JSON)](object_agg.sqlx)
+Emulates the `OBJECT_AGG` function in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/object_agg)
+```sql
+SELECT object_agg(k, v)
+FROM
+  (
+    SELECT 'a' AS k, json '1' AS v
+    UNION ALL
+    SELECT 'b' as k, json '2' as v);
+```
+
+Row|f0_
+---|---
+1|{"b":2,"a":1}
+
+```sql
+SELECT object_agg(k, v)
+FROM
+  (
+    SELECT 'a' AS k, json '1' AS v
+    UNION ALL
+    SELECT 'a' AS k, json '3' AS b
+    UNION ALL
+    SELECT 'b' as k, json '2' as v);
+```
+
+Error: Duplicate field key 'a' at object_agg(STRING, JSON) line 7, columns 6-7
+
+
