@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const {generate_udf_test} = unit_test_utils;
+const {generate_udf_test, generate_udaf_test} = unit_test_utils;
 
 generate_udf_test("factorial", [
     {
@@ -107,4 +107,44 @@ generate_udf_test("json_ilike", [
         expected_output: `JSON '{"cba": 2}'`
     }
 ]);
+
+generate_udaf_test("object_agg",
+    {
+        input_columns: [`key`, `value`, `false NOT AGGREGATE`],
+        input_rows: `
+            select 'a' as key, JSON '1' as value
+            union all
+            select 'b' as key, JSON '2' as value
+        `,
+        expected_output: `JSON '{"a": 1, "b": 2}'`
+    }
+);
+
+generate_udaf_test("object_agg",
+    {
+        input_columns: [`key`, `value`, `true NOT AGGREGATE`],
+        input_rows: `
+            select 'a' as key, JSON '1' as value
+            union all
+            select null as key, JSON '3' as value
+            union all
+            select 'b' as key, JSON '2' as value
+            union all
+            select 'b' as key, null as value
+        `,
+        expected_output: `JSON '{"a": 1, "b": 2}'`
+    }
+);
+
+generate_udaf_test("object_agg",
+    {
+        input_columns: [`key`, `value`, `true NOT AGGREGATE`],
+        input_rows: `
+            select 'a' as key, JSON '1' as value
+            union all
+            select 'a' as key, JSON '1' as value
+        `,
+        expected_output: `JSON '{"a": 1}'`
+    }
+);
 
