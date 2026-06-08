@@ -148,3 +148,64 @@ generate_udaf_test("object_agg",
     }
 );
 
+generate_udf_test("array_equal", [
+    {
+        inputs: [`[JSON '1', JSON '2']`, `[JSON '1', JSON '2']`],
+        expected_output: `true`
+    },
+    {
+        inputs: [`[JSON '1', JSON '2']`, `[JSON '1', JSON '3']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '1', JSON '2']`, `[JSON '1']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '1', CAST(NULL AS JSON)]`, `[JSON '1', CAST(NULL AS JSON)]`],
+        expected_output: `true`
+    },
+    {
+        inputs: [`[JSON '1']`, `[JSON '"1"']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '{"a": 1}']`, `[JSON '{"a": 1}']`],
+        expected_output: `true`
+    },
+    {
+        inputs: [`[JSON '{"a": 1}']`, `[JSON '{"b": 1}']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '{"a": 1}']`, `[JSON '{"a": 2}']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '{"a": {"b": 1}}']`, `[JSON '{"a": {"b": 1}}']`],
+        expected_output: `true`
+    },
+    {
+        inputs: [`[JSON '{"a": {"b": 1}}']`, `[JSON '{"a": {"b": 2}}']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`[JSON '[1, 2]']`, `[JSON '[1, 2]']`],
+        expected_output: `true`
+    },
+    {
+        inputs: [`[JSON '[1, 2]']`, `[JSON '[1, 3]']`],
+        expected_output: `false`
+    },
+    {
+        inputs: [`CAST(NULL AS ARRAY<JSON>)`, `CAST(NULL AS ARRAY<JSON>)`],
+        expected_output: `CAST(NULL AS BOOLEAN)`
+    },
+    {
+        inputs: [`[JSON '1']`, `CAST(NULL AS ARRAY<JSON>)`],
+        expected_output: `CAST(NULL AS BOOLEAN)`
+    }
+]);
+
+
+
