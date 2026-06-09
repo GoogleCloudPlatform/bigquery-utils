@@ -16,7 +16,10 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(str STRING, regexp STRING, p INT64, o INT64, mode STRING, g INT64) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js
+OPTIONS (
+    description="""Implements regexp_substr_generic (str, regexp, p, o, mode, g)."""
+) AS """
   if (str == null || regexp == null || p == null || o == null || mode == null) return null;
   var r = new RegExp(regexp, mode);
   var m = str.substring(p - 1).matchAll(r);

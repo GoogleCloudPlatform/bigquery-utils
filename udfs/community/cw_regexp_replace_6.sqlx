@@ -15,7 +15,10 @@ config { hasOutput: true }
  * limitations under the License.
  */
 
-CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING) RETURNS STRING AS
+CREATE OR REPLACE FUNCTION ${self()}(haystack STRING, regexp STRING, replacement STRING, p INT64, o INT64, mode STRING) RETURNS STRING 
+OPTIONS (
+    description="""Implements regexp_replace/6 (haystack, regexp, replacement, p, o, mode)."""
+) AS
 (
    ${ref("cw_regexp_replace_generic")}(haystack, regexp, replacement, p, o, ${ref("cw_regex_mode")}(mode))
 );
