@@ -1,0 +1,63 @@
+config { hasOutput: true }
+/*
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+CREATE OR REPLACE FUNCTION ${self()}(a ARRAY<JSON>, b ARRAY<JSON>)
+RETURNS BOOLEAN
+LANGUAGE js
+OPTIONS (
+  description = "Compares two arrays of JSON for equality, emulating Snowflake's = operator for untyped arrays."
+) AS r"""
+  if (a === null || b === null) return null;
+  if (a.length !== b.length) return false;
+
+  const isEqual = (x, y) => {
+    if (x === null) return y === null;
+    if (y === null) return false;
+    if (x === undefined) return y === undefined;
+    if (y === undefined) return false;
+    if (typeof x !== typeof y) return false;
+
+
+    if (Array.isArray(x)) {
+      if (!Array.isArray(y)) return false;
+      if (x.length !== y.length) return false;
+      for (let i = 0; i < x.length; i++) {
+        if (!isEqual(x[i], y[i])) return false;
+      }
+      return true;
+    }
+
+    if (typeof x === 'object') {
+      if (Array.isArray(y)) return false;
+      const keysX = Object.keys(x);
+      const keysY = Object.keys(y);
+      if (keysX.length !== keysY.length) return false;
+      for (const key of keysX) {
+        if (!Object.hasOwn(y, key)) return false;
+        if (!isEqual(x[key], y[key])) return false;
+      }
+      return true;
+    }
+
+    return x === y;
+  };
+
+  for (let i = 0; i < a.length; i++) {
+    if (!isEqual(a[i], b[i])) return false;
+  }
+  return true;
+""";

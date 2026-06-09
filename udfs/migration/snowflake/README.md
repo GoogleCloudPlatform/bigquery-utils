@@ -13,12 +13,31 @@ SELECT bqutil.sf.factorial(0)
 
 ## UDFs
 
+* [array_equal](#array_equal)
 * [factorial](#factorial)
 * [flatten](#flatten)
 
 
 ## Documentation
 
+### [array_equal(a ARRAY<JSON>, b ARRAY<JSON>)](array_equal.sqlx)
+Compares two arrays of JSON for equality, emulating Snowflake's `=` operator for untyped arrays.
+*   Returns `true` if arrays are of equal length and all corresponding elements are equal.
+*   Returns `false` if arrays are of different lengths or any corresponding elements are not equal.
+*   Returns `null` if either input array is `null`.
+*   Objects are compared recursively, ensuring they have the same keys and equal values (order of keys does not matter).
+*   Nested arrays are compared recursively.
+*   Null elements within arrays are treated as equal to other null elements.
+
+```sql
+SELECT bqutil.sf.array_equal([JSON '1', JSON '2'], [JSON '1', JSON '2']) as eq1,
+       bqutil.sf.array_equal([JSON '{"a": 1}'], [JSON '{"a": 1}']) as eq2,
+       bqutil.sf.array_equal([JSON '[1, 2]'], [JSON '[1, 3]']) as eq3;
+```
+
+eq1|eq2|eq3
+---|---|---
+true|true|false
 ### [factorial(integer_expr INT64)](factorial.sqlx)
 Computes the factorial of its input. The input argument must be an integer expression in the range of `0` to `27`. Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/factorial.html)
 ```sql
