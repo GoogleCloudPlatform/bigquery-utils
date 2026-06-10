@@ -1,0 +1,11 @@
+{
+  "message": {
+    "data": "dGVzdA==",
+    "attributes": {
+      "bucketId": "event-driven-pipeline-bucket",
+      "objectId": "yrvine-rotation-demo/san_francisco_bikeshare/bikeshare_regions/trigger.txt"
+    },
+    "publishTime": "2017-09-25T23:16:42.302Z",
+    "messageId": "91010751788941"
+  }
+}
