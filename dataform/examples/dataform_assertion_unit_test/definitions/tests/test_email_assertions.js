@@ -24,7 +24,7 @@ const test_cases = {
         Otherwise it will show that the custom data quality rules failed. 
     */
     
-    "ruinanliu@google.com" : "TRUE",
+    "ruinanliu@domain.com" : "TRUE",
     "among.us@amongus.net" : "TRUE",
     "1736#$%.com" : "FALSE"
 };

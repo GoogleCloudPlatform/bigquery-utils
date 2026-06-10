@@ -13,7 +13,7 @@
 // limitations under the License.
 
 const {generate_test} = unit_test_utils;
-const {test_phone_number} = phone_assertions;
+const {test_phone_number} = phone_number_assertions;
 const test_name = "test_telephone_number_assertions";
 const test_cases = {
     /*
@@ -32,7 +32,7 @@ const test_cases = {
    "7928374657" : "TRUE",
    "7847563738" : "TRUE",
    "6768907654" : "TRUE",
-   "1234567" : "FALSE",
+   "1234567"    : "FALSE",
    "0123456789" : "FALSE",
    "1111111111" : "FALSE",
    "374657389a" : "FALSE"
