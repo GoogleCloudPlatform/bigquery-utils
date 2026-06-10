@@ -14,8 +14,12 @@ SELECT bqutil.sf.factorial(0)
 ## UDFs
 
 * [array_equal](#array_equal)
+* [bitmap_bit_position](#bitmap_bit_position)
+* [bitmap_bucket_number](#bitmap_bucket_number)
 * [factorial](#factorial)
 * [flatten](#flatten)
+* [json_ilike](#json_ilike)
+* [object_agg](#object_agg)
 
 
 ## Documentation
@@ -38,6 +42,33 @@ SELECT bqutil.sf.array_equal([JSON '1', JSON '2'], [JSON '1', JSON '2']) as eq1,
 eq1|eq2|eq3
 ---|---|---
 true|true|false
+
+### [bitmap_bit_position(value INT64)](bitmap_bit_position.sqlx)
+Emulates the `bitmap_bit_position` function present in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/bitmap_bit_position)
+
+```sql
+SELECT bqutil.sf.bitmap_bit_position(1) as pos1,
+       bqutil.sf.bitmap_bit_position(32768) as pos2,
+       bqutil.sf.bitmap_bit_position(32769) as pos3;
+```
+
+pos1|pos2|pos3
+---|---|---
+0|32767|0
+
+### [bitmap_bucket_number(value INT64)](bitmap_bucket_number.sqlx)
+Emulates the `bitmap_bucket_number` function present in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/bitmap_bucket_number)
+
+```sql
+SELECT bqutil.sf.bitmap_bucket_number(1) as bucket1,
+       bqutil.sf.bitmap_bucket_number(32768) as bucket2,
+       bqutil.sf.bitmap_bucket_number(32769) as bucket3;
+```
+
+bucket1|bucket2|bucket3
+---|---|---
+1|1|2
+
 ### [factorial(integer_expr INT64)](factorial.sqlx)
 Computes the factorial of its input. The input argument must be an integer expression in the range of `0` to `27`. Due to data type differences, the maximum input value in BigQuery is smaller than in Snowflake. [Snowflake docs](https://docs.snowflake.com/en/sql-reference/functions/factorial.html)
 ```sql

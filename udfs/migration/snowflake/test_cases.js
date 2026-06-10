@@ -207,5 +207,64 @@ generate_udf_test("array_equal", [
     }
 ]);
 
+generate_udf_test("bitmap_bucket_number", [
+    {
+        inputs: [`CAST(1 AS INT64)`],
+        expected_output: `CAST(1 AS INT64)`
+    },
+    {
+        inputs: [`CAST(1000000 AS INT64)`],
+        expected_output: `CAST(31 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32767 AS INT64)`],
+        expected_output: `CAST(1 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32768 AS INT64)`],
+        expected_output: `CAST(1 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32769 AS INT64)`],
+        expected_output: `CAST(2 AS INT64)`
+    },
+    {
+        inputs: [`CAST(400000 AS INT64)`],
+        expected_output: `CAST(13 AS INT64)`
+    },
+    {
+        inputs: [`CAST(0 AS INT64)`],
+        expected_output: `CAST(0 AS INT64)`
+    }
+]);
 
-
+generate_udf_test("bitmap_bit_position", [
+    {
+        inputs: [`CAST(1 AS INT64)`],
+        expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [`CAST(1000000 AS INT64)`],
+        expected_output: `CAST(16959 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32767 AS INT64)`],
+        expected_output: `CAST(32766 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32768 AS INT64)`],
+        expected_output: `CAST(32767 AS INT64)`
+    },
+    {
+        inputs: [`CAST(32769 AS INT64)`],
+        expected_output: `CAST(0 AS INT64)`
+    },
+    {
+        inputs: [`CAST(400000 AS INT64)`],
+        expected_output: `CAST(6783 AS INT64)`
+    },
+    {
+        inputs: [`CAST(0 AS INT64)`],
+        expected_output: `CAST(0 AS INT64)`
+    }
+]);
