@@ -38,6 +38,52 @@ generate_udf_test("int", [
     expected_output: `CAST(7 AS INT64)`,
   },
 ]);
+generate_udf_test("insight_counts", [
+
+    {
+        inputs: [`STRUCT(
+            1000 AS avgPreviousExecutionMs,  
+            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[
+                (1, true, false, [STRUCT('code1', 'message1')]),
+                (2, false, true, [STRUCT('code2', 'message2')]),
+                (3, true, true, NULL)
+            ] AS stage_performance_standalone_insights,
+            ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[
+                (3, STRUCT(10.0))
+            ] AS stage_performance_change_insights)`
+        ],
+        expected_output: `[
+            STRUCT('Slot contention' AS insight, 2 AS count),
+            STRUCT('Shuffle quota issue' AS insight, 2 AS count),
+            STRUCT('Input data change' AS insight, 1 AS count)
+        ]`
+    },
+    {
+        inputs: [`STRUCT(
+            1000 AS avgPreviousExecutionMs,  
+            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[
+                (1, true, false, NULL),
+                (2, true, false, NULL)
+            ] AS stage_performance_standalone_insights,
+            ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[] AS stage_performance_change_insights)`
+        ],
+        expected_output: `[STRUCT('Slot contention' AS insight, 2 AS count)]` 
+    },
+]);
+
+generate_udf_test("insight_counts", [
+
+    {
+        inputs: [`STRUCT(
+            NULL AS avgPreviousExecutionMs,  
+            ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>[] AS stage_performance_standalone_insights,
+            ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>[] AS stage_performance_change_insights)`
+        ],
+        expected_output: `[]` 
+    },
+]);
+
+
 generate_udf_test("json_extract_keys", [
   {
     inputs: [`'{"foo" : "cat", "bar": "dog", "hat": "rat"}'`],
