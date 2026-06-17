@@ -1852,6 +1852,21 @@ SELECT
 'tino', 'julie', 'jordan'
 ```
 
+### [insight_counts(STRUCT<stage_performance_standalone_insights ARRAY<STRUCT<stage_id INT64, slot_contention BOOL, insufficient_shuffle_quota BOOL, bi_engine_reasons ARRAY<STRUCT<code STRING, message STRING>>>>, stage_performance_change_insights ARRAY<STRUCT<stage_id INT64, input_data_change STRUCT<records_read_diff_percentage FLOAT64>>>>)](insight_counts.sqlx)
+Input: performanceInsights: query_info.performance_insights in the JOBS Information Schema [view](https://cloud.google.com/bigquery/docs/information-schema-jobs-by-organization#schema)
+Output: An array of structs representing each performance insight and their count throughout the stages of a job.
+
+```sql
+SELECT
+  bqutil.fn.insight_counts(query_info.performance_insights),
+
+`[
+    STRUCT('Slot contention', 1),
+    STRUCT('Shuffle quota issue', 1),
+    STRUCT('Input data change', 1)
+  ]`
+```
+
 ### [sure_cond(value STRING, cond BOOL)](sure_cond.sqlx)
 
 If `cond` is `FALSE` the function cause error.
