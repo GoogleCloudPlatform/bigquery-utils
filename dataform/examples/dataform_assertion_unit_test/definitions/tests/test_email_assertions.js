@@ -16,20 +16,18 @@ const {generate_test} = unit_test_utils;
 const {test_email_validity} = personal_info_assertions;
 const test_name = "test_email_assertion_test";
 const test_cases = {
-    /*
-        Provide your own testing data following the structure
-        <INPUT_TESTING_DATA> : "<EXPECTED OUTCOME>"
-        For example, if a testing data has the <EXPECTED OUTCOME> to be TRUE,
-        then the program will expect the custom data quality rules to also produce TRUE. 
-        Otherwise it will show that the custom data quality rules failed. 
-    */
-    
-    "ruinanliu@google.com" : "TRUE",
-    "among.us@amongus.net" : "TRUE",
-    "1736#$%.com" : "FALSE"
+  /*
+      Provide your own testing data following the structure
+      <INPUT_TESTING_DATA> : "<EXPECTED OUTCOME>"
+      For example, if a testing data has the <EXPECTED OUTCOME> to be TRUE,
+      then the program will expect the custom data quality rules to also produce TRUE.
+      Otherwise it will show that the custom data quality rules failed.
+  */
+
+  "someone@google.com": "TRUE",
+  "among.us@amongus.net": "TRUE",
+  "1736#$%.com": "FALSE"
 };
 // The function below will generate the necessary SQL to run unit tests.
-generate_test(test_name,
-    test_cases,
-    test_email_validity);
+generate_test(test_name, test_cases, test_email_validity);
     
