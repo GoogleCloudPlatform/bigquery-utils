@@ -1,0 +1,15 @@
+steps:
+  # step 0: run terraform commands in deploy.sh to detects drifts
+  - name: 'alpine/terragrunt'
+    entrypoint: 'bash'
+    dir: './tools/terraform_sync_tool/'
+    args: ['deploy.sh', 'qa', 'terraform-sync-tool']
+
+  # step 1: run python scripts to investigate terraform output
+  - name: python:3.7
+    entrypoint: 'bash'
+    dir: './tools/terraform_sync_tool/'
+    args: 
+    - -c
+    - 'pip install -r ./requirements.txt'
+    - 'python terraform_sync.py plan_out.json <GCP_PROJECT_ID>'
