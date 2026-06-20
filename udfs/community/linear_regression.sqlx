@@ -16,6 +16,9 @@ config { hasOutput: true }
  */
 
 CREATE OR REPLACE FUNCTION ${self()}(data ARRAY<STRUCT<X FLOAT64, Y FLOAT64>>)
+OPTIONS (
+    description="Linear Regression."
+)
 AS ((
      WITH results AS (
        WITH sums AS (

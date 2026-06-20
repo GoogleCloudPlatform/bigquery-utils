@@ -17,7 +17,10 @@ config { hasOutput: true }
 
  /* Internal function */
 CREATE OR REPLACE FUNCTION ${self()}(mode STRING) RETURNS STRING
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="""Internal function"""
+) AS """
   var m = '';
   if (mode == 'i' || mode == 'm')
     m += mode;

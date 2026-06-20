@@ -18,7 +18,11 @@ config { hasOutput: true }
 /* TODO: Convert BQ generated error string to a number appropriate for other DBs */
 CREATE OR REPLACE FUNCTION ${self()}( errmsg string)
 RETURNS int64
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="Convert BQ generated error string to a number appropriate for other DBs"
+)
+AS """
    if ( ! errmsg  )
       return 0;
    return 1;

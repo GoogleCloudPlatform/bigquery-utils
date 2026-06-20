@@ -17,7 +17,11 @@ config { hasOutput: true }
 
 CREATE OR REPLACE FUNCTION ${self()}(text string, delim string, flags string)
 RETURNS array<struct<tokennumber int64, token string>>
-LANGUAGE js AS """
+LANGUAGE js 
+OPTIONS (
+    description="""Implements regexp split on delim"""
+)
+AS """
     var idx = 0;
     var nxt = function() {
         idx ++;
